@@ -40,7 +40,7 @@ Dùng lại thay vì tự viết trong từng module. Ví dụ đầy đủ có 
 | Dữ liệu có hiệu lực theo thời gian (GC-06) | `use HasEffectivePeriod` + `$table->effectivePeriod()`; đổi dữ liệu bằng `supersedeWith()` |
 | Tìm không dấu, sắp xếp theo chữ cái tiếng Việt (GC-01) | `use HasVietnameseSearch` + `$table->searchText()` + `protected array $searchable = [...]`; truy vấn `->search($tuKhoa)->orderByVietnamese('name')` |
 | Quy tắc nghiệp vụ | `extends App\Support\Services\BaseService`; từ chối bằng `$this->fail('Lý do.', 'Cách khắc phục.')` |
-| Phân quyền | `extends App\Support\Policies\DenyByDefaultPolicy`, chỉ ghi đè thao tác được phép |
+| Phân quyền theo ma trận vai trò (xem mục "Phân quyền" bên dưới) | Policy `extends App\Modules\Auth\Policies\ModulePolicy` + model `implements HasDataScope` |
 | Hiển thị ngày, giờ, tiền (GC-09) | `App\Support\Format::date()`, `dateTime()`, `money()` |
 | Nhật ký kiểm toán khi tạo/sửa/xóa/khôi phục (GC-03) | Tự động với mọi model kế thừa `StandardModel`; che cột nhạy cảm bằng `protected array $auditMasked = [...]`, bỏ qua cột bằng `$auditExclude` |
 | Ghi kèm lý do thay đổi | `app(AuditLogger::class)->withReason('Lý do…', fn () => $model->update([...]))` |
@@ -78,3 +78,54 @@ Lưu ý:
 - `HasActiveStatus` chỉ dành cho danh mục. Sinh viên, lớp học phần… có máy trạng thái riêng.
 - Bảng có hiệu lực theo thời gian: ràng buộc unique phải gồm cả `effective_from`.
 - Test tự tạo bảng (DDL) dùng `DatabaseMigrations` thay cho `RefreshDatabase`, vì MySQL tự commit khi tạo bảng.
+
+## Phân quyền (module AUTH)
+
+Mọi quyết định truy cập đi qua ma trận vai trò – hành động – phạm vi dữ liệu (docs/BA.md mục 4), kiểm tra ở máy chủ và **mặc định từ chối**. Ẩn nút trên giao diện không được coi là đủ.
+
+**1. Policy của module** chỉ cần mã module; `view/update/delete/approve` tự kiểm tra phạm vi trên đúng bản ghi:
+
+```php
+class StudentPolicy extends ModulePolicy
+{
+    protected string $module = 'STU';
+}
+// AppServiceProvider::boot(): Gate::policy(Student::class, StudentPolicy::class);
+```
+
+**2. Model khai báo cách lọc theo phạm vi** (ALL không cần xử lý). Phạm vi nào không thêm điều kiện thì bị coi là từ chối:
+
+```php
+class Student extends StandardModel implements HasDataScope
+{
+    public function applyDataScope(Builder $query, DataScope $scope, User $user): void
+    {
+        match ($scope) {
+            DataScope::Own => $query->where('user_id', $user->id),
+            DataScope::Advisee => $query->whereIn('admin_class_id', /* lớp user đang cố vấn */),
+            DataScope::Faculty => $query->whereIn('faculty_id', /* khoa user quản lý */),
+            default => $query->whereRaw('1 = 0'),
+        };
+    }
+}
+```
+
+**3. Trong Controller:**
+
+```php
+Gate::authorize('view', $student);                                  // một bản ghi: chống truy cập trái quyền (IDOR)
+$list = app(AccessControl::class)
+    ->constrain(Student::query(), $request->user(), 'STU', PermissionAction::View)
+    ->paginate();                                                   // danh sách: chỉ dữ liệu trong phạm vi
+```
+
+**4. Chặn cả route:** `->middleware('permission:STU.view')`, hoặc `'permission:AUTH.update,ALL'` khi cần quyền toàn trường.
+
+Ghi nhớ:
+
+- Vai trò mặc định và ma trận nằm ở `database/seeders/AuthSeeder.php` (chép từ BA mục 4.2). Thêm module mới không cần sửa gì: danh mục quyền đã có đủ 23 module.
+- Người có nhiều vai trò được hợp các quyền. Vai trò có thời hạn (`valid_from`, `valid_to`); gỡ vai trò chỉ đặt ngày kết thúc, không xóa lịch sử.
+- Với `create` ở phạm vi hẹp (ví dụ sinh viên tự đăng ký học phần, phạm vi OWN), Service phải tự bảo đảm bản ghi tạo ra thuộc đúng người đó.
+- Mọi lỗi 403 tự được ghi nhật ký kiểm toán (hành động "Từ chối truy cập").
+- Khóa hoặc ngừng tài khoản phải gọi `RoleService::ensureNotLastAdmin()` trước (BR-AUTH-05).
+- Trong test: dùng trait `Tests\Support\InteractsWithRoles` (`seedRoles()`, `userWithRoles('LEC', 'ADV')`).

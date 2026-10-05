@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Modules\Auth\Services\AccessControl;
 use App\Modules\System\Policies\AuditLogPolicy;
 use App\Support\Audit\AuditLog;
 use App\Support\Audit\AuditLogger;
@@ -18,6 +19,9 @@ class AppServiceProvider extends ServiceProvider
     {
         // Một AuditLogger cho mỗi yêu cầu (lý do gắn bằng withReason không lẫn sang yêu cầu khác)
         $this->app->scoped(AuditLogger::class);
+
+        // Một AccessControl cho mỗi yêu cầu: nhớ quyền đã tính, và RoleService::flush() xóa đúng bộ nhớ đó
+        $this->app->scoped(AccessControl::class);
     }
 
     /**

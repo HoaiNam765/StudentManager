@@ -10,10 +10,12 @@ use App\Support\Audit\AuditLogger;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
+use Tests\Support\InteractsWithRoles;
 use Tests\TestCase;
 
 class AuditLogSearchTest extends TestCase
 {
+    use InteractsWithRoles;
     use RefreshDatabase;
 
     private AuditLogSearch $search;
@@ -81,15 +83,24 @@ class AuditLogSearchTest extends TestCase
         );
     }
 
-    public function test_mac_dinh_khong_ai_xem_xuat_sua_xoa_duoc_nhat_ky(): void
+    public function test_chi_admin_xem_va_xuat_duoc_khong_ai_sua_xoa_duoc_nhat_ky(): void
     {
-        $user = User::factory()->create();
-        $log = $this->logAt('2026-10-04 18:00:00', AuditEvent::Login, $user);
+        $this->seedRoles();
+        $admin = $this->userWithRoles('ADMIN');
+        $acad = $this->userWithRoles('ACAD');
+        $log = $this->logAt('2026-10-04 18:00:00', AuditEvent::Login, $acad);
 
-        $gate = Gate::forUser($user);
-        $this->assertTrue($gate->denies('viewAny', AuditLog::class), 'Chờ RBAC mở quyền cho ADMIN');
-        $this->assertTrue($gate->denies('export', AuditLog::class));
-        $this->assertTrue($gate->denies('update', $log), 'Nhật ký không bao giờ được sửa');
-        $this->assertTrue($gate->denies('delete', $log), 'Nhật ký không bao giờ được xóa');
+        $this->assertTrue(Gate::forUser($admin)->allows('viewAny', AuditLog::class));
+        $this->assertTrue(Gate::forUser($admin)->allows('view', $log));
+        $this->assertTrue(Gate::forUser($admin)->allows('export', AuditLog::class));
+
+        foreach ([$acad, User::factory()->create()] as $user) {
+            $this->assertTrue(Gate::forUser($user)->denies('viewAny', AuditLog::class), 'Chỉ ADMIN xem nhật ký (FR-SYS-004)');
+            $this->assertTrue(Gate::forUser($user)->denies('export', AuditLog::class));
+        }
+
+        foreach (['update', 'delete', 'restore', 'forceDelete'] as $ability) {
+            $this->assertTrue(Gate::forUser($admin)->denies($ability, $log), "Kể cả ADMIN cũng không được {$ability} nhật ký");
+        }
     }
 }

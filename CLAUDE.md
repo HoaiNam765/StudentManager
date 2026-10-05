@@ -40,7 +40,8 @@ Ghi nhớ cho Claude Code khi làm việc với dự án này. Cập nhật mụ
 - Windows 11 + Laragon: PHP 8.3, Composer, MySQL 8.4 (`C:\laragon\bin\mysql\mysql-8.4.3-winx64\bin\mysql.exe`, root không mật khẩu), Node 24, `gh` đã đăng nhập.
 - CSDL: `student_manager` (dev), `student_manager_test` (test, `Tests\TestCase` tự tạo; test bị chặn nếu tên CSDL không kết thúc bằng `_test`).
 - Lệnh kiểm tra: `php artisan test`, `composer lint` (Pint), `npm run build`.
-- Tài khoản dùng thử: `admin@studentmanager.test` (vai trò ADMIN), tạo bởi `DevUserSeeder`; mật khẩu xem trong seeder.
+- Tài khoản dùng thử: tên đăng nhập `admin` / `admin@studentmanager.test` (vai trò ADMIN), tạo bởi `DevUserSeeder`; mật khẩu xem trong seeder.
+- Chạy thử trên trình duyệt: `php artisan serve --port=8010` chạy nền rồi mở `/login`; khung trình duyệt bị che thì không bấm được nút, đọc trang bằng JavaScript và kiểm tra `audit_logs`.
 
 ## Kiến trúc mã
 
@@ -48,6 +49,7 @@ Ghi nhớ cho Claude Code khi làm việc với dự án này. Cập nhật mụ
 - Route theo cổng: `routes/web.php` (công khai), `student.php`, `teacher.php`, `admin.php` (nạp trong `bootstrap/app.php`).
 - `app/Support`: `StandardModel` (người tạo/sửa, xóa mềm, **tự ghi nhật ký kiểm toán**), `HasActiveStatus`, `HasEffectivePeriod`, `HasVietnameseSearch` (cột `search_text`), `Format`, `BaseService` + `BusinessRuleException` (lỗi nghiệp vụ → 422 kèm cách khắc phục), `DenyByDefaultPolicy`, macro migration (`standardColumns`, `activeStatus`, `effectivePeriod`, `searchText`), `Audit/` (AuditLog, AuditLogger, AuditEvent).
 - Phân quyền (`app/Modules/Auth`): `AccessControl` (scoped), `ModulePolicy`, `HasDataScope`, `RoleService`, middleware `permission:MODULE.action[,ALL]`; ma trận mặc định trong `database/seeders/AuthSeeder.php`. Mọi lỗi 403 ghi nhật ký "Từ chối truy cập".
+- Đăng nhập (`app/Modules/Auth`): `LoginService` (khóa tạm, thông báo lỗi giống nhau, `unlock()`), `PasswordService` (`change()`, `setTemporaryPassword()`, `mustChange()`, `rule()` = `Password::defaults()`), `PortalResolver` (vai trò → `admin.home` / `teacher.home` / `student.home`), middleware `password.changed` gắn sẵn cho 3 cổng (JSON trả 428). Route: `login`, `login.store` (throttle `login`), `logout`, `password.change`, `password.update`, `root` (`/`). View tạm của BE: `auth/login`, `auth/change-password`, `portal-home` (FE sẽ thay).
 - Tiếng Việt: `lang/vi` (gói dev `laravel-lang/common`), `APP_LOCALE=vi`; lưu thời gian UTC, hiển thị UTC+7 (`config/studentmanager.php`).
 - Seeder: `DatabaseSeeder::MODULE_SEEDERS` theo thứ tự phụ thuộc BA 5.5, rồi `DevUserSeeder`.
 
@@ -71,10 +73,11 @@ Ghi nhớ cho Claude Code khi làm việc với dự án này. Cập nhật mụ
 | #69 | #219 | Lớp nền dùng chung (`app/Support`), tiếng Việt; sửa các `.gitignore` con bị thiếu |
 | #68 | #220 | Test trên MySQL, CI GitHub Actions, `CONTRIBUTING.md`, `composer lint`, seeder theo module |
 | #70 | #221 | Nhật ký kiểm toán chỉ ghi thêm, tự ghi cho `StandardModel`, tra cứu ở module System |
-| #71 | (chưa mở) | RBAC: vai trò, ma trận quyền, phạm vi dữ liệu, API quản trị phân quyền — nhánh `feature/be-phan-quyen-rbac` |
+| #71 | #222 | RBAC: vai trò, ma trận quyền, phạm vi dữ liệu, API quản trị phân quyền; thêm `CLAUDE.md` |
+| #72 | (chưa mở) | Đăng nhập bằng tên đăng nhập/email, vào cổng theo vai trò, khóa tạm, mật khẩu tạm, đổi mật khẩu, chính sách mật khẩu, giới hạn tần suất — nhánh `feature/be-dang-nhap` |
 
 ## Việc tiếp theo của A (P1)
 
-#72 đăng nhập (nhớ ghi nhật ký Login/LoginFailed, khóa tạm 5 lần/15 phút) → #85, #86 CTĐT → #87 import giảng viên → #94–#97 sinh viên, gán CTĐT → #103–#106 đăng ký học phần → #115–#117 thông báo → #118 dashboard.
+#85, #86 CTĐT → #87 import giảng viên → #94–#97 sinh viên, gán CTĐT → #103–#106 đăng ký học phần → #115–#117 thông báo → #118 dashboard.
 
 Còn mở chung: chốt câu hỏi BA mục 12 (Q-01, Q-03, Q-19, Q-20, Q-22); điền "Nhóm thực hiện", "Giảng viên hướng dẫn" ở `docs/BA.md` và `README.md`; PR #3 (FE) đang Draft.

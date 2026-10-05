@@ -129,3 +129,13 @@ Ghi nhớ:
 - Mọi lỗi 403 tự được ghi nhật ký kiểm toán (hành động "Từ chối truy cập").
 - Khóa hoặc ngừng tài khoản phải gọi `RoleService::ensureNotLastAdmin()` trước (BR-AUTH-05).
 - Trong test: dùng trait `Tests\Support\InteractsWithRoles` (`seedRoles()`, `userWithRoles('LEC', 'ADV')`).
+
+## Đăng nhập và mật khẩu (module AUTH)
+
+- Đăng nhập bằng tên đăng nhập (`users.username`: MSSV với sinh viên, mã cán bộ với nhân sự) hoặc email. Module tạo tài khoản (STU, TCH, quản lý người dùng) phải điền `username`.
+- **Cấp mật khẩu tạm** (tài khoản mới, quản trị viên đặt lại): `app(PasswordService::class)->setTemporaryPassword($user, $matKhauTam)`. Người dùng bị buộc đổi ở lần đăng nhập đầu, mật khẩu tạm hết hạn sau 7 ngày (BR-AUTH-10), mọi phiên đang mở bị đăng xuất.
+- **Quên mật khẩu** (#82) theo liên kết đặt lại một lần, hạn 30 phút (BR-AUTH-03): người dùng tự chọn mật khẩu mới, nên thêm hàm `reset()` vào `PasswordService` dùng lại `store()` (lịch sử mật khẩu, đổi `remember_token`) và đăng xuất mọi phiên.
+- **Mở khóa trước hạn** (FR-AUTH-006): `app(LoginService::class)->unlock($user)`.
+- **Khóa hẳn / ngừng tài khoản**: gọi `RoleService::ensureNotLastAdmin()` trước, rồi thêm điều kiện chặn vào `LoginService::attempt()` (một chỗ duy nhất).
+- Mật khẩu mới luôn kiểm tra bằng `Password::defaults()` (chính sách trong `config/studentmanager.php`, mục `auth.password`).
+- Mọi route của 3 cổng đã có middleware `password.changed`: chưa đổi mật khẩu tạm thì bị đưa về trang đổi mật khẩu (JSON trả mã 428).

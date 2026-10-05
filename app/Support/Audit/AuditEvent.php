@@ -25,6 +25,7 @@ enum AuditEvent: string
     case Rejected = 'rejected';
     case Locked = 'locked';
     case Unlocked = 'unlocked';
+    case PasswordChanged = 'password_changed';
 
     public function label(): string
     {
@@ -44,6 +45,7 @@ enum AuditEvent: string
             self::Rejected => 'Từ chối',
             self::Locked => 'Khóa',
             self::Unlocked => 'Mở khóa',
+            self::PasswordChanged => 'Đổi mật khẩu',
         };
     }
 }

@@ -18,4 +18,36 @@ return [
 
     'currency_symbol' => '₫',
 
+    /*
+    |--------------------------------------------------------------------------
+    | Đăng nhập và mật khẩu (module AUTH)
+    |--------------------------------------------------------------------------
+    | Giá trị mặc định theo docs/BA.md: BR-AUTH-06 (khóa tạm), BR-AUTH-10 (mật khẩu tạm),
+    | FR-AUTH-005 (chính sách mật khẩu), NFR-SEC-03 (giới hạn tần suất). Không viết cứng trong mã (GC-12).
+    */
+    'auth' => [
+        // Khóa tạm sau N lần sai liên tiếp trong khoảng thời gian, khóa trong M phút
+        'lockout_max_attempts' => (int) env('AUTH_LOCKOUT_MAX_ATTEMPTS', 5),
+        'lockout_window_minutes' => (int) env('AUTH_LOCKOUT_WINDOW_MINUTES', 15),
+        'lockout_minutes' => (int) env('AUTH_LOCKOUT_MINUTES', 15),
+
+        // Giới hạn số lần gửi biểu mẫu đăng nhập mỗi phút (chống dò mật khẩu hàng loạt)
+        'throttle_per_minute' => (int) env('AUTH_THROTTLE_PER_MINUTE', 10),
+        'throttle_per_ip_per_minute' => (int) env('AUTH_THROTTLE_PER_IP_PER_MINUTE', 30),
+
+        // Mật khẩu tạm do hệ thống hoặc quản trị viên cấp hết hạn sau N ngày nếu chưa dùng
+        'temporary_password_days' => (int) env('AUTH_TEMPORARY_PASSWORD_DAYS', 7),
+
+        'password' => [
+            'min_length' => (int) env('AUTH_PASSWORD_MIN_LENGTH', 8),
+            'mixed_case' => (bool) env('AUTH_PASSWORD_MIXED_CASE', true),
+            'numbers' => (bool) env('AUTH_PASSWORD_NUMBERS', true),
+            'symbols' => (bool) env('AUTH_PASSWORD_SYMBOLS', false),
+            // Không được trùng N mật khẩu gần nhất (tính cả mật khẩu hiện tại)
+            'history' => (int) env('AUTH_PASSWORD_HISTORY', 3),
+            // Hết hạn sau N ngày, buộc đổi; để trống là không hết hạn
+            'expires_days' => env('AUTH_PASSWORD_EXPIRES_DAYS') !== null ? (int) env('AUTH_PASSWORD_EXPIRES_DAYS') : null,
+        ],
+    ],
+
 ];

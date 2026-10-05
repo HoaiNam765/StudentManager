@@ -113,7 +113,9 @@ Yêu cầu: PHP 8.3, Composer, MySQL 8 (Laragon có sẵn) và Node.js từ 20.1
 
 5. Chạy thử: mở hai cửa sổ dòng lệnh, một cửa sổ chạy `npm run dev` (tự cập nhật khi sửa giao diện), cửa sổ kia chạy `php artisan serve`. Mở http://localhost:8000; nếu thư mục nằm trong `www` của Laragon thì vào được cả http://studentmanager.test.
 
-Tài khoản dùng thử (chỉ có ở môi trường phát triển, tạo bởi `DevUserSeeder`): `admin@studentmanager.test`, mật khẩu `password`.
+Tài khoản dùng thử (chỉ có ở môi trường phát triển, tạo bởi `DevUserSeeder`, vai trò ADMIN): tên đăng nhập `admin` hoặc email `admin@studentmanager.test`, mật khẩu `password`. Mở http://localhost:8000/login.
+
+Đăng nhập sai 5 lần liên tiếp trong 15 phút thì tài khoản tạm khóa 15 phút (cấu hình trong `config/studentmanager.php`, mục `auth`).
 
 **Sau mỗi lần `git pull`:** chạy `composer install` (nếu `composer.lock` đổi), `npm install` (nếu `package-lock.json` đổi) và `php artisan migrate` (nếu có migration mới). So `.env` của bạn với `.env.example` xem có biến mới không.
 

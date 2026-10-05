@@ -24,8 +24,13 @@ class DevUserSeeder extends Seeder
 
         $user = User::firstOrCreate(
             ['email' => self::EMAIL],
-            ['name' => 'Quản trị thử nghiệm', 'password' => self::PASSWORD],
+            ['username' => 'admin', 'name' => 'Quản trị thử nghiệm', 'password' => self::PASSWORD],
         );
+
+        // Tài khoản tạo trước khi có cột username (issue #72) thì bổ sung tên đăng nhập
+        if ($user->username === null) {
+            $user->forceFill(['username' => 'admin'])->save();
+        }
 
         $admin = Role::where('code', Role::ADMIN)->first();
 

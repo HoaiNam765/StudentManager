@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Auth\Http\Middleware\EnsurePasswordIsChanged;
 use App\Modules\Auth\Http\Middleware\EnsurePermission;
 use App\Support\Audit\AuditEvent;
 use App\Support\Audit\AuditLogger;
@@ -18,22 +19,26 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
         then: function (): void {
-            // Ba cổng giao diện theo docs/BA.md mục 8.1; trang công khai nằm ở routes/web.php
-            Route::middleware('web')->prefix('student')->name('student.')
+            // Ba cổng giao diện theo docs/BA.md mục 8.1; trang công khai nằm ở routes/web.php.
+            // password.changed: chưa đổi mật khẩu tạm / mật khẩu quá hạn thì chưa dùng được các cổng.
+            Route::middleware(['web', 'password.changed'])->prefix('student')->name('student.')
                 ->group(base_path('routes/student.php'));
-            Route::middleware('web')->prefix('teacher')->name('teacher.')
+            Route::middleware(['web', 'password.changed'])->prefix('teacher')->name('teacher.')
                 ->group(base_path('routes/teacher.php'));
-            Route::middleware('web')->prefix('admin')->name('admin.')
+            Route::middleware(['web', 'password.changed'])->prefix('admin')->name('admin.')
                 ->group(base_path('routes/admin.php'));
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'permission' => EnsurePermission::class,
+            'password.changed' => EnsurePasswordIsChanged::class,
         ]);
 
-        // Chưa có trang đăng nhập (issue #72) thì đưa khách về trang chủ thay vì lỗi "Route [login] not defined"
-        $middleware->redirectGuestsTo(fn () => Route::has('login') ? route('login') : '/');
+        $middleware->redirectGuestsTo(fn () => route('login'));
+
+        // Đã đăng nhập mà mở trang đăng nhập thì về trang chủ theo vai trò
+        $middleware->redirectUsersTo(fn (Request $request) => route('root'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

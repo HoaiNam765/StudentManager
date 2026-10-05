@@ -1,5 +1,6 @@
 <?php
 
+use App\Support\Exceptions\BusinessRuleException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -28,4 +29,13 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
+
+        // Vi phạm quy tắc nghiệp vụ không phải lỗi hệ thống: báo lý do và cách khắc phục (GC-04, UX-09)
+        $exceptions->render(function (BusinessRuleException $e, Request $request) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => $e->userMessage()], 422);
+            }
+
+            return back()->withInput()->withErrors(['business_rule' => $e->userMessage()]);
+        });
     })->create();

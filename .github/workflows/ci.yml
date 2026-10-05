@@ -1,0 +1,88 @@
+# Kiểm tra tự động cho mỗi Pull Request và mỗi lần cập nhật main (issue #68).
+# Chạy chuẩn mã (Pint), build giao diện (Vite) và toàn bộ test trên MySQL 8.4 giống máy dev.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: Pint + Test (PHP 8.3, MySQL 8.4)
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+          MYSQL_DATABASE: student_manager_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    env:
+      DB_CONNECTION: mysql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: student_manager_test
+      DB_USERNAME: root
+      DB_PASSWORD: ""
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cài PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: mbstring, pdo_mysql, bcmath, intl, zip
+          coverage: none
+
+      - name: Lấy thư mục cache của Composer
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
+
+      - name: Cài thư viện PHP
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Kiểm tra chuẩn mã (Pint)
+        run: vendor/bin/pint --test
+
+      - name: Cài Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Build giao diện
+        run: |
+          npm ci
+          npm run build
+
+      - name: Tạo file .env
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Chạy test
+        run: php artisan test

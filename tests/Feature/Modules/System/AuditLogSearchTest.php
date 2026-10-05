@@ -12,6 +12,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
 use Tests\Support\InteractsWithRoles;
 use Tests\TestCase;
+use Illuminate\Support\Facades\Auth;
 
 class AuditLogSearchTest extends TestCase
 {
@@ -31,7 +32,7 @@ class AuditLogSearchTest extends TestCase
     private function logAt(string $utc, AuditEvent $event, ?User $actor = null, ?User $subject = null, array $new = []): AuditLog
     {
         $this->travelTo(CarbonImmutable::parse($utc, 'UTC'));
-        $actor === null ? auth()->logout() : $this->actingAs($actor);
+        $actor === null ? Auth::logout() : $this->actingAs($actor);
 
         return app(AuditLogger::class)->record($event, $subject, [], $new);
     }

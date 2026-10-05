@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth')->group(function (): void {
     // Trang chủ tạm; thay bằng dashboard theo vai trò (FR-RPT-001) khi có
-    Route::get('/', fn () => view('portal-home', ['portal' => 'Cổng Quản trị / Văn phòng']))->name('home');
+    Route::get('/', fn() => view('portal-home', ['portal' => 'Cổng Quản trị / Văn phòng']))->name('home');
 
     // Phân quyền (AUTH): chỉ người có quyền trên toàn trường, mặc định là ADMIN
     Route::middleware('permission:AUTH.view,ALL')->group(function (): void {

@@ -33,7 +33,7 @@ class AcademicYearService extends BaseService
 
             return app(AuditLogger::class)->withReason(
                 'Tạo năm học.',
-                fn () => AcademicYear::create($data)
+                fn() => AcademicYear::create($data)
             );
         });
     }
@@ -66,6 +66,21 @@ class AcademicYearService extends BaseService
                 $this->fail(
                     'Thời gian năm học bị chồng với một năm học khác.',
                     'Vui lòng chọn khoảng thời gian không trùng với năm học đã tồn tại.'
+                );
+            }
+
+            $hasTermOutsideAcademicYear = $academicYear->terms()
+                ->where(function (Builder $query) use ($startDate, $endDate): void {
+                    $query
+                        ->whereDate('start_date', '<', $startDate)
+                        ->orWhereDate('end_date', '>', $endDate);
+                })
+                ->exists();
+
+            if ($hasTermOutsideAcademicYear) {
+                $this->fail(
+                    'Khoảng thời gian năm học không bao phủ hết các học kỳ đã tạo.',
+                    'Vui lòng chọn ngày bắt đầu và ngày kết thúc bao phủ toàn bộ các học kỳ hiện có.'
                 );
             }
 
@@ -142,7 +157,7 @@ class AcademicYearService extends BaseService
 
             return app(AuditLogger::class)->withReason(
                 'Tạo học kỳ.',
-                fn () => Term::create($data)
+                fn() => Term::create($data)
             );
         });
     }
@@ -255,64 +270,69 @@ class AcademicYearService extends BaseService
         Term $term,
         TermStatus $newStatus
     ): Term {
-        $term = Term::query()
-            ->lockForUpdate()
-            ->findOrFail($term->id);
+        return $this->transaction(function () use (
+            $term,
+            $newStatus
+        ): Term {
+            $term = Term::query()
+                ->lockForUpdate()
+                ->findOrFail($term->id);
 
-        $allowedTransitions = [
-            TermStatus::PLANNED->value => [
-                TermStatus::REGISTRATION->value,
-            ],
+            $allowedTransitions = [
+                TermStatus::PLANNED->value => [
+                    TermStatus::REGISTRATION->value,
+                ],
 
-            TermStatus::REGISTRATION->value => [],
+                TermStatus::REGISTRATION->value => [],
 
-            TermStatus::IN_PROGRESS->value => [
-                TermStatus::EXAM_GRADING->value,
-            ],
+                TermStatus::IN_PROGRESS->value => [
+                    TermStatus::EXAM_GRADING->value,
+                ],
 
-            TermStatus::EXAM_GRADING->value => [
-                TermStatus::COMPLETED->value,
-            ],
+                TermStatus::EXAM_GRADING->value => [
+                    TermStatus::COMPLETED->value,
+                ],
 
-            TermStatus::COMPLETED->value => [],
+                TermStatus::COMPLETED->value => [],
 
-            TermStatus::LOCKED->value => [],
-        ];
+                TermStatus::LOCKED->value => [],
+            ];
 
-        $currentStatus = $term->status->value;
+            $currentStatus = $term->status->value;
 
-        if (! in_array(
-            $newStatus->value,
-            $allowedTransitions[$currentStatus] ?? [],
-            true
-        )) {
-            $this->fail(
-                'Không thể chuyển trạng thái học kỳ theo quy trình hiện tại.',
-                'Vui lòng thực hiện các trạng thái theo đúng thứ tự nghiệp vụ.'
-            );
-        }
-
-        if (
-            $currentStatus === TermStatus::IN_PROGRESS->value
-            && $newStatus === TermStatus::EXAM_GRADING
-            && now()->lt($term->end_date)
-        ) {
-            $this->fail(
-                'Chưa đến ngày kết thúc học kỳ.',
-                'Chỉ được chuyển sang Thi và nhập điểm sau ngày kết thúc học kỳ.'
-            );
-        }
-
-        return app(AuditLogger::class)->withReason(
-            'Đổi trạng thái học kỳ.',
-            function () use ($term, $newStatus): Term {
-                $term->update([
-                    'status' => $newStatus->value,
-                ]);
-
-                return $term->fresh();
+            if (! in_array(
+                $newStatus->value,
+                $allowedTransitions[$currentStatus] ?? [],
+                true
+            )) {
+                $this->fail(
+                    'Không thể chuyển trạng thái học kỳ theo quy trình hiện tại.',
+                    'Vui lòng thực hiện các trạng thái theo đúng thứ tự nghiệp vụ.'
+                );
             }
-        );
+
+            if (
+                $currentStatus === TermStatus::IN_PROGRESS->value
+                && $newStatus === TermStatus::EXAM_GRADING
+                && now()->lt($term->end_date)
+            ) {
+                $this->fail(
+                    'Chưa đến ngày kết thúc học kỳ.',
+                    'Chỉ được chuyển sang Thi và nhập điểm sau ngày kết thúc học kỳ.'
+                );
+            }
+
+            return app(AuditLogger::class)->withReason(
+                'Đổi trạng thái học kỳ.',
+                function () use ($term, $newStatus): Term {
+                    $term->update([
+                        'status' => $newStatus->value,
+                    ]);
+
+                    return $term->fresh();
+                }
+            );
+        });
     }
 
     public function deleteAcademicYear(

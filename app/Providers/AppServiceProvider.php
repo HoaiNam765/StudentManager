@@ -55,6 +55,7 @@ class AppServiceProvider extends ServiceProvider
             AcademicYearPolicy::class
         );
 
+        // Chính sách mật khẩu theo cấu hình (FR-AUTH-005); dùng ở mọi nơi bằng Password::defaults()
         Password::defaults(fn () => PasswordService::rule());
 
         $this->configureLoginRateLimit();
@@ -83,14 +84,6 @@ class AppServiceProvider extends ServiceProvider
                     ->response($respond),
             ];
         });
-        // Gate::policy(
-        //     AuditLog::class,
-        //     AuditLogPolicy::class
-        // );
 
-        // Gate::policy(
-        //     AcademicYear::class,
-        //     AcademicYearPolicy::class
-        // );
     }
 }

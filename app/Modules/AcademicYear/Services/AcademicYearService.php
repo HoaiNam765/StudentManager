@@ -33,7 +33,7 @@ class AcademicYearService extends BaseService
 
             return app(AuditLogger::class)->withReason(
                 'Tạo năm học.',
-                fn() => AcademicYear::create($data)
+                fn () => AcademicYear::create($data)
             );
         });
     }
@@ -157,7 +157,7 @@ class AcademicYearService extends BaseService
 
             return app(AuditLogger::class)->withReason(
                 'Tạo học kỳ.',
-                fn() => Term::create($data)
+                fn () => Term::create($data)
             );
         });
     }

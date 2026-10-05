@@ -2,39 +2,9 @@
 
 namespace App\Modules\AcademicYear\Policies;
 
-use App\Support\Policies\DenyByDefaultPolicy;
-use Illuminate\Contracts\Auth\Authenticatable;
+use App\Modules\Auth\Policies\ModulePolicy;
 
-class AcademicYearPolicy extends DenyByDefaultPolicy
+class AcademicYearPolicy extends ModulePolicy
 {
-    public function viewAny(?Authenticatable $user): bool
-    {
-        return $user !== null;
-    }
-
-    public function view(
-        ?Authenticatable $user,
-        $academicYear
-    ): bool {
-        return $user !== null;
-    }
-
-    public function create(?Authenticatable $user): bool
-    {
-        return false;
-    }
-
-    public function update(
-        ?Authenticatable $user,
-        $academicYear
-    ): bool {
-        return false;
-    }
-
-    public function delete(
-        ?Authenticatable $user,
-        $academicYear
-    ): bool {
-        return false;
-    }
+    protected string $module = 'ACY';
 }

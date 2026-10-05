@@ -6,33 +6,97 @@ use App\Modules\AcademicYear\Models\AcademicYear;
 use App\Modules\AcademicYear\Models\Term;
 use App\Modules\AcademicYear\Models\TermStatus;
 use App\Modules\AcademicYear\Models\TermType;
+use App\Support\Audit\AuditLogger;
 use App\Support\Services\BaseService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 
 class AcademicYearService extends BaseService
 {
-    /**
-     * Tạo năm học.
-     */
     public function createAcademicYear(array $data): AcademicYear
     {
-        $startDate = Carbon::parse($data['start_date']);
-        $endDate = Carbon::parse($data['end_date']);
+        return $this->transaction(function () use ($data): AcademicYear {
+            $startDate = Carbon::parse($data['start_date']);
+            $endDate = Carbon::parse($data['end_date']);
 
-        if ($endDate->lt($startDate)) {
-            $this->fail(
-                'Ngày kết thúc năm học không hợp lệ.',
-                'Vui lòng chọn ngày kết thúc sau ngày bắt đầu.'
+            if ($endDate->lt($startDate)) {
+                $this->fail(
+                    'Ngày kết thúc năm học không hợp lệ.',
+                    'Vui lòng chọn ngày kết thúc sau ngày bắt đầu.'
+                );
+            }
+
+            $this->validateAcademicYearOverlap(
+                $startDate,
+                $endDate
             );
-        }
 
-        return AcademicYear::create($data);
+            return app(AuditLogger::class)->withReason(
+                'Tạo năm học.',
+                fn () => AcademicYear::create($data)
+            );
+        });
     }
 
-    /**
-     * Tạo học kỳ.
-     */
+    public function updateAcademicYear(
+        AcademicYear $academicYear,
+        array $data
+    ): AcademicYear {
+        return $this->transaction(function () use (
+            $academicYear,
+            $data
+        ): AcademicYear {
+            $startDate = Carbon::parse($data['start_date']);
+            $endDate = Carbon::parse($data['end_date']);
+
+            if ($endDate->lt($startDate)) {
+                $this->fail(
+                    'Ngày kết thúc năm học không hợp lệ.',
+                    'Vui lòng chọn ngày kết thúc sau ngày bắt đầu.'
+                );
+            }
+
+            $exists = AcademicYear::query()
+                ->where('id', '!=', $academicYear->id)
+                ->whereDate('start_date', '<=', $endDate)
+                ->whereDate('end_date', '>=', $startDate)
+                ->exists();
+
+            if ($exists) {
+                $this->fail(
+                    'Thời gian năm học bị chồng với một năm học khác.',
+                    'Vui lòng chọn khoảng thời gian không trùng với năm học đã tồn tại.'
+                );
+            }
+
+            return app(AuditLogger::class)->withReason(
+                'Cập nhật năm học.',
+                function () use ($academicYear, $data): AcademicYear {
+                    $academicYear->update($data);
+
+                    return $academicYear->fresh();
+                }
+            );
+        });
+    }
+
+    private function validateAcademicYearOverlap(
+        Carbon $startDate,
+        Carbon $endDate
+    ): void {
+        $exists = AcademicYear::query()
+            ->whereDate('start_date', '<=', $endDate)
+            ->whereDate('end_date', '>=', $startDate)
+            ->exists();
+
+        if ($exists) {
+            $this->fail(
+                'Thời gian năm học bị chồng với một năm học khác.',
+                'Vui lòng chọn khoảng thời gian không trùng với năm học đã tồn tại.'
+            );
+        }
+    }
+
     public function createTerm(array $data): Term
     {
         return $this->transaction(function () use ($data): Term {
@@ -46,7 +110,9 @@ class AcademicYearService extends BaseService
                 );
             }
 
-            $academicYear = AcademicYear::find($data['academic_year_id']);
+            $academicYear = AcademicYear::query()
+                ->lockForUpdate()
+                ->find($data['academic_year_id']);
 
             if ($academicYear === null) {
                 $this->fail(
@@ -74,15 +140,13 @@ class AcademicYearService extends BaseService
 
             $data['status'] ??= TermStatus::PLANNED->value;
 
-            return Term::create($data);
+            return app(AuditLogger::class)->withReason(
+                'Tạo học kỳ.',
+                fn () => Term::create($data)
+            );
         });
     }
 
-    /**
-     * BR-ACY-01:
-     * - Các kỳ chính không được chồng nhau.
-     * - Kỳ hè không được chồng với kỳ chính.
-     */
     private function validateTermOverlap(
         int $academicYearId,
         string $type,
@@ -91,21 +155,25 @@ class AcademicYearService extends BaseService
     ): void {
         $query = Term::query()
             ->where('academic_year_id', $academicYearId)
-            ->where(function (Builder $query) use ($startDate, $endDate): void {
+            ->where(function (Builder $query) use (
+                $startDate,
+                $endDate
+            ): void {
                 $query
                     ->whereDate('start_date', '<=', $endDate)
                     ->whereDate('end_date', '>=', $startDate);
             });
 
         if ($type === TermType::MAIN->value) {
-            $query->where(function (Builder $query): void {
-                $query
-                    ->where('type', TermType::MAIN->value)
-                    ->orWhere('type', TermType::SUMMER->value);
-            });
+            $query->whereIn('type', [
+                TermType::MAIN->value,
+                TermType::SUMMER->value,
+            ]);
         } else {
-            // Học kỳ hè chỉ cần kiểm tra với học kỳ chính.
-            $query->where('type', TermType::MAIN->value);
+            $query->where(
+                'type',
+                TermType::MAIN->value
+            );
         }
 
         if ($query->exists()) {
@@ -116,11 +184,6 @@ class AcademicYearService extends BaseService
         }
     }
 
-    /**
-     * Lấy học kỳ hiện hành.
-     *
-     * Theo Issue #75, học kỳ hiện hành là kỳ chính đang diễn ra.
-     */
     public function getCurrentTerm(): ?Term
     {
         return Term::query()
@@ -130,12 +193,6 @@ class AcademicYearService extends BaseService
             ->first();
     }
 
-    /**
-     * Đặt học kỳ chính thành đang diễn ra.
-     *
-     * Không tự động chuyển kỳ cũ sang "Kết thúc".
-     * Kỳ cũ phải đi qua state machine đúng quy trình.
-     */
     public function setCurrentTerm(Term $term): Term
     {
         return $this->transaction(function () use ($term): Term {
@@ -161,6 +218,13 @@ class AcademicYearService extends BaseService
                 );
             }
 
+            if (now()->lt($term->start_date)) {
+                $this->fail(
+                    'Chưa đến ngày bắt đầu học kỳ.',
+                    'Chỉ được bắt đầu học kỳ từ ngày bắt đầu đã cấu hình.'
+                );
+            }
+
             $currentTerm = Term::query()
                 ->where('type', TermType::MAIN->value)
                 ->where('status', TermStatus::IN_PROGRESS->value)
@@ -174,34 +238,33 @@ class AcademicYearService extends BaseService
                 );
             }
 
-            $term->update([
-                'status' => TermStatus::IN_PROGRESS->value,
-            ]);
+            return app(AuditLogger::class)->withReason(
+                'Đặt học kỳ hiện hành.',
+                function () use ($term): Term {
+                    $term->update([
+                        'status' => TermStatus::IN_PROGRESS->value,
+                    ]);
 
-            return $term->fresh();
+                    return $term->fresh();
+                }
+            );
         });
     }
 
-    /**
-     * FR-ACY-006:
-     * Chuyển trạng thái theo đúng state machine.
-     *
-     * Lưu ý:
-     * Chuyển sang LOCKED không thực hiện ở ACY.
-     * BR-ACY-06 yêu cầu việc khóa phải đi qua SYS.
-     */
     public function changeStatus(
         Term $term,
         TermStatus $newStatus
     ): Term {
+        $term = Term::query()
+            ->lockForUpdate()
+            ->findOrFail($term->id);
+
         $allowedTransitions = [
             TermStatus::PLANNED->value => [
                 TermStatus::REGISTRATION->value,
             ],
 
-            TermStatus::REGISTRATION->value => [
-                TermStatus::IN_PROGRESS->value,
-            ],
+            TermStatus::REGISTRATION->value => [],
 
             TermStatus::IN_PROGRESS->value => [
                 TermStatus::EXAM_GRADING->value,
@@ -229,43 +292,50 @@ class AcademicYearService extends BaseService
             );
         }
 
-        $term->update([
-            'status' => $newStatus->value,
-        ]);
+        if (
+            $currentStatus === TermStatus::IN_PROGRESS->value
+            && $newStatus === TermStatus::EXAM_GRADING
+            && now()->lt($term->end_date)
+        ) {
+            $this->fail(
+                'Chưa đến ngày kết thúc học kỳ.',
+                'Chỉ được chuyển sang Thi và nhập điểm sau ngày kết thúc học kỳ.'
+            );
+        }
 
-        return $term->fresh();
+        return app(AuditLogger::class)->withReason(
+            'Đổi trạng thái học kỳ.',
+            function () use ($term, $newStatus): Term {
+                $term->update([
+                    'status' => $newStatus->value,
+                ]);
+
+                return $term->fresh();
+            }
+        );
     }
 
-    /**
-     * Không cho xóa năm học nếu còn học kỳ liên quan.
-     */
-    public function deleteAcademicYear(AcademicYear $academicYear): void
-    {
+    public function deleteAcademicYear(
+        AcademicYear $academicYear
+    ): void {
         if ($academicYear->terms()->exists()) {
             $this->fail(
                 'Không thể xóa năm học vì đã có học kỳ liên quan.',
-                'Hãy khóa năm học thay vì xóa dữ liệu đã phát sinh.'
+                'Hãy khóa dữ liệu thay vì xóa dữ liệu đã phát sinh.'
             );
         }
 
-        $academicYear->delete();
+        $this->fail(
+            'Không cho phép xóa năm học.',
+            'Năm học là dữ liệu nghiệp vụ và không được xóa khỏi hệ thống.'
+        );
     }
 
-    /**
-     * Xóa học kỳ khi chưa có dữ liệu phụ thuộc.
-     *
-     * Hiện tại P1 chưa có các bảng ENR/TTB/GRD/EXM.
-     * Khi các module đó được tạo, bổ sung kiểm tra quan hệ tại đây.
-     */
     public function deleteTerm(Term $term): void
     {
-        if ($term->status === TermStatus::LOCKED) {
-            $this->fail(
-                'Không thể xóa học kỳ đã khóa.',
-                'Học kỳ đã khóa chỉ được mở khóa theo quy trình ngoại lệ của SYS.'
-            );
-        }
-
-        $term->delete();
+        $this->fail(
+            'Không cho phép xóa học kỳ.',
+            'Học kỳ chỉ được khóa theo quy trình nghiệp vụ của hệ thống.'
+        );
     }
 }

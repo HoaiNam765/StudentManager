@@ -2,10 +2,11 @@
 
 namespace App\Providers;
 
+use App\Modules\AcademicYear\Models\AcademicYear;
+use App\Modules\AcademicYear\Models\Term;
+use App\Modules\AcademicYear\Policies\AcademicYearPolicy;
 use App\Modules\Auth\Services\AccessControl;
 use App\Modules\Auth\Services\PasswordService;
-use App\Modules\AcademicYear\Models\AcademicYear;
-use App\Modules\AcademicYear\Policies\AcademicYearPolicy;
 use App\Modules\System\Policies\AuditLogPolicy;
 use App\Support\Audit\AuditLog;
 use App\Support\Audit\AuditLogger;
@@ -39,9 +40,21 @@ class AppServiceProvider extends ServiceProvider
     {
         BlueprintMacros::register();
 
-        Gate::policy(AuditLog::class, AuditLogPolicy::class);
+        Gate::policy(
+            AuditLog::class,
+            AuditLogPolicy::class
+        );
 
-        // Chính sách mật khẩu theo cấu hình (FR-AUTH-005); dùng ở mọi nơi bằng Password::defaults()
+        Gate::policy(
+            AcademicYear::class,
+            AcademicYearPolicy::class
+        );
+
+        Gate::policy(
+            Term::class,
+            AcademicYearPolicy::class
+        );
+
         Password::defaults(fn () => PasswordService::rule());
 
         $this->configureLoginRateLimit();
@@ -70,14 +83,14 @@ class AppServiceProvider extends ServiceProvider
                     ->response($respond),
             ];
         });
-        Gate::policy(
-            AuditLog::class,
-            AuditLogPolicy::class
-        );
+        // Gate::policy(
+        //     AuditLog::class,
+        //     AuditLogPolicy::class
+        // );
 
-        Gate::policy(
-            AcademicYear::class,
-            AcademicYearPolicy::class
-        );
+        // Gate::policy(
+        //     AcademicYear::class,
+        //     AcademicYearPolicy::class
+        // );
     }
 }

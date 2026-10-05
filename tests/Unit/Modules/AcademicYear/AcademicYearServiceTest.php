@@ -293,4 +293,56 @@ class AcademicYearServiceTest extends TestCase
         app(AcademicYearService::class)
             ->deleteAcademicYear($academicYear);
     }
+
+    public function test_change_status_khong_duoc_chuyen_registration_sang_in_progress(): void
+    {
+        $academicYear = AcademicYear::create([
+            'name' => '2026-2027',
+            'start_date' => '2026-09-01',
+            'end_date' => '2027-08-31',
+        ]);
+
+        $term = Term::create([
+            'academic_year_id' => $academicYear->id,
+            'name' => 'Học kỳ 1',
+            'type' => 'main',
+            'start_date' => '2026-09-01',
+            'end_date' => '2027-01-10',
+            'weeks' => 18,
+            'status' => TermStatus::REGISTRATION,
+        ]);
+
+        $this->expectException(BusinessRuleException::class);
+
+        app(AcademicYearService::class)->changeStatus(
+            $term,
+            TermStatus::IN_PROGRESS
+        );
+    }
+
+    public function test_khong_duoc_chuyen_sang_exam_grading_truoc_ngay_ket_thuc(): void
+    {
+        $academicYear = AcademicYear::create([
+            'name' => '2026-2027',
+            'start_date' => '2026-09-01',
+            'end_date' => '2027-08-31',
+        ]);
+
+        $term = Term::create([
+            'academic_year_id' => $academicYear->id,
+            'name' => 'Học kỳ 1',
+            'type' => 'main',
+            'start_date' => '2026-09-01',
+            'end_date' => '2099-01-10',
+            'weeks' => 18,
+            'status' => TermStatus::IN_PROGRESS,
+        ]);
+
+        $this->expectException(BusinessRuleException::class);
+
+        app(AcademicYearService::class)->changeStatus(
+            $term,
+            TermStatus::EXAM_GRADING
+        );
+    }
 }

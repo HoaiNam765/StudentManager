@@ -1,9 +1,9 @@
 <?php
 
+use App\Modules\AcademicYear\Http\Controllers\AcademicYearController;
 use App\Modules\Auth\Http\Controllers\RoleController;
 use App\Modules\Auth\Http\Controllers\RolePermissionController;
 use App\Modules\Auth\Http\Controllers\UserRoleController;
-use App\Modules\AcademicYear\Http\Controllers\AcademicYearController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -39,32 +39,65 @@ Route::middleware('auth')->group(function (): void {
         ->middleware('permission:AUTH.update,ALL')->name('users.roles.store');
     Route::delete('users/{user}/roles/{role}', [UserRoleController::class, 'destroy'])
         ->middleware('permission:AUTH.update,ALL')->name('users.roles.destroy');
+
+    Route::prefix('academic-years')
+        ->name('academic-years.')
+        ->group(function (): void {
+
+            Route::get('/', [
+                AcademicYearController::class,
+                'index',
+            ])
+                ->middleware('permission:ACY.view,ALL')
+                ->name('index');
+
+            Route::get('/current-term', [
+                AcademicYearController::class,
+                'currentTerm',
+            ])
+                ->middleware('permission:ACY.view,ALL')
+                ->name('current-term');
+
+            Route::get('/{academicYear}', [
+                AcademicYearController::class,
+                'show',
+            ])
+                ->middleware('permission:ACY.view,ALL')
+                ->name('show');
+
+            Route::post('/', [
+                AcademicYearController::class,
+                'store',
+            ])
+                ->middleware('permission:ACY.create,ALL')
+                ->name('store');
+
+            Route::put('/{academicYear}', [
+                AcademicYearController::class,
+                'update',
+            ])
+                ->middleware('permission:ACY.update,ALL')
+                ->name('update');
+
+            Route::post('/terms', [
+                AcademicYearController::class,
+                'storeTerm',
+            ])
+                ->middleware('permission:ACY.create,ALL')
+                ->name('terms.store');
+
+            Route::post('/terms/{term}/current', [
+                AcademicYearController::class,
+                'setCurrentTerm',
+            ])
+                ->middleware('permission:ACY.approve,ALL')
+                ->name('terms.current');
+
+            Route::post('/terms/{term}/status/{status}', [
+                AcademicYearController::class,
+                'changeStatus',
+            ])
+                ->middleware('permission:ACY.approve,ALL')
+                ->name('terms.status');
+        });
 });
-Route::prefix('academic-years')
-    ->name('academic-years.')
-    ->group(function (): void {
-        Route::post('/', [
-            AcademicYearController::class,
-            'store',
-        ])->name('store');
-
-        Route::post('/terms', [
-            AcademicYearController::class,
-            'storeTerm',
-        ])->name('terms.store');
-
-        Route::get('/current-term', [
-            AcademicYearController::class,
-            'currentTerm',
-        ])->name('current-term');
-
-        Route::post('/terms/{term}/current', [
-            AcademicYearController::class,
-            'setCurrentTerm',
-        ])->name('terms.current');
-
-        Route::post('/terms/{term}/status/{status}', [
-            AcademicYearController::class,
-            'changeStatus',
-        ])->name('terms.status');
-    });

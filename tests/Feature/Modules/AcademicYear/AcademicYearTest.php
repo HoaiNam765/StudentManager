@@ -6,14 +6,22 @@ use App\Modules\AcademicYear\Models\AcademicYear;
 use App\Modules\AcademicYear\Models\Term;
 use App\Modules\AcademicYear\Models\TermStatus;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Tests\Support\InteractsWithRoles;
 use Tests\TestCase;
 
 class AcademicYearTest extends TestCase
 {
     use DatabaseMigrations;
+    use InteractsWithRoles;
 
     public function test_tao_nam_hoc_thanh_cong(): void
     {
+        $this->seedRoles();
+
+        $user = $this->userWithRoles('ACAD');
+
+        $this->actingAs($user);
+
         $response = $this->postJson(
             '/admin/academic-years',
             [
@@ -32,6 +40,12 @@ class AcademicYearTest extends TestCase
 
     public function test_tao_hoc_ky_thanh_cong(): void
     {
+        $this->seedRoles();
+
+        $user = $this->userWithRoles('ACAD');
+
+        $this->actingAs($user);
+
         $academicYear = AcademicYear::create([
             'name' => '2026-2027',
             'start_date' => '2026-09-01',
@@ -60,6 +74,12 @@ class AcademicYearTest extends TestCase
 
     public function test_khong_cho_hoc_ky_chong_thoi_gian(): void
     {
+        $this->seedRoles();
+
+        $user = $this->userWithRoles('ACAD');
+
+        $this->actingAs($user);
+
         $academicYear = AcademicYear::create([
             'name' => '2026-2027',
             'start_date' => '2026-09-01',
@@ -101,6 +121,12 @@ class AcademicYearTest extends TestCase
 
     public function test_lay_hoc_ky_hien_hanh(): void
     {
+        $this->seedRoles();
+
+        $user = $this->userWithRoles('ACAD');
+
+        $this->actingAs($user);
+
         $academicYear = AcademicYear::create([
             'name' => '2026-2027',
             'start_date' => '2026-09-01',
@@ -124,5 +150,22 @@ class AcademicYearTest extends TestCase
         $response
             ->assertOk()
             ->assertJsonPath('id', $term->id);
+    }
+
+    public function test_user_khong_co_quyen_create_acy_bi_tu_choi(): void
+    {
+        $this->seedRoles();
+
+        $user = $this->userWithRoles('STU');
+
+        $response = $this
+            ->actingAs($user)
+            ->postJson('/admin/academic-years', [
+                'name' => '2026-2027',
+                'start_date' => '2026-09-01',
+                'end_date' => '2027-08-31',
+            ]);
+
+        $response->assertForbidden();
     }
 }

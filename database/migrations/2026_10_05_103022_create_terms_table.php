@@ -16,7 +16,6 @@ return new class extends Migration
                 ->restrictOnDelete();
 
             $table->string('name', 100);
-
             $table->string('type', 20);
 
             $table->date('start_date');
@@ -27,7 +26,10 @@ return new class extends Migration
             $table->string('status', 30)
                 ->default('planned');
 
-            $table->standardColumns();
+            $table->unique([
+                'academic_year_id',
+                'name',
+            ]);
 
             $table->index([
                 'academic_year_id',
@@ -35,6 +37,8 @@ return new class extends Migration
                 'start_date',
                 'end_date',
             ]);
+
+            $table->standardColumns();
         });
     }
 

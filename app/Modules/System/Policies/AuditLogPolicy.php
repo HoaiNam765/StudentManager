@@ -2,20 +2,35 @@
 
 namespace App\Modules\System\Policies;
 
-use App\Support\Policies\DenyByDefaultPolicy;
+use App\Modules\Auth\Policies\ModulePolicy;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Model;
 
 /**
- * Quyền với nhật ký kiểm toán (FR-SYS-004, tác nhân ADMIN).
- *
- * Hiện mặc định từ chối mọi thao tác; Issue RBAC (module AUTH) sẽ mở `viewAny`, `view`, `export`
- * cho ADMIN. `update`, `delete`, `restore`, `forceDelete` giữ nguyên từ chối vĩnh viễn:
- * nhật ký không được sửa hoặc xóa (BR-SYS-01).
+ * Quyền với nhật ký kiểm toán (FR-SYS-004): theo ma trận phân quyền, mục "AUDIT"
+ * (mặc định chỉ ADMIN được xem và xuất).
+ * Sửa, xóa, khôi phục luôn bị từ chối: nhật ký chỉ được ghi thêm (BR-SYS-01).
  */
-class AuditLogPolicy extends DenyByDefaultPolicy
+class AuditLogPolicy extends ModulePolicy
 {
-    /** Xuất nhật ký ra file (Excel/CSV). */
-    public function export(?Authenticatable $user): bool
+    protected string $module = 'AUDIT';
+
+    public function create(?Authenticatable $user): bool
+    {
+        return false;
+    }
+
+    public function update(?Authenticatable $user, Model $model): bool
+    {
+        return false;
+    }
+
+    public function delete(?Authenticatable $user, Model $model): bool
+    {
+        return false;
+    }
+
+    public function restore(?Authenticatable $user, Model $model): bool
     {
         return false;
     }

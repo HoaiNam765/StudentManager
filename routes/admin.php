@@ -3,6 +3,7 @@
 use App\Modules\Auth\Http\Controllers\RoleController;
 use App\Modules\Auth\Http\Controllers\RolePermissionController;
 use App\Modules\Auth\Http\Controllers\UserRoleController;
+use App\Modules\AcademicYear\Http\Controllers\AcademicYearController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -39,3 +40,31 @@ Route::middleware('auth')->group(function (): void {
     Route::delete('users/{user}/roles/{role}', [UserRoleController::class, 'destroy'])
         ->middleware('permission:AUTH.update,ALL')->name('users.roles.destroy');
 });
+Route::prefix('academic-years')
+    ->name('academic-years.')
+    ->group(function (): void {
+        Route::post('/', [
+            AcademicYearController::class,
+            'store',
+        ])->name('store');
+
+        Route::post('/terms', [
+            AcademicYearController::class,
+            'storeTerm',
+        ])->name('terms.store');
+
+        Route::get('/current-term', [
+            AcademicYearController::class,
+            'currentTerm',
+        ])->name('current-term');
+
+        Route::post('/terms/{term}/current', [
+            AcademicYearController::class,
+            'setCurrentTerm',
+        ])->name('terms.current');
+
+        Route::post('/terms/{term}/status/{status}', [
+            AcademicYearController::class,
+            'changeStatus',
+        ])->name('terms.status');
+    });

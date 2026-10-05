@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Modules\Auth\Services\AccessControl;
 use App\Modules\Auth\Services\PasswordService;
+use App\Modules\AcademicYear\Models\AcademicYear;
+use App\Modules\AcademicYear\Policies\AcademicYearPolicy;
 use App\Modules\System\Policies\AuditLogPolicy;
 use App\Support\Audit\AuditLog;
 use App\Support\Audit\AuditLogger;
@@ -68,5 +70,14 @@ class AppServiceProvider extends ServiceProvider
                     ->response($respond),
             ];
         });
+        Gate::policy(
+            AuditLog::class,
+            AuditLogPolicy::class
+        );
+
+        Gate::policy(
+            AcademicYear::class,
+            AcademicYearPolicy::class
+        );
     }
 }

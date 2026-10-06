@@ -50,4 +50,27 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Trung tâm import (module SYS)
+    |--------------------------------------------------------------------------
+    | FR-SYS-007, BR-SYS-07, GC-07, NFR-PERF-04 (5.000 dòng không quá 60 giây). Không viết cứng trong mã (GC-12).
+    */
+    'import' => [
+        // Disk lưu file tải lên
+        'disk' => env('IMPORT_DISK', 'local'),
+
+        // Dung lượng file tối đa (KB)
+        'max_file_kb' => (int) env('IMPORT_MAX_FILE_KB', 10240),
+
+        // Từ số dòng này trở lên thì kiểm tra/lưu chạy nền (hàng đợi)
+        'async_threshold' => (int) env('IMPORT_ASYNC_THRESHOLD', 500),
+
+        // Số dòng mỗi lần ghi vào CSDL và mỗi lần cập nhật tiến trình
+        'chunk_size' => (int) env('IMPORT_CHUNK_SIZE', 500),
+
+        // Thời gian tối đa (giây) của một job nền
+        'job_timeout_seconds' => (int) env('IMPORT_JOB_TIMEOUT_SECONDS', 120),
+    ],
+
 ];

@@ -64,6 +64,8 @@ Ghi nhớ cho Claude Code khi làm việc với dự án này. Cập nhật mụ
 - PowerShell 5.1: `ConvertFrom-Json` không bung mảng cấp ngoài; tham số chứa dấu nháy kép bị tách sai (dùng file: `git commit -F`, `gh --body-file`, `gh api --input`); không pipe lệnh tạo dữ liệu qua `Select-Object -First` (giết tiến trình giữa chừng).
 - Môi trường chặn `rmdir /s` và `Remove-Item Env:`: dùng thư mục mới, `$env:X = $null`.
 - Khi chép khung dự án, đừng loại file theo tên trên toàn cây (từng làm mất 12 file `.gitignore` con).
+- Test dùng `travelTo()` lùi đồng hồ: vai trò gán bằng `RoleService::assign` có `valid_from` = ngày thật lúc tạo, nên sau khi lùi về quá khứ quyền chưa có hiệu lực. Gọi `travelBack()` trước khi kiểm tra quyền, đừng `travelTo` sang một ngày cố định khác (chỉ xanh đúng hôm đó). `AuditLogSearchTest` từng đỏ trên `main` ngày 06/10 vì lỗi này.
+- Khi PR của bạn trong nhóm đỏ CI: đọc log (`gh run view <id> --log-failed`) và chạy lại trên `main` trước khi kết luận lỗi do PR. Trình format của IDE đổi `fn (` thành `fn(` làm Pint đỏ; chạy `composer lint` trước khi push.
 
 ## Nhật ký công việc
 
@@ -74,7 +76,8 @@ Ghi nhớ cho Claude Code khi làm việc với dự án này. Cập nhật mụ
 | #68 | #220 | Test trên MySQL, CI GitHub Actions, `CONTRIBUTING.md`, `composer lint`, seeder theo module |
 | #70 | #221 | Nhật ký kiểm toán chỉ ghi thêm, tự ghi cho `StandardModel`, tra cứu ở module System |
 | #71 | #222 | RBAC: vai trò, ma trận quyền, phạm vi dữ liệu, API quản trị phân quyền; thêm `CLAUDE.md` |
-| #72 | (chưa mở) | Đăng nhập bằng tên đăng nhập/email, vào cổng theo vai trò, khóa tạm, mật khẩu tạm, đổi mật khẩu, chính sách mật khẩu, giới hạn tần suất — nhánh `feature/be-dang-nhap` |
+| #72 | #223 | Đăng nhập bằng tên đăng nhập/email, vào cổng theo vai trò, khóa tạm, mật khẩu tạm, đổi mật khẩu, chính sách mật khẩu, giới hạn tần suất |
+| #75 | #224 | Năm học – học kỳ (module `AcademicYear`, của B): tạo/xem/sửa năm học, tạo học kỳ, học kỳ hiện hành, máy trạng thái theo ngày, không xóa chỉ khóa, quyền `ACY.*`, nhật ký kiểm toán. Chưa có: sửa học kỳ, trạng thái/khóa năm học. Mình đã sửa thẳng trên nhánh của B (Pint, test, vài việc nhỏ theo review) |
 
 ## Việc tiếp theo của A (P1)
 

@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Modules\AcademicYear\Models\AcademicYear;
+use App\Modules\AcademicYear\Models\Term;
+use App\Modules\AcademicYear\Policies\AcademicYearPolicy;
 use App\Modules\Auth\Services\AccessControl;
 use App\Modules\Auth\Services\PasswordService;
 use App\Modules\System\Policies\AuditLogPolicy;
@@ -37,7 +40,20 @@ class AppServiceProvider extends ServiceProvider
     {
         BlueprintMacros::register();
 
-        Gate::policy(AuditLog::class, AuditLogPolicy::class);
+        Gate::policy(
+            AuditLog::class,
+            AuditLogPolicy::class
+        );
+
+        Gate::policy(
+            AcademicYear::class,
+            AcademicYearPolicy::class
+        );
+
+        Gate::policy(
+            Term::class,
+            AcademicYearPolicy::class
+        );
 
         // Chính sách mật khẩu theo cấu hình (FR-AUTH-005); dùng ở mọi nơi bằng Password::defaults()
         Password::defaults(fn () => PasswordService::rule());

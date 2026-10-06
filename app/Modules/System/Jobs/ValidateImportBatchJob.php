@@ -2,8 +2,8 @@
 
 namespace App\Modules\System\Jobs;
 
+use App\Modules\System\Enums\ImportStatus;
 use App\Modules\System\Models\ImportBatch;
-use App\Modules\System\Services\ImportRegistry;
 use App\Modules\System\Services\ImportService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -14,38 +14,44 @@ use Throwable;
 
 /**
  * Job kiểm tra file import lớn chạy nền (NFR-PERF-04).
- * 5.000 dòng phải hoàn tất trong 60 giây.
+ * 5.000 dòng phải hoàn tất trong 60 giây. Chạy với tư cách người đã bấm kiểm tra để nhật ký ghi đúng người (GC-03).
  */
 class ValidateImportBatchJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /** Thời gian tối đa (giây) trước khi queue coi là timeout */
-    public int $timeout = 120;
+    /** Thời gian tối đa (giây) của job; lấy từ cấu hình (GC-12) */
+    public int $timeout;
 
-    /** Số lần thử lại khi gặp lỗi không mong muốn */
+    /** Không tự thử lại: lỗi thì lô chuyển sang Failed để người dùng tải lại file */
     public int $tries = 1;
 
-    public function __construct(public readonly int $batchId) {}
+    public function __construct(
+        public readonly int $batchId,
+        public readonly ?int $userId = null,
+    ) {
+        $this->timeout = (int) config('studentmanager.import.job_timeout_seconds');
+    }
 
-    public function handle(ImportService $importService, ImportRegistry $registry): void
+    public function handle(ImportService $importService): void
     {
-        $batch = ImportBatch::findOrFail($this->batchId);
-        $importer = $registry->get($batch->importer);
-        $rows = $importer->parseRows($batch->path, $batch->disk);
+        $batch = ImportBatch::query()->find($this->batchId);
 
-        $importService->doValidate($batch, $rows);
+        // Lô đã bị xóa hoặc không còn ở trạng thái đang kiểm tra (job chạy trùng): bỏ qua
+        if ($batch === null || $batch->status !== ImportStatus::Validating) {
+            return;
+        }
+
+        $importService->runAs($this->userId, fn () => $importService->validateInBackground($batch));
     }
 
     public function failed(Throwable $exception): void
     {
-        $batch = ImportBatch::find($this->batchId);
-        if ($batch) {
-            $batch->update([
-                'status' => \App\Modules\System\Enums\ImportStatus::Failed,
-                'error_summary' => 'Lỗi khi kiểm tra file: ' . $exception->getMessage(),
-                'finished_at' => now(),
-            ]);
-        }
+        $service = app(ImportService::class);
+
+        $service->runAs(
+            $this->userId,
+            fn () => $service->failBatchById($this->batchId, 'Lỗi khi kiểm tra file: '.$exception->getMessage())
+        );
     }
 }

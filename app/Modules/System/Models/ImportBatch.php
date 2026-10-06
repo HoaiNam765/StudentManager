@@ -2,8 +2,12 @@
 
 namespace App\Modules\System\Models;
 
+use App\Models\User;
+use App\Modules\Auth\Contracts\HasDataScope;
+use App\Modules\Auth\Enums\DataScope;
 use App\Modules\System\Enums\ImportStatus;
 use App\Support\Concerns\HasStandardFields;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -13,8 +17,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * Mỗi lần import là một lô có mã duy nhất.
  * Không dùng StandardModel để tránh ghi audit log tự động
  * (audit log được ghi thủ công khi cần, tránh log spam từ job update progress).
+ *
+ * Phạm vi dữ liệu: người có quyền toàn trường (ALL) thấy mọi lô; phạm vi OWN chỉ thấy lô do mình tạo.
  */
-class ImportBatch extends Model
+class ImportBatch extends Model implements HasDataScope
 {
     use HasStandardFields;
     use SoftDeletes;
@@ -50,6 +56,14 @@ class ImportBatch extends Model
         'started_at' => 'datetime',
         'finished_at' => 'datetime',
     ];
+
+    public function applyDataScope(Builder $query, DataScope $scope, User $user): void
+    {
+        match ($scope) {
+            DataScope::Own => $query->where('created_by', $user->id),
+            default => $query->whereRaw('1 = 0'),
+        };
+    }
 
     public function rows(): HasMany
     {

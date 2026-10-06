@@ -2,6 +2,7 @@
 
 namespace App\Modules\System\Http\Requests;
 
+use App\Modules\System\Models\ImportBatch;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
@@ -12,7 +13,7 @@ class UploadImportRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->can('create', \App\Modules\System\Models\ImportBatch::class);
+        return $this->user()->can('create', ImportBatch::class);
     }
 
     /** @return array<string, mixed> */
@@ -24,7 +25,7 @@ class UploadImportRequest extends FormRequest
                 'required',
                 'file',
                 // Ngưỡng dung lượng lấy từ cấu hình (GC-12, NFR-MNT-03)
-                'max:' . config('studentmanager.import.max_file_kb', 10240),
+                'max:'.config('studentmanager.import.max_file_kb'),
                 'mimes:xlsx,xls,csv',
             ],
         ];
@@ -36,7 +37,7 @@ class UploadImportRequest extends FormRequest
         return [
             'importer.required' => 'Vui lòng chọn loại import.',
             'file.required' => 'Vui lòng chọn file để tải lên.',
-            'file.max' => 'Kích thước file vượt quá giới hạn cho phép (' . config('studentmanager.import.max_file_kb', 10240) . ' KB).',
+            'file.max' => 'Kích thước file vượt quá giới hạn cho phép ('.config('studentmanager.import.max_file_kb').' KB).',
             'file.mimes' => 'Chỉ chấp nhận file định dạng Excel (.xlsx, .xls) hoặc CSV (.csv).',
         ];
     }

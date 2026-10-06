@@ -5,14 +5,20 @@ namespace App\Modules\System\Services;
 use App\Models\User;
 use App\Modules\System\Enums\ImportRowStatus;
 use App\Modules\System\Enums\ImportStatus;
+use App\Modules\System\Jobs\SaveImportBatchJob;
+use App\Modules\System\Jobs\ValidateImportBatchJob;
 use App\Modules\System\Models\ImportBatch;
 use App\Modules\System\Models\ImportRow;
 use App\Support\Audit\AuditEvent;
 use App\Support\Audit\AuditLogger;
 use App\Support\Exceptions\BusinessRuleException;
 use App\Support\Services\BaseService;
+use Closure;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -28,23 +34,20 @@ use Throwable;
  *   4. save()       — lưu (all_valid | all)
  *   5. rollback()   — hoàn tác theo lô nếu chưa có dữ liệu phụ thuộc
  *
- * File lớn (>= ngưỡng cấu hình) được dispatch sang hàng đợi (NFR-PERF-04).
+ * File lớn (>= ngưỡng cấu hình) được dispatch sang hàng đợi (NFR-PERF-04). Mọi ngưỡng lấy từ
+ * config('studentmanager.import') (GC-12).
+ *
+ * Chống chạy trùng: chuyển trạng thái lô bằng cập nhật có điều kiện (claim), chỉ một yêu cầu thắng.
  */
 class ImportService extends BaseService
 {
-    /** Disk mặc định để lưu file import (lấy từ cấu hình, GC-12) */
-    private string $disk;
-
-    /** Số dòng tối đa xử lý đồng bộ, vượt ngưỡng sẽ chạy nền (NFR-PERF-04) */
-    private int $asyncThreshold;
+    /** Số lần thử lại khi mã lô bị trùng do hai yêu cầu tải lên cùng lúc */
+    private const CODE_ATTEMPTS = 5;
 
     public function __construct(
         private readonly ImportRegistry $registry,
         private readonly AuditLogger $audit,
-    ) {
-        $this->disk = config('studentmanager.import.disk', 'local');
-        $this->asyncThreshold = (int) config('studentmanager.import.async_threshold', 500);
-    }
+    ) {}
 
     // -------------------------------------------------------------------------
     // Bước 1: Tải file và tạo lô
@@ -52,7 +55,6 @@ class ImportService extends BaseService
 
     /**
      * Tải file lên và tạo ImportBatch mới (trạng thái pending).
-     * Ném BusinessRuleException nếu file không đúng định dạng.
      *
      * @throws BusinessRuleException
      */
@@ -61,31 +63,56 @@ class ImportService extends BaseService
         $importer = $this->registry->get($importerKey);
         $importer->validateFile($file);
 
-        $path = $file->store("imports/{$importerKey}/" . now()->format('Ymd'), $this->disk);
+        $disk = $this->disk();
+        $path = $file->store("imports/{$importerKey}/".now()->format('Ymd'), $disk);
 
         if ($path === false) {
-            throw new BusinessRuleException(
+            $this->fail(
                 'Không thể lưu file tải lên.',
                 'Kiểm tra dung lượng đĩa và quyền ghi thư mục storage.'
             );
         }
 
-        return $this->transaction(function () use ($importerKey, $file, $path, $user): ImportBatch {
-            $batch = ImportBatch::create([
-                'code' => $this->generateCode($importerKey),
-                'importer' => $importerKey,
-                'original_filename' => $file->getClientOriginalName(),
-                'disk' => $this->disk,
-                'path' => $path,
-                'status' => ImportStatus::Pending,
-                'created_by' => $user->id,
-                'updated_by' => $user->id,
-            ]);
+        $attempt = 0;
 
-            $this->audit->record(AuditEvent::Created, $batch);
+        while (true) {
+            $attempt++;
 
-            return $batch;
-        });
+            try {
+                return $this->transaction(function () use ($importerKey, $file, $disk, $path, $user): ImportBatch {
+                    $batch = ImportBatch::create([
+                        'code' => $this->nextCode($importerKey),
+                        'importer' => $importerKey,
+                        'original_filename' => $file->getClientOriginalName(),
+                        'disk' => $disk,
+                        'path' => $path,
+                        'status' => ImportStatus::Pending,
+                        'created_by' => $user->id,
+                        'updated_by' => $user->id,
+                    ]);
+
+                    $this->audit->record(AuditEvent::Created, $batch, [], [
+                        'importer' => $importerKey,
+                        'original_filename' => $batch->original_filename,
+                    ], 'Tải file import lên.');
+
+                    return $batch;
+                });
+            } catch (UniqueConstraintViolationException $e) {
+                // Mã lô trùng do yêu cầu khác vừa tạo: tính lại mã và thử lại
+                if ($attempt < self::CODE_ATTEMPTS) {
+                    continue;
+                }
+
+                Storage::disk($disk)->delete($path);
+
+                throw $e;
+            } catch (Throwable $e) {
+                Storage::disk($disk)->delete($path);
+
+                throw $e;
+            }
+        }
     }
 
     // -------------------------------------------------------------------------
@@ -93,91 +120,143 @@ class ImportService extends BaseService
     // -------------------------------------------------------------------------
 
     /**
-     * Kiểm tra từng dòng của lô. Nếu file lớn hơn ngưỡng, dispatch job chạy nền.
-     * Trả về $batch đã cập nhật.
+     * Kiểm tra từng dòng của lô. File từ ngưỡng cấu hình trở lên chạy nền bằng job.
+     * Lô được "chiếm" (pending → validating) trước khi đọc file nên hai yêu cầu cùng lúc không dispatch trùng;
+     * file rỗng hoặc đọc lỗi thì lô chuyển sang Failed, không bao giờ kẹt ở "Đang kiểm tra".
      *
      * @throws BusinessRuleException
      */
-    public function validate(ImportBatch $batch): ImportBatch
+    public function validate(ImportBatch $batch, User $user): ImportBatch
     {
         $this->assertStatus($batch, [ImportStatus::Pending]);
-
-        $importer = $this->registry->get($batch->importer);
-        $rows = $importer->parseRows($batch->path, $batch->disk);
-        $totalRows = count($rows);
-
-        $batch->update([
-            'status' => ImportStatus::Validating,
-            'total_rows' => $totalRows,
+        $this->claim($batch, ImportStatus::Pending, ImportStatus::Validating, [
             'started_at' => now(),
-        ]);
+            'finished_at' => null,
+            'progress' => 0,
+            'error_summary' => null,
+        ], $user);
 
-        if ($totalRows === 0) {
-            $this->fail('File không có dữ liệu.', 'Hãy tải file mẫu, điền dữ liệu và thử lại.');
+        $threshold = $this->asyncThreshold();
+        $rows = [];
+        $count = 0;
+
+        try {
+            $importer = $this->registry->get($batch->importer);
+
+            // Chỉ đọc đủ số dòng cần để biết file lớn hay nhỏ; Importer trả Generator thì không nạp cả file
+            foreach ($importer->parseRows($batch->path, $batch->disk) as $row) {
+                $rows[] = $row;
+
+                if (++$count >= $threshold) {
+                    break;
+                }
+            }
+        } catch (Throwable $e) {
+            $this->markFailed($batch, 'Không đọc được file: '.$this->describe($e));
+
+            throw $e;
+        }
+
+        if ($count === 0) {
+            $message = 'File không có dữ liệu.';
+            $this->markFailed($batch, $message);
+
+            $this->fail($message, 'Hãy tải file mẫu, điền dữ liệu rồi tải lên lại.');
         }
 
         // File lớn → chạy nền (NFR-PERF-04)
-        if ($totalRows >= $this->asyncThreshold) {
-            $job = \App\Modules\System\Jobs\ValidateImportBatchJob::dispatch($batch->id);
-            $batch->update(['job_id' => (string) $job->getJobId()]);
+        if ($count >= $threshold) {
+            $this->dispatchJob($batch, new ValidateImportBatchJob($batch->id, $user->id));
 
             return $batch->refresh();
         }
 
         // File nhỏ → xử lý đồng bộ
-        $this->doValidate($batch, $rows);
+        $this->doValidate($batch, $rows, $count);
 
         return $batch->refresh();
     }
 
     /**
-     * Thực hiện kiểm tra từng dòng (đồng bộ hoặc từ job).
-     *
-     * @param  array<int, array<string, mixed>>  $rows
+     * Phần kiểm tra chạy trong job nền: đếm số dòng để tính tiến trình rồi kiểm tra theo luồng.
      */
-    public function doValidate(ImportBatch $batch, array $rows): void
+    public function validateInBackground(ImportBatch $batch): void
     {
         $importer = $this->registry->get($batch->importer);
-        $total = count($rows);
-        $validCount = 0;
-        $invalidCount = 0;
 
-        // Xóa các dòng cũ nếu validate lại
-        ImportRow::where('import_batch_id', $batch->id)->delete();
+        $total = $this->countRows($importer->parseRows($batch->path, $batch->disk));
 
-        foreach ($rows as $index => $rawRow) {
-            $rowNumber = $index + 2; // dòng 1 là header
-            $errors = $importer->validateRow($rowNumber, $rawRow);
+        $this->doValidate($batch, $importer->parseRows($batch->path, $batch->disk), $total);
+    }
 
-            $status = empty($errors) ? ImportRowStatus::Valid : ImportRowStatus::Invalid;
-            if ($status === ImportRowStatus::Valid) {
-                $validCount++;
-            } else {
-                $invalidCount++;
+    /**
+     * Kiểm tra từng dòng và ghi vào import_rows theo lô (insert nhiều dòng một lần).
+     *
+     * @param  iterable<int, array<string, mixed>>  $rows
+     */
+    public function doValidate(ImportBatch $batch, iterable $rows, ?int $total = null): void
+    {
+        try {
+            $importer = $this->registry->get($batch->importer);
+            $chunk = $this->chunkSize();
+
+            // Kiểm tra lại (hoặc job chạy lại) thì bỏ kết quả cũ
+            ImportRow::query()->where('import_batch_id', $batch->id)->delete();
+
+            $processed = 0;
+            $valid = 0;
+            $invalid = 0;
+            $buffer = [];
+
+            foreach ($rows as $rawRow) {
+                $rowNumber = $processed + 2; // dòng 1 là tiêu đề
+                $errors = $importer->validateRow($rowNumber, $rawRow);
+                $isValid = $errors === [];
+
+                $isValid ? $valid++ : $invalid++;
+                $processed++;
+
+                $buffer[] = $this->rowRecord($batch, $rowNumber, $rawRow, $isValid, $errors);
+
+                if (count($buffer) >= $chunk) {
+                    ImportRow::query()->insert($buffer);
+                    $buffer = [];
+
+                    if ($total !== null && $total > 0) {
+                        $batch->update(['progress' => min(49, (int) floor($processed / $total * 50))]);
+                    }
+                }
             }
 
-            ImportRow::create([
-                'import_batch_id' => $batch->id,
-                'row_number' => $rowNumber,
-                'raw_data' => $rawRow,
-                'status' => $status,
-                'errors' => empty($errors) ? null : $errors,
+            if ($buffer !== []) {
+                ImportRow::query()->insert($buffer);
+            }
+
+            $batch->update([
+                'status' => ImportStatus::Validated,
+                'total_rows' => $processed,
+                'valid_rows' => $valid,
+                'invalid_rows' => $invalid,
+                'progress' => 50,
             ]);
 
-            // Cập nhật tiến trình mỗi 50 dòng
-            if (($index + 1) % 50 === 0 || ($index + 1) === $total) {
-                $progress = (int) round((($index + 1) / $total) * 50); // 0–50% cho validate
-                $batch->update(['progress' => $progress]);
-            }
-        }
+            $this->audit->record(
+                AuditEvent::Updated,
+                $batch,
+                ['status' => ImportStatus::Validating->value],
+                [
+                    'status' => ImportStatus::Validated->value,
+                    'total_rows' => $processed,
+                    'valid_rows' => $valid,
+                    'invalid_rows' => $invalid,
+                ],
+                'Kiểm tra dữ liệu import.'
+            );
+        } catch (Throwable $e) {
+            $this->markFailed($batch, 'Lỗi khi kiểm tra file: '.$this->describe($e));
 
-        $batch->update([
-            'status' => ImportStatus::Validated,
-            'valid_rows' => $validCount,
-            'invalid_rows' => $invalidCount,
-            'total_rows' => $total,
-            'progress' => 50,
-        ]);
+            throw $e;
+        }
     }
 
     // -------------------------------------------------------------------------
@@ -187,7 +266,7 @@ class ImportService extends BaseService
     /**
      * Lấy dữ liệu xem trước: thống kê + danh sách dòng có lỗi.
      *
-     * @return array{batch: ImportBatch, error_rows: \Illuminate\Database\Eloquent\Collection}
+     * @return array{batch: ImportBatch, error_rows: Collection}
      */
     public function preview(ImportBatch $batch): array
     {
@@ -203,10 +282,12 @@ class ImportService extends BaseService
 
     /**
      * Lưu lô import theo chế độ:
-     *   all_valid  — chỉ lưu các dòng hợp lệ, bỏ qua dòng lỗi (GC-07)
-     *   all        — lưu tất cả; nếu có bất kỳ lỗi nào thì rollback toàn bộ
+     *   all_valid  — chỉ lưu các dòng hợp lệ, bỏ qua dòng lỗi (GC-07); dòng hợp lệ nhưng lỗi lúc lưu được ghi lỗi
+     *                riêng, các dòng khác vẫn được lưu
+     *   all        — lưu tất cả; có bất kỳ lỗi nào thì không lưu dòng nào
      *
      * @param  'all_valid'|'all'  $mode
+     *
      * @throws BusinessRuleException
      */
     public function save(ImportBatch $batch, string $mode, User $user): ImportBatch
@@ -226,23 +307,19 @@ class ImportService extends BaseService
 
         if ($mode === 'all' && $batch->invalid_rows > 0) {
             $this->fail(
-                'Không thể lưu toàn bộ vì có ' . $batch->invalid_rows . ' dòng lỗi.',
+                'Không thể lưu toàn bộ vì có '.$batch->invalid_rows.' dòng lỗi.',
                 "Hãy chọn 'Chỉ lưu dòng hợp lệ' hoặc sửa các dòng lỗi rồi tải lại file."
             );
         }
 
-        $batch->update([
-            'status' => ImportStatus::Saving,
+        $this->claim($batch, ImportStatus::Validated, ImportStatus::Saving, [
             'save_mode' => $mode,
-            'updated_by' => $user->id,
-        ]);
-
-        $total = $batch->total_rows;
+            'finished_at' => null,
+        ], $user);
 
         // File lớn → chạy nền
-        if ($total >= $this->asyncThreshold) {
-            $job = \App\Modules\System\Jobs\SaveImportBatchJob::dispatch($batch->id, $mode);
-            $batch->update(['job_id' => (string) $job->getJobId()]);
+        if ($batch->total_rows >= $this->asyncThreshold()) {
+            $this->dispatchJob($batch, new SaveImportBatchJob($batch->id, $mode, $user->id));
 
             return $batch->refresh();
         }
@@ -254,72 +331,92 @@ class ImportService extends BaseService
     }
 
     /**
-     * Thực hiện lưu từng dòng (đồng bộ hoặc từ job).
+     * Thực hiện lưu từng dòng (đồng bộ hoặc từ job), toàn bộ trong một giao dịch: hoặc lưu xong cả lô,
+     * hoặc không dòng nào được lưu. Mỗi dòng chạy trong một điểm lưu (savepoint) riêng nên với "all_valid"
+     * một dòng lỗi chỉ làm hỏng chính dòng đó.
+     *
+     * Lưu ý: tiến trình được ghi trong giao dịch nên chỉ thấy sau khi lưu xong (khác bước kiểm tra).
      */
     public function doSave(ImportBatch $batch, string $mode): void
     {
         $importer = $this->registry->get($batch->importer);
-        $rows = $batch->rows()->orderBy('row_number')->get();
-        $total = $rows->count();
-        $savedCount = 0;
+        $chunk = $this->chunkSize();
+        $totalRows = max(1, $batch->total_rows);
+        $processed = 0;
+        $saved = 0;
+        $failed = 0;
 
         try {
-            $this->transaction(function () use ($batch, $importer, $rows, $mode, $total, &$savedCount): void {
-                foreach ($rows as $index => $row) {
-                    if ($row->status === ImportRowStatus::Invalid) {
-                        // all_valid: bỏ qua dòng lỗi; all: không thể tới đây (đã check trước)
-                        $row->markSkipped();
-                        continue;
+            $this->transaction(function () use ($batch, $importer, $mode, $chunk, $totalRows, &$processed, &$saved, &$failed): void {
+                $batch->rows()->orderBy('id')->chunkById($chunk, function ($rows) use ($batch, $importer, $mode, $totalRows, &$processed, &$saved, &$failed): void {
+                    /** @var ImportRow $row */
+                    foreach ($rows as $row) {
+                        $processed++;
+
+                        if ($row->status === ImportRowStatus::Invalid) {
+                            $row->markSkipped();
+
+                            continue;
+                        }
+
+                        if ($row->status !== ImportRowStatus::Valid) {
+                            continue;
+                        }
+
+                        try {
+                            $result = DB::transaction(fn () => $importer->saveRow($row->row_number, $row->raw_data));
+                        } catch (Throwable $e) {
+                            if ($mode === 'all') {
+                                throw $e;
+                            }
+
+                            $row->markInvalid([[
+                                'column' => '*',
+                                'message' => $this->rowSaveError($e),
+                            ]]);
+                            $failed++;
+
+                            continue;
+                        }
+
+                        $row->markSaved($result['type'], $result['id']);
+                        $saved++;
                     }
 
-                    if ($row->status !== ImportRowStatus::Valid) {
-                        continue;
-                    }
-
-                    $result = $importer->saveRow($row->row_number, $row->raw_data);
-                    $row->markSaved($result['type'], $result['id']);
-                    $savedCount++;
-
-                    // Cập nhật tiến trình 50–100%
-                    if (($index + 1) % 50 === 0 || ($index + 1) === $total) {
-                        $progress = 50 + (int) round((($index + 1) / $total) * 50);
-                        $batch->update(['progress' => min(99, $progress)]);
-                    }
-                }
+                    $batch->update(['progress' => min(99, 50 + (int) floor($processed / $totalRows * 50))]);
+                });
 
                 $batch->update([
                     'status' => ImportStatus::Saved,
-                    'saved_rows' => $savedCount,
+                    'saved_rows' => $saved,
+                    'valid_rows' => $batch->valid_rows - $failed,
+                    'invalid_rows' => $batch->invalid_rows + $failed,
+                    'error_summary' => $failed > 0
+                        ? "{$failed} dòng hợp lệ nhưng không lưu được; xem lỗi theo dòng."
+                        : null,
                     'progress' => 100,
                     'finished_at' => now(),
                 ]);
+
+                $this->audit->record(
+                    AuditEvent::Imported,
+                    $batch,
+                    ['status' => ImportStatus::Saving->value],
+                    [
+                        'status' => ImportStatus::Saved->value,
+                        'save_mode' => $mode,
+                        'saved_rows' => $saved,
+                        'failed_rows' => $failed,
+                        'total_rows' => $batch->total_rows,
+                    ],
+                    'Lưu dữ liệu import.'
+                );
             });
-        } catch (BusinessRuleException $e) {
-            $batch->update([
-                'status' => ImportStatus::Failed,
-                'error_summary' => $e->userMessage(),
-                'finished_at' => now(),
-            ]);
-            throw $e;
         } catch (Throwable $e) {
-            $batch->update([
-                'status' => ImportStatus::Failed,
-                'error_summary' => 'Lỗi hệ thống khi lưu dữ liệu: ' . $e->getMessage(),
-                'finished_at' => now(),
-            ]);
+            $this->markFailed($batch, 'Lỗi khi lưu dữ liệu: '.$this->describe($e).' Không có dòng nào được lưu.');
+
             throw $e;
         }
-
-        $this->audit->record(
-            AuditEvent::Created,
-            $batch,
-            [],
-            [
-                'save_mode' => $mode,
-                'saved_rows' => $savedCount,
-                'total_rows' => $total,
-            ]
-        );
     }
 
     // -------------------------------------------------------------------------
@@ -328,45 +425,69 @@ class ImportService extends BaseService
 
     /**
      * Hoàn tác toàn lô: xóa các bản ghi đã lưu nếu chưa có dữ liệu phụ thuộc (BR-SYS-07).
+     * Kiểm tra trước cho cả lô (canRollbackRow, không xóa gì), rồi mới xóa trong một giao dịch:
+     * không bao giờ hoàn tác dở dang.
      *
      * @throws BusinessRuleException
      */
     public function rollback(ImportBatch $batch, User $user): ImportBatch
     {
-        if (! $batch->canRollback()) {
-            $this->fail(
-                'Lô này không thể hoàn tác (trạng thái: ' . $batch->status->label() . ').',
-                'Chỉ có thể hoàn tác lô đã lưu thành công.'
-            );
-        }
-
         $importer = $this->registry->get($batch->importer);
-        $savedRows = $batch->savedRows()->get();
-        $cannotRollback = [];
+        $chunk = $this->chunkSize();
 
-        // Kiểm tra trước: dòng nào có dữ liệu phụ thuộc?
-        foreach ($savedRows as $row) {
-            if (! $importer->rollbackRow($row->saved_model_type, $row->saved_model_id)) {
-                $cannotRollback[] = $row->row_number;
-            }
-        }
+        $this->transaction(function () use ($batch, $importer, $user, $chunk): void {
+            // Khóa lô để hai yêu cầu hoàn tác cùng lúc không chạy song song
+            $locked = ImportBatch::query()->whereKey($batch->id)->lockForUpdate()->firstOrFail();
 
-        if (! empty($cannotRollback)) {
-            $lines = implode(', ', array_slice($cannotRollback, 0, 10));
-            $suffix = count($cannotRollback) > 10 ? '…' : '';
-            $this->fail(
-                'Không thể hoàn tác vì ' . count($cannotRollback) . " dòng đã có dữ liệu phụ thuộc (dòng {$lines}{$suffix}).",
-                'Hãy xử lý các dữ liệu phụ thuộc trước khi hoàn tác.'
-            );
-        }
-
-        $this->transaction(function () use ($batch, $savedRows, $importer, $user): void {
-            foreach ($savedRows as $row) {
-                $importer->rollbackRow($row->saved_model_type, $row->saved_model_id);
-                $row->update(['status' => ImportRowStatus::Pending]);
+            if (! $locked->canRollback()) {
+                $this->fail(
+                    'Lô này không thể hoàn tác (trạng thái: '.$locked->status->label().').',
+                    'Chỉ có thể hoàn tác lô đã lưu thành công.'
+                );
             }
 
-            $batch->update([
+            $cannotRollback = [];
+            $savedCount = 0;
+
+            $locked->savedRows()->orderBy('id')->chunkById($chunk, function ($rows) use ($importer, &$cannotRollback, &$savedCount): void {
+                foreach ($rows as $row) {
+                    $savedCount++;
+
+                    if (! $importer->canRollbackRow($row->saved_model_type, $row->saved_model_id)) {
+                        $cannotRollback[] = $row->row_number;
+                    }
+                }
+            });
+
+            if ($cannotRollback !== []) {
+                $lines = implode(', ', array_slice($cannotRollback, 0, 10));
+                $suffix = count($cannotRollback) > 10 ? '…' : '';
+
+                $this->fail(
+                    'Không thể hoàn tác vì '.count($cannotRollback)." dòng đã có dữ liệu phụ thuộc (dòng {$lines}{$suffix}).",
+                    'Hãy xử lý các dữ liệu phụ thuộc trước khi hoàn tác.'
+                );
+            }
+
+            $locked->savedRows()->orderBy('id')->chunkById($chunk, function ($rows) use ($importer): void {
+                /** @var ImportRow $row */
+                foreach ($rows as $row) {
+                    if (! $importer->rollbackRow($row->saved_model_type, $row->saved_model_id)) {
+                        $this->fail(
+                            "Không thể hoàn tác dòng {$row->row_number}.",
+                            'Dữ liệu vừa thay đổi; không có dòng nào bị xóa. Tải lại trang rồi thử lại.'
+                        );
+                    }
+
+                    $row->update([
+                        'status' => ImportRowStatus::Pending,
+                        'saved_model_type' => null,
+                        'saved_model_id' => null,
+                    ]);
+                }
+            });
+
+            $locked->update([
                 'status' => ImportStatus::RolledBack,
                 'saved_rows' => 0,
                 'updated_by' => $user->id,
@@ -374,10 +495,11 @@ class ImportService extends BaseService
             ]);
 
             $this->audit->record(
-                AuditEvent::Deleted,
-                $batch,
-                ['saved_rows' => $savedRows->count()],
-                ['status' => ImportStatus::RolledBack->value]
+                AuditEvent::RolledBack,
+                $locked,
+                ['status' => ImportStatus::Saved->value, 'saved_rows' => $savedCount],
+                ['status' => ImportStatus::RolledBack->value],
+                'Hoàn tác lô import.'
             );
         });
 
@@ -385,22 +507,229 @@ class ImportService extends BaseService
     }
 
     // -------------------------------------------------------------------------
-    // Hàm phụ trợ
+    // Xóa lô
     // -------------------------------------------------------------------------
 
     /**
-     * Sinh mã lô: IMP-{IMPORTER}-{YYYYMMDD}-{XXXX}
+     * Xóa mềm lô khỏi lịch sử. Không xóa lô đang chạy, và không xóa lô đã lưu dữ liệu (phải hoàn tác trước).
+     *
+     * @throws BusinessRuleException
      */
-    private function generateCode(string $importerKey): string
+    public function delete(ImportBatch $batch, User $user): void
     {
-        $prefix = 'IMP-' . strtoupper(substr($importerKey, 0, 6)) . '-' . now()->format('Ymd') . '-';
-        $last = ImportBatch::where('code', 'like', $prefix . '%')
-            ->orderByDesc('id')
+        $this->transaction(function () use ($batch, $user): void {
+            $locked = ImportBatch::query()->whereKey($batch->id)->lockForUpdate()->firstOrFail();
+
+            if (in_array($locked->status, [ImportStatus::Validating, ImportStatus::Saving], true)) {
+                $this->fail(
+                    "Lô import {$locked->code} đang được xử lý.",
+                    'Chờ lô xử lý xong rồi xóa.'
+                );
+            }
+
+            if ($locked->status === ImportStatus::Saved) {
+                $this->fail(
+                    "Lô import {$locked->code} đã lưu dữ liệu vào hệ thống.",
+                    'Hãy hoàn tác lô trước nếu muốn xóa khỏi lịch sử.'
+                );
+            }
+
+            $locked->update(['updated_by' => $user->id]);
+            $locked->delete();
+
+            $this->audit->record(
+                AuditEvent::Deleted,
+                $locked,
+                ['status' => $locked->status->value],
+                [],
+                'Xóa lô import khỏi lịch sử.'
+            );
+        });
+    }
+
+    // -------------------------------------------------------------------------
+    // Job nền
+    // -------------------------------------------------------------------------
+
+    /**
+     * Chạy $callback với người dùng $userId là người thực hiện, để nhật ký kiểm toán ghi đúng người
+     * khi xử lý trong job nền (không có phiên đăng nhập). Trả lại người dùng cũ khi xong.
+     */
+    public function runAs(?int $userId, Closure $callback): mixed
+    {
+        $user = $userId === null ? null : User::query()->find($userId);
+
+        if ($user === null) {
+            return $callback();
+        }
+
+        $previous = Auth::user();
+        Auth::setUser($user);
+
+        try {
+            return $callback();
+        } finally {
+            $previous !== null ? Auth::setUser($previous) : Auth::forgetUser();
+        }
+    }
+
+    /** Đánh dấu lô thất bại theo id (dùng khi job nền báo lỗi). */
+    public function failBatchById(int $batchId, string $summary): void
+    {
+        $batch = ImportBatch::query()->find($batchId);
+
+        if ($batch !== null) {
+            $this->markFailed($batch, $summary);
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Hàm phụ trợ
+    // -------------------------------------------------------------------------
+
+    private function disk(): string
+    {
+        return (string) config('studentmanager.import.disk');
+    }
+
+    private function asyncThreshold(): int
+    {
+        return (int) config('studentmanager.import.async_threshold');
+    }
+
+    private function chunkSize(): int
+    {
+        return max(1, (int) config('studentmanager.import.chunk_size'));
+    }
+
+    /**
+     * Sinh mã lô: IMP-{IMPORTER}-{YYYYMMDD}-{XXXX}. Tính cả lô đã xóa mềm vì mã vẫn nằm trong chỉ mục unique;
+     * nếu hai yêu cầu sinh trùng thì upload() thử lại.
+     */
+    private function nextCode(string $importerKey): string
+    {
+        $prefix = 'IMP-'.strtoupper(substr($importerKey, 0, 6)).'-'.now()->format('Ymd').'-';
+
+        $last = ImportBatch::withTrashed()
+            ->where('code', 'like', $prefix.'%')
+            ->orderByDesc('code')
             ->value('code');
 
-        $seq = $last ? ((int) substr($last, -4)) + 1 : 1;
+        $seq = $last === null ? 1 : ((int) Str::afterLast($last, '-')) + 1;
 
-        return $prefix . str_pad((string) $seq, 4, '0', STR_PAD_LEFT);
+        return $prefix.str_pad((string) $seq, 4, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * Chuyển trạng thái lô bằng cập nhật có điều kiện: chỉ một yêu cầu thắng, các yêu cầu đồng thời còn lại bị từ chối
+     * (không dispatch job trùng, không lưu hai lần).
+     *
+     * @param  array<string, mixed>  $values
+     */
+    private function claim(ImportBatch $batch, ImportStatus $from, ImportStatus $to, array $values, User $user): void
+    {
+        $updated = ImportBatch::query()
+            ->whereKey($batch->getKey())
+            ->where('status', $from->value)
+            ->update([...$values, 'status' => $to->value, 'updated_by' => $user->id]);
+
+        $batch->refresh();
+
+        if ($updated === 0) {
+            $this->fail(
+                "Lô import {$batch->code} đang được xử lý bởi yêu cầu khác (trạng thái: {$batch->status->label()}).",
+                'Tải lại trang để xem trạng thái mới nhất, không gửi lại thao tác này.'
+            );
+        }
+    }
+
+    /**
+     * Đẩy job nền; nếu không đẩy được thì lô không được kẹt ở trạng thái đang xử lý.
+     */
+    private function dispatchJob(ImportBatch $batch, ValidateImportBatchJob|SaveImportBatchJob $job): void
+    {
+        try {
+            $jobId = Bus::dispatch($job);
+        } catch (Throwable $e) {
+            $this->markFailed($batch, 'Không đưa được công việc vào hàng đợi: '.$this->describe($e));
+
+            throw $e;
+        }
+
+        // Với hàng đợi đồng bộ, job đã chạy xong ở dòng trên; chỉ ghi mã job khi hàng đợi thật trả về mã
+        if (is_scalar($jobId) && $jobId) {
+            ImportBatch::query()->whereKey($batch->getKey())->update(['job_id' => (string) $jobId]);
+        }
+    }
+
+    /**
+     * Đặt lô sang Failed nếu đang kiểm tra hoặc đang lưu; không ghi đè lô đã xong (Validated, Saved…).
+     */
+    private function markFailed(ImportBatch $batch, string $summary): void
+    {
+        $updated = ImportBatch::query()
+            ->whereKey($batch->getKey())
+            ->whereIn('status', [ImportStatus::Validating->value, ImportStatus::Saving->value])
+            ->update([
+                'status' => ImportStatus::Failed->value,
+                'error_summary' => Str::limit($summary, 1000, '…'),
+                'finished_at' => now(),
+            ]);
+
+        $batch->refresh();
+
+        if ($updated > 0) {
+            $this->audit->record(
+                AuditEvent::Updated,
+                $batch,
+                [],
+                ['status' => ImportStatus::Failed->value, 'error_summary' => $batch->error_summary],
+                'Import thất bại.'
+            );
+        }
+    }
+
+    private function describe(Throwable $e): string
+    {
+        return $e instanceof BusinessRuleException ? $e->userMessage() : $e->getMessage();
+    }
+
+    /** Thông báo lỗi theo dòng khi lưu: lỗi nghiệp vụ nêu nguyên văn, lỗi hệ thống không để lộ chi tiết kỹ thuật. */
+    private function rowSaveError(Throwable $e): string
+    {
+        if ($e instanceof BusinessRuleException) {
+            return $e->userMessage();
+        }
+
+        report($e);
+
+        return 'Không lưu được dòng này do lỗi dữ liệu (ví dụ trùng khóa). Kiểm tra lại dữ liệu của dòng rồi nhập lại riêng dòng này.';
+    }
+
+    /** @param  iterable<int, array<string, mixed>>  $rows */
+    private function countRows(iterable $rows): int
+    {
+        return is_array($rows) ? count($rows) : iterator_count($rows);
+    }
+
+    /**
+     * Một bản ghi import_rows để insert theo lô (insert không qua cast nên tự mã hóa JSON).
+     *
+     * @param  array<string, mixed>  $rawRow
+     * @param  array<int, array{column: string, message: string}>  $errors
+     * @return array<string, mixed>
+     */
+    private function rowRecord(ImportBatch $batch, int $rowNumber, array $rawRow, bool $isValid, array $errors): array
+    {
+        return [
+            'import_batch_id' => $batch->id,
+            'row_number' => $rowNumber,
+            'raw_data' => json_encode($rawRow, JSON_UNESCAPED_UNICODE),
+            'status' => ($isValid ? ImportRowStatus::Valid : ImportRowStatus::Invalid)->value,
+            'errors' => $isValid ? null : json_encode($errors, JSON_UNESCAPED_UNICODE),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
     }
 
     /**
@@ -413,7 +742,7 @@ class ImportService extends BaseService
         if (! in_array($batch->status, $allowed, true)) {
             $allowedLabels = implode(', ', array_map(fn ($s) => $s->label(), $allowed));
             $this->fail(
-                "Lô import #{$batch->code} ở trạng thái '{$batch->status->label()}', không thể thực hiện thao tác này.",
+                "Lô import {$batch->code} ở trạng thái '{$batch->status->label()}', không thể thực hiện thao tác này.",
                 "Thao tác này chỉ được phép khi lô ở trạng thái: {$allowedLabels}."
             );
         }

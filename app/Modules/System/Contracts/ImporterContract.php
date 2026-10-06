@@ -10,11 +10,13 @@ use Illuminate\Http\UploadedFile;
  * Ví dụ đăng ký trong AppServiceProvider hoặc ModuleServiceProvider:
  *
  *     $this->app->make(\App\Modules\System\Services\ImportRegistry::class)
- *         ->register('student', new StudentImporter());
+ *         ->register(new StudentImporter());
  *
  * Hoặc bind lazy qua ImportRegistry::registerLazy():
  *
- *     ImportRegistry::registerLazy('teacher', fn () => new TeacherImporter());
+ *     $registry->registerLazy('teacher', fn () => new TeacherImporter());
+ *
+ * Quyền dùng trung tâm import theo module SYS (xem ImportBatchPolicy): xem, tạo, xóa/hoàn tác.
  */
 interface ImporterContract
 {
@@ -47,11 +49,14 @@ interface ImporterContract
     public function validateFile(UploadedFile $file): void;
 
     /**
-     * Đọc file và trả về mảng các dòng, mỗi dòng là array key-value theo cột.
+     * Đọc file và trả về các dòng, mỗi dòng là array key-value theo cột (không gồm dòng tiêu đề).
      *
-     * @return array<int, array<string, mixed>>
+     * Nên trả về Generator (yield từng dòng) để file lớn không bị nạp hết vào bộ nhớ (NFR-PERF-04):
+     * trung tâm import chỉ đọc đủ số dòng cần để quyết định chạy nền, rồi đọc lại theo luồng trong job.
+     *
+     * @return iterable<int, array<string, mixed>>
      */
-    public function parseRows(string $filePath, string $disk): array;
+    public function parseRows(string $filePath, string $disk): iterable;
 
     /**
      * Kiểm tra một dòng dữ liệu thô.
@@ -64,7 +69,9 @@ interface ImporterContract
 
     /**
      * Lưu một dòng hợp lệ vào CSDL trong giao dịch của lô.
-     * Trả về [model_type, model_id] để lưu vào import_rows.saved_model_* (dùng hoàn tác).
+     * Trả về [type, id] để lưu vào import_rows.saved_model_* (dùng hoàn tác).
+     * Ném BusinessRuleException (có cách khắc phục) nếu dòng không lưu được; khi chọn "Chỉ lưu dòng hợp lệ"
+     * dòng đó được ghi lỗi và các dòng còn lại vẫn được lưu.
      *
      * @param  array<string, mixed>  $rawRow
      * @return array{type: string, id: int|string}
@@ -72,17 +79,14 @@ interface ImporterContract
     public function saveRow(int $rowNumber, array $rawRow): array;
 
     /**
-     * Hoàn tác một dòng đã lưu.
-     * Được gọi khi người dùng chọn hoàn tác theo lô (BR-SYS-07).
-     * Trả về false nếu dòng không thể hoàn tác (đã có dữ liệu phụ thuộc).
+     * Dòng đã lưu này có thể hoàn tác không? Chỉ kiểm tra, KHÔNG được thay đổi dữ liệu (BR-SYS-07).
+     * Trả về false nếu đã có dữ liệu phụ thuộc.
      */
-    public function rollbackRow(string $modelType, int|string $modelId): bool;
+    public function canRollbackRow(string $modelType, int|string $modelId): bool;
 
     /**
-     * Danh sách vai trò được phép dùng importer này.
-     * Trả về [] nghĩa là chỉ ADMIN.
-     *
-     * @return list<string>
+     * Hoàn tác một dòng đã lưu (xóa bản ghi). Chỉ được gọi sau khi canRollbackRow() trả về true cho cả lô,
+     * và nằm trong giao dịch của lô: ném lỗi hoặc trả false thì toàn bộ lô được giữ nguyên.
      */
-    public function allowedRoles(): array;
+    public function rollbackRow(string $modelType, int|string $modelId): bool;
 }

@@ -3,6 +3,8 @@
 namespace App\Modules\System\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Auth\Enums\PermissionAction;
+use App\Modules\Auth\Services\AccessControl;
 use App\Modules\System\Http\Requests\SaveImportRequest;
 use App\Modules\System\Http\Requests\UploadImportRequest;
 use App\Modules\System\Models\ImportBatch;
@@ -12,6 +14,7 @@ use App\Modules\System\Services\ImportService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Gate;
 
 /**
  * API Trung tâm Import (FR-SYS-007).
@@ -33,7 +36,7 @@ class ImportController extends Controller
      */
     public function importers(Request $request): JsonResponse
     {
-        $this->authorize('viewAny', ImportBatch::class);
+        Gate::authorize('viewAny', ImportBatch::class);
 
         $all = $this->registry->all();
 
@@ -54,10 +57,12 @@ class ImportController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $this->authorize('viewAny', ImportBatch::class);
+        Gate::authorize('viewAny', ImportBatch::class);
 
-        $batches = ImportBatch::query()
-            ->with('createdBy:id,name')
+        // Chỉ thấy lô trong phạm vi dữ liệu của mình (ALL: mọi lô; OWN: lô do mình tạo)
+        $batches = app(AccessControl::class)
+            ->constrain(ImportBatch::query(), $request->user(), 'SYS', PermissionAction::View)
+            ->with('creator:id,name')
             ->when($request->filled('importer'), fn ($q) => $q->where('importer', $request->input('importer')))
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->input('status')))
             ->orderByDesc('id')
@@ -73,7 +78,7 @@ class ImportController extends Controller
      */
     public function show(Request $request, ImportBatch $batch): JsonResponse
     {
-        $this->authorize('view', $batch);
+        Gate::authorize('view', $batch);
 
         $errorRows = $batch->invalidRows()
             ->orderBy('row_number')
@@ -108,9 +113,9 @@ class ImportController extends Controller
      */
     public function validateBatch(Request $request, ImportBatch $batch): JsonResponse
     {
-        $this->authorize('validate', $batch);
+        Gate::authorize('validate', $batch);
 
-        $batch = $this->importService->validate($batch);
+        $batch = $this->importService->validate($batch, $request->user());
 
         return response()->json($this->presentBatch($batch));
     }
@@ -122,7 +127,7 @@ class ImportController extends Controller
      */
     public function preview(Request $request, ImportBatch $batch): JsonResponse
     {
-        $this->authorize('preview', $batch);
+        Gate::authorize('preview', $batch);
 
         ['batch' => $batch, 'error_rows' => $errorRows] = $this->importService->preview($batch);
 
@@ -152,7 +157,7 @@ class ImportController extends Controller
      */
     public function rollback(Request $request, ImportBatch $batch): JsonResponse
     {
-        $this->authorize('rollback', $batch);
+        Gate::authorize('rollback', $batch);
 
         $batch = $this->importService->rollback($batch, $request->user());
 
@@ -166,8 +171,9 @@ class ImportController extends Controller
      */
     public function destroy(Request $request, ImportBatch $batch): Response
     {
-        $this->authorize('delete', $batch);
-        $batch->delete();
+        Gate::authorize('delete', $batch);
+
+        $this->importService->delete($batch, $request->user());
 
         return response()->noContent();
     }
@@ -179,7 +185,7 @@ class ImportController extends Controller
      */
     public function progress(Request $request, ImportBatch $batch): JsonResponse
     {
-        $this->authorize('view', $batch);
+        Gate::authorize('view', $batch);
 
         return response()->json([
             'id' => $batch->id,

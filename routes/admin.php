@@ -4,6 +4,7 @@ use App\Modules\AcademicYear\Http\Controllers\AcademicYearController;
 use App\Modules\Auth\Http\Controllers\RoleController;
 use App\Modules\Auth\Http\Controllers\RolePermissionController;
 use App\Modules\Auth\Http\Controllers\UserRoleController;
+use App\Modules\System\Http\Controllers\ImportController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -99,5 +100,30 @@ Route::middleware('auth')->group(function (): void {
             ])
                 ->middleware('permission:ACY.approve,ALL')
                 ->name('terms.status');
+        });
+
+    // Trung tâm import (SYS, FR-SYS-007): xem = SYS.view, tải lên/kiểm tra/lưu = SYS.create, hoàn tác/xóa = SYS.delete.
+    // Quyền trên từng lô (phạm vi dữ liệu) kiểm tra tiếp bằng ImportBatchPolicy.
+    Route::prefix('imports')
+        ->name('imports.')
+        ->group(function (): void {
+            Route::middleware('permission:SYS.view')->group(function (): void {
+                Route::get('importers', [ImportController::class, 'importers'])->name('importers');
+                Route::get('/', [ImportController::class, 'index'])->name('index');
+                Route::get('{batch}', [ImportController::class, 'show'])->whereNumber('batch')->name('show');
+                Route::get('{batch}/preview', [ImportController::class, 'preview'])->whereNumber('batch')->name('preview');
+                Route::get('{batch}/progress', [ImportController::class, 'progress'])->whereNumber('batch')->name('progress');
+            });
+
+            Route::middleware('permission:SYS.create')->group(function (): void {
+                Route::post('/', [ImportController::class, 'upload'])->name('upload');
+                Route::post('{batch}/validate', [ImportController::class, 'validateBatch'])->whereNumber('batch')->name('validate');
+                Route::post('{batch}/save', [ImportController::class, 'save'])->whereNumber('batch')->name('save');
+            });
+
+            Route::middleware('permission:SYS.delete')->group(function (): void {
+                Route::post('{batch}/rollback', [ImportController::class, 'rollback'])->whereNumber('batch')->name('rollback');
+                Route::delete('{batch}', [ImportController::class, 'destroy'])->whereNumber('batch')->name('destroy');
+            });
         });
 });

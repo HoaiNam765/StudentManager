@@ -90,6 +90,9 @@ class AuditLogSearchTest extends TestCase
         $acad = $this->userWithRoles('ACAD');
         $log = $this->logAt('2026-10-04 18:00:00', AuditEvent::Login, $acad);
 
+        // Vai trò được gán theo ngày thật; trả đồng hồ về hiện tại để quyền có hiệu lực (không phụ thuộc ngày chạy test)
+        $this->travelBack();
+
         $this->assertTrue(Gate::forUser($admin)->allows('viewAny', AuditLog::class));
         $this->assertTrue(Gate::forUser($admin)->allows('view', $log));
         $this->assertTrue(Gate::forUser($admin)->allows('export', AuditLog::class));

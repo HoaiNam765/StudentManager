@@ -270,6 +270,71 @@ class AcademicYearServiceTest extends TestCase
         );
     }
 
+    public function test_khong_cho_sua_nam_hoc_neu_khong_bao_phu_het_hoc_ky_da_tao(): void
+    {
+        $academicYear = AcademicYear::create([
+            'name' => '2026-2027',
+            'start_date' => '2026-09-01',
+            'end_date' => '2027-08-31',
+        ]);
+
+        Term::create([
+            'academic_year_id' => $academicYear->id,
+            'name' => 'Học kỳ 2',
+            'type' => 'main',
+            'start_date' => '2027-01-15',
+            'end_date' => '2027-06-30',
+            'weeks' => 18,
+            'status' => TermStatus::PLANNED,
+        ]);
+
+        try {
+            app(AcademicYearService::class)->updateAcademicYear($academicYear, [
+                'name' => '2026-2027',
+                'start_date' => '2026-09-01',
+                'end_date' => '2027-05-31',
+            ]);
+
+            $this->fail('Phải từ chối khi ngày kết thúc mới nằm trước ngày kết thúc của học kỳ đã tạo.');
+        } catch (BusinessRuleException $e) {
+            $this->assertStringContainsString('không bao phủ hết các học kỳ', $e->getMessage());
+            $this->assertNotEmpty($e->hint(), 'Thông báo lỗi phải kèm cách khắc phục (GC-04)');
+        }
+
+        $this->assertSame(
+            '2027-08-31',
+            $academicYear->fresh()->end_date->toDateString(),
+            'Năm học phải giữ nguyên khi bị từ chối'
+        );
+    }
+
+    public function test_cho_sua_nam_hoc_khi_van_bao_phu_het_hoc_ky_da_tao(): void
+    {
+        $academicYear = AcademicYear::create([
+            'name' => '2026-2027',
+            'start_date' => '2026-09-01',
+            'end_date' => '2027-08-31',
+        ]);
+
+        Term::create([
+            'academic_year_id' => $academicYear->id,
+            'name' => 'Học kỳ 2',
+            'type' => 'main',
+            'start_date' => '2027-01-15',
+            'end_date' => '2027-06-30',
+            'weeks' => 18,
+            'status' => TermStatus::PLANNED,
+        ]);
+
+        $updated = app(AcademicYearService::class)->updateAcademicYear($academicYear, [
+            'name' => '2026-2027',
+            'start_date' => '2026-08-15',
+            'end_date' => '2027-06-30',
+        ]);
+
+        $this->assertSame('2027-06-30', $updated->end_date->toDateString());
+    }
+
     public function test_khong_xoa_nam_hoc_da_co_hoc_ky(): void
     {
         $academicYear = AcademicYear::create([

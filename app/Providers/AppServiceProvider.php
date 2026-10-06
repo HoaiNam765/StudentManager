@@ -84,6 +84,5 @@ class AppServiceProvider extends ServiceProvider
                     ->response($respond),
             ];
         });
-
     }
 }

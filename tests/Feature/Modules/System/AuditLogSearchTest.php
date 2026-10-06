@@ -9,7 +9,6 @@ use App\Support\Audit\AuditLog;
 use App\Support\Audit\AuditLogger;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Tests\Support\InteractsWithRoles;
 use Tests\TestCase;
@@ -32,7 +31,7 @@ class AuditLogSearchTest extends TestCase
     private function logAt(string $utc, AuditEvent $event, ?User $actor = null, ?User $subject = null, array $new = []): AuditLog
     {
         $this->travelTo(CarbonImmutable::parse($utc, 'UTC'));
-        $actor === null ? Auth::logout() : $this->actingAs($actor);
+        $actor === null ? auth()->logout() : $this->actingAs($actor);
 
         return app(AuditLogger::class)->record($event, $subject, [], $new);
     }
@@ -45,7 +44,7 @@ class AuditLogSearchTest extends TestCase
         $b = $this->logAt('2026-10-01 02:00:00', AuditEvent::Login, $admin);
         $c = $this->logAt('2026-10-01 03:00:00', AuditEvent::Updated, $other, $admin);
 
-        $ids = fn(array $filters) => $this->search->query($filters)->pluck('id')->all();
+        $ids = fn (array $filters) => $this->search->query($filters)->pluck('id')->all();
 
         $this->assertSame([$b->id, $a->id], $ids(['user_id' => $admin->id]), 'Theo người, mới nhất trước');
         $this->assertSame([$c->id, $a->id], $ids(['event' => AuditEvent::Updated]));
@@ -60,7 +59,7 @@ class AuditLogSearchTest extends TestCase
         $late = $this->logAt('2026-10-04 16:59:00', AuditEvent::Login);
         $nextDay = $this->logAt('2026-10-04 18:00:00', AuditEvent::Login);
 
-        $ids = fn(array $filters) => $this->search->query($filters)->pluck('id')->all();
+        $ids = fn (array $filters) => $this->search->query($filters)->pluck('id')->all();
 
         $this->assertSame([$late->id], $ids(['from' => '2026-10-04', 'to' => '2026-10-04']));
         $this->assertSame([$nextDay->id], $ids(['from' => '2026-10-05', 'to' => '2026-10-05']));
@@ -89,17 +88,12 @@ class AuditLogSearchTest extends TestCase
         $this->seedRoles();
         $admin = $this->userWithRoles('ADMIN');
         $acad = $this->userWithRoles('ACAD');
+        $log = $this->logAt('2026-10-04 18:00:00', AuditEvent::Login, $acad);
 
-        $log = $this->logAt(
-            '2026-10-04 18:00:00',
-            AuditEvent::Login,
-            $acad
-        );
-
-        $this->travelTo(CarbonImmutable::parse('2026-10-06 12:00:00', 'UTC'));
+        // Vai trò được gán theo ngày thật; trả đồng hồ về hiện tại để quyền có hiệu lực (không phụ thuộc ngày chạy test)
+        $this->travelBack();
 
         $this->assertTrue(Gate::forUser($admin)->allows('viewAny', AuditLog::class));
-
         $this->assertTrue(Gate::forUser($admin)->allows('view', $log));
         $this->assertTrue(Gate::forUser($admin)->allows('export', AuditLog::class));
 

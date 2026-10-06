@@ -298,6 +298,14 @@ class AcademicYearService extends BaseService
                 TermStatus::LOCKED->value => [],
             ];
 
+            // BR-ACY-03: chuyển sang Đang diễn ra chỉ đi qua setCurrentTerm (có kiểm tra học kỳ chính khác)
+            if ($newStatus === TermStatus::IN_PROGRESS) {
+                $this->fail(
+                    'Không thể đổi trạng thái trực tiếp sang Đang diễn ra.',
+                    'Hãy dùng thao tác "Đặt học kỳ hiện hành" để bắt đầu học kỳ.'
+                );
+            }
+
             $currentStatus = $term->status->value;
 
             if (! in_array(
@@ -338,13 +346,7 @@ class AcademicYearService extends BaseService
     public function deleteAcademicYear(
         AcademicYear $academicYear
     ): void {
-        if ($academicYear->terms()->exists()) {
-            $this->fail(
-                'Không thể xóa năm học vì đã có học kỳ liên quan.',
-                'Hãy khóa dữ liệu thay vì xóa dữ liệu đã phát sinh.'
-            );
-        }
-
+        // BR-ACY-04: không xóa, chỉ khóa. Năm học luôn bị chặn, dù đã có học kỳ hay chưa.
         $this->fail(
             'Không cho phép xóa năm học.',
             'Năm học là dữ liệu nghiệp vụ và không được xóa khỏi hệ thống.'

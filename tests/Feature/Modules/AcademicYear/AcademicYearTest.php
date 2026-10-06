@@ -195,6 +195,29 @@ class AcademicYearTest extends TestCase
         );
     }
 
+    public function test_sua_nam_hoc_kiem_tra_du_lieu_bang_form_request(): void
+    {
+        $this->seedRoles();
+
+        $user = $this->userWithRoles('ACAD');
+
+        $academicYear = AcademicYear::create([
+            'name' => '2026-2027',
+            'start_date' => '2026-09-01',
+            'end_date' => '2027-08-31',
+        ]);
+
+        $this->actingAs($user)
+            ->putJson("/admin/academic-years/{$academicYear->id}", [
+                'name' => '2026-2027',
+                'start_date' => '2027-01-01',
+                'end_date' => '2026-09-01',
+            ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['end_date'])
+            ->assertJsonPath('errors.end_date.0', 'Ngày kết thúc phải sau ngày bắt đầu.');
+    }
+
     public function test_user_khong_co_quyen_dat_hoc_ky_hien_hanh_va_doi_trang_thai_bi_tu_choi(): void
     {
         $this->seedRoles();

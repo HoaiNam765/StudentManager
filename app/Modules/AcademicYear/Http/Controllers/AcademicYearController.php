@@ -5,12 +5,12 @@ namespace App\Modules\AcademicYear\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Modules\AcademicYear\Http\Requests\StoreAcademicYearRequest;
 use App\Modules\AcademicYear\Http\Requests\StoreTermRequest;
+use App\Modules\AcademicYear\Http\Requests\UpdateAcademicYearRequest;
 use App\Modules\AcademicYear\Models\AcademicYear;
 use App\Modules\AcademicYear\Models\Term;
 use App\Modules\AcademicYear\Models\TermStatus;
 use App\Modules\AcademicYear\Services\AcademicYearService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class AcademicYearController extends Controller
@@ -54,31 +54,14 @@ class AcademicYearController extends Controller
     }
 
     public function update(
-        Request $request,
+        UpdateAcademicYearRequest $request,
         AcademicYear $academicYear
     ): JsonResponse {
         Gate::authorize('update', $academicYear);
 
-        $data = $request->validate([
-            'name' => [
-                'required',
-                'string',
-                'max:50',
-            ],
-            'start_date' => [
-                'required',
-                'date',
-            ],
-            'end_date' => [
-                'required',
-                'date',
-                'after:start_date',
-            ],
-        ]);
-
         $academicYear = $this->service->updateAcademicYear(
             $academicYear,
-            $data
+            $request->validated()
         );
 
         return response()->json($academicYear);

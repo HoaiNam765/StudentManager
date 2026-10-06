@@ -377,12 +377,18 @@ class AcademicYearServiceTest extends TestCase
             'status' => TermStatus::REGISTRATION,
         ]);
 
-        $this->expectException(BusinessRuleException::class);
+        try {
+            app(AcademicYearService::class)->changeStatus(
+                $term,
+                TermStatus::IN_PROGRESS
+            );
 
-        app(AcademicYearService::class)->changeStatus(
-            $term,
-            TermStatus::IN_PROGRESS
-        );
+            $this->fail('Phải từ chối đổi trạng thái trực tiếp sang Đang diễn ra.');
+        } catch (BusinessRuleException $e) {
+            $this->assertStringContainsString('Đặt học kỳ hiện hành', $e->hint());
+        }
+
+        $this->assertSame(TermStatus::REGISTRATION, $term->fresh()->status);
     }
 
     public function test_khong_duoc_chuyen_sang_exam_grading_truoc_ngay_ket_thuc(): void

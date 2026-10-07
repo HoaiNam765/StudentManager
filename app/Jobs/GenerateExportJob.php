@@ -10,6 +10,7 @@ use App\Modules\System\Models\ExportRequest;
 use App\Support\Exports\ExportColumn;
 use App\Support\Exports\ExportFormat;
 use App\Support\Exports\ExportRenderer;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Model;
@@ -19,7 +20,6 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use RuntimeException;
-use Symfony\Component\HttpKernel\Exception\AuthorizationException;
 use Throwable;
 
 class GenerateExportJob implements ShouldQueue
@@ -115,7 +115,12 @@ class GenerateExportJob implements ShouldQueue
                 throw new RuntimeException('Không thể lưu tệp xuất vào vùng lưu trữ.');
             }
 
-            $request->update(['status' => 'completed', 'path' => $relativePath]);
+            // Tệp có thể chứa dữ liệu nhạy cảm nên chỉ giữ theo hạn cấu hình; lệnh exports:prune dọn sau đó
+            $request->update([
+                'status' => 'completed',
+                'path' => $relativePath,
+                'expires_at' => now()->addDays((int) config('studentmanager.export.retention_days')),
+            ]);
         } finally {
             if (is_file($tempPath)) {
                 unlink($tempPath);
@@ -128,12 +133,14 @@ class GenerateExportJob implements ShouldQueue
         Storage::disk(config('studentmanager.export.disk'))
             ->delete('exports/'.$this->requestId.'.'.$this->format);
 
+        // Lỗi quyền có thông báo dành cho người dùng nên nêu đúng lý do; lỗi khác không để lộ chi tiết kỹ thuật
+        $message = $exception instanceof AuthorizationException
+            ? $exception->getMessage().' Hãy gửi yêu cầu xuất mới.'
+            : 'Tác vụ xuất thất bại. Hãy gửi yêu cầu mới hoặc liên hệ quản trị viên.';
+
         ExportRequest::query()
             ->whereKey($this->requestId)
-            ->update([
-                'status' => 'failed',
-                'error_message' => 'Tác vụ xuất thất bại. Hãy gửi yêu cầu mới hoặc liên hệ quản trị viên.',
-            ]);
+            ->update(['status' => 'failed', 'error_message' => $message]);
     }
 
     /** @return list<string> */

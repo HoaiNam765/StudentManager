@@ -84,6 +84,15 @@ return [
         'sync_threshold' => (int) env('EXPORT_SYNC_THRESHOLD', 50000),
         'job_timeout_seconds' => (int) env('EXPORT_JOB_TIMEOUT_SECONDS', 300),
         'pdf_font' => env('EXPORT_PDF_FONT', 'DejaVu Sans'),
+
+        // PDF dựng cả bảng trong bộ nhớ nên tốn hơn Excel/CSV rất nhiều (đo trên máy dev, 3 cột:
+        // 1.000 dòng ≈ 3,6 giây/190 MB, 2.000 dòng ≈ 12 giây/480 MB, 3.000 dòng ≈ 25 giây/920 MB;
+        // Excel 50.000 dòng ≈ 2 giây/22 MB). PDF từ ngưỡng này chạy nền; quá mức trần thì từ chối.
+        'pdf_sync_threshold' => (int) env('EXPORT_PDF_SYNC_THRESHOLD', 300),
+        'pdf_max_rows' => (int) env('EXPORT_PDF_MAX_ROWS', 2000),
+
+        // Số ngày giữ tệp xuất chạy nền; sau đó lệnh exports:prune xóa tệp và đặt yêu cầu sang expired
+        'retention_days' => (int) env('EXPORT_RETENTION_DAYS', 7),
     ],
 
 ];

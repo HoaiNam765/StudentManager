@@ -21,6 +21,7 @@ return new class extends Migration
             $table->json('view_scopes');
             $table->string('path')->nullable();
             $table->text('error_message')->nullable();
+            $table->timestamp('expires_at')->nullable()->index()->comment('Hết hạn giữ tệp; sau đó bị dọn và chuyển sang expired');
             $table->timestamps();
             $table->index(['user_id', 'created_at']);
         });

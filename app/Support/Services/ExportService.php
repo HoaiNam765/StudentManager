@@ -22,7 +22,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\AuthorizationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
@@ -63,7 +62,8 @@ class ExportService extends BaseService
             ->count();
 
         $safeFilename = Str::slug(pathinfo($filename, PATHINFO_FILENAME)) ?: 'danh-sach';
-        $syncThreshold = (int) config('studentmanager.export.sync_threshold');
+        $syncThreshold = $this->syncThresholdFor($exportFormat);
+        $this->assertPdfWithinLimit($exportFormat, $rowCount);
 
         if ($rowCount > $syncThreshold) {
             return $this->queue(
@@ -102,7 +102,7 @@ class ExportService extends BaseService
         }
     }
 
-    /** @return array{id: string, status: string, format: string, filename: string, row_count: int, error_message: ?string} */
+    /** @return array{id: string, status: string, format: string, filename: string, row_count: int, error_message: ?string, expires_at: ?string} */
     public function status(string $requestId, User $user): array
     {
         $request = $this->ownedRequest($requestId, $user);
@@ -112,11 +112,12 @@ class ExportService extends BaseService
 
         return [
             'id' => $request->id,
-            'status' => $request->status,
+            'status' => $request->isExpired() ? 'expired' : $request->status,
             'format' => $request->format,
             'filename' => $request->filename,
             'row_count' => $request->row_count,
             'error_message' => $request->error_message,
+            'expires_at' => $request->expires_at?->toIso8601String(),
         ];
     }
 
@@ -126,6 +127,13 @@ class ExportService extends BaseService
         $columns = array_map(ExportColumn::fromArray(...), $request->columns);
         $this->authorizeExport($user, $request->module, $columns);
         $this->assertSameScopes($user, $request->module, $request->export_scopes, $request->view_scopes);
+
+        if ($request->isExpired()) {
+            throw new BusinessRuleException(
+                'Tệp xuất đã hết hạn và đã bị xóa.',
+                'Tệp chỉ được giữ '.(int) config('studentmanager.export.retention_days').' ngày. Hãy gửi yêu cầu xuất dữ liệu mới.'
+            );
+        }
 
         if ($request->status !== 'completed') {
             throw new BusinessRuleException(
@@ -143,8 +151,9 @@ class ExportService extends BaseService
             );
         }
 
+        // Sự kiện riêng (Downloaded) để báo cáo không đếm đôi với lần xuất (Exported)
         $this->audit->record(
-            AuditEvent::Exported,
+            AuditEvent::Downloaded,
             newValues: [
                 'request_id' => $request->id,
                 'module' => $request->module,
@@ -156,6 +165,66 @@ class ExportService extends BaseService
 
         return Storage::disk(config('studentmanager.export.disk'))
             ->download($request->path, $request->filename.'.'.$request->format);
+    }
+
+    /**
+     * Xóa tệp xuất đã quá hạn giữ và chuyển yêu cầu sang `expired` (chạy hằng ngày bằng lệnh `exports:prune`).
+     * Không đổi trạng thái nếu xóa tệp thất bại, để lần chạy sau thử lại.
+     *
+     * @return int số yêu cầu đã dọn
+     */
+    public function pruneExpired(): int
+    {
+        $disk = Storage::disk(config('studentmanager.export.disk'));
+        $pruned = 0;
+
+        ExportRequest::query()
+            ->where('status', 'completed')
+            ->where('expires_at', '<=', now())
+            ->chunkById(100, function ($requests) use ($disk, &$pruned): void {
+                foreach ($requests as $request) {
+                    if ($request->path !== null && ! $disk->delete($request->path)) {
+                        report(new \RuntimeException("Không xóa được tệp xuất hết hạn {$request->path}."));
+
+                        continue;
+                    }
+
+                    $request->update(['status' => 'expired', 'path' => null]);
+                    $pruned++;
+                }
+            });
+
+        if ($pruned > 0) {
+            $this->audit->record(
+                AuditEvent::Deleted,
+                newValues: ['pruned' => $pruned],
+                reason: 'Dọn tệp xuất dữ liệu hết hạn.'
+            );
+        }
+
+        return $pruned;
+    }
+
+    /** PDF có ngưỡng đồng bộ riêng (thấp hơn) vì dựng cả bảng trong bộ nhớ. */
+    private function syncThresholdFor(ExportFormat $format): int
+    {
+        $threshold = (int) config('studentmanager.export.sync_threshold');
+
+        return $format === ExportFormat::Pdf
+            ? min($threshold, (int) config('studentmanager.export.pdf_sync_threshold'))
+            : $threshold;
+    }
+
+    private function assertPdfWithinLimit(ExportFormat $format, int $rowCount): void
+    {
+        $max = (int) config('studentmanager.export.pdf_max_rows');
+
+        if ($format === ExportFormat::Pdf && $max > 0 && $rowCount > $max) {
+            $this->fail(
+                'PDF chỉ xuất tối đa '.number_format($max, 0, ',', '.').' dòng, yêu cầu này có '.number_format($rowCount, 0, ',', '.').' dòng.',
+                'Hãy xuất Excel (.xlsx) hoặc CSV cho danh sách lớn, hoặc lọc bớt dữ liệu rồi xuất lại PDF.'
+            );
+        }
     }
 
     /**
@@ -332,7 +401,8 @@ class ExportService extends BaseService
             $this->scopeValues($user, $module, PermissionAction::Export) !== $exportScopes
             || $this->scopeValues($user, $module, PermissionAction::View) !== $viewScopes
         ) {
-            throw new AuthorizationException('Quyền xuất dữ liệu đã thay đổi; hãy gửi yêu cầu xuất mới.');
+            // abort(403) để đi qua bộ xử lý lỗi 403 chung (ghi nhật ký từ chối truy cập, trả 403 chứ không phải 500)
+            abort(403, 'Quyền xuất dữ liệu đã thay đổi; hãy gửi yêu cầu xuất mới.');
         }
     }
 

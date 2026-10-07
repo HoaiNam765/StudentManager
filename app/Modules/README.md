@@ -80,6 +80,15 @@ các cột này chỉ được xuất khi người dùng có quyền xem toàn t
 được nhúng để giữ dấu tiếng Việt. Cấu hình ngưỡng (`EXPORT_SYNC_THRESHOLD`), disk và thời gian job
 ở `config/studentmanager.php` (`studentmanager.export`).
 
+Lưu ý khi dùng `ExportService`:
+
+- **PDF nặng hơn Excel/CSV nhiều** (dompdf dựng cả bảng trong bộ nhớ; đo 3 cột: 1.000 dòng ≈ 3,6 giây/190 MB, 2.000 dòng ≈ 12 giây/480 MB; Excel 50.000 dòng ≈ 2 giây/22 MB). PDF từ `pdf_sync_threshold` (mặc định 300 dòng) chạy nền, quá `pdf_max_rows` (mặc định 2.000) bị từ chối kèm gợi ý xuất Excel/CSV. Worker xử lý PDF cần `memory_limit` từ 512 MB.
+- **Tệp xuất nền chỉ được giữ `retention_days` ngày** (mặc định 7) vì có thể chứa dữ liệu nhạy cảm. Lệnh `exports:prune` chạy hằng ngày lúc 02:00 (`routes/console.php`) xóa tệp và đặt yêu cầu sang `expired`; máy chủ cần chạy `php artisan schedule:run` mỗi phút. `status()` trả `expired` và `download()` báo rõ "đã hết hạn" ngay khi quá hạn, kể cả khi lệnh dọn chưa chạy tới.
+- **Tải tệp ghi sự kiện `Downloaded`**, tách khỏi `Exported` (ghi lúc xuất) để báo cáo không đếm đôi.
+- **Dữ liệu nhạy cảm trong hàng đợi:** tác vụ nền lưu câu SQL và các giá trị ràng buộc (`bindings`) của truy vấn vào bảng `jobs`. Không đưa dữ liệu cá nhân (CCCD, số điện thoại…) vào điều kiện lọc của truy vấn xuất nền; lọc theo mã, trạng thái, khoảng ngày thì an toàn.
+- **Đếm số dòng** bằng `fromSub` nên truy vấn có `join` phải `select` các cột có tên riêng (alias), nếu không MySQL báo trùng tên cột.
+- **Cần `ext-zip`** của PHP để ghi `.xlsx` (OpenSpout ghi theo luồng, bộ nhớ gần như không đổi theo số dòng; không dùng PhpSpreadsheet).
+
 Ví dụ migration và model của một danh mục:
 
 ```php

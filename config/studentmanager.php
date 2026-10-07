@@ -73,4 +73,17 @@ return [
         'job_timeout_seconds' => (int) env('IMPORT_JOB_TIMEOUT_SECONDS', 120),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Xuất dữ liệu (GC-01, NFR-CMP-02, NFR-PERF-03)
+    |--------------------------------------------------------------------------
+    | Trên ngưỡng đồng bộ thì xuất nền; các tác vụ lớn không giữ toàn bộ bảng trong bộ nhớ.
+    */
+    'export' => [
+        'disk' => env('EXPORT_DISK', 'local'),
+        'sync_threshold' => (int) env('EXPORT_SYNC_THRESHOLD', 50000),
+        'job_timeout_seconds' => (int) env('EXPORT_JOB_TIMEOUT_SECONDS', 300),
+        'pdf_font' => env('EXPORT_PDF_FONT', 'DejaVu Sans'),
+    ],
+
 ];

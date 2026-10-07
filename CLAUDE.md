@@ -78,6 +78,7 @@ Ghi nhớ cho Claude Code khi làm việc với dự án này. Cập nhật mụ
 | #71 | #222 | RBAC: vai trò, ma trận quyền, phạm vi dữ liệu, API quản trị phân quyền; thêm `CLAUDE.md` |
 | #72 | #223 | Đăng nhập bằng tên đăng nhập/email, vào cổng theo vai trò, khóa tạm, mật khẩu tạm, đổi mật khẩu, chính sách mật khẩu, giới hạn tần suất |
 | #75 | #224 | Năm học – học kỳ (module `AcademicYear`, của B): tạo/xem/sửa năm học, tạo học kỳ, học kỳ hiện hành, máy trạng thái theo ngày, không xóa chỉ khóa, quyền `ACY.*`, nhật ký kiểm toán. Chưa có: sửa học kỳ, trạng thái/khóa năm học. Mình đã sửa thẳng trên nhánh của B (Pint, test, vài việc nhỏ theo review) |
+| — | — | Dịch vụ xuất Excel/PDF dùng chung: quyền/phạm vi, cột nhạy cảm, phông tiếng Việt, audit và tác vụ nền theo ngưỡng |
 
 ## Việc tiếp theo của A (P1)
 

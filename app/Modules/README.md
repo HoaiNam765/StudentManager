@@ -46,6 +46,39 @@ Dùng lại thay vì tự viết trong từng module. Ví dụ đầy đủ có 
 | Ghi kèm lý do thay đổi | `app(AuditLogger::class)->withReason('Lý do…', fn () => $model->update([...]))` |
 | Ghi hành động không phải tạo/sửa/xóa (đăng nhập, từ chối truy cập, xem dữ liệu nhạy cảm, duyệt, khóa…) | `app(AuditLogger::class)->record(AuditEvent::ViewSensitive, $model, reason: '…')`; thiếu loại thì thêm case vào `App\Support\Audit\AuditEvent` |
 | Tra cứu nhật ký (màn hình quản trị) | `App\Modules\System\Services\AuditLogSearch`; quyền ở `AuditLogPolicy` |
+| Xuất danh sách Excel / PDF | `App\Support\Services\ExportService`; truyền truy vấn Eloquent chưa phân trang, mã module, người dùng và `ExportColumn[]`; dịch vụ tự lọc theo quyền X/phạm vi, audit và chuyển tác vụ trên ngưỡng sang nền |
+
+Ví dụ xuất một danh sách:
+
+```php
+$result = app(ExportService::class)->export(
+    Student::query()->where('status', 'active'),
+    [
+        new ExportColumn('student_code', 'MSSV'),
+        new ExportColumn('full_name', 'Họ và tên'),
+    ],
+    'STU',
+    $request->user(),
+    format: 'xlsx',
+    filename: 'sinh-vien-dang-hoc',
+);
+
+if ($result->isQueued()) {
+    return response()->json([
+        'id' => $result->requestId,
+        'status' => app(ExportService::class)->status($result->requestId, $request->user()),
+    ], 202);
+}
+
+return $result->download;
+```
+
+Với tác vụ nền, kiểm tra bằng `ExportService::status($id, $user)` và tải bằng
+`ExportService::download($id, $user)`. Chỉ người tạo còn quyền mới xem/tải được yêu cầu.
+Đánh dấu `new ExportColumn('national_id', 'Số định danh', sensitive: true)` cho dữ liệu nhạy cảm;
+các cột này chỉ được xuất khi người dùng có quyền xem toàn trường (`View/ALL`). PDF dùng DejaVu Sans
+được nhúng để giữ dấu tiếng Việt. Cấu hình ngưỡng (`EXPORT_SYNC_THRESHOLD`), disk và thời gian job
+ở `config/studentmanager.php` (`studentmanager.export`).
 
 Ví dụ migration và model của một danh mục:
 

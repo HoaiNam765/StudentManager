@@ -28,6 +28,7 @@ enum AuditEvent: string
     case PasswordChanged = 'password_changed';
     case Imported = 'imported';
     case RolledBack = 'rolled_back';
+    case Downloaded = 'downloaded';
 
     public function label(): string
     {
@@ -50,6 +51,7 @@ enum AuditEvent: string
             self::PasswordChanged => 'Đổi mật khẩu',
             self::Imported => 'Nhập dữ liệu',
             self::RolledBack => 'Hoàn tác',
+            self::Downloaded => 'Tải xuống',
         };
     }
 }

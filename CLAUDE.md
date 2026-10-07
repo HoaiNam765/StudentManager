@@ -40,6 +40,7 @@ Ghi nhớ cho Claude Code khi làm việc với dự án này. Cập nhật mụ
 - Windows 11 + Laragon: PHP 8.3, Composer, MySQL 8.4 (`C:\laragon\bin\mysql\mysql-8.4.3-winx64\bin\mysql.exe`, root không mật khẩu), Node 24, `gh` đã đăng nhập.
 - CSDL: `student_manager` (dev), `student_manager_test` (test, `Tests\TestCase` tự tạo; test bị chặn nếu tên CSDL không kết thúc bằng `_test`).
 - Lệnh kiểm tra: `php artisan test`, `composer lint` (Pint), `npm run build`.
+- Xuất `.xlsx` (OpenSpout) cần `extension=zip`; PHP của Laragon mặc định chưa bật. Bật trong `php.ini`, hoặc chạy tạm không sửa `php.ini`: đặt `PHP_INI_SCAN_DIR` trỏ tới thư mục chứa một file `.ini` có dòng `extension=zip` (cờ `-d` không truyền được cho `php artisan test` vì nó chạy phpunit ở tiến trình con).
 - Tài khoản dùng thử: tên đăng nhập `admin` / `admin@studentmanager.test` (vai trò ADMIN), tạo bởi `DevUserSeeder`; mật khẩu xem trong seeder.
 - Chạy thử trên trình duyệt: `php artisan serve --port=8010` chạy nền rồi mở `/login`; khung trình duyệt bị che thì không bấm được nút, đọc trang bằng JavaScript và kiểm tra `audit_logs`.
 
@@ -78,6 +79,7 @@ Ghi nhớ cho Claude Code khi làm việc với dự án này. Cập nhật mụ
 | #71 | #222 | RBAC: vai trò, ma trận quyền, phạm vi dữ liệu, API quản trị phân quyền; thêm `CLAUDE.md` |
 | #72 | #223 | Đăng nhập bằng tên đăng nhập/email, vào cổng theo vai trò, khóa tạm, mật khẩu tạm, đổi mật khẩu, chính sách mật khẩu, giới hạn tần suất |
 | #75 | #224 | Năm học – học kỳ (module `AcademicYear`, của B): tạo/xem/sửa năm học, tạo học kỳ, học kỳ hiện hành, máy trạng thái theo ngày, không xóa chỉ khóa, quyền `ACY.*`, nhật ký kiểm toán. Chưa có: sửa học kỳ, trạng thái/khóa năm học. Mình đã sửa thẳng trên nhánh của B (Pint, test, vài việc nhỏ theo review) |
+| #81 | #227 | Dịch vụ xuất Excel/CSV/PDF dùng chung (`App\Support\Services\ExportService`, của C): quyền X và phạm vi dữ liệu, cột nhạy cảm, phông tiếng Việt, audit (`Exported`, `Downloaded`), tác vụ nền theo ngưỡng (PDF ngưỡng riêng + mức trần), tệp nền giữ 7 ngày rồi dọn bằng `exports:prune`. Chưa có route/controller cho `status`/`download`. Mình đã sửa thẳng trên nhánh của C theo review (đúng lớp ngoại lệ, PDF, hạn giữ tệp) |
 
 ## Việc tiếp theo của A (P1)
 

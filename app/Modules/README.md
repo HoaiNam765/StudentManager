@@ -176,7 +176,7 @@ Ghi nhớ:
 
 - Đăng nhập bằng tên đăng nhập (`users.username`: MSSV với sinh viên, mã cán bộ với nhân sự) hoặc email. Module tạo tài khoản (STU, TCH, quản lý người dùng) phải điền `username`.
 - **Cấp mật khẩu tạm** (tài khoản mới, quản trị viên đặt lại): `app(PasswordService::class)->setTemporaryPassword($user, $matKhauTam)`. Người dùng bị buộc đổi ở lần đăng nhập đầu, mật khẩu tạm hết hạn sau 7 ngày (BR-AUTH-10), mọi phiên đang mở bị đăng xuất.
-- **Quên mật khẩu** (#82) theo liên kết đặt lại một lần, hạn 30 phút (BR-AUTH-03): người dùng tự chọn mật khẩu mới, nên thêm hàm `reset()` vào `PasswordService` dùng lại `store()` (lịch sử mật khẩu, đổi `remember_token`) và đăng xuất mọi phiên.
+- **Quên mật khẩu** (FR-AUTH-003): `/forgot-password` → email chứa liên kết (`ResetPasswordLink`) → `/reset-password/{token}`. Mã do password broker của Laravel tạo, lưu dạng băm, dùng một lần, hết hạn sau `AUTH_PASSWORD_RESET_MINUTES` phút (mặc định 30, BR-AUTH-03). Phản hồi luôn giống nhau dù tài khoản có tồn tại hay không; tài khoản đã khóa, đã ngừng thì không gửi liên kết. Đặt lại xong (`PasswordService::reset()`): mật khẩu mới theo chính sách, không trùng mật khẩu gần đây, mở khóa tạm, đăng xuất mọi phiên. Giới hạn tần suất `throttle:password-reset` (5 lần/phút/IP).
 - **Mở khóa trước hạn** (FR-AUTH-006): `app(LoginService::class)->unlock($user)`.
 - **Khóa hẳn / ngừng tài khoản**: dùng `UserService` (mục dưới). `LoginService::attempt()` chặn bằng `User::canSignIn()` sau khi đúng mật khẩu, nên chỉ người biết mật khẩu mới thấy lý do cụ thể.
 - Mật khẩu mới luôn kiểm tra bằng `Password::defaults()` (chính sách trong `config/studentmanager.php`, mục `auth.password`).

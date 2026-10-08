@@ -26,6 +26,7 @@ enum AuditEvent: string
     case Locked = 'locked';
     case Unlocked = 'unlocked';
     case PasswordChanged = 'password_changed';
+    case PasswordResetRequested = 'password_reset_requested';
     case Imported = 'imported';
     case RolledBack = 'rolled_back';
     case Downloaded = 'downloaded';
@@ -49,6 +50,7 @@ enum AuditEvent: string
             self::Locked => 'Khóa',
             self::Unlocked => 'Mở khóa',
             self::PasswordChanged => 'Đổi mật khẩu',
+            self::PasswordResetRequested => 'Yêu cầu đặt lại mật khẩu',
             self::Imported => 'Nhập dữ liệu',
             self::RolledBack => 'Hoàn tác',
             self::Downloaded => 'Tải xuống',

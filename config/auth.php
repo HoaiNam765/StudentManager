@@ -96,7 +96,8 @@ return [
         'users' => [
             'provider' => 'users',
             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
-            'expire' => 60,
+            // BR-AUTH-03: liên kết đặt lại dùng một lần, hết hạn sau 30 phút; mỗi tài khoản tối đa một liên kết mỗi 60 giây
+            'expire' => (int) env('AUTH_PASSWORD_RESET_MINUTES', 30),
             'throttle' => 60,
         ],
     ],

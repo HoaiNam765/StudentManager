@@ -25,7 +25,7 @@
     <aside id="app-sidebar" class="w-64 min-w-[260px] h-screen bg-surface-container-lowest flex flex-col justify-between border-r border-outline-variant fixed left-0 top-0 z-40 select-none -translate-x-full md:translate-x-0 transition-transform duration-200">
         <div class="p-4 flex flex-col gap-5 overflow-y-auto">
             <div class="flex items-center gap-3 px-1 py-1">
-                <div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-white shadow-sm flex-shrink-0">
+                <div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-white shadow-sm shrink-0">
                     <span class="material-symbols-outlined text-2xl font-bold" aria-hidden="true">school</span>
                 </div>
                 <div class="flex flex-col overflow-hidden">
@@ -61,7 +61,7 @@
 
         <div class="p-3 border-t border-outline-variant bg-surface-container-low m-2 rounded-xl flex items-center justify-between gap-2">
             <div class="flex items-center gap-2.5 overflow-hidden">
-                <div class="w-8 h-8 rounded-full bg-primary text-white text-xs flex items-center justify-center font-bold flex-shrink-0">{{ $initials }}</div>
+                <div class="w-8 h-8 rounded-full bg-primary text-white text-xs flex items-center justify-center font-bold shrink-0">{{ $initials }}</div>
                 <div class="flex flex-col min-w-0">
                     <p class="text-xs font-semibold text-on-surface truncate">{{ $currentUser->name }}</p>
                     <p class="text-[11px] text-on-surface-variant truncate">{{ $currentUser->username ?? $currentUser->email }}</p>
@@ -103,7 +103,7 @@
             </div>
 
             <footer class="w-full max-w-[1440px] mx-auto mt-12 pt-6 border-t border-outline-variant text-center text-xs text-on-surface-variant">
-                <p>© {{ now()->year }} Trường Đại học Công Thương TP. Hồ Chí Minh (HUIT) - Cổng Quản lý Học vụ | Hỗ trợ kỹ thuật: <a href="mailto:daotao@huit.edu.vn" class="text-primary hover:underline">daotao@huit.edu.vn</a></p>
+                <p>© {{ now()->year }} {{ config('studentmanager.school.name') }} ({{ config('studentmanager.school.abbr') }}) - Cổng Quản lý Học vụ | Hỗ trợ kỹ thuật: <a href="mailto:daotao@huit.edu.vn" class="text-primary hover:underline">daotao@huit.edu.vn</a></p>
             </footer>
         </main>
     </div>

@@ -12,7 +12,7 @@
                     HUIT
                 </div>
                 <div class="flex flex-col min-w-0">
-                    <span class="font-bold text-[15px] leading-5 text-slate-800 tracking-tight truncate">Trường ĐH Công Thương</span>
+                    <span class="font-bold text-[15px] leading-5 text-slate-800 tracking-tight truncate">{{ config('studentmanager.school.short_name') }}</span>
                     <span class="text-[12px] leading-4 text-slate-500 truncate">Cổng Giảng viên • QL Học vụ</span>
                 </div>
             </div>
@@ -524,7 +524,7 @@
         <!-- Footer -->
         <footer class="bg-white border-t border-[#E2E8F0] py-4 px-8 mt-auto flex">
             <div class="max-w-[1120px] w-full mx-auto flex flex-col md:flex-row items-center justify-between text-xs text-slate-500 gap-2">
-                <div>© 2024 Trường Đại học Công Thương TP. Hồ Chí Minh (HUIT) - Hệ thống Quản lý Học vụ điện tử.</div>
+                <div>© 2024 {{ config('studentmanager.school.name') }} ({{ config('studentmanager.school.abbr') }}) - Hệ thống Quản lý Học vụ điện tử.</div>
                 <div class="flex items-center gap-3 font-medium">
                     <span>Hỗ trợ kỹ thuật: 028 3816 1673</span>
                     <span class="text-slate-300">|</span>

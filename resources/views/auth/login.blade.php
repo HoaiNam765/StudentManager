@@ -5,125 +5,8 @@
 <link href="https://fonts.googleapis.com" rel="preconnect">
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<script id="tailwind-config">
-    tailwind.config = {
-      darkMode: "class",
-      theme: {
-        extend: {
-          "colors": {
-            "primary-fixed": "#dae2ff",
-            "outline-variant": "#c3c6d5",
-            "on-primary-fixed": "#001849",
-            "primary-container": "#3f6fde",
-            "on-tertiary-fixed": "#001e2c",
-            "tertiary-fixed": "#c4e7ff",
-            "error": "#ba1a1a",
-            "surface": "#f8f9ff",
-            "on-surface-variant": "#434653",
-            "inverse-primary": "#b2c5ff",
-            "surface-variant": "#d3e4fe",
-            "on-primary": "#ffffff",
-            "on-secondary-fixed": "#131b2e",
-            "on-primary-fixed-variant": "#003fa3",
-            "primary": "#1c55c4",
-            "on-tertiary-fixed-variant": "#004c69",
-            "on-error-container": "#93000a",
-            "surface-container-highest": "#d3e4fe",
-            "on-tertiary-container": "#fcfcff",
-            "surface-tint": "#2057c6",
-            "on-secondary": "#ffffff",
-            "tertiary": "#006387",
-            "on-surface": "#0b1c30",
-            "on-secondary-container": "#5c647a",
-            "background": "#f8f9ff",
-            "surface-dim": "#cbdbf5",
-            "on-tertiary": "#ffffff",
-            "on-secondary-fixed-variant": "#3f465c",
-            "secondary-fixed": "#dae2fd",
-            "inverse-on-surface": "#eaf1ff",
-            "on-primary-container": "#fefcff",
-            "on-background": "#0b1c30",
-            "outline": "#737685",
-            "surface-container-high": "#dce9ff",
-            "primary-fixed-dim": "#b2c5ff",
-            "error-container": "#ffdad6",
-            "tertiary-container": "#007da9",
-            "inverse-surface": "#213145",
-            "secondary-fixed-dim": "#bec6e0",
-            "on-error": "#ffffff",
-            "surface-container": "#e5eeff",
-            "secondary": "#565e74",
-            "surface-container-low": "#eff4ff",
-            "surface-bright": "#f8f9ff",
-            "secondary-container": "#dae2fd",
-            "surface-container-lowest": "#ffffff",
-            "tertiary-fixed-dim": "#7bd0ff"
-          },
-          "borderRadius": {
-            "DEFAULT": "0.25rem",
-            "lg": "0.5rem",
-            "xl": "0.75rem",
-            "full": "9999px"
-          },
-          "spacing": {
-            "gutter-mobile": "1rem",
-            "space-xl": "2rem",
-            "space-md": "1rem",
-            "space-lg": "1.5rem",
-            "gutter": "1.5rem",
-            "margin-mobile": "1rem",
-            "margin": "2rem",
-            "space-sm": "0.5rem",
-            "space-xs": "0.25rem"
-          },
-          "fontFamily": {
-            "label-md": ["Inter"],
-            "headline-md": ["Inter"],
-            "body-sm": ["Inter"],
-            "headline-xl-mobile": ["Inter"],
-            "label-lg": ["Inter"],
-            "headline-xl": ["Inter"],
-            "display-lg": ["Inter"],
-            "headline-sm": ["Inter"],
-            "display-lg-mobile": ["Inter"],
-            "label-sm": ["Inter"],
-            "body-md": ["Inter"],
-            "headline-lg": ["Inter"],
-            "body-lg": ["Inter"]
-          },
-          "fontSize": {
-            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
-            "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.005em", "fontWeight": "600" }],
-            "body-sm": ["12px", { "lineHeight": "18px", "fontWeight": "400" }],
-            "headline-xl-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
-            "label-lg": ["14px", { "lineHeight": "20px", "fontWeight": "600" }],
-            "headline-xl": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
-            "display-lg": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
-            "headline-sm": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
-            "display-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.015em", "fontWeight": "700" }],
-            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "500" }],
-            "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
-            "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
-            "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
-          }
-        }
-      }
-    }
-  </script>
-<style>
-    .material-symbols-outlined {
-      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-      display: inline-block;
-      vertical-align: middle;
-      line-height: 1;
-    }
-    .custom-shadow {
-      box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 1px 2px -1px rgba(15, 23, 42, 0.02);
-    }
-  </style>
+@include('partials.icon-font')
+@vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-surface text-on-surface antialiased min-h-screen flex flex-col font-body-md text-body-md selection:bg-primary-container selection:text-on-primary-container">
 <!-- TopNavBar (Shared Component Anchor) -->
@@ -135,7 +18,7 @@
 <span class="material-symbols-outlined text-[20px]" data-icon="school">school</span>
 </div>
 <div class="flex flex-col">
-<span class="text-headline-sm font-headline-sm text-primary tracking-tight leading-tight">Trường Đại học Công Thương TP. Hồ Chí Minh - Cổng Thông tin Học vụ</span>
+<span class="text-headline-sm font-headline-sm text-primary tracking-tight leading-tight">{{ config('studentmanager.school.name') }} - Cổng Thông tin Học vụ</span>
 <span class="text-label-sm font-label-sm text-on-surface-variant hidden sm:inline-block">
             Cổng quản lý và đào tạo tín chỉ chính quy
           </span>
@@ -177,12 +60,12 @@
             Cổng thông tin học vụ
           </p>
 <!-- Integration Highlight Pill -->
-<div class="mt-8 bg-white/10 border border-white/15 rounded-xl p-4 backdrop-blur-sm">
+<div class="mt-8 bg-white/10 border border-white/15 rounded-xl p-4 backdrop-blur-xs">
 <div class="flex items-center gap-2 mb-2">
 <span class="material-symbols-outlined text-white text-[18px]" data-icon="verified_user">verified_user</span>
 <span class="text-label-md font-label-md text-white font-semibold">Cổng tích hợp xác thực</span>
 </div>
-<p class="text-blue-100 text-body-sm font-body-sm leading-normal">Dành cho Sinh viên, Giảng viên &amp; Cán bộ quản lý đào tạo Trường Đại học Công Thương.</p>
+<p class="text-blue-100 text-body-sm font-body-sm leading-normal">Dành cho Sinh viên, Giảng viên &amp; Cán bộ quản lý đào tạo {{ config('studentmanager.school.name') }}.</p>
 </div>
 <!-- Feature Bullets -->
 <ul class="mt-6 space-y-2.5 text-body-sm font-body-sm text-blue-100">
@@ -204,9 +87,9 @@
 <div class="relative z-10 pt-6 mt-6 border-t border-white/20 flex items-center justify-between text-blue-100 text-label-md font-label-md">
 <div class="flex items-center gap-2">
 <span class="material-symbols-outlined text-[18px]" data-icon="account_balance">account_balance</span>
-<span class="font-medium tracking-wide">Trường Đại học Công Thương</span>
+<span class="font-medium tracking-wide">{{ config('studentmanager.school.short_name') }}</span>
 </div>
-<span class="text-label-sm font-label-sm text-blue-200">HUIT</span>
+<span class="text-label-sm font-label-sm text-blue-200">{{ config('studentmanager.school.abbr') }}</span>
 </div>
 </div>
 <!-- RIGHT LOGIN FORM PANEL (Col-span 7, ~58% width) -->
@@ -295,7 +178,7 @@
 <!-- Footer (Shared Component Anchor) -->
 <footer class="bg-surface-container-lowest border-t border-outline-variant w-full bottom-0 left-0 transition-opacity duration-150 ease-in-out">
 <div class="flex flex-col md:flex-row justify-between items-center w-full px-space-md lg:px-space-xl py-space-sm gap-space-xs">
-<span class="text-label-sm font-label-sm text-on-surface-variant text-center md:text-left">© 2024 Trường Đại học Công Thương TP. Hồ Chí Minh. Hệ thống Quản lý Học vụ. Bảo lưu mọi quyền.</span>
+<span class="text-label-sm font-label-sm text-on-surface-variant text-center md:text-left">© 2024 {{ config('studentmanager.school.name') }}. Hệ thống Quản lý Học vụ. Bảo lưu mọi quyền.</span>
 <div class="flex items-center gap-space-md">
 <a class="text-label-sm font-label-sm text-on-surface-variant hover:text-primary underline transition-colors duration-150" href="#">Quy chế đào tạo</a>
 <a class="text-label-sm font-label-sm text-on-surface-variant hover:text-primary underline transition-colors duration-150" href="#">Chính sách bảo mật</a>

@@ -12,7 +12,7 @@
                 HUIT
             </div>
             <div class="flex flex-col min-w-0">
-                <div class="text-[15px] font-bold text-on-surface tracking-tight leading-snug truncate">Trường ĐH Công Thương</div>
+                <div class="text-[15px] font-bold text-on-surface tracking-tight leading-snug truncate">{{ config('studentmanager.school.short_name') }}</div>
                 <div class="text-xs text-on-surface-variant truncate">Cổng Sinh viên</div>
             </div>
         </div>
@@ -477,7 +477,7 @@
         <!-- Footer -->
         <footer class="mt-auto py-4 px-8 border-t border-[#E2E8F0] text-center text-xs text-on-surface-variant bg-white flex flex-col sm:flex-row items-center justify-between gap-2">
             <div>
-                © 2024 <strong>Trường Đại học Công Thương TP. Hồ Chí Minh (HUIT)</strong> - Hệ thống Quản lý Học vụ.
+                © 2024 <strong>{{ config('studentmanager.school.name') }} ({{ config('studentmanager.school.abbr') }})</strong> - Hệ thống Quản lý Học vụ.
             </div>
             <div class="flex items-center gap-4 text-xs">
                 <a href="#" class="hover:text-primary transition-colors">Quy chế đào tạo tín chỉ</a>

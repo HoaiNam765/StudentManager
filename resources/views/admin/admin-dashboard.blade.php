@@ -13,7 +13,7 @@
                     <span class="material-symbols-outlined text-[24px]">school</span>
                 </div>
                 <div class="overflow-hidden">
-                    <div class="font-bold text-[15px] text-on-surface leading-snug truncate">Trường ĐH Công Thương</div>
+                    <div class="font-bold text-[15px] text-on-surface leading-snug truncate">{{ config('studentmanager.school.short_name') }}</div>
                     <div class="font-medium text-[12px] text-on-surface-variant truncate">Hệ thống Quản lý Học vụ</div>
                 </div>
             </div>
@@ -501,7 +501,7 @@
 
             <!-- Footer -->
             <footer class="pt-8 border-t border-surface-container text-xs text-on-surface-variant flex flex-col items-center justify-center text-center gap-2 pb-6">
-                <div>© 2024 <strong>Trường Đại học Công Thương TP. Hồ Chí Minh (HUIT)</strong> - Hệ thống Quản lý Học vụ.</div>
+                <div>© 2024 <strong>{{ config('studentmanager.school.name') }} ({{ config('studentmanager.school.abbr') }})</strong> - Hệ thống Quản lý Học vụ.</div>
                 <div class="text-outline flex items-center gap-3">
                     <span>Hỗ trợ kỹ thuật: <a href="mailto:daotao@huit.edu.vn" class="hover:text-primary transition-colors">daotao@huit.edu.vn</a></span>
                     <span>•</span>

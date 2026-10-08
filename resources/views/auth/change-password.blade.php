@@ -141,7 +141,7 @@
 
 <!-- Notice -->
 <div class="w-full max-w-[540px] mt-4 bg-surface-container-low border border-outline-variant rounded-xl p-4 flex gap-3 items-start shadow-xs">
-    <span class="material-symbols-outlined text-primary text-[22px] flex-shrink-0 mt-0.5" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">info</span>
+    <span class="material-symbols-outlined text-primary text-[22px] shrink-0 mt-0.5" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">info</span>
     <div class="text-xs text-on-surface leading-relaxed">
         <span class="font-semibold text-primary">Lưu ý bảo mật:</span> Sau khi đổi mật khẩu thành công, các phiên đăng nhập khác của bạn sẽ tự động đăng xuất để đảm bảo an toàn tài khoản.
     </div>

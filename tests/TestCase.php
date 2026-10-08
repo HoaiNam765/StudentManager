@@ -7,6 +7,14 @@ use Tests\Support\TestDatabaseGuard;
 
 abstract class TestCase extends BaseTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Giao diện dùng @vite; test không cần chạy npm run build
+        $this->withoutVite();
+    }
+
     /**
      * Chạy trước RefreshDatabase / DatabaseMigrations (các trait này gọi migrate:fresh).
      */

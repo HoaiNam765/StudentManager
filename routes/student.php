@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('auth')->group(function (): void {
-    // Trang chủ tạm; thay bằng dashboard sinh viên (FR-RPT-009) khi có
-    Route::get('/', fn () => view('portal-home', ['portal' => 'Cổng Sinh viên']))->name('home');
+    // Dashboard dùng dữ liệu mẫu của nhóm FE; thay bằng dữ liệu thật khi có (FR-RPT-009)
+    Route::get('/', [DashboardController::class, 'student'])->name('home');
+    Route::get('/mobile', [DashboardController::class, 'studentMobile'])->name('mobile');
 });

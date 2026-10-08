@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Modules\AcademicYear\Http\Controllers\AcademicYearController;
 use App\Modules\Auth\Http\Controllers\RoleController;
 use App\Modules\Auth\Http\Controllers\RolePermissionController;
@@ -17,8 +18,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('auth')->group(function (): void {
-    // Trang chủ tạm; thay bằng dashboard theo vai trò (FR-RPT-001) khi có
-    Route::get('/', fn () => view('portal-home', ['portal' => 'Cổng Quản trị / Văn phòng']))->name('home');
+    // Dashboard dùng dữ liệu mẫu của nhóm FE; thay bằng dữ liệu thật khi có (FR-RPT-001)
+    Route::get('/', [DashboardController::class, 'admin'])->name('home');
 
     // Phân quyền (AUTH): chỉ người có quyền trên toàn trường, mặc định là ADMIN
     Route::middleware('permission:AUTH.view,ALL')->group(function (): void {

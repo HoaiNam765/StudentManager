@@ -18,6 +18,13 @@ return [
 
     'currency_symbol' => '₫',
 
+    // Tên trường hiển thị ở giao diện (đăng nhập, menu, chân trang)
+    'school' => [
+        'name' => env('SCHOOL_NAME', 'Trường Đại học Công Thương TP. Hồ Chí Minh'),
+        'short_name' => env('SCHOOL_SHORT_NAME', 'Trường ĐH Công Thương'),
+        'abbr' => env('SCHOOL_ABBR', 'HUIT'),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Đăng nhập và mật khẩu (module AUTH)

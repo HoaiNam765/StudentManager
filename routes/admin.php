@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Modules\AcademicYear\Http\Controllers\AcademicCalendarController;
 use App\Modules\AcademicYear\Http\Controllers\AcademicYearController;
 use App\Modules\Auth\Http\Controllers\RoleController;
 use App\Modules\Auth\Http\Controllers\RolePermissionController;
@@ -110,6 +111,29 @@ Route::middleware('auth')->group(function (): void {
                 ->middleware('permission:ACY.approve,ALL')
                 ->name('terms.status');
         });
+
+    // Lịch học vụ và ngày nghỉ (ACY, FR-ACY-004, 005, 007): xem = ACY.view (mọi vai trò), sửa = ACY.update,
+    // duyệt sửa mốc của học kỳ đã bắt đầu = ACY.approve toàn trường (BR-ACY-05), ngày nghỉ thêm/xóa = ACY.create/delete
+    Route::middleware('permission:ACY.view')->group(function (): void {
+        Route::get('terms/{term}/milestones', [AcademicCalendarController::class, 'milestones'])->name('terms.milestones.index');
+        Route::get('milestone-change-requests', [AcademicCalendarController::class, 'changeRequests'])->name('milestone-change-requests.index');
+        Route::get('holidays', [AcademicCalendarController::class, 'holidays'])->name('holidays.index');
+        Route::get('holidays/days-off', [AcademicCalendarController::class, 'daysOff'])->name('holidays.days-off');
+    });
+
+    Route::middleware('permission:ACY.update')->group(function (): void {
+        Route::put('terms/{term}/milestones', [AcademicCalendarController::class, 'saveMilestones'])->name('terms.milestones.update');
+        Route::post('terms/{term}/milestones/copy', [AcademicCalendarController::class, 'copyMilestones'])->name('terms.milestones.copy');
+        Route::put('holidays/{holiday}', [AcademicCalendarController::class, 'updateHoliday'])->name('holidays.update');
+    });
+
+    Route::middleware('permission:ACY.approve,ALL')->group(function (): void {
+        Route::post('milestone-change-requests/{milestoneChangeRequest}/approve', [AcademicCalendarController::class, 'approve'])->name('milestone-change-requests.approve');
+        Route::post('milestone-change-requests/{milestoneChangeRequest}/reject', [AcademicCalendarController::class, 'reject'])->name('milestone-change-requests.reject');
+    });
+
+    Route::post('holidays', [AcademicCalendarController::class, 'storeHoliday'])->middleware('permission:ACY.create')->name('holidays.store');
+    Route::delete('holidays/{holiday}', [AcademicCalendarController::class, 'destroyHoliday'])->middleware('permission:ACY.delete')->name('holidays.destroy');
 
     // Trung tâm import (SYS, FR-SYS-007): xem = SYS.view, tải lên/kiểm tra/lưu = SYS.create, hoàn tác/xóa = SYS.delete.
     // Quyền trên từng lô (phạm vi dữ liệu) kiểm tra tiếp bằng ImportBatchPolicy.

@@ -223,6 +223,14 @@ $resolver->setFor($khoa, $ngay)->code;            // bộ quy chế đang áp d�
 
 **Tham số hệ thống** (tên trường, logo, liên hệ, múi giờ, ngôn ngữ, định dạng ngày, chính sách phiên): `app(SettingService::class)->get('school.name')`; danh sách ở `SettingDefinitions`. Tham số đã lưu ghi đè config lúc khởi động (`studentmanager.school.name`, `short_name`, `abbr` mà giao diện đang hiển thị, `studentmanager.display_timezone`, `app.locale`, `studentmanager.formats.date`, `session.lifetime`, `studentmanager.auth.remember_days`). Học kỳ hiện hành thuộc module ACY. API: `GET/PUT /admin/settings`, `POST /admin/settings/logo`.
 
+## Lịch học vụ và ngày nghỉ (ACY, FR-ACY-004, 005, 007)
+
+- **Đọc mốc của học kỳ:** `app(MilestoneService::class)->date($term, MilestoneType::WithdrawDeadline)` (ENR: mở/đóng đăng ký, hạn hủy, hạn rút; EXM: thi; GRD: nhập, công bố điểm; FEE: hạn nộp học phí). Mốc chưa đặt thì trả `null`.
+- Thứ tự hợp lý kiểm tra theo `MilestoneType::orderRules()` (BR-ACY-02). Học kỳ đã bắt đầu thì `save()` tạo `MilestoneChangeRequest` chờ một cán bộ khác có quyền ACY.approve duyệt (BR-ACY-05); duyệt xong mới áp dụng, nhật ký ghi lý do và người duyệt, người đề nghị nhận thông báo.
+- **Ngày nghỉ cho TTB:** `app(HolidayService::class)->daysOff($tu, $den, $term)` / `isDayOff($ngay, $term)` (nghỉ toàn trường + nghỉ riêng của học kỳ). Ngày nghỉ đã bắt đầu thì không sửa, không xóa.
+- Sao chép lịch từ học kỳ trước, dời theo chênh lệch ngày bắt đầu: `copyFrom($nguon, $dich)` (FR-ACY-007).
+- API: `/admin/terms/{id}/milestones` (+ `/copy`), `/admin/milestone-change-requests` (+ `/{id}/approve`, `/reject`), `/admin/holidays` (+ `/days-off`). Lưu ý ma trận ACY: ADMIN chỉ có Xem, ACAD quản lý.
+
 ## Phòng học (ROM, FR-ROM-001, 002)
 
 - Bảng `campuses` → `buildings` → `rooms` (+ `room_types`, `room_maintenances`). Mã phòng duy nhất toàn trường, sức chứa học ≥ 1, sức chứa thi từ 0 (không dùng làm phòng thi) đến sức chứa học (BR-ROM-01).

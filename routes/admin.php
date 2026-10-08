@@ -5,6 +5,7 @@ use App\Modules\AcademicYear\Http\Controllers\AcademicYearController;
 use App\Modules\Auth\Http\Controllers\RoleController;
 use App\Modules\Auth\Http\Controllers\RolePermissionController;
 use App\Modules\Auth\Http\Controllers\UserRoleController;
+use App\Modules\Faculty\Http\Controllers\UnitController;
 use App\Modules\Room\Http\Controllers\FacilityController;
 use App\Modules\Room\Http\Controllers\RoomController;
 use App\Modules\System\Http\Controllers\AdministrativeUnitController;
@@ -213,4 +214,29 @@ Route::middleware('auth')->group(function (): void {
         Route::delete('buildings/{building}', [FacilityController::class, 'destroyBuilding'])->name('buildings.destroy');
         Route::delete('rooms/{room}', [RoomController::class, 'destroy'])->name('rooms.destroy');
     });
+
+    // Khoa, bộ môn, ngành, chuyên ngành, hệ đào tạo (FAC, FR-FAC-001..005, 010): {unitType} là faculties | departments | majors | specializations.
+    // Middleware chặn theo hành động; phạm vi FACULTY (DEAN) kiểm tra tiếp trên từng bản ghi trong UnitController.
+    $unitTypes = array_keys(UnitController::TYPES);
+
+    Route::middleware('permission:FAC.view')->group(function () use ($unitTypes): void {
+        Route::get('training-types', [UnitController::class, 'trainingTypes'])->name('training-types.index');
+        Route::get('{unitType}', [UnitController::class, 'index'])->whereIn('unitType', $unitTypes)->name('units.index');
+        Route::get('{unitType}/{id}', [UnitController::class, 'show'])->whereIn('unitType', $unitTypes)->whereNumber('id')->name('units.show');
+    });
+
+    Route::get('{unitType}/export', [UnitController::class, 'export'])
+        ->whereIn('unitType', $unitTypes)->middleware('permission:FAC.export')->name('units.export');
+
+    Route::middleware('permission:FAC.create')->group(function () use ($unitTypes): void {
+        Route::post('training-types', [UnitController::class, 'storeTrainingType'])->name('training-types.store');
+        Route::post('{unitType}', [UnitController::class, 'store'])->whereIn('unitType', $unitTypes)->name('units.store');
+    });
+
+    Route::put('training-types/{trainingType}', [UnitController::class, 'updateTrainingType'])
+        ->middleware('permission:FAC.update,ALL')->name('training-types.update');
+    Route::put('{unitType}/{id}', [UnitController::class, 'update'])
+        ->whereIn('unitType', $unitTypes)->whereNumber('id')->middleware('permission:FAC.update')->name('units.update');
+    Route::delete('{unitType}/{id}', [UnitController::class, 'destroy'])
+        ->whereIn('unitType', $unitTypes)->whereNumber('id')->middleware('permission:FAC.delete')->name('units.destroy');
 });

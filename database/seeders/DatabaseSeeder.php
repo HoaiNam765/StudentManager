@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
     public const MODULE_SEEDERS = [
         SystemSeeder::class,          // SYS: cấu hình, bộ quy chế, danh mục dùng chung
         AuthSeeder::class,            // AUTH: vai trò, quyền, ma trận phân quyền mặc định
-        // FacultySeeder::class,      // FAC: khoa, bộ môn, ngành
+        FacultySeeder::class,         // FAC: khoa, bộ môn, ngành
         // AcademicYearSeeder::class, // ACY: năm học, học kỳ, lịch học vụ
         RoomSeeder::class,            // ROM: phòng học
         // SubjectSeeder::class,      // SUB: học phần, quan hệ, cơ cấu điểm

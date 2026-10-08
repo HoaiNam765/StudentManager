@@ -54,6 +54,9 @@ interface ImporterContract
      * Nên trả về Generator (yield từng dòng) để file lớn không bị nạp hết vào bộ nhớ (NFR-PERF-04):
      * trung tâm import chỉ đọc đủ số dòng cần để quyết định chạy nền, rồi đọc lại theo luồng trong job.
      *
+     * Khóa của mỗi dòng là vị trí dòng dữ liệu (0 = dòng ngay sau tiêu đề); trung tâm import báo lỗi ở "dòng khóa + 2".
+     * Importer bỏ qua dòng trống thì vẫn trả khóa theo vị trí thật để số dòng báo lỗi khớp với file (SpreadsheetImporter làm sẵn).
+     *
      * @return iterable<int, array<string, mixed>>
      */
     public function parseRows(string $filePath, string $disk): iterable;

@@ -14,6 +14,7 @@ use App\Modules\System\Services\ImportRegistry;
 use App\Support\Audit\AuditLog;
 use App\Support\Audit\AuditLogger;
 use App\Support\Database\BlueprintMacros;
+use App\Support\References\ReferenceRegistry;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -37,6 +38,9 @@ class AppServiceProvider extends ServiceProvider
 
         // Registry trung tâm import: một singleton, các module gọi register() khi boot
         $this->app->singleton(ImportRegistry::class);
+
+        // Sổ đăng ký tham chiếu dùng chung: module nào có khóa ngoại tới danh mục thì đăng ký khi boot
+        $this->app->singleton(ReferenceRegistry::class);
     }
 
     /**

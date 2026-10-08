@@ -4,6 +4,7 @@ use App\Http\Controllers\AccountController;
 use App\Modules\Auth\Http\Controllers\LoginController;
 use App\Modules\Auth\Http\Controllers\PasswordController;
 use App\Modules\Auth\Services\PortalResolver;
+use App\Modules\System\Http\Controllers\LookupOptionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -37,4 +38,10 @@ Route::middleware(['auth', 'password.changed'])->prefix('tai-khoan')->name('acco
     Route::get('/cai-dat', [AccountController::class, 'settings'])->name('settings');
     Route::get('/phien-dang-nhap', [AccountController::class, 'sessions'])->name('sessions');
     Route::get('/thong-bao', [AccountController::class, 'notifications'])->name('notifications');
+});
+
+// Danh sách lựa chọn cho biểu mẫu (danh mục dùng chung, địa chỉ): mọi người dùng đã đăng nhập, chỉ giá trị đang hoạt động
+Route::middleware(['auth', 'password.changed'])->prefix('danh-muc')->name('lookups.')->group(function (): void {
+    Route::get('/don-vi-hanh-chinh', [LookupOptionController::class, 'administrativeUnits'])->name('administrative-units');
+    Route::get('/{category}', [LookupOptionController::class, 'options'])->where('category', '[A-Z][A-Z0-9_]*')->name('options');
 });

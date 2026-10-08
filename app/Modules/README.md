@@ -196,3 +196,22 @@ $this->app->make(ImportRegistry::class)->register(new StudentImporter());
 - API: `/admin/imports` (route `admin.imports.*`). Quyền theo ma trận module `SYS`: xem = `SYS.view`, tải lên/kiểm tra/lưu = `SYS.create`, hoàn tác/xóa = `SYS.delete`.
 - Ngưỡng chạy nền, cỡ lô ghi CSDL, dung lượng file, timeout job: `config/studentmanager.php`, mục `import`.
 - Cách viết Importer mẫu và test: `tests/Support/FakeImporter.php`, `tests/Unit/Modules/System/ImportServiceTest.php`.
+- Đọc file Excel/CSV: kế thừa `App\Modules\System\Importers\SpreadsheetImporter`, khai báo `columns()` (cột bắt buộc, tùy chọn theo tiêu đề dòng 1) rồi chỉ viết `validateRow`/`saveRow`/`canRollbackRow`/`rollbackRow`. Lớp nền đọc `.xlsx`/`.csv` theo luồng, báo thiếu cột, bỏ dòng trống mà vẫn báo lỗi đúng số dòng trong file, từ chối `.xls` cũ kèm hướng dẫn lưu lại. Ví dụ: `LookupValueImporter`, `AdministrativeUnitImporter`.
+
+## Danh mục dùng chung (SYS, FR-SYS-002)
+
+- Ô chọn trong biểu mẫu: `app(LookupService::class)->options(LookupCategory::GENDER)` (chỉ giá trị đang hoạt động, đúng thứ tự). Giao diện gọi `GET /danh-muc/{MÃ}` (mọi người dùng đã đăng nhập). Danh mục có sẵn: `GENDER`, `ETHNICITY` (54 dân tộc), `RELIGION`, `NATIONALITY`, `PRIORITY_GROUP`, `PRIORITY_AREA`, `CONTRACT_TYPE`.
+- Địa chỉ (BR-STU-09): bảng `administrative_units`, mặc định mô hình hai cấp từ 01/07/2025 (`GET /danh-muc/don-vi-hanh-chinh?parent_id=`); dữ liệu ba cấp cũ lấy bằng `?scheme=three_level_legacy`, đơn vị cũ trỏ tới đơn vị mới qua `successor_id`. Lưu địa chỉ: lưu `id` của xã/phường (mô hình hai cấp) và dòng chi tiết (số nhà, đường).
+- Seeder có 34 tỉnh/thành; **danh sách xã/phường nhập bằng trung tâm import** (Importer `administrative_units`, nhập tỉnh trước, xã ở lô sau). Mã tỉnh và mã dân tộc cần đối chiếu danh mục chính thức trước khi dùng thật.
+- Mã là khóa ổn định: không đổi, không cấp lại (kể cả đã xóa). Quản trị: `/admin/lookups`, `/admin/administrative-units` (quyền `SYS.*`).
+
+## Dữ liệu đang được tham chiếu (`ReferenceRegistry`)
+
+Quy tắc "đã được dùng thì chỉ ngừng, không xóa / không đổi mã" (BR-SYS-09, BR-FAC-01, BR-ROM-04, GC-02) dùng chung `App\Support\References\ReferenceRegistry`. **Module nào thêm khóa ngoại tới bảng của module khác thì đăng ký trong ServiceProvider của mình**, để module kia biết mà chặn xóa:
+
+```php
+// ví dụ trong StudentServiceProvider::boot()
+app(ReferenceRegistry::class)->register(LookupValue::class, 'students', 'gender_id', 'sinh viên');
+```
+
+`usages($model)` trả `['sinh viên' => 120]` (tính cả bản ghi đã xóa mềm), `ReferenceRegistry::describe()` ghép thành "120 sinh viên" để đưa vào thông báo lỗi. Bảng chưa tồn tại (module chưa cài) được bỏ qua.

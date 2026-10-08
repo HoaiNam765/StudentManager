@@ -178,9 +178,19 @@ Ghi nhớ:
 - **Cấp mật khẩu tạm** (tài khoản mới, quản trị viên đặt lại): `app(PasswordService::class)->setTemporaryPassword($user, $matKhauTam)`. Người dùng bị buộc đổi ở lần đăng nhập đầu, mật khẩu tạm hết hạn sau 7 ngày (BR-AUTH-10), mọi phiên đang mở bị đăng xuất.
 - **Quên mật khẩu** (#82) theo liên kết đặt lại một lần, hạn 30 phút (BR-AUTH-03): người dùng tự chọn mật khẩu mới, nên thêm hàm `reset()` vào `PasswordService` dùng lại `store()` (lịch sử mật khẩu, đổi `remember_token`) và đăng xuất mọi phiên.
 - **Mở khóa trước hạn** (FR-AUTH-006): `app(LoginService::class)->unlock($user)`.
-- **Khóa hẳn / ngừng tài khoản**: gọi `RoleService::ensureNotLastAdmin()` trước, rồi thêm điều kiện chặn vào `LoginService::attempt()` (một chỗ duy nhất).
+- **Khóa hẳn / ngừng tài khoản**: dùng `UserService` (mục dưới). `LoginService::attempt()` chặn bằng `User::canSignIn()` sau khi đúng mật khẩu, nên chỉ người biết mật khẩu mới thấy lý do cụ thể.
 - Mật khẩu mới luôn kiểm tra bằng `Password::defaults()` (chính sách trong `config/studentmanager.php`, mục `auth.password`).
 - Mọi route của 3 cổng đã có middleware `password.changed`: chưa đổi mật khẩu tạm thì bị đưa về trang đổi mật khẩu (JSON trả mã 428).
+
+## Quản lý người dùng (AUTH, FR-AUTH-008, 009)
+
+- `UserService::create(['username', 'name', 'email', 'profile_type', 'profile_id'?, 'roles'?])`: tên đăng nhập duy nhất, không đổi, không tái sử dụng; gán vai trò mặc định theo loại hồ sơ (`ProfileType`: sinh viên → STU, giảng viên → LEC, nhân viên phải chọn vai trò); cấp mật khẩu tạm gửi qua email (`TemporaryPasswordIssued`), buộc đổi ở lần đầu.
+- STU, TCH tạo hồ sơ xong thì gọi `UserService::create()` (hoặc `linkProfile($user, ProfileType::Student, $student->id)` nếu tài khoản đã có). Mỗi tài khoản đúng một hồ sơ chính, mỗi hồ sơ một tài khoản (BR-AUTH-01).
+- Trạng thái (`AccountStatus`): hoạt động, đã khóa (`lock`/`unlock`, quyền AUTH.approve), ngừng (`deactivate`/`activate`), chỉ đọc. Khóa và ngừng hủy mọi phiên (`UserSessions::terminate`), không làm mất ADMIN cuối cùng còn hoạt động (BR-AUTH-05), không tự khóa mình.
+- **BR-AUTH-07:** khi đổi tình trạng học tập, STU gọi `UserService::applyStudentStatus($user, StudentAccountEvent::…)`. Thôi học, buộc thôi học, chuyển trường: hẹn ngừng sau `auth.student_deactivate_after_days` ngày (mặc định 30); lệnh `users:apply-deactivations` chạy 00:15 hằng ngày. Tốt nghiệp: chỉ đọc (middleware `EnsureAccountWritable` chặn mọi yêu cầu ghi, trừ đăng xuất và đổi mật khẩu). Học lại: hoạt động.
+- Tạo hàng loạt qua trung tâm import, Importer `users` (cột `username`, `name`, `email`, `profile_type`, `roles`).
+- API `/admin/users` (danh sách lọc theo trạng thái, loại hồ sơ, vai trò, từ khóa; chi tiết, tạo, sửa, khóa, mở khóa, ngừng, kích hoạt, cấp lại mật khẩu tạm); theo ma trận chỉ ADMIN có quyền AUTH toàn trường.
+- Môi trường phát triển: `DevRoleUsersSeeder` tạo một tài khoản mẫu cho mỗi vai trò (`acad.test`, `stu.test`…; DEAN được giao nhiệm kỳ trưởng khoa CNTT).
 
 ## Trung tâm import (SYS, FR-SYS-007)
 

@@ -4,9 +4,12 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Modules\Auth\Concerns\HasRoles;
+use App\Modules\Auth\Enums\AccountStatus;
+use App\Modules\Auth\Enums\ProfileType;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -39,7 +42,37 @@ class User extends Authenticatable
             'failed_login_started_at' => 'datetime',
             'locked_until' => 'datetime',
             'last_login_at' => 'datetime',
+            'status' => AccountStatus::class,
+            'status_changed_at' => 'datetime',
+            'deactivate_at' => 'datetime',
+            'profile_type' => ProfileType::class,
         ];
+    }
+
+    /**
+     * Được đăng nhập không: tài khoản hoạt động hoặc chỉ đọc, chưa tới ngày hẹn ngừng (BR-AUTH-07).
+     * Khóa tạm do nhập sai mật khẩu kiểm tra riêng bằng isLockedOut().
+     */
+    public function canSignIn(): bool
+    {
+        if ($this->deactivate_at !== null && $this->deactivate_at->isPast()) {
+            return false;
+        }
+
+        return ($this->status ?? AccountStatus::Active)->canSignIn();
+    }
+
+    /** Tài khoản đang hoạt động đầy đủ: trạng thái active, chưa tới ngày hẹn ngừng (dùng khi đếm ADMIN còn lại). */
+    public function scopeOperational(Builder $query): void
+    {
+        $query->where('status', AccountStatus::Active)
+            ->where(fn (Builder $q) => $q->whereNull('deactivate_at')->orWhere('deactivate_at', '>', now()));
+    }
+
+    /** Chế độ chỉ đọc (sinh viên đã tốt nghiệp): xem được, không thao tác ghi. */
+    public function isReadOnly(): bool
+    {
+        return $this->status === AccountStatus::ReadOnly;
     }
 
     public function passwordHistories(): HasMany

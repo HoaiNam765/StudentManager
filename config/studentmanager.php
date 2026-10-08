@@ -66,6 +66,17 @@ return [
     |--------------------------------------------------------------------------
     | FR-SYS-007, BR-SYS-07, GC-07, NFR-PERF-04 (5.000 dòng không quá 60 giây). Không viết cứng trong mã (GC-12).
     */
+    /*
+    |--------------------------------------------------------------------------
+    | Khoa, bộ môn (module FAC)
+    |--------------------------------------------------------------------------
+    | BR-FAC-04: trưởng khoa, trưởng bộ môn phải là giảng viên hoặc cán bộ đang hoạt động thuộc đơn vị đó,
+    | trừ khi bật ngoại lệ. Lớp kiểm tra thật do TCH cài (LeaderEligibility).
+    */
+    'faculty' => [
+        'allow_leader_outside_unit' => (bool) env('FACULTY_ALLOW_LEADER_OUTSIDE_UNIT', false),
+    ],
+
     'import' => [
         // Disk lưu file tải lên
         'disk' => env('IMPORT_DISK', 'local'),

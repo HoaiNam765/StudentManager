@@ -5,6 +5,7 @@ use App\Modules\AcademicYear\Http\Controllers\AcademicYearController;
 use App\Modules\Auth\Http\Controllers\RoleController;
 use App\Modules\Auth\Http\Controllers\RolePermissionController;
 use App\Modules\Auth\Http\Controllers\UserRoleController;
+use App\Modules\Faculty\Http\Controllers\LeadershipController;
 use App\Modules\Faculty\Http\Controllers\UnitController;
 use App\Modules\Room\Http\Controllers\FacilityController;
 use App\Modules\Room\Http\Controllers\RoomController;
@@ -213,6 +214,15 @@ Route::middleware('auth')->group(function (): void {
         Route::delete('campuses/{campus}', [FacilityController::class, 'destroyCampus'])->name('campuses.destroy');
         Route::delete('buildings/{building}', [FacilityController::class, 'destroyBuilding'])->name('buildings.destroy');
         Route::delete('rooms/{room}', [RoomController::class, 'destroy'])->name('rooms.destroy');
+    });
+
+    // Lãnh đạo đơn vị theo nhiệm kỳ (FAC, FR-FAC-006): xem = FAC.view; giao, kết thúc, hủy = FAC.update toàn trường (ACAD, ADMIN)
+    Route::get('leadership-terms', [LeadershipController::class, 'index'])->middleware('permission:FAC.view')->name('leadership-terms.index');
+
+    Route::middleware('permission:FAC.update,ALL')->group(function (): void {
+        Route::post('leadership-terms', [LeadershipController::class, 'store'])->name('leadership-terms.store');
+        Route::post('leadership-terms/{leadershipTerm}/end', [LeadershipController::class, 'end'])->name('leadership-terms.end');
+        Route::delete('leadership-terms/{leadershipTerm}', [LeadershipController::class, 'destroy'])->name('leadership-terms.destroy');
     });
 
     // Khoa, bộ môn, ngành, chuyên ngành, hệ đào tạo (FAC, FR-FAC-001..005, 010): {unitType} là faculties | departments | majors | specializations.

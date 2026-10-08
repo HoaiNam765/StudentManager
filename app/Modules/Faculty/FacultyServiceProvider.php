@@ -2,12 +2,16 @@
 
 namespace App\Modules\Faculty;
 
+use App\Modules\Faculty\Contracts\LeaderEligibility;
 use App\Modules\Faculty\Models\Department;
 use App\Modules\Faculty\Models\Faculty;
+use App\Modules\Faculty\Models\LeadershipTerm;
 use App\Modules\Faculty\Models\Major;
 use App\Modules\Faculty\Models\Specialization;
 use App\Modules\Faculty\Models\TrainingType;
 use App\Modules\Faculty\Policies\UnitPolicy;
+use App\Modules\Faculty\Services\AnyUserIsEligible;
+use App\Modules\Faculty\Services\FacultyAccess;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -21,9 +25,18 @@ use Illuminate\Support\ServiceProvider;
  */
 class FacultyServiceProvider extends ServiceProvider
 {
+    public function register(): void
+    {
+        // Đơn vị người dùng quản lý được nhớ trong một yêu cầu
+        $this->app->scoped(FacultyAccess::class);
+
+        // Chưa có module TCH: chưa kiểm tra người được giao chức vụ có thuộc đơn vị không (TCH #88 bind lại)
+        $this->app->bindIf(LeaderEligibility::class, AnyUserIsEligible::class);
+    }
+
     public function boot(): void
     {
-        foreach ([Faculty::class, Department::class, Major::class, Specialization::class, TrainingType::class] as $model) {
+        foreach ([Faculty::class, Department::class, Major::class, Specialization::class, TrainingType::class, LeadershipTerm::class] as $model) {
             Gate::policy($model, UnitPolicy::class);
         }
     }

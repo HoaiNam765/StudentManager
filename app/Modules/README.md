@@ -223,6 +223,14 @@ $resolver->setFor($khoa, $ngay)->code;            // bộ quy chế đang áp d�
 
 **Tham số hệ thống** (tên trường, logo, liên hệ, múi giờ, ngôn ngữ, định dạng ngày, chính sách phiên): `app(SettingService::class)->get('school.name')`; danh sách ở `SettingDefinitions`. Tham số đã lưu ghi đè config lúc khởi động (`studentmanager.school.name`, `short_name`, `abbr` mà giao diện đang hiển thị, `studentmanager.display_timezone`, `app.locale`, `studentmanager.formats.date`, `session.lifetime`, `studentmanager.auth.remember_days`). Học kỳ hiện hành thuộc module ACY. API: `GET/PUT /admin/settings`, `POST /admin/settings/logo`.
 
+## Phòng học (ROM, FR-ROM-001, 002)
+
+- Bảng `campuses` → `buildings` → `rooms` (+ `room_types`, `room_maintenances`). Mã phòng duy nhất toàn trường, sức chứa học ≥ 1, sức chứa thi từ 0 (không dùng làm phòng thi) đến sức chứa học (BR-ROM-01).
+- **TTB, EXM phải hỏi trước khi xếp lịch (BR-ROM-02):** `app(RoomAvailability::class)->assertSchedulable($room, $tuNgay, $denNgay)` (hoặc `problems()` để lấy danh sách lý do): phòng phải "Sử dụng được", tòa nhà và cơ sở còn hoạt động, không trùng lịch bảo trì. Kiểm tra trùng lịch học, lịch thi là việc của TTB/EXM.
+- Loại phòng có mã cố định `RoomType::LECTURE` (LT), `COMPUTER_LAB` (MT), `LABORATORY` (TN), `HALL` (HT), `EXAM` (PT) để TTB kiểm tra BR-ROM-03.
+- **Module lưu `room_id` (buổi học, ca thi…) phải đăng ký với `ReferenceRegistry`** trong ServiceProvider của mình, khi đó phòng đã có lịch sử sử dụng chỉ ngừng được, không xóa, không đổi mã (BR-ROM-04).
+- API: `/admin/campuses`, `/admin/buildings`, `/admin/room-types`, `/admin/rooms`, `/admin/rooms/{id}/availability?from=&to=`, `/admin/rooms/{id}/maintenances` (quyền `ROM.*`; mọi vai trò được xem theo ma trận). Seeder: 1 cơ sở, 2 tòa nhà, 20 phòng mẫu.
+
 ## Dữ liệu đang được tham chiếu (`ReferenceRegistry`)
 
 Quy tắc "đã được dùng thì chỉ ngừng, không xóa / không đổi mã" (BR-SYS-09, BR-FAC-01, BR-ROM-04, GC-02) dùng chung `App\Support\References\ReferenceRegistry`. **Module nào thêm khóa ngoại tới bảng của module khác thì đăng ký trong ServiceProvider của mình**, để module kia biết mà chặn xóa:

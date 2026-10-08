@@ -5,6 +5,8 @@ use App\Modules\AcademicYear\Http\Controllers\AcademicYearController;
 use App\Modules\Auth\Http\Controllers\RoleController;
 use App\Modules\Auth\Http\Controllers\RolePermissionController;
 use App\Modules\Auth\Http\Controllers\UserRoleController;
+use App\Modules\Room\Http\Controllers\FacilityController;
+use App\Modules\Room\Http\Controllers\RoomController;
 use App\Modules\System\Http\Controllers\AdministrativeUnitController;
 use App\Modules\System\Http\Controllers\ImportController;
 use App\Modules\System\Http\Controllers\LookupController;
@@ -175,5 +177,40 @@ Route::middleware('auth')->group(function (): void {
         Route::delete('lookups/{lookupCategory:code}', [LookupController::class, 'destroyCategory'])->name('lookups.destroy');
         Route::delete('lookup-values/{lookupValue}', [LookupController::class, 'destroyValue'])->name('lookups.values.destroy');
         Route::delete('administrative-units/{administrativeUnit}', [AdministrativeUnitController::class, 'destroy'])->name('administrative-units.destroy');
+    });
+
+    // Cơ sở, tòa nhà, phòng học, lịch bảo trì (ROM, FR-ROM-001, 002): xem = ROM.view (mọi vai trò theo ma trận),
+    // thêm = ROM.create, sửa / đổi tình trạng / lịch bảo trì = ROM.update, xóa = ROM.delete
+    Route::middleware('permission:ROM.view')->group(function (): void {
+        Route::get('campuses', [FacilityController::class, 'campuses'])->name('campuses.index');
+        Route::get('buildings', [FacilityController::class, 'buildings'])->name('buildings.index');
+        Route::get('room-types', [FacilityController::class, 'roomTypes'])->name('room-types.index');
+        Route::get('rooms', [RoomController::class, 'index'])->name('rooms.index');
+        Route::get('rooms/{room}', [RoomController::class, 'show'])->name('rooms.show');
+        Route::get('rooms/{room}/availability', [RoomController::class, 'availability'])->name('rooms.availability');
+        Route::get('rooms/{room}/maintenances', [RoomController::class, 'maintenancesOf'])->name('rooms.maintenances.index');
+    });
+
+    Route::middleware('permission:ROM.create')->group(function (): void {
+        Route::post('campuses', [FacilityController::class, 'storeCampus'])->name('campuses.store');
+        Route::post('buildings', [FacilityController::class, 'storeBuilding'])->name('buildings.store');
+        Route::post('room-types', [FacilityController::class, 'storeRoomType'])->name('room-types.store');
+        Route::post('rooms', [RoomController::class, 'store'])->name('rooms.store');
+    });
+
+    Route::middleware('permission:ROM.update')->group(function (): void {
+        Route::put('campuses/{campus}', [FacilityController::class, 'updateCampus'])->name('campuses.update');
+        Route::put('buildings/{building}', [FacilityController::class, 'updateBuilding'])->name('buildings.update');
+        Route::put('room-types/{roomType}', [FacilityController::class, 'updateRoomType'])->name('room-types.update');
+        Route::put('rooms/{room}', [RoomController::class, 'update'])->name('rooms.update');
+        Route::post('rooms/{room}/maintenances', [RoomController::class, 'storeMaintenance'])->name('rooms.maintenances.store');
+        Route::put('room-maintenances/{roomMaintenance}', [RoomController::class, 'updateMaintenance'])->name('room-maintenances.update');
+        Route::delete('room-maintenances/{roomMaintenance}', [RoomController::class, 'destroyMaintenance'])->name('room-maintenances.destroy');
+    });
+
+    Route::middleware('permission:ROM.delete')->group(function (): void {
+        Route::delete('campuses/{campus}', [FacilityController::class, 'destroyCampus'])->name('campuses.destroy');
+        Route::delete('buildings/{building}', [FacilityController::class, 'destroyBuilding'])->name('buildings.destroy');
+        Route::delete('rooms/{room}', [RoomController::class, 'destroy'])->name('rooms.destroy');
     });
 });

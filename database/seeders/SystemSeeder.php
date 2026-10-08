@@ -5,7 +5,8 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 
 /**
- * Dữ liệu nền của module SYS: danh mục dùng chung (và các phần khác của SYS khi có).
+ * Dữ liệu nền của module SYS: danh mục dùng chung, bộ quy chế mặc định. Tham số hệ thống không cần seed:
+ * chưa lưu thì dùng giá trị mặc định (SettingDefinitions).
  */
 class SystemSeeder extends Seeder
 {
@@ -13,6 +14,7 @@ class SystemSeeder extends Seeder
     {
         $this->call([
             LookupSeeder::class,
+            PolicySeeder::class,
         ]);
     }
 }

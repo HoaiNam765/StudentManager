@@ -7,8 +7,12 @@ use App\Modules\System\Importers\LookupValueImporter;
 use App\Modules\System\Models\AdministrativeUnit;
 use App\Modules\System\Models\LookupCategory;
 use App\Modules\System\Models\LookupValue;
+use App\Modules\System\Models\PolicySet;
 use App\Modules\System\Policies\LookupPolicy;
+use App\Modules\System\Policies\PolicySetPolicy;
 use App\Modules\System\Services\ImportRegistry;
+use App\Modules\System\Services\PolicyResolver;
+use App\Modules\System\Services\SettingService;
 use App\Support\References\ReferenceRegistry;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -19,8 +23,19 @@ use Illuminate\Support\ServiceProvider;
  */
 class SystemServiceProvider extends ServiceProvider
 {
+    public function register(): void
+    {
+        // Nhớ bộ quy chế đã tra trong một yêu cầu; worker hàng đợi được làm mới sau mỗi job
+        $this->app->scoped(PolicyResolver::class);
+    }
+
     public function boot(): void
     {
+        Gate::policy(PolicySet::class, PolicySetPolicy::class);
+
+        // Tham số hệ thống đã lưu (múi giờ, ngôn ngữ, định dạng ngày, thời gian phiên) ghi đè config
+        $this->app->booted(fn () => $this->app->make(SettingService::class)->applyToConfig());
+
         Gate::policy(LookupCategory::class, LookupPolicy::class);
         Gate::policy(LookupValue::class, LookupPolicy::class);
         Gate::policy(AdministrativeUnit::class, LookupPolicy::class);

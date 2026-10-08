@@ -45,6 +45,9 @@ return [
         // "Ghi nhớ đăng nhập" có hiệu lực tối đa N ngày; 0 = tắt (FR-AUTH-007). Quản trị viên đổi được ở tham số hệ thống
         'remember_days' => (int) env('AUTH_REMEMBER_DAYS', 30),
 
+        // Sinh viên thôi học, buộc thôi học, chuyển trường: ngừng tài khoản sau N ngày (BR-AUTH-07); 0 = ngừng ngay
+        'student_deactivate_after_days' => (int) env('AUTH_STUDENT_DEACTIVATE_AFTER_DAYS', 30),
+
         // Mật khẩu tạm do hệ thống hoặc quản trị viên cấp hết hạn sau N ngày nếu chưa dùng
         'temporary_password_days' => (int) env('AUTH_TEMPORARY_PASSWORD_DAYS', 7),
 

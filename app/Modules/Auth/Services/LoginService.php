@@ -3,6 +3,7 @@
 namespace App\Modules\Auth\Services;
 
 use App\Models\User;
+use App\Modules\Auth\Enums\AccountStatus;
 use App\Support\Audit\AuditEvent;
 use App\Support\Audit\AuditLogger;
 use Illuminate\Support\Facades\Auth;
@@ -20,7 +21,7 @@ use Illuminate\Validation\ValidationException;
  * - Mọi lần đăng nhập thành công/thất bại và lần khóa đều ghi nhật ký kiểm toán.
  *
  * Cảnh báo cho chủ tài khoản khi bị khóa (sự kiện EV-AUTH-02) sẽ nối khi có module NOT.
- * Trạng thái tài khoản (khóa hẳn, ngừng hoạt động) thuộc issue quản lý người dùng: kiểm tra thêm trong attempt().
+ * Tài khoản bị khóa hẳn, ngừng hoạt động hoặc đã tới ngày hẹn ngừng (User::canSignIn) bị chặn sau khi đúng mật khẩu.
  */
 class LoginService
 {
@@ -58,6 +59,15 @@ class LoginService
         }
 
         // Từ đây người dùng đã chứng minh đúng mật khẩu: được phép biết lý do cụ thể
+        if (! $user->canSignIn()) {
+            $locked = $user->status === AccountStatus::Locked;
+            $this->audit->record(AuditEvent::LoginFailed, $user, reason: $locked ? 'Tài khoản đã bị khóa' : 'Tài khoản đã ngừng hoạt động');
+
+            throw ValidationException::withMessages(['login' => $locked
+                ? 'Tài khoản đã bị khóa. Liên hệ quản trị viên để được mở khóa.'
+                : 'Tài khoản đã ngừng hoạt động. Liên hệ phòng Đào tạo hoặc quản trị viên.']);
+        }
+
         if ($user->must_change_password && $user->temporary_password_expires_at?->isPast()) {
             $this->audit->record(AuditEvent::LoginFailed, $user, reason: 'Mật khẩu tạm đã hết hạn');
 

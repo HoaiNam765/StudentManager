@@ -17,7 +17,10 @@ use Illuminate\Validation\ValidationException;
  */
 class PasswordService
 {
-    public function __construct(private readonly AuditLogger $audit) {}
+    public function __construct(
+        private readonly AuditLogger $audit,
+        private readonly UserSessions $sessions,
+    ) {}
 
     /** Quy tắc mật khẩu mới theo cấu hình; đã đăng ký làm Password::defaults(). */
     public static function rule(): Password
@@ -130,13 +133,6 @@ class PasswordService
 
     private function logoutOtherSessions(User $user, ?string $keepSessionId): void
     {
-        if (config('session.driver') !== 'database') {
-            return;
-        }
-
-        DB::table(config('session.table', 'sessions'))
-            ->where('user_id', $user->id)
-            ->when($keepSessionId !== null, fn ($query) => $query->where('id', '!=', $keepSessionId))
-            ->delete();
+        $this->sessions->terminate($user, $keepSessionId);
     }
 }

@@ -39,5 +39,8 @@ class DatabaseSeeder extends Seeder
 
         // Chạy sau seeder của module để tài khoản dùng thử được gán vai trò ADMIN
         $this->call(DevUserSeeder::class);
+
+        // Tài khoản mẫu cho từng vai trò (môi trường phát triển)
+        $this->call(DevRoleUsersSeeder::class);
     }
 }

@@ -86,6 +86,7 @@ Ghi nhớ cho Claude Code khi làm việc với dự án này. Cập nhật mụ
 | #78 | (chưa mở) | Danh mục dùng chung (SYS): `LookupCategory`/`LookupValue` (giới tính, 54 dân tộc, tôn giáo, quốc tịch, đối tượng/khu vực ưu tiên, loại hợp đồng), đơn vị hành chính hai cấp 2025 + ba cấp cũ, Importer danh mục, `ReferenceRegistry`, `SpreadsheetImporter`; sửa số dòng báo lỗi của trung tâm import khi file có dòng trống — nhánh `feature/be-danh-muc-dung-chung` |
 | #79 | (chưa mở) | Tham số hệ thống (`SettingService`, ghi đè config lúc khởi động) và bộ quy chế đào tạo theo khóa (`PolicySet`/`PolicyItem`, `PolicyResolver`, mặc định theo phụ lục C, ban hành không hồi tố, báo ADMIN khác qua mail log) — nhánh `feature/be-cau-hinh-quy-che` |
 | #77 | (chưa mở) | Phòng học (module `Room`, của B): cơ sở, tòa nhà, loại phòng, phòng (sức chứa học/thi), tình trạng, lịch bảo trì, `RoomAvailability` cho TTB/EXM (BR-ROM-02), không xóa phòng đã dùng (BR-ROM-04), seeder 20 phòng — nhánh `feature/be-phong-hoc` |
+| #73 | (chưa mở) | Khoa, bộ môn, ngành, chuyên ngành, hệ đào tạo (module `Faculty`, của B): mã ổn định, ngừng khoa liệt kê dữ liệu cần chuyển, `FacultyAccess` cho phạm vi FACULTY (rỗng tới #74), `ReferenceRegistry::activeUsages`, xuất Excel (FAC.export, ma trận chưa cấp), seeder 3 khoa 6 ngành — nhánh `feature/be-khoa-bo-mon-nganh` |
 
 ## Việc tiếp theo của A (P1)
 

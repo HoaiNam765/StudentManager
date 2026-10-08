@@ -231,6 +231,14 @@ $resolver->setFor($khoa, $ngay)->code;            // bộ quy chế đang áp d�
 - **Module lưu `room_id` (buổi học, ca thi…) phải đăng ký với `ReferenceRegistry`** trong ServiceProvider của mình, khi đó phòng đã có lịch sử sử dụng chỉ ngừng được, không xóa, không đổi mã (BR-ROM-04).
 - API: `/admin/campuses`, `/admin/buildings`, `/admin/room-types`, `/admin/rooms`, `/admin/rooms/{id}/availability?from=&to=`, `/admin/rooms/{id}/maintenances` (quyền `ROM.*`; mọi vai trò được xem theo ma trận). Seeder: 1 cơ sở, 2 tòa nhà, 20 phòng mẫu.
 
+## Khoa, bộ môn, ngành (FAC, FR-FAC-001..005, 010)
+
+- Bảng `faculties` → `departments`; `faculties` → `majors` → `specializations`; `training_types` (đúng một hệ mặc định: chính quy). Lấy hệ mặc định: `TrainingType::default()`.
+- `Major::standard_terms` và `averageCreditsPerTerm()` là căn cứ thời gian học tối đa (STU) và khối lượng đăng ký (ENR) (BR-FAC-07).
+- **Phạm vi FACULTY dùng chung:** `app(FacultyAccess::class)->facultyIds($user)` / `departmentIds($user)` cho các module có `faculty_id`, `department_id` (ví dụ `DataScope::Faculty => $q->whereIn('faculty_id', …)`).
+- **Module có khóa ngoại tới khoa, bộ môn, ngành… đăng ký với `ReferenceRegistry`**, kèm `active:` (điều kiện "còn hoạt động", ví dụ giảng viên đang làm việc) để đơn vị không ngừng được khi chưa chuyển hết dữ liệu (BR-FAC-05). Đơn vị đã có dữ liệu liên quan thì không đổi mã (BR-FAC-01) và không xóa.
+- API: `/admin/{faculties|departments|majors|specializations}` (+ `/{id}`, `/export`), `/admin/training-types`. DEAN chỉ thấy và chỉ sửa thông tin mô tả, liên hệ của đơn vị mình. Xuất Excel cần quyền `FAC.export`: **ma trận BA 4.2 chưa cấp X cho FAC** nên mặc định không ai xuất được (FR-FAC-010 ghi ACAD xuất) — cần chốt và cấp qua `/admin/roles/{id}/permissions`.
+
 ## Dữ liệu đang được tham chiếu (`ReferenceRegistry`)
 
 Quy tắc "đã được dùng thì chỉ ngừng, không xóa / không đổi mã" (BR-SYS-09, BR-FAC-01, BR-ROM-04, GC-02) dùng chung `App\Support\References\ReferenceRegistry`. **Module nào thêm khóa ngoại tới bảng của module khác thì đăng ký trong ServiceProvider của mình**, để module kia biết mà chặn xóa:

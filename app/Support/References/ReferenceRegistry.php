@@ -24,17 +24,52 @@ use Illuminate\Support\Facades\Schema;
  */
 final class ReferenceRegistry
 {
-    /** @var array<class-string<Model>, list<array{table: string, column: string, label: string, constraint: ?Closure}>> */
+    /** @var array<class-string<Model>, list<array{table: string, column: string, label: string, constraint: ?Closure, active: ?Closure}>> */
     private array $references = [];
 
     /**
      * @param  class-string<Model>  $model  Model bị tham chiếu
      * @param  string  $label  Tên hiển thị của dữ liệu tham chiếu, ví dụ "bộ môn", "sinh viên"
      * @param  (Closure(Builder): void)|null  $constraint  Điều kiện thêm, ví dụ chỉ tính bản ghi cùng loại
+     * @param  (Closure(Builder): void)|null  $active  Điều kiện "còn hoạt động" (ví dụ sinh viên đang học); khai báo thì
+     *                                                 tham chiếu này còn chặn việc ngừng hoạt động bản ghi bị tham chiếu
+     *                                                 cho tới khi chuyển hết (BR-FAC-05), xem `activeUsages()`
      */
-    public function register(string $model, string $table, string $column, string $label, ?Closure $constraint = null): void
+    public function register(string $model, string $table, string $column, string $label, ?Closure $constraint = null, ?Closure $active = null): void
     {
-        $this->references[$model][] = compact('table', 'column', 'label', 'constraint');
+        $this->references[$model][] = compact('table', 'column', 'label', 'constraint', 'active');
+    }
+
+    /**
+     * Chỉ tính các tham chiếu còn hoạt động (đã khai báo `$active` khi đăng ký): dữ liệu phải chuyển đi
+     * trước khi được ngừng hoạt động bản ghi bị tham chiếu.
+     *
+     * @return array<string, int>
+     */
+    public function activeUsages(Model $model): array
+    {
+        $usages = [];
+
+        foreach ($this->references[$model::class] ?? [] as $reference) {
+            if ($reference['active'] === null || ! Schema::hasTable($reference['table'])) {
+                continue;
+            }
+
+            $query = DB::table($reference['table'])->where($reference['column'], $model->getKey());
+
+            if ($reference['constraint'] !== null) {
+                ($reference['constraint'])($query);
+            }
+
+            ($reference['active'])($query);
+            $count = $query->count();
+
+            if ($count > 0) {
+                $usages[$reference['label']] = ($usages[$reference['label']] ?? 0) + $count;
+            }
+        }
+
+        return $usages;
     }
 
     /**

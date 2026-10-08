@@ -39,6 +39,12 @@ trait HasActiveStatus
         return $this->status === ActiveStatus::Active;
     }
 
+    /** Nhãn tiếng Việt của trạng thái (`$model->status_label`), dùng khi xuất Excel hoặc hiển thị. */
+    public function getStatusLabelAttribute(): string
+    {
+        return $this->status->label();
+    }
+
     public function activate(): bool
     {
         return $this->forceFill(['status' => ActiveStatus::Active])->save();

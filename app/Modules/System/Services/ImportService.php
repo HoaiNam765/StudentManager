@@ -144,8 +144,8 @@ class ImportService extends BaseService
             $importer = $this->registry->get($batch->importer);
 
             // Chỉ đọc đủ số dòng cần để biết file lớn hay nhỏ; Importer trả Generator thì không nạp cả file
-            foreach ($importer->parseRows($batch->path, $batch->disk) as $row) {
-                $rows[] = $row;
+            foreach ($importer->parseRows($batch->path, $batch->disk) as $index => $row) {
+                $rows[$index] = $row; // giữ khóa để đánh đúng số dòng
 
                 if (++$count >= $threshold) {
                     break;
@@ -208,8 +208,10 @@ class ImportService extends BaseService
             $invalid = 0;
             $buffer = [];
 
-            foreach ($rows as $rawRow) {
-                $rowNumber = $processed + 2; // dòng 1 là tiêu đề
+            foreach ($rows as $index => $rawRow) {
+                // Dòng 1 là tiêu đề. Importer bỏ qua dòng trống thì trả khóa là vị trí thật (xem SpreadsheetImporter)
+                // để số dòng báo lỗi khớp với file; Importer khác trả khóa 0, 1, 2… như trước.
+                $rowNumber = $index + 2;
                 $errors = $importer->validateRow($rowNumber, $rawRow);
                 $isValid = $errors === [];
 

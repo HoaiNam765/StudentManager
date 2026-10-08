@@ -5,7 +5,9 @@ use App\Modules\AcademicYear\Http\Controllers\AcademicYearController;
 use App\Modules\Auth\Http\Controllers\RoleController;
 use App\Modules\Auth\Http\Controllers\RolePermissionController;
 use App\Modules\Auth\Http\Controllers\UserRoleController;
+use App\Modules\System\Http\Controllers\AdministrativeUnitController;
 use App\Modules\System\Http\Controllers\ImportController;
+use App\Modules\System\Http\Controllers\LookupController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -127,4 +129,30 @@ Route::middleware('auth')->group(function (): void {
                 Route::delete('{batch}', [ImportController::class, 'destroy'])->whereNumber('batch')->name('destroy');
             });
         });
+
+    // Danh mục dùng chung và đơn vị hành chính (SYS, FR-SYS-002): xem = SYS.view, thêm = SYS.create, sửa/ngừng = SYS.update, xóa = SYS.delete
+    Route::middleware('permission:SYS.view')->group(function (): void {
+        Route::get('lookups', [LookupController::class, 'categories'])->name('lookups.index');
+        Route::get('lookups/{lookupCategory:code}/values', [LookupController::class, 'values'])->name('lookups.values.index');
+        Route::get('administrative-units', [AdministrativeUnitController::class, 'index'])->name('administrative-units.index');
+        Route::get('administrative-units/{administrativeUnit}', [AdministrativeUnitController::class, 'show'])->name('administrative-units.show');
+    });
+
+    Route::middleware('permission:SYS.create')->group(function (): void {
+        Route::post('lookups', [LookupController::class, 'storeCategory'])->name('lookups.store');
+        Route::post('lookups/{lookupCategory:code}/values', [LookupController::class, 'storeValue'])->name('lookups.values.store');
+        Route::post('administrative-units', [AdministrativeUnitController::class, 'store'])->name('administrative-units.store');
+    });
+
+    Route::middleware('permission:SYS.update')->group(function (): void {
+        Route::put('lookups/{lookupCategory:code}', [LookupController::class, 'updateCategory'])->name('lookups.update');
+        Route::put('lookup-values/{lookupValue}', [LookupController::class, 'updateValue'])->name('lookups.values.update');
+        Route::put('administrative-units/{administrativeUnit}', [AdministrativeUnitController::class, 'update'])->name('administrative-units.update');
+    });
+
+    Route::middleware('permission:SYS.delete')->group(function (): void {
+        Route::delete('lookups/{lookupCategory:code}', [LookupController::class, 'destroyCategory'])->name('lookups.destroy');
+        Route::delete('lookup-values/{lookupValue}', [LookupController::class, 'destroyValue'])->name('lookups.values.destroy');
+        Route::delete('administrative-units/{administrativeUnit}', [AdministrativeUnitController::class, 'destroy'])->name('administrative-units.destroy');
+    });
 });

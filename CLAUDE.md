@@ -88,6 +88,7 @@ Ghi nhớ cho Claude Code khi làm việc với dự án này. Cập nhật mụ
 | #77 | (chưa mở) | Phòng học (module `Room`, của B): cơ sở, tòa nhà, loại phòng, phòng (sức chứa học/thi), tình trạng, lịch bảo trì, `RoomAvailability` cho TTB/EXM (BR-ROM-02), không xóa phòng đã dùng (BR-ROM-04), seeder 20 phòng — nhánh `feature/be-phong-hoc` |
 | #73 | (chưa mở) | Khoa, bộ môn, ngành, chuyên ngành, hệ đào tạo (module `Faculty`, của B): mã ổn định, ngừng khoa liệt kê dữ liệu cần chuyển, `FacultyAccess` cho phạm vi FACULTY (rỗng tới #74), `ReferenceRegistry::activeUsages`, xuất Excel (FAC.export, ma trận chưa cấp), seeder 3 khoa 6 ngành — nhánh `feature/be-khoa-bo-mon-nganh` |
 | #74 | (chưa mở) | Lãnh đạo đơn vị theo nhiệm kỳ (`LeadershipTerm`, `LeadershipService`): mỗi nhiệm kỳ sinh dòng DEAN cùng ngày hiệu lực, tối đa một trưởng mỗi đơn vị, thay trưởng từ ngày D, `FacultyAccess` lấy đơn vị từ nhiệm kỳ, lệnh `faculty:sync-leadership`, `LeaderEligibility` chờ TCH — nhánh `feature/be-lanh-dao-don-vi` |
+| #76 | (chưa mở) | Lịch học vụ (`TermMilestone`, `MilestoneService`: thứ tự BR-ACY-02, sửa mốc học kỳ đã bắt đầu qua đề nghị chờ người duyệt khác, sao chép từ kỳ trước) và ngày nghỉ (`Holiday`, `HolidayService::daysOff` cho TTB), seeder năm học 2026–2027 — nhánh `feature/be-lich-hoc-vu` |
 
 ## Việc tiếp theo của A (P1)
 

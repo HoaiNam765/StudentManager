@@ -4,6 +4,7 @@ namespace App\Modules\AcademicYear\Models;
 
 use App\Support\Models\StandardModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Term extends StandardModel
 {
@@ -30,5 +31,11 @@ class Term extends StandardModel
     public function academicYear(): BelongsTo
     {
         return $this->belongsTo(AcademicYear::class);
+    }
+
+    /** Lịch học vụ (các mốc) của học kỳ; đọc và sửa qua MilestoneService. */
+    public function milestones(): HasMany
+    {
+        return $this->hasMany(TermMilestone::class);
     }
 }

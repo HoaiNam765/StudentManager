@@ -5,7 +5,7 @@
 @section('content')
 <div class="flex min-h-screen">
     <!-- Sidebar -->
-    <aside class="w-64 h-screen bg-white border-r border-[#E2E8F0] shadow-sm fixed left-0 top-0 z-40 flex flex-col justify-between overflow-y-auto">
+    <aside id="app-sidebar" class="w-64 h-screen bg-white border-r border-[#E2E8F0] shadow-sm fixed left-0 top-0 z-40 -translate-x-full md:translate-x-0 transition-transform duration-200 flex flex-col justify-between overflow-y-auto">
         <div class="p-5">
             <div class="flex items-center gap-3 px-1 py-1 mb-6">
                 <div class="w-10 h-10 rounded-xl bg-[#4776E6] text-white flex items-center justify-center font-bold tracking-wider text-base shadow-sm shrink-0">
@@ -18,7 +18,7 @@
             </div>
 
             <nav class="flex flex-col gap-1">
-                <a href="{{ route('lecturer.dashboard') ?? '#' }}" class="bg-[#EEF2FD] text-[#4776E6] font-semibold rounded-lg px-3.5 py-2.5 flex items-center gap-3 border-l-[3px] border-[#4776E6] transition-colors">
+                <a href="{{ route('teacher.home') }}" class="bg-[#EEF2FD] text-[#4776E6] font-semibold rounded-lg px-3.5 py-2.5 flex items-center gap-3 border-l-[3px] border-[#4776E6] transition-colors">
                     <span class="material-symbols-outlined text-[20px]">dashboard</span>
                     <span class="text-[14px]">Tổng quan</span>
                 </a>
@@ -74,27 +74,27 @@
                         <span class="text-[11px] text-slate-500 truncate">Khoa CNTT (Giảng viên)</span>
                     </div>
                 </div>
-                <button title="Đăng xuất" type="button" class="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-200 transition-colors">
-                    <span class="material-symbols-outlined text-[18px]">logout</span>
-                </button>
+                @include('partials.logout-form', ['class' => 'text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-200 transition-colors', 'icon' => 'text-[18px]'])
             </div>
         </div>
     </aside>
 
     <!-- Workspace -->
-    <div class="flex-1 ml-64 min-w-0 flex flex-col min-h-screen">
+    <div class="flex-1 md:ml-64 min-w-0 flex flex-col min-h-screen">
         <!-- Topbar -->
-        <header class="h-14 bg-white border-b border-[#E2E8F0] sticky top-0 z-30 px-8 flex items-center justify-between shadow-sm">
-            <div class="flex items-center gap-4">
-                <nav class="flex items-center gap-1.5 text-xs text-slate-500">
-                    <a href="#" class="hover:text-[#4776E6] transition-colors flex items-center gap-1 font-medium">
+        <header class="h-14 bg-white border-b border-[#E2E8F0] sticky top-0 z-30 px-4 md:px-8 flex items-center justify-between shadow-sm">
+            <div class="flex items-center gap-3 md:gap-4 min-w-0">
+                @include('partials.menu-button')
+                <nav class="flex items-center gap-1.5 text-xs text-slate-500 min-w-0">
+                    <a href="#" class="hidden sm:flex hover:text-[#4776E6] transition-colors items-center gap-1 font-medium">
                         <span class="material-symbols-outlined text-sm">home</span>
                         Trang chủ
                     </a>
-                    <span class="text-slate-300">/</span>
-                    <span class="text-slate-800 font-semibold">Cổng Giảng viên</span>
+                    <span class="hidden sm:inline text-slate-300">/</span>
+                    <span class="text-slate-800 font-semibold truncate">Cổng Giảng viên</span>
                 </nav>
-                <span class="text-slate-300">|</span>
+                <span class="hidden lg:inline text-slate-300">|</span>
+<div class="hidden lg:flex items-center gap-2 bg-[#EEF2FD] text-[#4776E6]|</span>
                 <div class="flex items-center gap-2 bg-[#EEF2FD] text-[#4776E6] px-3 py-1 rounded-full border border-blue-100">
                     <span class="material-symbols-outlined text-base">date_range</span>
                     <span class="text-xs font-semibold">Học kỳ 1 • 2024–2025</span>
@@ -102,18 +102,18 @@
                         <span class="material-symbols-outlined text-sm">expand_more</span>
                     </button>
                 </div>
-                <div class="text-slate-600 text-xs flex items-center gap-1 font-medium">
+                <div class="text-slate-600 text-xs hidden xl:flex items-center gap-1 font-medium">
                     <span class="material-symbols-outlined text-sm text-slate-400">domain</span>
                     Khoa Công nghệ Thông tin
                 </div>
             </div>
 
-            <div class="flex items-center gap-3.5">
-                <button title="Thông báo hệ thống" class="relative p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 transition-colors">
+            <div class="flex items-center gap-2 md:gap-3.5 shrink-0">
+                <button title="Thông báo hệ thống" aria-label="Thông báo hệ thống" class="relative p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 transition-colors">
                     <span class="material-symbols-outlined text-xl">notifications</span>
                     <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 ring-2 ring-white"></span>
                 </button>
-                <button title="Trợ giúp" class="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 transition-colors">
+                <button title="Trợ giúp" class="hidden sm:block p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 transition-colors">
                     <span class="material-symbols-outlined text-xl">help_outline</span>
                 </button>
                 <div class="h-5 w-px bg-slate-200"></div>
@@ -121,16 +121,16 @@
                     <div class="w-8 h-8 rounded-full bg-[#4776E6] text-white font-semibold flex items-center justify-center text-xs shadow-sm">
                         TN
                     </div>
-                    <span class="text-xs font-semibold text-slate-800">TS. Trần Hoàng Nam</span>
+                    <span class="hidden md:inline text-xs font-semibold text-slate-800">TS. Trần Hoàng Nam</span>
                 </div>
             </div>
         </header>
 
         <!-- Canvas -->
-        <main class="flex-1 p-8 w-full bg-[#F7F9FC]">
+        <main class="flex-1 p-4 md:p-8 w-full bg-[#F7F9FC]">
             <div class="max-w-[1120px] mx-auto space-y-7">
                 <!-- Header -->
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-1 border-b border-slate-200/60">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-1 border-b border-slate-200/60">
                     <div>
                         <h1 class="text-[28px] font-bold text-[#1E293B] tracking-tight flex items-center gap-2">
                             Xin chào, TS. Trần Hoàng Nam <span>👋</span>
@@ -147,7 +147,7 @@
                             <span>Học kỳ 1 (2024–2025)</span>
                         </div>
                     </div>
-                    <div class="flex items-center gap-3 shrink-0">
+                    <div class="flex flex-wrap items-center gap-3 lg:shrink-0">
                         <button class="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-semibold rounded-lg shadow-sm transition-all active:scale-95">
                             <span class="material-symbols-outlined text-lg text-slate-500">how_to_reg</span>
                             Điểm danh nhanh
@@ -534,4 +534,5 @@
         </footer>
     </div>
 </div>
+@include('partials.sidebar-toggle')
 @endsection

@@ -3,74 +3,31 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
+/**
+ * Các trang tài khoản của nhóm FE (issue #6). Đổi mật khẩu do module Auth xử lý
+ * (route `password.change` và `password.update`), không làm lại ở đây.
+ * Phiên đăng nhập và tùy chọn thông báo đang là dữ liệu mẫu, chưa lưu gì.
+ */
 class AccountController extends Controller
 {
-    /**
-     * Trang tổng hợp Cài đặt tài khoản & Bảo mật
-     */
-    public function settings(): View
+    /** Cài đặt tài khoản */
+    public function settings(Request $request): View
     {
-        $user = [
-            'name' => 'Nguyễn Văn An',
-            'student_id' => '2001210123',
-            'email' => 'an.nv@huit.edu.vn',
-            'phone' => '0987 654 321',
-            'faculty' => 'Khoa Công nghệ Thông tin',
-            'specialization' => 'Kỹ thuật Phần mềm (Khóa 12)',
-            'status' => 'Sinh viên đang học',
-        ];
+        $user = $request->user();
 
-        return view('student-settings', compact('user'));
-    }
-
-    /**
-     * Trang Đổi mật khẩu
-     */
-    public function changePassword(): View
-    {
-        return view('change-password');
-    }
-
-    /**
-     * Xử lý xác thực và cập nhật mật khẩu mới theo chuẩn HUIT
-     */
-    public function updatePassword(Request $request): RedirectResponse
-    {
-        $validated = $request->validate([
-            'current_password' => ['required', 'string'],
-            'new_password' => [
-                'required',
-                'string',
-                'min:8',
-                'max:32',
-                'regex:/[A-Z]/',      // ít nhất 1 chữ hoa
-                'regex:/[a-z]/',      // ít nhất 1 chữ thường
-                'regex:/[0-9]/',      // ít nhất 1 chữ số
-                'regex:/[@$!%*#?&]/', // ít nhất 1 ký tự đặc biệt
-                'different:current_password',
-            ],
-            'confirm_password' => ['required', 'same:new_password'],
-        ], [
-            'new_password.min' => 'Mật khẩu phải có tối thiểu 8 ký tự.',
-            'new_password.regex' => 'Mật khẩu phải chứa ít nhất 1 chữ hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt.',
-            'new_password.different' => 'Mật khẩu mới không được trùng với mật khẩu cũ.',
-            'confirm_password.same' => 'Mật khẩu xác nhận không trùng khớp.',
+        return view('account.settings', [
+            'user' => $user,
+            'roles' => $user->activeRoles()->pluck('roles.name'),
         ]);
-
-        return redirect()->back()->with('success', 'Mật khẩu đã được cập nhật thành công!');
     }
 
-    /**
-     * Quản lý Phiên đăng nhập đang hoạt động
-     */
+    /** Phiên đăng nhập đang hoạt động (dữ liệu mẫu) */
     public function sessions(): View
     {
         $sessions = [
             [
-                'id' => 'sess_1',
                 'device_name' => 'Google Chrome trên Windows 11',
                 'device_type' => 'desktop',
                 'is_current' => true,
@@ -81,7 +38,6 @@ class AccountController extends Controller
                 'browser' => 'Chrome 124.0 • Windows 64-bit',
             ],
             [
-                'id' => 'sess_2',
                 'device_name' => 'Safari trên iPhone 14 Pro',
                 'device_type' => 'mobile',
                 'is_current' => false,
@@ -92,7 +48,6 @@ class AccountController extends Controller
                 'browser' => 'Mobile Safari 17.4 • iOS 17.4.1',
             ],
             [
-                'id' => 'sess_3',
                 'device_name' => 'Google Chrome trên Samsung Galaxy Tab S9',
                 'device_type' => 'tablet',
                 'is_current' => false,
@@ -104,33 +59,19 @@ class AccountController extends Controller
             ],
         ];
 
-        return view('active-sessions', compact('sessions'));
+        return view('account.sessions', compact('sessions'));
     }
 
-    /**
-     * Đăng xuất khỏi tất cả các thiết bị khác
-     */
-    public function logoutOtherDevices(Request $request): RedirectResponse
-    {
-        return redirect()->back()->with('success', 'Đã đăng xuất khỏi tất cả các thiết bị khác thành công!');
-    }
-
-    /**
-     * Tùy chọn thông báo học vụ
-     */
+    /** Tùy chọn thông báo học vụ (dữ liệu mẫu) */
     public function notifications(): View
     {
-        $channels = ['email' => true, 'sms' => false, 'in_app' => true, 'push' => false];
-        $frequency = 'daily';
+        $channels = [
+            'email' => ['label' => 'Email', 'description' => 'Gửi thông báo tới hộp thư của tài khoản', 'icon' => 'mail', 'enabled' => true],
+            'sms' => ['label' => 'Tin nhắn SMS', 'description' => 'Chỉ dùng cho thông báo khẩn', 'icon' => 'sms', 'enabled' => false],
+            'in_app' => ['label' => 'Trong hệ thống', 'description' => 'Hiện ở chuông thông báo trên thanh trên cùng', 'icon' => 'notifications', 'enabled' => true],
+            'push' => ['label' => 'Thông báo đẩy', 'description' => 'Nhận trên điện thoại khi cài ứng dụng', 'icon' => 'smartphone', 'enabled' => false],
+        ];
 
-        return view('notification-preferences', compact('channels', 'frequency'));
-    }
-
-    /**
-     * Cập nhật tùy chọn thông báo
-     */
-    public function updateNotifications(Request $request): RedirectResponse
-    {
-        return redirect()->back()->with('success', 'Đã lưu cấu hình thông báo thành công!');
+        return view('account.notifications', compact('channels'));
     }
 }

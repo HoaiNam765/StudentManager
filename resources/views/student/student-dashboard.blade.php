@@ -5,7 +5,7 @@
 @section('content')
 <div class="flex min-h-screen">
     <!-- Left Sidebar -->
-    <aside class="h-screen w-64 flex flex-col fixed left-0 top-0 z-40 bg-white border-r border-[#E2E8F0] shadow-sm select-none">
+    <aside id="app-sidebar" class="h-screen w-64 flex flex-col fixed left-0 top-0 z-40 -translate-x-full md:translate-x-0 transition-transform duration-200 bg-white border-r border-[#E2E8F0] shadow-sm select-none">
         <!-- Header Brand -->
         <div class="p-4 border-b border-[#E2E8F0] flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white font-bold text-base shadow-sm ring-2 ring-primary/20">
@@ -20,7 +20,7 @@
         <!-- Navigation Links -->
         <div class="flex-1 px-3 py-4 space-y-1 overflow-y-auto custom-scrollbar">
             <!-- Tab 1: Tổng quan (Active) -->
-            <a href="{{ route('student.dashboard') ?? '#' }}" class="bg-[#EEF2FD] text-primary font-semibold rounded-lg px-3 py-2.5 flex items-center gap-3 border-l-[3px] border-primary transition-colors">
+            <a href="{{ route('student.home') }}" class="bg-[#EEF2FD] text-primary font-semibold rounded-lg px-3 py-2.5 flex items-center gap-3 border-l-[3px] border-primary transition-colors">
                 <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">dashboard</span>
                 <span class="text-sm font-semibold">Tổng quan</span>
             </a>
@@ -68,21 +68,20 @@
                     <div class="text-[11px] text-on-surface-variant truncate">2001210123 • 12DHTT01</div>
                 </div>
             </div>
-            <button title="Đăng xuất" class="p-1 text-on-surface-variant hover:text-error transition-colors rounded-lg">
-                <span class="material-symbols-outlined text-[20px]">logout</span>
-            </button>
+            @include('partials.logout-form')
         </div>
     </aside>
 
     <!-- Workspace Shell -->
-    <div class="flex-1 flex flex-col ml-64 min-w-0 min-h-screen">
+    <div class="flex-1 flex flex-col md:ml-64 min-w-0 min-h-screen">
         <!-- Top Navigation Bar -->
-        <header class="sticky top-0 z-30 h-14 bg-white border-b border-[#E2E8F0] px-8 flex items-center justify-between shadow-xs">
-            <div class="flex items-center gap-4">
-                <nav class="flex items-center gap-2 text-xs text-on-surface-variant">
-                    <span class="text-on-surface-variant">Trang chủ</span>
-                    <span class="material-symbols-outlined text-[14px] text-outline-variant">chevron_right</span>
-                    <span class="text-on-surface font-semibold">Cổng thông tin Sinh viên</span>
+        <header class="sticky top-0 z-30 h-14 bg-white border-b border-[#E2E8F0] px-4 md:px-8 flex items-center justify-between shadow-xs">
+            <div class="flex items-center gap-3 md:gap-4 min-w-0">
+                @include('partials.menu-button')
+                <nav class="flex items-center gap-2 text-xs text-on-surface-variant min-w-0">
+                    <span class="hidden sm:inline text-on-surface-variant">Trang chủ</span>
+                    <span class="hidden sm:inline material-symbols-outlined text-[14px] text-outline-variant">chevron_right</span>
+                    <span class="text-on-surface font-semibold truncate">Cổng thông tin Sinh viên</span>
                 </nav>
                 <div class="h-4 w-px bg-outline-variant/60 hidden sm:block"></div>
                 <div class="hidden md:inline-flex items-center gap-1.5 bg-[#EEF2FD] text-primary font-semibold px-2.5 py-1 rounded-full text-xs border border-primary/20">
@@ -96,7 +95,7 @@
                     <input type="text" placeholder="Tìm kiếm nhanh..." class="h-8 text-xs pl-8 pr-3 bg-surface-container-low/50 border border-outline-variant/60 rounded-lg text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/20 w-48">
                     <span class="material-symbols-outlined absolute left-2 top-2 text-[15px] text-outline">search</span>
                 </div>
-                <button title="Thông báo" class="relative p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors">
+                <button title="Thông báo" aria-label="Thông báo" class="relative p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors">
                     <span class="material-symbols-outlined text-[20px]">notifications</span>
                     <span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full ring-2 ring-white"></span>
                 </button>
@@ -111,7 +110,7 @@
         </header>
 
         <!-- Main Content -->
-        <main class="flex-1 p-8 w-full bg-[#F7F9FC]">
+        <main class="flex-1 p-4 md:p-8 w-full bg-[#F7F9FC]">
             <div class="max-w-[1120px] w-full mx-auto space-y-6">
                 <!-- Welcome Banner Card -->
                 <div class="bg-white border border-[#E2E8F0] rounded-xl p-6 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-5 relative overflow-hidden">
@@ -490,4 +489,5 @@
         </footer>
     </div>
 </div>
+@include('partials.sidebar-toggle')
 @endsection

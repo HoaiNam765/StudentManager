@@ -1,8 +1,9 @@
 <?php
+
 // Mẫu test Giao diện
+
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -85,7 +86,7 @@ class DashboardController extends Controller
                 ['name' => 'Khóa 2022 (Năm 3)', 'pct' => 92],
                 ['name' => 'Khóa 2023 (Năm 2)', 'pct' => 81],
                 ['name' => 'Khóa 2024 (Tân sinh viên)', 'pct' => 45],
-            ]
+            ],
         ];
 
         $announcements = [
@@ -107,6 +108,12 @@ class DashboardController extends Controller
      * Cổng thông tin Sinh viên (Desktop)
      */
     public function student(): View
+    {
+        return view('student.student-dashboard', $this->studentData());
+    }
+
+    /** Dữ liệu mẫu dùng chung cho dashboard sinh viên (máy tính và điện thoại) */
+    private function studentData(): array
     {
         $student = [
             'name' => 'Nguyễn Văn An',
@@ -161,7 +168,7 @@ class DashboardController extends Controller
             ['course_name' => 'Kiến trúc máy tính', 'credits' => 3, 'semester' => 'HK trước', 'score' => 8.5, 'letter' => 'A'],
         ];
 
-        return view('student.student-dashboard', compact('student', 'todayClasses', 'recentGrades'));
+        return compact('student', 'todayClasses', 'recentGrades');
     }
 
     /**
@@ -191,6 +198,6 @@ class DashboardController extends Controller
      */
     public function studentMobile(): View
     {
-        return view('student.student-mobile');
+        return view('student.student-mobile', $this->studentData());
     }
 }

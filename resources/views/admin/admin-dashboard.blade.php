@@ -5,7 +5,7 @@
 @section('content')
 <div class="flex min-h-screen">
     <!-- ================= SIDEBAR (260px) ================= -->
-    <aside class="w-64 min-w-[260px] h-screen p-4 flex flex-col justify-between overflow-y-auto custom-scrollbar fixed left-0 top-0 z-40 bg-surface-container-lowest border-r border-outline-variant shadow-sm">
+    <aside id="app-sidebar" class="w-64 min-w-[260px] h-screen p-4 flex flex-col justify-between overflow-y-auto custom-scrollbar fixed left-0 top-0 z-40 -translate-x-full md:translate-x-0 transition-transform duration-200 bg-surface-container-lowest border-r border-outline-variant shadow-sm">
         <div class="flex flex-col flex-1">
             <!-- Brand -->
             <div class="flex items-center gap-3 px-2 py-3 mb-4 border-b border-surface-container pb-4">
@@ -27,7 +27,7 @@
 
             <!-- Navigation Links -->
             <nav class="space-y-1 flex-1">
-                <a href="{{ route('admin.dashboard') ?? '#' }}" class="bg-[#EEF2FD] text-primary border-l-4 border-l-primary font-semibold rounded-lg px-3 py-2.5 flex items-center gap-3 transition-colors">
+                <a href="{{ route('admin.home') }}" class="bg-[#EEF2FD] text-primary border-l-4 border-l-primary font-semibold rounded-lg px-3 py-2.5 flex items-center gap-3 transition-colors">
                     <span class="material-symbols-outlined text-primary text-[20px]" style="font-variation-settings: 'FILL' 1;">dashboard</span>
                     <span class="text-sm font-semibold">Tổng quan</span>
                 </a>
@@ -113,47 +113,46 @@
                         <div class="text-[11px] text-on-surface-variant truncate">admin@huit.edu.vn</div>
                     </div>
                 </div>
-                <button title="Đăng xuất" class="p-1 text-on-surface-variant hover:text-error rounded transition-colors shrink-0">
-                    <span class="material-symbols-outlined text-[18px]">logout</span>
-                </button>
+                @include('partials.logout-form', ['class' => 'p-1 text-on-surface-variant hover:text-error rounded transition-colors', 'icon' => 'text-[18px]'])
             </div>
         </div>
     </aside>
 
     <!-- ================= MAIN LAYOUT WRAPPER ================= -->
-    <div class="flex-1 ml-64 flex flex-col min-h-screen">
+    <div class="flex-1 md:ml-64 min-w-0 flex flex-col min-h-screen">
         <!-- TOPBAR -->
-        <header class="h-14 px-8 bg-surface-container-lowest border-b border-outline-variant/60 flex items-center justify-between sticky top-0 z-30 shadow-sm">
-            <div class="flex items-center gap-6 flex-1 max-w-2xl">
-                <nav class="flex items-center gap-2 text-xs text-on-surface-variant font-medium shrink-0">
-                    <a href="#" class="hover:text-primary transition-colors flex items-center gap-1.5 text-on-surface-variant">
+        <header class="h-14 px-4 md:px-8 bg-surface-container-lowest border-b border-outline-variant/60 flex items-center justify-between sticky top-0 z-30 shadow-sm">
+            <div class="flex items-center gap-3 lg:gap-6 flex-1 min-w-0 max-w-2xl">
+                @include('partials.menu-button')
+                <nav class="flex items-center gap-2 text-xs text-on-surface-variant font-medium min-w-0">
+                    <a href="#" class="hidden md:flex hover:text-primary transition-colors items-center gap-1.5 text-on-surface-variant">
                         <span class="material-symbols-outlined text-[18px]">home</span>
                         <span>Trang chủ</span>
                     </a>
-                    <span class="text-outline-variant">/</span>
-                    <span class="text-on-surface font-semibold">Tổng quan Quản lý Đào tạo</span>
+                    <span class="hidden md:inline text-outline-variant">/</span>
+                    <span class="text-on-surface font-semibold truncate">Tổng quan Quản lý Đào tạo</span>
                 </nav>
-                <div class="h-4 w-px bg-outline-variant shrink-0"></div>
-                <div class="flex items-center gap-2 bg-[#EEF2FD] text-primary font-semibold px-3 py-1 rounded-full text-xs border border-primary/20 shrink-0 cursor-pointer shadow-sm">
+                <div class="hidden xl:block h-4 w-px bg-outline-variant shrink-0"></div>
+                <div class="hidden xl:flex items-center gap-2 bg-[#EEF2FD] text-primary font-semibold px-3 py-1 rounded-full text-xs border border-primary/20 shrink-0 cursor-pointer shadow-sm">
                     <span class="material-symbols-outlined text-[15px]">calendar_today</span>
                     <span>Năm học 2024-2025 • Học kỳ 1</span>
                     <span class="material-symbols-outlined text-[16px]">arrow_drop_down</span>
                 </div>
             </div>
             
-            <div class="flex items-center gap-4">
-                <div class="relative w-64 md:w-80">
+            <div class="flex items-center gap-2 md:gap-4 shrink-0">
+                <div class="relative hidden lg:block w-64 xl:w-80">
                     <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">search</span>
                     <input type="text" placeholder="Tìm kiếm sinh viên, học phần, giảng viên..." class="w-full bg-[#F7F9FC] border border-outline-variant/80 rounded-lg pl-9 pr-9 py-1.5 text-xs text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
                     <kbd class="hidden sm:inline-block absolute right-2.5 top-1/2 -translate-y-1/2 px-1.5 py-0.5 text-[10px] font-semibold text-outline-variant bg-surface-container border border-outline-variant rounded">⌘K</kbd>
                 </div>
-                <div class="h-5 w-px bg-outline-variant/60"></div>
+                <div class="hidden lg:block h-5 w-px bg-outline-variant/60"></div>
                 <div class="flex items-center gap-1">
-                    <button title="Thông báo học vụ" class="relative p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg transition-colors">
+                    <button title="Thông báo học vụ" aria-label="Thông báo học vụ" class="relative p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg transition-colors">
                         <span class="material-symbols-outlined text-[20px]">notifications</span>
                         <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-error ring-2 ring-surface-container-lowest"></span>
                     </button>
-                    <button title="Trợ giúp nghiệp vụ" class="p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg transition-colors">
+                    <button title="Trợ giúp nghiệp vụ" class="hidden sm:block p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg transition-colors">
                         <span class="material-symbols-outlined text-[20px]">help</span>
                     </button>
                 </div>
@@ -172,7 +171,7 @@
         </header>
 
         <!-- MAIN WORKSPACE BODY -->
-        <main class="flex-1 p-8 space-y-6 max-w-[1120px] w-full mx-auto">
+        <main class="flex-1 p-4 md:p-8 space-y-6 max-w-[1120px] w-full mx-auto">
             <!-- Sync & Status Banner -->
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2 text-xs text-on-surface-variant bg-surface-container-lowest px-3 py-1.5 rounded-lg border border-outline-variant/60 shadow-sm">
@@ -188,12 +187,12 @@
             </div>
 
             <!-- Page Header Card -->
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/60 shadow-sm">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/60 shadow-sm">
                 <div>
                     <h1 class="text-[30px] font-bold text-on-surface tracking-tight leading-tight">Tổng quan Quản lý Đào tạo</h1>
                     <p class="text-sm text-on-surface-variant mt-1.5">Thống kê chỉ số đào tạo toàn trường, tiến độ mở lớp và các yêu cầu học vụ chờ xử lý.</p>
                 </div>
-                <div class="flex items-center gap-3 shrink-0">
+                <div class="flex flex-wrap items-center gap-3 lg:shrink-0">
                     <button class="h-10 px-4 bg-surface-container-lowest border border-outline-variant hover:bg-surface-container-low text-on-surface text-xs font-medium rounded-lg flex items-center gap-2 transition-colors active:scale-95 shadow-sm">
                         <span class="material-symbols-outlined text-[18px] text-on-surface-variant">download</span>
                         <span>Xuất báo cáo Thống kê</span>
@@ -512,4 +511,5 @@
         </main>
     </div>
 </div>
+@include('partials.sidebar-toggle')
 @endsection

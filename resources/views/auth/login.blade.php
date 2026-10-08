@@ -1,7 +1,7 @@
 <!DOCTYPE html><html class="light" lang="vi"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>Đăng nhập - Trường Đại học Công nghệ - Cổng Thông tin Học vụ</title>
+<title>Đăng nhập - Trường Đại học Công Thương TP. Hồ Chí Minh - Cổng Thông tin Học vụ</title>
 <link href="https://fonts.googleapis.com" rel="preconnect">
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
@@ -222,19 +222,26 @@
             </p>
 </div>
 <!-- Form Element -->
-<form class="space-y-5" onsubmit="event.preventDefault();">
+<form class="space-y-5" method="POST" action="{{ route('login.store') }}">
+@csrf
+@if (session('status'))
+<p class="rounded-lg bg-emerald-50 border border-emerald-200 px-3.5 py-2.5 text-body-md text-emerald-800" role="status">{{ session('status') }}</p>
+@endif
+@if ($errors->any())
+<p class="rounded-lg bg-error-container border border-error/30 px-3.5 py-2.5 text-body-md text-on-error-container" role="alert">{{ $errors->first('login') ?: $errors->first() }}</p>
+@endif
 <!-- Username Input -->
 <div>
-<label class="block text-body-md font-label-lg text-on-surface mb-1.5" for="username">
+<label class="block text-body-md font-label-lg text-on-surface mb-1.5" for="login">
                 Tên đăng nhập
               </label>
 <div class="relative">
 <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-outline">
 <span class="material-symbols-outlined text-[20px]" data-icon="person">person</span>
 </div>
-<input autocomplete="username" class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg pl-10 pr-3.5 py-2.5 text-body-md font-body-md text-on-surface placeholder:text-outline focus:border-[#4776E6] focus:ring-2 focus:ring-[#4776E6]/20 transition-all outline-none" id="username" name="username" placeholder="Nhập mã số / email" required="" type="text">
+<input autocomplete="username" class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg pl-10 pr-3.5 py-2.5 text-body-md font-body-md text-on-surface placeholder:text-outline focus:border-[#4776E6] focus:ring-2 focus:ring-[#4776E6]/20 transition-all outline-none" id="login" name="login" value="{{ old('login') }}" placeholder="Nhập tên đăng nhập / email" required autofocus type="text">
 </div>
-<p class="text-label-sm font-label-sm text-outline mt-1">Ví dụ: 20012000 hoặc canbo@huit.edu.vn</p>
+<p class="text-label-sm font-label-sm text-outline mt-1">Ví dụ: tên đăng nhập hoặc canbo@huit.edu.vn</p>
 </div>
 <!-- Password Input -->
 <div>
@@ -256,7 +263,7 @@
 <!-- Options Row (Remember me & Forgot password) -->
 <div class="flex items-center justify-between pt-1">
 <label class="flex items-center gap-2 cursor-pointer select-none">
-<input class="w-4 h-4 rounded border-outline-variant text-[#4776E6] focus:ring-[#4776E6]/20 focus:ring-offset-0 cursor-pointer" type="checkbox">
+<input class="w-4 h-4 rounded border-outline-variant text-[#4776E6] focus:ring-[#4776E6]/20 focus:ring-offset-0 cursor-pointer" name="remember" value="1" type="checkbox" @checked(old('remember'))>
 <span class="text-body-sm font-body-sm text-on-surface-variant">Ghi nhớ đăng nhập</span>
 </label>
 <a class="text-body-sm font-label-md text-[#4776E6] hover:underline cursor-pointer" href="#">

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountController;
 use App\Modules\Auth\Http\Controllers\LoginController;
 use App\Modules\Auth\Http\Controllers\PasswordController;
 use App\Modules\Auth\Services\PortalResolver;
@@ -13,15 +14,11 @@ use Illuminate\Support\Facades\Route;
 | Ba cổng (sinh viên, giảng viên, quản trị) nằm ở routes/student.php, teacher.php, admin.php.
 */
 
-// Trang gốc: tạm cho phép truy cập mẫu test giao diện không cần đăng nhập
-// Route::get('/', function (Request $request, PortalResolver $portals) {
-//     $home = $request->user() !== null ? $portals->homeRouteFor($request->user()) : null;
-//
-//     return redirect()->route($home ?? 'login');
-// })->name('root');
+// Trang gốc: đã đăng nhập thì vào trang chủ theo vai trò, chưa thì về trang đăng nhập
+Route::get('/', function (Request $request, PortalResolver $portals) {
+    $home = $request->user() !== null ? $portals->homeRouteFor($request->user()) : null;
 
-Route::get('/', function () {
-    return view('app'); // Hiển thị layout mẫu test (resources/views/app.blade.php)
+    return redirect()->route($home ?? 'login');
 })->name('root');
 
 Route::middleware('guest')->group(function (): void {
@@ -35,36 +32,9 @@ Route::middleware('auth')->group(function (): void {
     Route::put('/password', [PasswordController::class, 'update'])->name('password.update');
 });
 
-
-//Mẫu test giao diện
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\AccountController;
-
-
-
-// 1. Phân hệ Admin / Phòng Đào tạo
-Route::prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'admin'])->name('dashboard');
-});
-
-// 2. Phân hệ Sinh viên
-Route::prefix('sinh-vien')->name('student.')->group(function () {
-    Route::get('/tong-quan', [DashboardController::class, 'student'])->name('dashboard');
-    Route::get('/mobile', [DashboardController::class, 'studentMobile'])->name('mobile');
-});
-
-// 3. Phân hệ Giảng viên
-Route::prefix('giang-vien')->name('lecturer.')->group(function () {
-    Route::get('/tong-quan', [DashboardController::class, 'lecturer'])->name('dashboard');
-});
-
-// 4. Quản lý Tài khoản & Bảo mật
-Route::prefix('tai-khoan')->group(function () {
-    Route::get('/cai-dat', [AccountController::class, 'settings'])->name('student.settings');
-    Route::get('/doi-mat-khau', [AccountController::class, 'changePassword'])->name('password.change');
-    Route::post('/doi-mat-khau', [AccountController::class, 'updatePassword'])->name('password.update');
-    Route::get('/phien-dang-nhap', [AccountController::class, 'sessions'])->name('sessions.index');
-    Route::post('/phien-dang-nhap/dang-xuat-khac', [AccountController::class, 'logoutOtherDevices'])->name('sessions.logout-others');
-    Route::get('/thong-bao', [AccountController::class, 'notifications'])->name('notifications.settings');
-    Route::post('/thong-bao', [AccountController::class, 'updateNotifications'])->name('notifications.update');
+// Trang tài khoản dùng chung cho mọi vai trò; đổi mật khẩu dùng route `password.change` ở trên
+Route::middleware(['auth', 'password.changed'])->prefix('tai-khoan')->name('account.')->group(function (): void {
+    Route::get('/cai-dat', [AccountController::class, 'settings'])->name('settings');
+    Route::get('/phien-dang-nhap', [AccountController::class, 'sessions'])->name('sessions');
+    Route::get('/thong-bao', [AccountController::class, 'notifications'])->name('notifications');
 });

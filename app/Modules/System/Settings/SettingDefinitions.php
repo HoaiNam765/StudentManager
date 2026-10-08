@@ -17,8 +17,10 @@ final class SettingDefinitions
     public static function all(): array
     {
         return [
-            'school.name' => ['label' => 'Tên trường', 'group' => 'Thông tin trường', 'default' => config('app.name'), 'rules' => ['required', 'string', 'max:255'], 'important' => false],
-            'school.short_name' => ['label' => 'Tên viết tắt', 'group' => 'Thông tin trường', 'default' => null, 'rules' => ['nullable', 'string', 'max:50'], 'important' => false],
+            // Giao diện (FE) đọc tên trường từ config studentmanager.school.*: tham số đã lưu ghi đè đúng các khóa đó
+            'school.name' => ['label' => 'Tên trường', 'group' => 'Thông tin trường', 'default' => config('studentmanager.school.name'), 'rules' => ['required', 'string', 'max:255'], 'important' => false, 'config' => 'studentmanager.school.name'],
+            'school.short_name' => ['label' => 'Tên ngắn', 'group' => 'Thông tin trường', 'default' => config('studentmanager.school.short_name'), 'rules' => ['required', 'string', 'max:100'], 'important' => false, 'config' => 'studentmanager.school.short_name'],
+            'school.abbr' => ['label' => 'Tên viết tắt', 'group' => 'Thông tin trường', 'default' => config('studentmanager.school.abbr'), 'rules' => ['required', 'string', 'max:20'], 'important' => false, 'config' => 'studentmanager.school.abbr'],
             'school.logo_path' => ['label' => 'Logo (đường dẫn trên disk public)', 'group' => 'Thông tin trường', 'default' => null, 'rules' => ['nullable', 'string', 'max:500'], 'important' => false],
             'school.address' => ['label' => 'Địa chỉ', 'group' => 'Thông tin liên hệ', 'default' => null, 'rules' => ['nullable', 'string', 'max:500'], 'important' => false],
             'school.phone' => ['label' => 'Điện thoại', 'group' => 'Thông tin liên hệ', 'default' => null, 'rules' => ['nullable', 'string', 'max:30'], 'important' => false],

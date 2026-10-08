@@ -63,6 +63,9 @@ class SettingTest extends TestCase
         $settings->set(['school.name' => 'Trường Đại học Thử nghiệm'], $admin);
         Notification::assertNothingSent();
 
+        // Tên trường hiển thị trên giao diện (config studentmanager.school.name) đổi theo
+        $this->assertSame('Trường Đại học Thử nghiệm', config('studentmanager.school.name'));
+
         $settings->set(['session.remember_days' => 7], $admin);
         Notification::assertSentTo($otherAdmin, ImportantConfigurationChanged::class, fn ($n) => str_contains($n->lines[0], '→ 7'));
         Notification::assertNotSentTo($admin, ImportantConfigurationChanged::class);

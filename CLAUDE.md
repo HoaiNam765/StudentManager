@@ -84,6 +84,7 @@ Ghi nhớ cho Claude Code khi làm việc với dự án này. Cập nhật mụ
 | #80 | #225 | Trung tâm import (của C): lô có mã, báo lỗi theo dòng/cột, chỉ lưu dòng hợp lệ hoặc lưu toàn bộ, chạy nền, hoàn tác theo lô. Mình đã sửa thẳng trên nhánh của C theo review |
 | #81 | #227 | Dịch vụ xuất Excel/CSV/PDF dùng chung (`App\Support\Services\ExportService`, của C): quyền X và phạm vi dữ liệu, cột nhạy cảm, phông tiếng Việt, audit (`Exported`, `Downloaded`), tác vụ nền theo ngưỡng (PDF ngưỡng riêng + mức trần), tệp nền giữ 7 ngày rồi dọn bằng `exports:prune`. Chưa có route/controller cho `status`/`download`. Mình đã sửa thẳng trên nhánh của C theo review (đúng lớp ngoại lệ, PDF, hạn giữ tệp) |
 | #78 | (chưa mở) | Danh mục dùng chung (SYS): `LookupCategory`/`LookupValue` (giới tính, 54 dân tộc, tôn giáo, quốc tịch, đối tượng/khu vực ưu tiên, loại hợp đồng), đơn vị hành chính hai cấp 2025 + ba cấp cũ, Importer danh mục, `ReferenceRegistry`, `SpreadsheetImporter`; sửa số dòng báo lỗi của trung tâm import khi file có dòng trống — nhánh `feature/be-danh-muc-dung-chung` |
+| #79 | (chưa mở) | Tham số hệ thống (`SettingService`, ghi đè config lúc khởi động) và bộ quy chế đào tạo theo khóa (`PolicySet`/`PolicyItem`, `PolicyResolver`, mặc định theo phụ lục C, ban hành không hồi tố, báo ADMIN khác qua mail log) — nhánh `feature/be-cau-hinh-quy-che` |
 
 ## Việc tiếp theo của A (P1)
 

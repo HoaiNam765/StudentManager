@@ -8,6 +8,8 @@ use App\Modules\Auth\Http\Controllers\UserRoleController;
 use App\Modules\System\Http\Controllers\AdministrativeUnitController;
 use App\Modules\System\Http\Controllers\ImportController;
 use App\Modules\System\Http\Controllers\LookupController;
+use App\Modules\System\Http\Controllers\PolicySetController;
+use App\Modules\System\Http\Controllers\SettingController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -148,6 +150,25 @@ Route::middleware('auth')->group(function (): void {
         Route::put('lookups/{lookupCategory:code}', [LookupController::class, 'updateCategory'])->name('lookups.update');
         Route::put('lookup-values/{lookupValue}', [LookupController::class, 'updateValue'])->name('lookups.values.update');
         Route::put('administrative-units/{administrativeUnit}', [AdministrativeUnitController::class, 'update'])->name('administrative-units.update');
+    });
+
+    // Tham số hệ thống và bộ quy chế đào tạo (SYS, FR-SYS-001, FR-SYS-003): xem = SYS.view; sửa, soạn, ban hành = SYS.update
+    Route::middleware('permission:SYS.view')->group(function (): void {
+        Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
+        Route::get('policy-sets', [PolicySetController::class, 'index'])->name('policy-sets.index');
+        Route::get('policy-sets/definitions', [PolicySetController::class, 'definitions'])->name('policy-sets.definitions');
+        Route::get('policy-sets/resolve', [PolicySetController::class, 'resolve'])->name('policy-sets.resolve');
+        Route::get('policy-sets/{policySet}', [PolicySetController::class, 'show'])->whereNumber('policySet')->name('policy-sets.show');
+    });
+
+    Route::middleware('permission:SYS.update')->group(function (): void {
+        Route::put('settings', [SettingController::class, 'update'])->name('settings.update');
+        Route::post('settings/logo', [SettingController::class, 'uploadLogo'])->name('settings.logo');
+        Route::post('policy-sets', [PolicySetController::class, 'store'])->name('policy-sets.store');
+        Route::put('policy-sets/{policySet}', [PolicySetController::class, 'update'])->whereNumber('policySet')->name('policy-sets.update');
+        Route::put('policy-sets/{policySet}/items', [PolicySetController::class, 'updateItems'])->whereNumber('policySet')->name('policy-sets.items');
+        Route::post('policy-sets/{policySet}/publish', [PolicySetController::class, 'publish'])->whereNumber('policySet')->name('policy-sets.publish');
+        Route::delete('policy-sets/{policySet}', [PolicySetController::class, 'destroy'])->whereNumber('policySet')->name('policy-sets.destroy');
     });
 
     Route::middleware('permission:SYS.delete')->group(function (): void {

@@ -205,6 +205,24 @@ $this->app->make(ImportRegistry::class)->register(new StudentImporter());
 - Seeder có 34 tỉnh/thành; **danh sách xã/phường nhập bằng trung tâm import** (Importer `administrative_units`, nhập tỉnh trước, xã ở lô sau). Mã tỉnh và mã dân tộc cần đối chiếu danh mục chính thức trước khi dùng thật.
 - Mã là khóa ổn định: không đổi, không cấp lại (kể cả đã xóa). Quản trị: `/admin/lookups`, `/admin/administrative-units` (quyền `SYS.*`).
 
+## Tham số hệ thống và bộ quy chế (SYS, FR-SYS-001, FR-SYS-003)
+
+**Mọi ngưỡng quy chế đọc qua `PolicyResolver`, không viết cứng (GC-12):**
+
+```php
+$resolver = app(PolicyResolver::class);
+$resolver->value('attendance.ban_percent', cohort: $student->cohort_year, date: $session->date);   // 20
+$resolver->value('grading.scale', $khoa);         // [['min' => 8.5, 'letter' => 'A', 'gpa' => 4.0, 'passed' => true], ...]
+$resolver->setFor($khoa, $ngay)->code;            // bộ quy chế đang áp dụng
+```
+
+- Danh sách tham số, nhãn và giá trị mặc định (docs/BA.md phụ lục C): `App\Modules\System\Settings\PolicyDefinitions`. Cần ngưỡng mới thì khai báo ở đó; bộ đã ban hành trước đó dùng giá trị mặc định.
+- Chọn bộ: trong các bộ **đã ban hành** có phạm vi khóa chứa khóa của sinh viên và ngày hiệu lực không sau ngày cần tính, lấy bộ hiệu lực gần nhất. Dữ liệu đã chốt thì truyền đúng ngày của dữ liệu (ví dụ ngày công bố điểm) để không bị hồi tố.
+- Bộ đã ban hành không sửa, không xóa; muốn đổi thì tạo phiên bản mới (`based_on_id`, cùng mã) với ngày hiệu lực từ hôm nay trở đi (BR-SYS-02). Ban hành ghi nhật ký toàn bộ giá trị và báo các ADMIN khác (BR-SYS-08).
+- Seeder có bộ `QC-MAC-DINH` áp dụng mọi khóa. API: `/admin/policy-sets` (xem `SYS.view`; soạn, ban hành `SYS.update`), xem trước `GET /admin/policy-sets/resolve?cohort=2026&date=…`.
+
+**Tham số hệ thống** (tên trường, logo, liên hệ, múi giờ, ngôn ngữ, định dạng ngày, chính sách phiên): `app(SettingService::class)->get('school.name')`; danh sách ở `SettingDefinitions`. Tham số đã lưu ghi đè config lúc khởi động (`studentmanager.display_timezone`, `app.locale`, `studentmanager.formats.date`, `session.lifetime`, `studentmanager.auth.remember_days`). Học kỳ hiện hành thuộc module ACY. API: `GET/PUT /admin/settings`, `POST /admin/settings/logo`.
+
 ## Dữ liệu đang được tham chiếu (`ReferenceRegistry`)
 
 Quy tắc "đã được dùng thì chỉ ngừng, không xóa / không đổi mã" (BR-SYS-09, BR-FAC-01, BR-ROM-04, GC-02) dùng chung `App\Support\References\ReferenceRegistry`. **Module nào thêm khóa ngoại tới bảng của module khác thì đăng ký trong ServiceProvider của mình**, để module kia biết mà chặn xóa:

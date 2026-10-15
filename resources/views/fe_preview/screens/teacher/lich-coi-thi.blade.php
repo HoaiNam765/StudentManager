@@ -1,12 +1,12 @@
-@extends('fe_preview.layouts.lecturer')
-@section('page_title', 'Lịch coi thi & Phân công giám thị - HUIT Học Vụ')
+﻿@extends('fe_preview.layouts.teacher')
+@section('page_title', 'Lá»‹ch coi thi & PhÃ¢n cÃ´ng giÃ¡m thá»‹ - HUIT Há»c Vá»¥')
 @section('html_attributes')lang="vi" class="['light']"@endsection
 @section('body_attributes')class="['bg-[#f8f9ff]', 'text-slate-800', 'antialiased', 'min-h-screen', 'flex', 'selection:bg-blue-100', 'selection:text-blue-900']"@endsection
 @section('head')
 
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Lịch coi thi &amp; Phân công giám thị - HUIT Học Vụ</title>
+<title>Lá»‹ch coi thi &amp; PhÃ¢n cÃ´ng giÃ¡m thá»‹ - HUIT Há»c Vá»¥</title>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
@@ -51,7 +51,7 @@
     }
   </style>
 <style id="mobile-wrap-fix">
-/* Vá tạm cho 360px: cho phép hàng flex xuống dòng, không cho phần tử con tràn khỏi khung. Thay bằng sửa bố cục từng màn khi có thời gian. */
+/* VÃ¡ táº¡m cho 360px: cho phÃ©p hÃ ng flex xuá»‘ng dÃ²ng, khÃ´ng cho pháº§n tá»­ con trÃ n khá»i khung. Thay báº±ng sá»­a bá»‘ cá»¥c tá»«ng mÃ n khi cÃ³ thá»i gian. */
 @media (max-width:639px){
  main .flex:not(.flex-col):not(.flex-wrap):not(.overflow-x-auto){flex-wrap:wrap}
  main .flex>*{min-width:0}
@@ -74,8 +74,8 @@
 <span class="material-symbols-outlined text-[20px]">co_present</span>
 </div>
 <div class="overflow-hidden">
-<div class="font-bold text-[13.5px] text-slate-900 leading-tight truncate">HUIT Học Vụ</div>
-<div class="text-[11px] text-slate-500 font-medium truncate">Cổng Giảng viên</div>
+<div class="font-bold text-[13.5px] text-slate-900 leading-tight truncate">HUIT Há»c Vá»¥</div>
+<div class="text-[11px] text-slate-500 font-medium truncate">Cá»•ng Giáº£ng viÃªn</div>
 </div>
 </div>
 <button class="lg:hidden p-1.5 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100" onclick="toggleSidebar()">
@@ -85,38 +85,38 @@
 <!-- Navigation Menu (Dynamic by Stage) -->
 <div class="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-6">
 <div class="space-y-1">
-<div class="px-3 py-1.5 text-[10.5px] font-bold tracking-wider text-slate-500 uppercase">HOẠT ĐỘNG GIẢNG DẠY</div>
+<div class="px-3 py-1.5 text-[10.5px] font-bold tracking-wider text-slate-500 uppercase">HOáº T Äá»˜NG GIáº¢NG Dáº Y</div>
 <a class="flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors" href="{{ route('fe.preview.show', ['screen' => 'teacher/lich-giang-day']) }}">
 <span class="material-symbols-outlined text-[19px] text-slate-500 group-hover:text-slate-600">calendar_month</span>
-<span class="truncate">Lịch giảng dạy</span>
+<span class="truncate">Lá»‹ch giáº£ng dáº¡y</span>
 </a>
 <a class="flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors" href="{{ route('fe.preview.show', ['screen' => 'teacher/lop-hoc-phan']) }}">
 <span class="material-symbols-outlined text-[19px] text-slate-500 group-hover:text-slate-600">class</span>
-<span class="truncate">Lớp học phần phụ trách</span>
+<span class="truncate">Lá»›p há»c pháº§n phá»¥ trÃ¡ch</span>
 </a>
 <a class="flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors" href="{{ route('fe.preview.show', ['screen' => 'teacher/nhap-diem']) }}">
 <span class="material-symbols-outlined text-[19px] text-slate-500 group-hover:text-slate-600">edit_note</span>
-<span class="truncate">Nhập &amp; nộp điểm</span>
+<span class="truncate">Nháº­p &amp; ná»™p Ä‘iá»ƒm</span>
 </a>
 <a class="flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors" href="{{ route('fe.preview.show', ['screen' => 'teacher/de-cuong-hoc-phan']) }}">
 <span class="material-symbols-outlined text-[19px] text-slate-500 group-hover:text-slate-600">menu_book</span>
-<span class="truncate">Đề cương học phần</span>
+<span class="truncate">Äá» cÆ°Æ¡ng há»c pháº§n</span>
 </a>
 <a class="flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors" href="{{ route('fe.preview.show', ['screen' => 'teacher/thong-bao-lop']) }}">
 <span class="material-symbols-outlined text-[19px] text-slate-500 group-hover:text-slate-600">campaign</span>
-<span class="truncate">Gửi thông báo cho lớp</span>
+<span class="truncate">Gá»­i thÃ´ng bÃ¡o cho lá»›p</span>
 </a>
 <a class="flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors" href="{{ route('fe.preview.show', ['screen' => 'teacher/ho-so-lich-ban']) }}">
 <span class="material-symbols-outlined text-[19px] text-slate-500 group-hover:text-slate-600">event_busy</span>
-<span class="truncate">Hồ sơ &amp; Lịch bận</span>
+<span class="truncate">Há»“ sÆ¡ &amp; Lá»‹ch báº­n</span>
 </a>
 <a class="flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-semibold bg-blue-50 text-primary border-r-4 border-primary transition-colors" href="{{ route('fe.preview.show', ['screen' => 'teacher/lich-coi-thi']) }}">
 <span class="material-symbols-outlined text-[19px] text-primary">event_upcoming</span>
-<span class="truncate">Lịch coi thi</span>
+<span class="truncate">Lá»‹ch coi thi</span>
 </a>
 <a class="flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors" href="{{ route('fe.preview.show', ['screen' => 'teacher/diem-danh']) }}">
 <span class="material-symbols-outlined text-[19px] text-slate-500 group-hover:text-slate-600">check_circle</span>
-<span class="truncate">Điểm danh sinh viên</span>
+<span class="truncate">Äiá»ƒm danh sinh viÃªn</span>
 </a>
 </div>
 </div>
@@ -125,7 +125,7 @@
 <div class="flex items-center gap-2.5 text-xs text-slate-600">
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
-<div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
+<div class="font-semibold text-slate-800 text-[11.5px]">Há»— trá»£ ká»¹ thuáº­t: 028 3816 1673</div>
 <div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
 </div>
 </div>
@@ -142,24 +142,24 @@
 </button>
 <div class="min-w-0">
 <div class="flex items-center gap-2 min-w-0">
-<h1 class="text-base sm:text-lg font-bold text-slate-900 leading-tight truncate">Lịch coi thi &amp; Phân công giám thị</h1>
+<h1 class="text-base sm:text-lg font-bold text-slate-900 leading-tight truncate">Lá»‹ch coi thi &amp; PhÃ¢n cÃ´ng giÃ¡m thá»‹</h1>
 <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-blue-50 text-primary border border-blue-100">
-              Học kỳ 1 • 2026-2027
+              Há»c ká»³ 1 â€¢ 2026-2027
             </span>
 </div>
-<div class="text-xs text-slate-500 hidden sm:block">Trang chủ / Cổng Giảng viên / Lịch coi thi</div>
+<div class="text-xs text-slate-500 hidden sm:block">Trang chá»§ / Cá»•ng Giáº£ng viÃªn / Lá»‹ch coi thi</div>
 </div>
 </div>
 <!-- Header Right -->
 <div class="flex items-center gap-2 sm:gap-3 shrink-0">
 <!-- Role quick switch -->
 <div class="hidden md:flex items-center p-1 bg-slate-100 rounded-lg text-xs font-medium">
-<a class="px-2.5 py-1 text-slate-600 hover:text-slate-900" href="{{ route('fe.preview.show', ['screen' => 'student/tong-quan']) }}">Sinh viên</a>
-<span class="px-2.5 py-1 rounded-md bg-white text-primary font-semibold shadow-xs">Giảng viên</span>
-<a class="px-2.5 py-1 text-slate-600 hover:text-slate-900" href="{{ route('fe.preview.show', ['screen' => 'admin/tong-quan']) }}">Phòng ĐT</a>
+<a class="px-2.5 py-1 text-slate-600 hover:text-slate-900" href="{{ route('fe.preview.show', ['screen' => 'student/tong-quan']) }}">Sinh viÃªn</a>
+<span class="px-2.5 py-1 rounded-md bg-white text-primary font-semibold shadow-xs">Giáº£ng viÃªn</span>
+<a class="px-2.5 py-1 text-slate-600 hover:text-slate-900" href="{{ route('fe.preview.show', ['screen' => 'admin/tong-quan']) }}">PhÃ²ng ÄT</a>
 </div>
 <!-- Notification Bell -->
-<a class="relative p-2 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors" href="{{ route('fe.preview.show', ['screen' => 'teacher/thong-bao-lop']) }}" title="Thông báo">
+<a class="relative p-2 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors" href="{{ route('fe.preview.show', ['screen' => 'teacher/thong-bao-lop']) }}" title="ThÃ´ng bÃ¡o">
 <span class="material-symbols-outlined text-[21px]">notifications</span>
 </a>
 <!-- User Profile Pill -->
@@ -168,8 +168,8 @@
             THN
           </div>
 <div class="hidden sm:block text-left">
-<div class="text-xs font-semibold text-slate-900 leading-tight">TS. Trần Hoàng Nam</div>
-<div class="text-[11px] text-slate-500">GV-2018042 • Khoa CNTT</div>
+<div class="text-xs font-semibold text-slate-900 leading-tight">TS. Tráº§n HoÃ ng Nam</div>
+<div class="text-[11px] text-slate-500">GV-2018042 â€¢ Khoa CNTT</div>
 </div>
 </div>
 </div>
@@ -181,119 +181,119 @@
 <div class="flex items-center gap-2 border-b border-slate-200 pb-3">
 <a class="px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 flex items-center gap-1.5 transition-colors" href="{{ route('fe.preview.show', ['screen' => 'teacher/lich-giang-day']) }}">
 <span class="material-symbols-outlined text-[18px]">calendar_month</span>
-<span>Lịch giảng dạy</span>
+<span>Lá»‹ch giáº£ng dáº¡y</span>
 </a>
 <span class="px-4 py-2 rounded-lg text-xs font-semibold bg-primary text-white flex items-center gap-1.5 shadow-xs">
 <span class="material-symbols-outlined text-[18px]">event_upcoming</span>
-<span>Lịch coi thi</span>
+<span>Lá»‹ch coi thi</span>
 </span>
 </div>
 <!-- Summary Metric Cards -->
 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
 <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
-<span class="text-[11px] font-semibold text-slate-500 block uppercase">Tổng số ca coi thi</span>
+<span class="text-[11px] font-semibold text-slate-500 block uppercase">Tá»•ng sá»‘ ca coi thi</span>
 <span class="text-xl font-extrabold text-slate-900 mt-1 block">04 ca</span>
-<span class="text-[11px] text-slate-500">Kỳ thi HK1 • 2026-2027</span>
+<span class="text-[11px] text-slate-500">Ká»³ thi HK1 â€¢ 2026-2027</span>
 </div>
 <div class="bg-white p-4 rounded-xl border border-blue-200 bg-blue-50/20 shadow-xs">
-<span class="text-[11px] font-semibold text-primary block uppercase">Ca thi kế tiếp</span>
-<span class="text-base font-extrabold text-slate-900 mt-1 block truncate">18/11/2026 • Ca 1 (07:30)</span>
-<span class="text-[11px] text-primary font-medium">Phòng B.302 (Giám thị 1)</span>
+<span class="text-[11px] font-semibold text-primary block uppercase">Ca thi káº¿ tiáº¿p</span>
+<span class="text-base font-extrabold text-slate-900 mt-1 block truncate">18/11/2026 â€¢ Ca 1 (07:30)</span>
+<span class="text-[11px] text-primary font-medium">PhÃ²ng B.302 (GiÃ¡m thá»‹ 1)</span>
 </div>
 <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
-<span class="text-[11px] font-semibold text-slate-500 block uppercase">Tổng giờ quy đổi</span>
-<span class="text-xl font-extrabold text-slate-900 mt-1 block">12.0 giờ</span>
-<span class="text-[11px] text-emerald-700 font-medium">Đã xác nhận phân công</span>
+<span class="text-[11px] font-semibold text-slate-500 block uppercase">Tá»•ng giá» quy Ä‘á»•i</span>
+<span class="text-xl font-extrabold text-slate-900 mt-1 block">12.0 giá»</span>
+<span class="text-[11px] text-emerald-700 font-medium">ÄÃ£ xÃ¡c nháº­n phÃ¢n cÃ´ng</span>
 </div>
 </div>
 <!-- Exam Proctoring Table -->
 <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
 <div class="p-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
 <div>
-<h3 class="font-bold text-slate-900 text-sm">Danh sách ca phân công coi thi cá nhân</h3>
-<p class="text-xs text-slate-500 mt-0.5">Giảng viên: TS. Trần Hoàng Nam (GV-2018042) • Khoa Công nghệ Thông tin</p>
+<h3 class="font-bold text-slate-900 text-sm">Danh sÃ¡ch ca phÃ¢n cÃ´ng coi thi cÃ¡ nhÃ¢n</h3>
+<p class="text-xs text-slate-500 mt-0.5">Giáº£ng viÃªn: TS. Tráº§n HoÃ ng Nam (GV-2018042) â€¢ Khoa CÃ´ng nghá»‡ ThÃ´ng tin</p>
 </div>
 <button class="h-9 px-3.5 rounded-lg border border-slate-300 hover:bg-slate-50 text-xs font-semibold text-slate-700 flex items-center gap-1.5 transition-colors no-print" onclick="window.print()">
 <span class="material-symbols-outlined text-[16px]">print</span>
-<span>In lịch coi thi</span>
+<span>In lá»‹ch coi thi</span>
 </button>
 </div>
 <div class="overflow-x-auto">
 <table class="w-full text-left border-collapse">
 <thead>
 <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-<th class="py-3 px-4">Ngày thi</th>
-<th class="py-3 px-4">Ca thi / Thời gian</th>
-<th class="py-3 px-4">Phòng thi</th>
-<th class="py-3 px-4">Học phần</th>
-<th class="py-3 px-4 text-center">Số thí sinh</th>
-<th class="py-3 px-4">Vai trò giám thị</th>
-<th class="py-3 px-4 text-center">Trạng thái</th>
+<th class="py-3 px-4">NgÃ y thi</th>
+<th class="py-3 px-4">Ca thi / Thá»i gian</th>
+<th class="py-3 px-4">PhÃ²ng thi</th>
+<th class="py-3 px-4">Há»c pháº§n</th>
+<th class="py-3 px-4 text-center">Sá»‘ thÃ­ sinh</th>
+<th class="py-3 px-4">Vai trÃ² giÃ¡m thá»‹</th>
+<th class="py-3 px-4 text-center">Tráº¡ng thÃ¡i</th>
 </tr>
 </thead>
 <tbody class="divide-y divide-slate-100 text-xs font-medium text-slate-700">
 <tr class="hover:bg-blue-50/50 transition-colors bg-blue-50/20">
 <td class="py-3.5 px-4 font-bold text-primary">18/11/2026</td>
 <td class="py-3.5 px-4">Ca 1 (07:30 - 09:30)</td>
-<td class="py-3.5 px-4 font-bold text-slate-900">B.302 (CS chính)</td>
+<td class="py-3.5 px-4 font-bold text-slate-900">B.302 (CS chÃ­nh)</td>
 <td class="py-3.5 px-4">
-<div class="font-semibold text-slate-900">Lập trình Java</div>
-<div class="text-[11px] text-slate-500">Mã LHP: 241_71ITEC3201_01</div>
+<div class="font-semibold text-slate-900">Láº­p trÃ¬nh Java</div>
+<div class="text-[11px] text-slate-500">MÃ£ LHP: 241_71ITEC3201_01</div>
 </td>
 <td class="py-3.5 px-4 text-center font-bold">42</td>
 <td class="py-3.5 px-4">
-<span class="px-2 py-0.5 rounded font-bold bg-blue-100 text-primary border border-blue-200">Cán bộ coi thi 1</span>
+<span class="px-2 py-0.5 rounded font-bold bg-blue-100 text-primary border border-blue-200">CÃ¡n bá»™ coi thi 1</span>
 </td>
 <td class="py-3.5 px-4 text-center">
-<span class="px-2 py-0.5 rounded font-semibold bg-amber-50 text-amber-700 border border-amber-200">Sắp diễn ra</span>
+<span class="px-2 py-0.5 rounded font-semibold bg-amber-50 text-amber-700 border border-amber-200">Sáº¯p diá»…n ra</span>
 </td>
 </tr>
 <tr class="hover:bg-blue-50/50 transition-colors">
 <td class="py-3.5 px-4 font-bold text-slate-900">22/11/2026</td>
 <td class="py-3.5 px-4">Ca 3 (13:30 - 15:30)</td>
-<td class="py-3.5 px-4 font-bold text-slate-900">C.205 (CS chính)</td>
+<td class="py-3.5 px-4 font-bold text-slate-900">C.205 (CS chÃ­nh)</td>
 <td class="py-3.5 px-4">
-<div class="font-semibold text-slate-900">Cơ sở dữ liệu nâng cao</div>
-<div class="text-[11px] text-slate-500">Mã LHP: 241_71ITEC2202_02</div>
+<div class="font-semibold text-slate-900">CÆ¡ sá»Ÿ dá»¯ liá»‡u nÃ¢ng cao</div>
+<div class="text-[11px] text-slate-500">MÃ£ LHP: 241_71ITEC2202_02</div>
 </td>
 <td class="py-3.5 px-4 text-center font-bold">45</td>
 <td class="py-3.5 px-4">
-<span class="px-2 py-0.5 rounded font-bold bg-slate-100 text-slate-800 border border-slate-200">Cán bộ coi thi 2</span>
+<span class="px-2 py-0.5 rounded font-bold bg-slate-100 text-slate-800 border border-slate-200">CÃ¡n bá»™ coi thi 2</span>
 </td>
 <td class="py-3.5 px-4 text-center">
-<span class="px-2 py-0.5 rounded font-semibold bg-slate-100 text-slate-600">Chưa bắt đầu</span>
+<span class="px-2 py-0.5 rounded font-semibold bg-slate-100 text-slate-600">ChÆ°a báº¯t Ä‘áº§u</span>
 </td>
 </tr>
 <tr class="hover:bg-blue-50/50 transition-colors">
 <td class="py-3.5 px-4 font-bold text-slate-900">25/11/2026</td>
 <td class="py-3.5 px-4">Ca 2 (09:30 - 11:30)</td>
-<td class="py-3.5 px-4 font-bold text-slate-900">Lab 4.2 (CS chính)</td>
+<td class="py-3.5 px-4 font-bold text-slate-900">Lab 4.2 (CS chÃ­nh)</td>
 <td class="py-3.5 px-4">
-<div class="font-semibold text-slate-900">Kỹ thuật phần mềm</div>
-<div class="text-[11px] text-slate-500">Mã LHP: 241_71ITEC2105_01</div>
+<div class="font-semibold text-slate-900">Ká»¹ thuáº­t pháº§n má»m</div>
+<div class="text-[11px] text-slate-500">MÃ£ LHP: 241_71ITEC2105_01</div>
 </td>
 <td class="py-3.5 px-4 text-center font-bold">38</td>
 <td class="py-3.5 px-4">
-<span class="px-2 py-0.5 rounded font-bold bg-blue-100 text-primary border border-blue-200">Cán bộ coi thi 1</span>
+<span class="px-2 py-0.5 rounded font-bold bg-blue-100 text-primary border border-blue-200">CÃ¡n bá»™ coi thi 1</span>
 </td>
 <td class="py-3.5 px-4 text-center">
-<span class="px-2 py-0.5 rounded font-semibold bg-slate-100 text-slate-600">Chưa bắt đầu</span>
+<span class="px-2 py-0.5 rounded font-semibold bg-slate-100 text-slate-600">ChÆ°a báº¯t Ä‘áº§u</span>
 </td>
 </tr>
 <tr class="hover:bg-blue-50/50 transition-colors">
 <td class="py-3.5 px-4 font-bold text-slate-900">30/11/2026</td>
 <td class="py-3.5 px-4">Ca 1 (07:30 - 09:30)</td>
-<td class="py-3.5 px-4 font-bold text-slate-900">A.104 (CS chính)</td>
+<td class="py-3.5 px-4 font-bold text-slate-900">A.104 (CS chÃ­nh)</td>
 <td class="py-3.5 px-4">
-<div class="font-semibold text-slate-900">Mạng máy tính</div>
-<div class="text-[11px] text-slate-500">Mã LHP: 241_71ITEC2108_02</div>
+<div class="font-semibold text-slate-900">Máº¡ng mÃ¡y tÃ­nh</div>
+<div class="text-[11px] text-slate-500">MÃ£ LHP: 241_71ITEC2108_02</div>
 </td>
 <td class="py-3.5 px-4 text-center font-bold">40</td>
 <td class="py-3.5 px-4">
-<span class="px-2 py-0.5 rounded font-bold bg-slate-100 text-slate-800 border border-slate-200">Cán bộ coi thi 2</span>
+<span class="px-2 py-0.5 rounded font-bold bg-slate-100 text-slate-800 border border-slate-200">CÃ¡n bá»™ coi thi 2</span>
 </td>
 <td class="py-3.5 px-4 text-center">
-<span class="px-2 py-0.5 rounded font-semibold bg-slate-100 text-slate-600">Chưa bắt đầu</span>
+<span class="px-2 py-0.5 rounded font-semibold bg-slate-100 text-slate-600">ChÆ°a báº¯t Ä‘áº§u</span>
 </td>
 </tr>
 </tbody>
@@ -304,10 +304,10 @@
 </main>
 <!-- FOOTER -->
 <footer class="py-4 px-6 bg-white border-t border-slate-200/80 text-center text-xs text-slate-500 no-print flex flex-col sm:flex-row items-center justify-between gap-2">
-<div>© 2026 <strong>Trường Đại học Công Thương TP.HCM (HUIT)</strong> — Hệ thống Quản lý Học vụ.</div>
+<div>Â© 2026 <strong>TrÆ°á»ng Äáº¡i há»c CÃ´ng ThÆ°Æ¡ng TP.HCM (HUIT)</strong> â€” Há»‡ thá»‘ng Quáº£n lÃ½ Há»c vá»¥.</div>
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
-<span>Hỗ trợ: 028 3816 1673</span>
-<span>•</span>
+<span>Há»— trá»£: 028 3816 1673</span>
+<span>â€¢</span>
 <span>support@huit.edu.vn</span>
 </div>
 </footer>
@@ -328,9 +328,9 @@
     }
   </script>
 <script id="state-demo">
-/* HUIT Học Vụ - demo trạng thái giao diện (UX-08).
-   Thêm ?state=loading | empty | error vào URL để xem trạng thái đang tải / rỗng / lỗi của vùng dữ liệu chính.
-   Không có tham số: trang hiển thị dữ liệu bình thường. */
+/* HUIT Há»c Vá»¥ - demo tráº¡ng thÃ¡i giao diá»‡n (UX-08).
+   ThÃªm ?state=loading | empty | error vÃ o URL Ä‘á»ƒ xem tráº¡ng thÃ¡i Ä‘ang táº£i / rá»—ng / lá»—i cá»§a vÃ¹ng dá»¯ liá»‡u chÃ­nh.
+   KhÃ´ng cÃ³ tham sá»‘: trang hiá»ƒn thá»‹ dá»¯ liá»‡u bÃ¬nh thÆ°á»ng. */
 (function () {
   var st = new URLSearchParams(location.search).get('state');
   if (!st) return;
@@ -339,9 +339,9 @@
     if (!t) return;
     var box = t.closest('.overflow-x-auto') || t.parentElement;
     var msg = {
-      loading: ['Đang tải dữ liệu…', 'Vui lòng chờ trong giây lát.'],
-      empty: ['Chưa có dữ liệu', 'Thử đổi bộ lọc hoặc thêm mới để bắt đầu.'],
-      error: ['Không thể tải dữ liệu', 'Kết nối bị gián đoạn. Hãy kiểm tra mạng rồi thử lại.']
+      loading: ['Äang táº£i dá»¯ liá»‡uâ€¦', 'Vui lÃ²ng chá» trong giÃ¢y lÃ¡t.'],
+      empty: ['ChÆ°a cÃ³ dá»¯ liá»‡u', 'Thá»­ Ä‘á»•i bá»™ lá»c hoáº·c thÃªm má»›i Ä‘á»ƒ báº¯t Ä‘áº§u.'],
+      error: ['KhÃ´ng thá»ƒ táº£i dá»¯ liá»‡u', 'Káº¿t ná»‘i bá»‹ giÃ¡n Ä‘oáº¡n. HÃ£y kiá»ƒm tra máº¡ng rá»“i thá»­ láº¡i.']
     }[st];
     if (!msg) return;
     var p = document.createElement('div');
@@ -353,7 +353,7 @@
       for (var i = 0; i < 4; i++) rows += '<div style="height:14px;margin:10px auto;max-width:640px;border-radius:6px;background:#e2e8f0;animation:pulse 1.4s ease-in-out infinite"></div>';
       h = rows + h + '<style>@keyframes pulse{50%{opacity:.4}}</style>';
     }
-    if (st === 'error') h += '<button type="button" onclick="location.href=location.pathname" style="margin-top:14px;padding:8px 16px;border-radius:8px;background:#1c55c4;color:#fff;font-weight:600">Thử lại</button>';
+    if (st === 'error') h += '<button type="button" onclick="location.href=location.pathname" style="margin-top:14px;padding:8px 16px;border-radius:8px;background:#1c55c4;color:#fff;font-weight:600">Thá»­ láº¡i</button>';
     p.innerHTML = h;
     box.style.display = 'none';
     box.parentNode.insertBefore(p, box.nextSibling);
@@ -363,3 +363,4 @@
 </script>
 
 @endsection
+

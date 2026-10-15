@@ -1,12 +1,12 @@
-@extends('fe_preview.layouts.lecturer')
-@section('page_title', 'Hộp thư duyệt đơn từ sinh viên - HUIT Học Vụ')
+﻿@extends('fe_preview.layouts.teacher')
+@section('page_title', 'Há»™p thÆ° duyá»‡t Ä‘Æ¡n tá»« sinh viÃªn - HUIT Há»c Vá»¥')
 @section('html_attributes')lang="vi" class="['light']"@endsection
 @section('body_attributes')class="['bg-[#f8f9ff]', 'text-slate-800', 'antialiased', 'min-h-screen', 'flex', 'selection:bg-blue-100', 'selection:text-blue-900']"@endsection
 @section('head')
 
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Hộp thư duyệt đơn từ sinh viên - HUIT Học Vụ</title>
+<title>Há»™p thÆ° duyá»‡t Ä‘Æ¡n tá»« sinh viÃªn - HUIT Há»c Vá»¥</title>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
@@ -51,7 +51,7 @@
     }
   </style>
 <style id="mobile-wrap-fix">
-/* Vá tạm cho 360px: cho phép hàng flex xuống dòng, không cho phần tử con tràn khỏi khung. Thay bằng sửa bố cục từng màn khi có thời gian. */
+/* VÃ¡ táº¡m cho 360px: cho phÃ©p hÃ ng flex xuá»‘ng dÃ²ng, khÃ´ng cho pháº§n tá»­ con trÃ n khá»i khung. Thay báº±ng sá»­a bá»‘ cá»¥c tá»«ng mÃ n khi cÃ³ thá»i gian. */
 @media (max-width:639px){
  main .flex:not(.flex-col):not(.flex-wrap):not(.overflow-x-auto){flex-wrap:wrap}
  main .flex>*{min-width:0}
@@ -74,8 +74,8 @@
 <span class="material-symbols-outlined text-[20px]">co_present</span>
 </div>
 <div class="overflow-hidden">
-<div class="font-bold text-[13.5px] text-slate-900 leading-tight truncate">HUIT Học Vụ</div>
-<div class="text-[11px] text-slate-500 font-medium truncate">Cổng Giảng viên</div>
+<div class="font-bold text-[13.5px] text-slate-900 leading-tight truncate">HUIT Há»c Vá»¥</div>
+<div class="text-[11px] text-slate-500 font-medium truncate">Cá»•ng Giáº£ng viÃªn</div>
 </div>
 </div>
 <button class="lg:hidden p-1.5 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100" onclick="toggleSidebar()">
@@ -85,49 +85,49 @@
 <!-- Navigation Menu (Dynamic by Stage) -->
 <div class="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-6">
 <div class="space-y-1">
-<div class="px-3 py-1.5 text-[10.5px] font-bold tracking-wider text-slate-500 uppercase">HOẠT ĐỘNG GIẢNG DẠY</div>
+<div class="px-3 py-1.5 text-[10.5px] font-bold tracking-wider text-slate-500 uppercase">HOáº T Äá»˜NG GIáº¢NG Dáº Y</div>
 <a class="flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors" href="{{ route('fe.preview.show', ['screen' => 'teacher/lich-giang-day']) }}">
 <span class="material-symbols-outlined text-[19px] text-slate-500 group-hover:text-slate-600">calendar_month</span>
-<span class="truncate">Lịch giảng dạy</span>
+<span class="truncate">Lá»‹ch giáº£ng dáº¡y</span>
 </a>
 <a class="flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors" href="{{ route('fe.preview.show', ['screen' => 'teacher/lop-hoc-phan']) }}">
 <span class="material-symbols-outlined text-[19px] text-slate-500 group-hover:text-slate-600">class</span>
-<span class="truncate">Lớp học phần phụ trách</span>
+<span class="truncate">Lá»›p há»c pháº§n phá»¥ trÃ¡ch</span>
 </a>
 <a class="flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors" href="{{ route('fe.preview.show', ['screen' => 'teacher/nhap-diem']) }}">
 <span class="material-symbols-outlined text-[19px] text-slate-500 group-hover:text-slate-600">edit_note</span>
-<span class="truncate">Nhập &amp; nộp điểm</span>
+<span class="truncate">Nháº­p &amp; ná»™p Ä‘iá»ƒm</span>
 </a>
 <a class="flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors" href="{{ route('fe.preview.show', ['screen' => 'teacher/de-cuong-hoc-phan']) }}">
 <span class="material-symbols-outlined text-[19px] text-slate-500 group-hover:text-slate-600">menu_book</span>
-<span class="truncate">Đề cương học phần</span>
+<span class="truncate">Äá» cÆ°Æ¡ng há»c pháº§n</span>
 </a>
 <a class="flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors" href="{{ route('fe.preview.show', ['screen' => 'teacher/thong-bao-lop']) }}">
 <span class="material-symbols-outlined text-[19px] text-slate-500 group-hover:text-slate-600">campaign</span>
-<span class="truncate">Gửi thông báo cho lớp</span>
+<span class="truncate">Gá»­i thÃ´ng bÃ¡o cho lá»›p</span>
 </a>
 <a class="flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors" href="{{ route('fe.preview.show', ['screen' => 'teacher/ho-so-lich-ban']) }}">
 <span class="material-symbols-outlined text-[19px] text-slate-500 group-hover:text-slate-600">event_busy</span>
-<span class="truncate">Hồ sơ &amp; Lịch bận</span>
+<span class="truncate">Há»“ sÆ¡ &amp; Lá»‹ch báº­n</span>
 </a>
 <a class="flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors" href="{{ route('fe.preview.show', ['screen' => 'teacher/lich-coi-thi']) }}">
 <span class="material-symbols-outlined text-[19px] text-slate-500 group-hover:text-slate-600">event_upcoming</span>
-<span class="truncate">Lịch coi thi</span>
+<span class="truncate">Lá»‹ch coi thi</span>
 </a>
 <a class="flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors" href="{{ route('fe.preview.show', ['screen' => 'teacher/diem-danh']) }}">
 <span class="material-symbols-outlined text-[19px] text-slate-500 group-hover:text-slate-600">check_circle</span>
-<span class="truncate">Điểm danh sinh viên</span>
+<span class="truncate">Äiá»ƒm danh sinh viÃªn</span>
 </a>
 </div>
 <div class="space-y-1">
-<div class="px-3 py-1.5 text-[10.5px] font-bold tracking-wider text-slate-500 uppercase">CỐ VẤN &amp; DUYỆT ĐƠN</div>
+<div class="px-3 py-1.5 text-[10.5px] font-bold tracking-wider text-slate-500 uppercase">Cá» Váº¤N &amp; DUYá»†T ÄÆ N</div>
 <a class="flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors" href="{{ route('fe.preview.show', ['screen' => 'teacher/lop-co-van-hoc-tap']) }}">
 <span class="material-symbols-outlined text-[19px] text-slate-500 group-hover:text-slate-600">supervisor_account</span>
-<span class="truncate">Lớp cố vấn học tập</span>
+<span class="truncate">Lá»›p cá»‘ váº¥n há»c táº­p</span>
 </a>
 <a class="flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-semibold bg-blue-50 text-primary border-r-4 border-primary transition-colors" href="{{ route('fe.preview.show', ['screen' => 'teacher/duyet-don']) }}">
 <span class="material-symbols-outlined text-[19px] text-primary">rule_folder</span>
-<span class="truncate">Duyệt đơn từ</span>
+<span class="truncate">Duyá»‡t Ä‘Æ¡n tá»«</span>
 </a>
 </div>
 </div>
@@ -136,7 +136,7 @@
 <div class="flex items-center gap-2.5 text-xs text-slate-600">
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
-<div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
+<div class="font-semibold text-slate-800 text-[11.5px]">Há»— trá»£ ká»¹ thuáº­t: 028 3816 1673</div>
 <div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
 </div>
 </div>
@@ -153,24 +153,24 @@
 </button>
 <div class="min-w-0">
 <div class="flex items-center gap-2 min-w-0">
-<h1 class="text-base sm:text-lg font-bold text-slate-900 leading-tight truncate">Hộp thư duyệt đơn từ sinh viên</h1>
+<h1 class="text-base sm:text-lg font-bold text-slate-900 leading-tight truncate">Há»™p thÆ° duyá»‡t Ä‘Æ¡n tá»« sinh viÃªn</h1>
 <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-blue-50 text-primary border border-blue-100">
-              Học kỳ 1 • 2026-2027
+              Há»c ká»³ 1 â€¢ 2026-2027
             </span>
 </div>
-<div class="text-xs text-slate-500 hidden sm:block">Trang chủ / Cổng Giảng viên / Duyệt đơn</div>
+<div class="text-xs text-slate-500 hidden sm:block">Trang chá»§ / Cá»•ng Giáº£ng viÃªn / Duyá»‡t Ä‘Æ¡n</div>
 </div>
 </div>
 <!-- Header Right -->
 <div class="flex items-center gap-2 sm:gap-3 shrink-0">
 <!-- Role quick switch -->
 <div class="hidden md:flex items-center p-1 bg-slate-100 rounded-lg text-xs font-medium">
-<a class="px-2.5 py-1 text-slate-600 hover:text-slate-900" href="{{ route('fe.preview.show', ['screen' => 'student/tong-quan']) }}">Sinh viên</a>
-<span class="px-2.5 py-1 rounded-md bg-white text-primary font-semibold shadow-xs">Giảng viên</span>
-<a class="px-2.5 py-1 text-slate-600 hover:text-slate-900" href="{{ route('fe.preview.show', ['screen' => 'admin/tong-quan']) }}">Phòng ĐT</a>
+<a class="px-2.5 py-1 text-slate-600 hover:text-slate-900" href="{{ route('fe.preview.show', ['screen' => 'student/tong-quan']) }}">Sinh viÃªn</a>
+<span class="px-2.5 py-1 rounded-md bg-white text-primary font-semibold shadow-xs">Giáº£ng viÃªn</span>
+<a class="px-2.5 py-1 text-slate-600 hover:text-slate-900" href="{{ route('fe.preview.show', ['screen' => 'admin/tong-quan']) }}">PhÃ²ng ÄT</a>
 </div>
 <!-- Notification Bell -->
-<a class="relative p-2 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors" href="{{ route('fe.preview.show', ['screen' => 'teacher/thong-bao-lop']) }}" title="Thông báo">
+<a class="relative p-2 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors" href="{{ route('fe.preview.show', ['screen' => 'teacher/thong-bao-lop']) }}" title="ThÃ´ng bÃ¡o">
 <span class="material-symbols-outlined text-[21px]">notifications</span>
 </a>
 <!-- User Profile Pill -->
@@ -179,8 +179,8 @@
             THN
           </div>
 <div class="hidden sm:block text-left">
-<div class="text-xs font-semibold text-slate-900 leading-tight">TS. Trần Hoàng Nam</div>
-<div class="text-[11px] text-slate-500">GV-2018042 • Khoa CNTT</div>
+<div class="text-xs font-semibold text-slate-900 leading-tight">TS. Tráº§n HoÃ ng Nam</div>
+<div class="text-[11px] text-slate-500">GV-2018042 â€¢ Khoa CNTT</div>
 </div>
 </div>
 </div>
@@ -191,59 +191,59 @@
 <!-- Top Stat Overview -->
 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
 <div class="bg-white p-4 rounded-xl border border-amber-200 bg-amber-50/20 shadow-xs">
-<span class="text-[11px] font-semibold text-amber-700 block uppercase">Đơn chờ duyệt</span>
-<span class="text-xl font-extrabold text-amber-700 mt-1 block">02 đơn</span>
-<span class="text-[11px] text-amber-700 font-medium">Cần xử lý trong tuần</span>
+<span class="text-[11px] font-semibold text-amber-700 block uppercase">ÄÆ¡n chá» duyá»‡t</span>
+<span class="text-xl font-extrabold text-amber-700 mt-1 block">02 Ä‘Æ¡n</span>
+<span class="text-[11px] text-amber-700 font-medium">Cáº§n xá»­ lÃ½ trong tuáº§n</span>
 </div>
 <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
-<span class="text-[11px] font-semibold text-emerald-700 block uppercase">Đã đồng ý duyệt</span>
-<span class="text-xl font-extrabold text-emerald-700 mt-1 block">14 đơn</span>
-<span class="text-[11px] text-slate-500">Đã chuyển cấp Đào tạo</span>
+<span class="text-[11px] font-semibold text-emerald-700 block uppercase">ÄÃ£ Ä‘á»“ng Ã½ duyá»‡t</span>
+<span class="text-xl font-extrabold text-emerald-700 mt-1 block">14 Ä‘Æ¡n</span>
+<span class="text-[11px] text-slate-500">ÄÃ£ chuyá»ƒn cáº¥p ÄÃ o táº¡o</span>
 </div>
 <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
-<span class="text-[11px] font-semibold text-slate-500 block uppercase">Đã từ chối</span>
-<span class="text-xl font-extrabold text-slate-900 mt-1 block">01 đơn</span>
-<span class="text-[11px] text-slate-500">Có nêu rõ lý do</span>
+<span class="text-[11px] font-semibold text-slate-500 block uppercase">ÄÃ£ tá»« chá»‘i</span>
+<span class="text-xl font-extrabold text-slate-900 mt-1 block">01 Ä‘Æ¡n</span>
+<span class="text-[11px] text-slate-500">CÃ³ nÃªu rÃµ lÃ½ do</span>
 </div>
 </div>
 <!-- Request Inbox Table -->
 <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
 <div class="p-4 border-b border-slate-200">
-<h3 class="font-bold text-slate-900 text-sm">Hộp thư duyệt đơn từ sinh viên lớp cố vấn</h3>
+<h3 class="font-bold text-slate-900 text-sm">Há»™p thÆ° duyá»‡t Ä‘Æ¡n tá»« sinh viÃªn lá»›p cá»‘ váº¥n</h3>
 </div>
 <div class="overflow-x-auto">
 <table class="w-full text-left border-collapse">
 <thead>
 <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-<th class="py-3 px-4">Mã đơn</th>
-<th class="py-3 px-4">Sinh viên</th>
-<th class="py-3 px-4">Loại đơn</th>
-<th class="py-3 px-4">Lý do trình bày</th>
-<th class="py-3 px-4 text-center">Tệp minh chứng</th>
-<th class="py-3 px-4 text-center">Thao tác</th>
+<th class="py-3 px-4">MÃ£ Ä‘Æ¡n</th>
+<th class="py-3 px-4">Sinh viÃªn</th>
+<th class="py-3 px-4">Loáº¡i Ä‘Æ¡n</th>
+<th class="py-3 px-4">LÃ½ do trÃ¬nh bÃ y</th>
+<th class="py-3 px-4 text-center">Tá»‡p minh chá»©ng</th>
+<th class="py-3 px-4 text-center">Thao tÃ¡c</th>
 </tr>
 </thead>
 <tbody class="divide-y divide-slate-100 text-xs font-medium text-slate-700">
 <tr class="bg-amber-50/20 hover:bg-amber-50/40">
 <td class="py-3.5 px-4 font-mono font-bold text-primary">DON-2026-0412</td>
 <td class="py-3.5 px-4">
-<div class="font-bold text-slate-900">Nguyễn Văn An</div>
+<div class="font-bold text-slate-900">Nguyá»…n VÄƒn An</div>
 <div class="text-[11px] text-slate-500 font-mono">2001210123</div>
 </td>
-<td class="py-3.5 px-4 font-semibold text-slate-900">Đơn xin hoãn thi kết thúc HP</td>
-<td class="py-3.5 px-4 text-slate-600">Nằm viện điều trị sốt xuất huyết tại BV Thống Nhất</td>
+<td class="py-3.5 px-4 font-semibold text-slate-900">ÄÆ¡n xin hoÃ£n thi káº¿t thÃºc HP</td>
+<td class="py-3.5 px-4 text-slate-600">Náº±m viá»‡n Ä‘iá»u trá»‹ sá»‘t xuáº¥t huyáº¿t táº¡i BV Thá»‘ng Nháº¥t</td>
 <td class="py-3.5 px-4 text-center">
-<a class="text-primary hover:underline font-bold flex items-center justify-center gap-1" href="#" onclick="alert('Đang mở xem tệp giay_ra_vien.pdf'); return false;">
+<a class="text-primary hover:underline font-bold flex items-center justify-center gap-1" href="#" onclick="alert('Äang má»Ÿ xem tá»‡p giay_ra_vien.pdf'); return false;">
 <span class="material-symbols-outlined text-[16px]">attachment</span>
 <span>Xem file</span>
 </a>
 </td>
 <td class="py-3.5 px-4 text-center space-x-1">
-<button class="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px]" onclick="openConfirmApprove('Nguyễn Văn An', 'DON-2026-0412')">
-                Duyệt đơn
+<button class="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px]" onclick="openConfirmApprove('Nguyá»…n VÄƒn An', 'DON-2026-0412')">
+                Duyá»‡t Ä‘Æ¡n
               </button>
-<button class="px-2.5 py-1 rounded bg-red-100 hover:bg-red-200 text-red-700 font-bold text-[11px]" onclick="openRejectModalTeacher('Nguyễn Văn An', 'DON-2026-0412')">
-                Từ chối
+<button class="px-2.5 py-1 rounded bg-red-100 hover:bg-red-200 text-red-700 font-bold text-[11px]" onclick="openRejectModalTeacher('Nguyá»…n VÄƒn An', 'DON-2026-0412')">
+                Tá»« chá»‘i
               </button>
 </td>
 </tr>
@@ -258,29 +258,29 @@
 <span class="material-symbols-outlined text-[28px]">thumb_up</span>
 </div>
 <div class="text-center space-y-1">
-<h3 class="text-base font-bold text-slate-900">Xác nhận phê duyệt đơn từ</h3>
+<h3 class="text-base font-bold text-slate-900">XÃ¡c nháº­n phÃª duyá»‡t Ä‘Æ¡n tá»«</h3>
 <p class="text-xs text-slate-600 leading-relaxed">
-          Bạn xác nhận đồng ý duyệt đơn của sinh viên <strong id="appStuName">Nguyễn Văn An</strong>?
-          Hệ thống sẽ <strong>chuyển tiếp đơn này đến Phòng Đào tạo</strong> để xử lý bước tiếp theo.
+          Báº¡n xÃ¡c nháº­n Ä‘á»“ng Ã½ duyá»‡t Ä‘Æ¡n cá»§a sinh viÃªn <strong id="appStuName">Nguyá»…n VÄƒn An</strong>?
+          Há»‡ thá»‘ng sáº½ <strong>chuyá»ƒn tiáº¿p Ä‘Æ¡n nÃ y Ä‘áº¿n PhÃ²ng ÄÃ o táº¡o</strong> Ä‘á»ƒ xá»­ lÃ½ bÆ°á»›c tiáº¿p theo.
         </p>
 </div>
 <div class="pt-2 flex items-center gap-3">
-<button class="flex-1 h-9 rounded-lg border border-slate-300 text-slate-700 font-semibold text-xs" onclick="closeApproveModal()">Hủy</button>
-<button class="flex-1 h-9 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs" onclick="confirmApproveAction()">Xác nhận duyệt</button>
+<button class="flex-1 h-9 rounded-lg border border-slate-300 text-slate-700 font-semibold text-xs" onclick="closeApproveModal()">Há»§y</button>
+<button class="flex-1 h-9 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs" onclick="confirmApproveAction()">XÃ¡c nháº­n duyá»‡t</button>
 </div>
 </div>
 </div>
 <!-- Reject Modal -->
 <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden" id="rejectModalT">
 <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
-<h3 class="font-bold text-slate-900 text-sm">Từ chối đơn từ kèm lý do cụ thể</h3>
+<h3 class="font-bold text-slate-900 text-sm">Tá»« chá»‘i Ä‘Æ¡n tá»« kÃ¨m lÃ½ do cá»¥ thá»ƒ</h3>
 <div class="space-y-2 text-xs">
-<label class="block font-semibold text-slate-700" for="rej-t-reason">Lý do từ chối *</label>
-<textarea class="w-full p-2.5 rounded-lg border border-slate-300 text-xs bg-slate-50" id="rej-t-reason" placeholder="Nêu rõ lý do từ chối gửi cho sinh viên..." rows="3"></textarea>
+<label class="block font-semibold text-slate-700" for="rej-t-reason">LÃ½ do tá»« chá»‘i *</label>
+<textarea class="w-full p-2.5 rounded-lg border border-slate-300 text-xs bg-slate-50" id="rej-t-reason" placeholder="NÃªu rÃµ lÃ½ do tá»« chá»‘i gá»­i cho sinh viÃªn..." rows="3"></textarea>
 </div>
 <div class="flex justify-end gap-2 pt-2">
-<button class="h-9 px-4 rounded-lg border border-slate-300 text-slate-700 font-semibold text-xs" onclick="closeRejectModalT()">Hủy</button>
-<button class="h-9 px-4 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold text-xs" onclick="confirmRejectT()">Xác nhận từ chối</button>
+<button class="h-9 px-4 rounded-lg border border-slate-300 text-slate-700 font-semibold text-xs" onclick="closeRejectModalT()">Há»§y</button>
+<button class="h-9 px-4 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold text-xs" onclick="confirmRejectT()">XÃ¡c nháº­n tá»« chá»‘i</button>
 </div>
 </div>
 </div>
@@ -294,7 +294,7 @@
     document.getElementById('approveModal').classList.add('hidden');
   }
   function confirmApproveAction() {
-    alert('Đã phê duyệt đơn thành công! Đơn đã được chuyển tiếp đến Phòng Đào tạo.');
+    alert('ÄÃ£ phÃª duyá»‡t Ä‘Æ¡n thÃ nh cÃ´ng! ÄÆ¡n Ä‘Ã£ Ä‘Æ°á»£c chuyá»ƒn tiáº¿p Ä‘áº¿n PhÃ²ng ÄÃ o táº¡o.');
     closeApproveModal();
   }
   function openRejectModalT(name, id) {
@@ -305,18 +305,18 @@
   }
   function confirmRejectT() {
     const reason = document.getElementById('rej-t-reason').value;
-    if (!reason) { alert('Vui lòng nhập lý do từ chối!'); return; }
-    alert('Đã từ chối đơn kèm lý do giải thích cụ thể cho sinh viên.');
+    if (!reason) { alert('Vui lÃ²ng nháº­p lÃ½ do tá»« chá»‘i!'); return; }
+    alert('ÄÃ£ tá»« chá»‘i Ä‘Æ¡n kÃ¨m lÃ½ do giáº£i thÃ­ch cá»¥ thá»ƒ cho sinh viÃªn.');
     closeRejectModalT();
   }
 </script>
 </main>
 <!-- FOOTER -->
 <footer class="py-4 px-6 bg-white border-t border-slate-200/80 text-center text-xs text-slate-500 no-print flex flex-col sm:flex-row items-center justify-between gap-2">
-<div>© 2026 <strong>Trường Đại học Công Thương TP.HCM (HUIT)</strong> — Hệ thống Quản lý Học vụ.</div>
+<div>Â© 2026 <strong>TrÆ°á»ng Äáº¡i há»c CÃ´ng ThÆ°Æ¡ng TP.HCM (HUIT)</strong> â€” Há»‡ thá»‘ng Quáº£n lÃ½ Há»c vá»¥.</div>
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
-<span>Hỗ trợ: 028 3816 1673</span>
-<span>•</span>
+<span>Há»— trá»£: 028 3816 1673</span>
+<span>â€¢</span>
 <span>support@huit.edu.vn</span>
 </div>
 </footer>
@@ -337,9 +337,9 @@
     }
   </script>
 <script id="state-demo">
-/* HUIT Học Vụ - demo trạng thái giao diện (UX-08).
-   Thêm ?state=loading | empty | error vào URL để xem trạng thái đang tải / rỗng / lỗi của vùng dữ liệu chính.
-   Không có tham số: trang hiển thị dữ liệu bình thường. */
+/* HUIT Há»c Vá»¥ - demo tráº¡ng thÃ¡i giao diá»‡n (UX-08).
+   ThÃªm ?state=loading | empty | error vÃ o URL Ä‘á»ƒ xem tráº¡ng thÃ¡i Ä‘ang táº£i / rá»—ng / lá»—i cá»§a vÃ¹ng dá»¯ liá»‡u chÃ­nh.
+   KhÃ´ng cÃ³ tham sá»‘: trang hiá»ƒn thá»‹ dá»¯ liá»‡u bÃ¬nh thÆ°á»ng. */
 (function () {
   var st = new URLSearchParams(location.search).get('state');
   if (!st) return;
@@ -348,9 +348,9 @@
     if (!t) return;
     var box = t.closest('.overflow-x-auto') || t.parentElement;
     var msg = {
-      loading: ['Đang tải dữ liệu…', 'Vui lòng chờ trong giây lát.'],
-      empty: ['Chưa có dữ liệu', 'Thử đổi bộ lọc hoặc thêm mới để bắt đầu.'],
-      error: ['Không thể tải dữ liệu', 'Kết nối bị gián đoạn. Hãy kiểm tra mạng rồi thử lại.']
+      loading: ['Äang táº£i dá»¯ liá»‡uâ€¦', 'Vui lÃ²ng chá» trong giÃ¢y lÃ¡t.'],
+      empty: ['ChÆ°a cÃ³ dá»¯ liá»‡u', 'Thá»­ Ä‘á»•i bá»™ lá»c hoáº·c thÃªm má»›i Ä‘á»ƒ báº¯t Ä‘áº§u.'],
+      error: ['KhÃ´ng thá»ƒ táº£i dá»¯ liá»‡u', 'Káº¿t ná»‘i bá»‹ giÃ¡n Ä‘oáº¡n. HÃ£y kiá»ƒm tra máº¡ng rá»“i thá»­ láº¡i.']
     }[st];
     if (!msg) return;
     var p = document.createElement('div');
@@ -362,7 +362,7 @@
       for (var i = 0; i < 4; i++) rows += '<div style="height:14px;margin:10px auto;max-width:640px;border-radius:6px;background:#e2e8f0;animation:pulse 1.4s ease-in-out infinite"></div>';
       h = rows + h + '<style>@keyframes pulse{50%{opacity:.4}}</style>';
     }
-    if (st === 'error') h += '<button type="button" onclick="location.href=location.pathname" style="margin-top:14px;padding:8px 16px;border-radius:8px;background:#1c55c4;color:#fff;font-weight:600">Thử lại</button>';
+    if (st === 'error') h += '<button type="button" onclick="location.href=location.pathname" style="margin-top:14px;padding:8px 16px;border-radius:8px;background:#1c55c4;color:#fff;font-weight:600">Thá»­ láº¡i</button>';
     p.innerHTML = h;
     box.style.display = 'none';
     box.parentNode.insertBefore(p, box.nextSibling);
@@ -372,3 +372,4 @@
 </script>
 
 @endsection
+

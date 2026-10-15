@@ -18,6 +18,7 @@ class FePreviewController extends Controller
     public function show(string $screen): View
     {
         abort_unless(App::environment('local'), 404);
+
         $item = collect(config('fe_preview', []))->firstWhere('key', $screen);
         abort_if($item === null, 404);
 

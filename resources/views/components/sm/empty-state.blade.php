@@ -1,0 +1,2 @@
+@props(['title' => 'Chưa có dữ liệu', 'description' => 'Không có dữ liệu để hiển thị.'])
+<div {{ $attributes->class(['rounded-xl border border-dashed border-outline-variant bg-surface-container-lowest px-6 py-12 text-center']) }} role="status"><h2 class="text-base font-semibold text-on-surface">{{ $title }}</h2><p class="mt-2 text-sm text-on-surface-variant">{{ $description }}</p>{{ $slot }}</div>

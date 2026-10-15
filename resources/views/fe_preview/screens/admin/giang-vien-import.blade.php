@@ -508,7 +508,7 @@
 <!-- Bôi đỏ email sai -->
 <td class="py-3 px-4">
 <span class="bg-red-200 text-red-900 px-2 py-0.5 rounded font-mono font-bold border border-red-400">
-                      tuan.nv-huit.edu.vn
+                      nguoidung041-example.test
                     </span>
 </td>
 <td class="py-3 px-3 text-on-surface font-mono">0918234567</td>
@@ -520,7 +520,7 @@
 <div class="text-red-900 font-semibold flex items-start gap-1.5">
 <span class="material-symbols-outlined text-error text-[18px] flex-shrink-0 mt-0.5">error</span>
 <div>
-<p class="font-medium">Dòng 12, cột Email: email '<span class="font-mono underline">tuan.nv-huit.edu.vn</span>' không đúng định dạng.</p>
+<p class="font-medium">Dòng 12, cột Email: email '<span class="font-mono underline">nguoidung041-example.test</span>' không đúng định dạng.</p>
 <p class="text-xs text-red-700 mt-0.5">💡 <strong>Cách sửa:</strong> Thêm ký tự '@' hợp lệ (VD: <span class="font-mono">nguoidung039@example.test</span>).</p>
 </div>
 </div>

@@ -477,13 +477,13 @@
 <td class="px-4 py-3 text-on-surface-variant">Công nghệ thông tin</td>
 <td class="px-4 py-3 text-on-surface-variant">Khóa 2024</td>
 <td class="px-4 py-3 text-error font-medium underline decoration-dotted">
-                  nam.nh-huit.edu.vn
+                  nguoidung042-example.test
                 </td>
 <td class="px-4 py-3">
 <div class="p-2 rounded bg-white/80 border border-error/30 text-xs space-y-0.5">
 <p class="font-semibold text-error flex items-center gap-1">
 <span class="material-symbols-outlined text-[14px]">error</span>
-                      Cột Email: email "nam.nh-huit.edu.vn" không đúng định dạng.
+                      Cột Email: email "nguoidung042-example.test" không đúng định dạng.
                     </p>
 <p class="text-on-surface-variant">
 <strong class="text-on-surface">Cách sửa:</strong> Thêm ký tự "@" hợp lệ (vd: <span class="text-primary font-mono">nguoidung036@example.test</span>).

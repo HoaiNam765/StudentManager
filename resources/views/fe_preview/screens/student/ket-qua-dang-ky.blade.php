@@ -756,7 +756,7 @@
 </div>
 <div>
 <div class="font-mono font-semibold text-slate-800">MÃ VĂN BẢN: HUIT-DKHP-20261-2001210123</div>
-<div>Tra cứu tính hợp lệ tại: <span class="underline text-primary">portal.huit.edu.vn/verify</span></div>
+<div>Tra cứu tính hợp lệ tại: <span class="underline text-primary">portal.example.test/verify</span></div>
 <div>Thời điểm in: 16/10/2026 10:24:18 (IP: 115.79.45.12)</div>
 </div>
 </div>

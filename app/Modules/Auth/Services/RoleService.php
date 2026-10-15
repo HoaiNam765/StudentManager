@@ -241,7 +241,7 @@ class RoleService extends BaseService
 
     /**
      * BR-AUTH-05: không được làm mất ADMIN cuối cùng đang hoạt động.
-     * Issue quản lý người dùng gọi hàm này trước khi khóa hoặc ngừng tài khoản.
+     * UserService gọi hàm này trước khi khóa hoặc ngừng tài khoản; ADMIN đã khóa, ngừng hoặc chỉ đọc không được tính.
      */
     public function ensureNotLastAdmin(User $user): void
     {
@@ -249,7 +249,9 @@ class RoleService extends BaseService
             return;
         }
 
+        // Chỉ tính ADMIN còn thao tác được: tài khoản đang hoạt động, chưa tới ngày hẹn ngừng
         $activeAdmins = User::query()
+            ->operational()
             ->whereHas('activeRoles', fn ($q) => $q->where('roles.code', Role::ADMIN))
             ->count();
 

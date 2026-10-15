@@ -41,7 +41,7 @@ Ghi nhớ cho Claude Code khi làm việc với dự án này. Cập nhật mụ
 - CSDL: `student_manager` (dev), `student_manager_test` (test, `Tests\TestCase` tự tạo; test bị chặn nếu tên CSDL không kết thúc bằng `_test`).
 - Lệnh kiểm tra: `php artisan test`, `composer lint` (Pint), `npm run build`.
 - Đọc/ghi `.xlsx` (OpenSpout: xuất dữ liệu, Importer) cần `extension=zip`; PHP của Laragon mặc định chưa bật (máy hiện đã bật trong `php.ini`). Nếu thiếu thì bật trong `php.ini`, hoặc chạy tạm không sửa `php.ini`: đặt `PHP_INI_SCAN_DIR` trỏ tới thư mục chứa một file `.ini` có dòng `extension=zip` (cờ `-d` không truyền được cho `php artisan test` vì nó chạy phpunit ở tiến trình con).
-- Tài khoản dùng thử: tên đăng nhập `admin` / `admin@studentmanager.test` (vai trò ADMIN), tạo bởi `DevUserSeeder`; mật khẩu xem trong seeder.
+- Tài khoản dùng thử: tên đăng nhập `admin` / `admin@studentmanager.test` (vai trò ADMIN), tạo bởi `DevUserSeeder`; mỗi vai trò khác một tài khoản `<mã vai trò viết thường>.test` (`DevRoleUsersSeeder`). Mật khẩu xem trong seeder.
 - Chạy thử trên trình duyệt: `php artisan serve --port=8010` chạy nền rồi mở `/login`; khung trình duyệt bị che thì không bấm được nút, đọc trang bằng JavaScript và kiểm tra `audit_logs`.
 
 ## Kiến trúc mã
@@ -89,6 +89,7 @@ Ghi nhớ cho Claude Code khi làm việc với dự án này. Cập nhật mụ
 | #73 | (chưa mở) | Khoa, bộ môn, ngành, chuyên ngành, hệ đào tạo (module `Faculty`, của B): mã ổn định, ngừng khoa liệt kê dữ liệu cần chuyển, `FacultyAccess` cho phạm vi FACULTY (rỗng tới #74), `ReferenceRegistry::activeUsages`, xuất Excel (FAC.export, ma trận chưa cấp), seeder 3 khoa 6 ngành — nhánh `feature/be-khoa-bo-mon-nganh` |
 | #74 | (chưa mở) | Lãnh đạo đơn vị theo nhiệm kỳ (`LeadershipTerm`, `LeadershipService`): mỗi nhiệm kỳ sinh dòng DEAN cùng ngày hiệu lực, tối đa một trưởng mỗi đơn vị, thay trưởng từ ngày D, `FacultyAccess` lấy đơn vị từ nhiệm kỳ, lệnh `faculty:sync-leadership`, `LeaderEligibility` chờ TCH — nhánh `feature/be-lanh-dao-don-vi` |
 | #76 | (chưa mở) | Lịch học vụ (`TermMilestone`, `MilestoneService`: thứ tự BR-ACY-02, sửa mốc học kỳ đã bắt đầu qua đề nghị chờ người duyệt khác, sao chép từ kỳ trước) và ngày nghỉ (`Holiday`, `HolidayService::daysOff` cho TTB), seeder năm học 2026–2027 — nhánh `feature/be-lich-hoc-vu` |
+| #83 | (chưa mở) | Quản lý người dùng (`UserService`, của C): trạng thái tài khoản (hoạt động/khóa/ngừng/chỉ đọc) chặn ở `LoginService`, mỗi tài khoản một hồ sơ chính, vai trò mặc định theo loại hồ sơ, mật khẩu tạm qua email, BR-AUTH-07 (`applyStudentStatus`, lệnh `users:apply-deactivations`), middleware chỉ đọc, Importer `users`, API `/admin/users`, `DevRoleUsersSeeder`; `ensureNotLastAdmin` chỉ đếm ADMIN còn hoạt động — nhánh `feature/be-quan-ly-nguoi-dung` |
 
 ## Việc tiếp theo của A (P1)
 

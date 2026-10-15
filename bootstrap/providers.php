@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Auth\AuthServiceProvider;
 use App\Modules\Faculty\FacultyServiceProvider;
 use App\Modules\Room\RoomServiceProvider;
 use App\Modules\System\SystemServiceProvider;
@@ -10,4 +11,5 @@ return [
     SystemServiceProvider::class,
     RoomServiceProvider::class,
     FacultyServiceProvider::class,
+    AuthServiceProvider::class,
 ];

@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Auth\Http\Middleware\EnsureAccountWritable;
 use App\Modules\Auth\Http\Middleware\EnsurePasswordIsChanged;
 use App\Modules\Auth\Http\Middleware\EnsurePermission;
 use App\Support\Audit\AuditEvent;
@@ -34,6 +35,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => EnsurePermission::class,
             'password.changed' => EnsurePasswordIsChanged::class,
         ]);
+
+        // Tài khoản chỉ đọc (sinh viên đã tốt nghiệp, BR-AUTH-07) không thao tác ghi ở bất kỳ trang nào
+        $middleware->web(append: [EnsureAccountWritable::class]);
 
         $middleware->redirectGuestsTo(fn () => route('login'));
 

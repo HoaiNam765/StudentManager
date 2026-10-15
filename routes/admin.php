@@ -5,6 +5,7 @@ use App\Modules\AcademicYear\Http\Controllers\AcademicCalendarController;
 use App\Modules\AcademicYear\Http\Controllers\AcademicYearController;
 use App\Modules\Auth\Http\Controllers\RoleController;
 use App\Modules\Auth\Http\Controllers\RolePermissionController;
+use App\Modules\Auth\Http\Controllers\UserController;
 use App\Modules\Auth\Http\Controllers\UserRoleController;
 use App\Modules\Faculty\Http\Controllers\LeadershipController;
 use App\Modules\Faculty\Http\Controllers\UnitController;
@@ -50,6 +51,26 @@ Route::middleware('auth')->group(function (): void {
         ->middleware('permission:AUTH.update,ALL')->name('users.roles.store');
     Route::delete('users/{user}/roles/{role}', [UserRoleController::class, 'destroy'])
         ->middleware('permission:AUTH.update,ALL')->name('users.roles.destroy');
+
+    // Quản lý người dùng (AUTH, FR-AUTH-008): mặc định chỉ ADMIN (quyền AUTH toàn trường).
+    // Tạo hàng loạt (FR-AUTH-009) qua trung tâm import, Importer "users".
+    Route::middleware('permission:AUTH.view,ALL')->group(function (): void {
+        Route::get('users', [UserController::class, 'index'])->name('users.index');
+        Route::get('users/{user}', [UserController::class, 'show'])->name('users.show');
+    });
+    Route::post('users', [UserController::class, 'store'])->middleware('permission:AUTH.create,ALL')->name('users.store');
+
+    Route::middleware('permission:AUTH.update,ALL')->group(function (): void {
+        Route::put('users/{user}', [UserController::class, 'update'])->name('users.update');
+        Route::post('users/{user}/deactivate', [UserController::class, 'deactivate'])->name('users.deactivate');
+        Route::post('users/{user}/activate', [UserController::class, 'activate'])->name('users.activate');
+        Route::post('users/{user}/temporary-password', [UserController::class, 'issueTemporaryPassword'])->name('users.temporary-password');
+    });
+
+    Route::middleware('permission:AUTH.approve,ALL')->group(function (): void {
+        Route::post('users/{user}/lock', [UserController::class, 'lock'])->name('users.lock');
+        Route::post('users/{user}/unlock', [UserController::class, 'unlock'])->name('users.unlock');
+    });
 
     Route::prefix('academic-years')
         ->name('academic-years.')

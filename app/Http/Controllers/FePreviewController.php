@@ -11,6 +11,7 @@ class FePreviewController extends Controller
     public function index(): View
     {
         abort_unless(App::environment('local'), 404);
+
         return view('fe_preview.index', ['screens' => config('fe_preview', [])]);
     }
 
@@ -19,6 +20,7 @@ class FePreviewController extends Controller
         abort_unless(App::environment('local'), 404);
         $item = collect(config('fe_preview', []))->firstWhere('key', $screen);
         abort_if($item === null, 404);
+
         return view($item['view']);
     }
 }

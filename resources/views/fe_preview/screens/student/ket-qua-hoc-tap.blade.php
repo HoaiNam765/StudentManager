@@ -168,7 +168,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -211,7 +211,7 @@
             NVA
           </div>
 <div class="hidden sm:block text-left">
-<div class="text-xs font-semibold text-slate-900 leading-tight">Nguyễn Văn An</div>
+<div class="text-xs font-semibold text-slate-900 leading-tight">Người dùng mẫu 25</div>
 <div class="text-[11px] text-slate-500">2001210123 • 12DHTH01</div>
 </div>
 </div>
@@ -686,8 +686,8 @@
 <p class="italic text-[11px] text-slate-500">(Ký và ghi rõ họ tên)</p>
 </div>
 <div>
-<p class="font-semibold text-slate-700 italic text-[11px]">Nguyễn Văn An</p>
-<p class="font-bold text-slate-800 uppercase mt-1">Nguyễn Văn An</p>
+<p class="font-semibold text-slate-700 italic text-[11px]">Người dùng mẫu 25</p>
+<p class="font-bold text-slate-800 uppercase mt-1">Người dùng mẫu 25</p>
 </div>
 </div>
 <!-- Col 2: Online Verification QR -->
@@ -709,14 +709,14 @@
 <div class="w-24 h-24 rounded-full border-2 border-dashed border-red-500/40 text-red-700 flex items-center justify-center mx-auto opacity-70 rotate-[-12deg] absolute -top-12 left-1/2 -translate-x-1/2 pointer-events-none text-[10px] font-bold text-center leading-tight">
                   ĐÃ XÁC THỰC<br/>PHÒNG ĐÀO TẠO<br/>HUIT
                 </div>
-<p class="font-serif italic text-primary font-bold text-sm">Lê Trung Đạo</p>
-<p class="font-bold text-slate-900 mt-1">PGS. TS. Lê Trung Đạo</p>
+<p class="font-serif italic text-primary font-bold text-sm">Người dùng mẫu 17</p>
+<p class="font-bold text-slate-900 mt-1">PGS. TS. Người dùng mẫu 17</p>
 </div>
 </div>
 </div>
 <!-- Bottom Security Code & Legal Note -->
 <div class="mt-8 pt-4 border-t border-slate-200 flex items-center justify-between text-[10px] text-slate-500">
-<span>Văn bản trích xuất từ Cổng Thông tin Quản lý Đào tạo HUIT (https://sinhvien.huit.edu.vn)</span>
+<span>Văn bản trích xuất từ Cổng Thông tin Quản lý Đào tạo HUIT (https://portal.example.test/)</span>
 <span>Mã bảo mật điện tử: 98FC-42A1-B88E-2025</span>
 </div>
 </div>
@@ -739,7 +739,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

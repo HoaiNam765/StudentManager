@@ -168,7 +168,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -211,7 +211,7 @@
             NVA
           </div>
 <div class="hidden sm:block text-left">
-<div class="text-xs font-semibold text-slate-900 leading-tight">Nguyễn Văn An</div>
+<div class="text-xs font-semibold text-slate-900 leading-tight">Người dùng mẫu 25</div>
 <div class="text-[11px] text-slate-500">2001210123 • 12DHTH01</div>
 </div>
 </div>
@@ -344,7 +344,7 @@
                     </div>
 <div class="text-[12px] text-secondary ml-5">Phòng: A2.301</div>
 </td>
-<td class="py-3 px-4 text-secondary">TS. Trần Hoàng Nam</td>
+<td class="py-3 px-4 text-secondary">TS. Người dùng mẫu 38</td>
 <td class="py-3 px-4 text-secondary font-mono text-[12px]">15/10/2026 08:15</td>
 <td class="py-3 px-4">
 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
@@ -372,7 +372,7 @@
                     </div>
 <div class="text-[12px] text-secondary ml-5">Phòng: B.204</div>
 </td>
-<td class="py-3 px-4 text-secondary">ThS. Lê Quang Huy</td>
+<td class="py-3 px-4 text-secondary">ThS. Người dùng mẫu 11</td>
 <td class="py-3 px-4 text-secondary font-mono text-[12px]">15/10/2026 08:18</td>
 <td class="py-3 px-4">
 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
@@ -400,7 +400,7 @@
                     </div>
 <div class="text-[12px] text-secondary ml-5">Phòng: A1.102</div>
 </td>
-<td class="py-3 px-4 text-secondary">TS. Võ Văn Hùng</td>
+<td class="py-3 px-4 text-secondary">TS. Người dùng mẫu 46</td>
 <td class="py-3 px-4 text-secondary font-mono text-[12px]">15/10/2026 08:22</td>
 <td class="py-3 px-4">
 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
@@ -428,7 +428,7 @@
                     </div>
 <div class="text-[12px] text-secondary ml-5">Phòng: B.105</div>
 </td>
-<td class="py-3 px-4 text-secondary">ThS. Đỗ Văn Cường</td>
+<td class="py-3 px-4 text-secondary">ThS. Người dùng mẫu 56</td>
 <td class="py-3 px-4 text-secondary font-mono text-[12px]">15/10/2026 08:25</td>
 <td class="py-3 px-4">
 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
@@ -456,7 +456,7 @@
                     </div>
 <div class="text-[12px] text-secondary ml-5">Lab: PM04</div>
 </td>
-<td class="py-3 px-4 text-secondary">PGS.TS. Vũ Đình Trọng</td>
+<td class="py-3 px-4 text-secondary">PGS.TS. Người dùng mẫu 49</td>
 <td class="py-3 px-4 text-secondary font-mono text-[12px]">15/10/2026 08:31</td>
 <td class="py-3 px-4">
 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
@@ -484,7 +484,7 @@
                     </div>
 <div class="text-[12px] text-secondary ml-5">Phòng: A2.205</div>
 </td>
-<td class="py-3 px-4 text-secondary">ThS. Hoàng Minh Đức</td>
+<td class="py-3 px-4 text-secondary">ThS. Người dùng mẫu 05</td>
 <td class="py-3 px-4 text-secondary font-mono text-[12px]">15/10/2026 09:12</td>
 <td class="py-3 px-4">
 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200">
@@ -508,7 +508,7 @@
 <td class="py-3 px-4 text-secondary italic">
                     Chưa xếp (Lớp đã đầy)
                   </td>
-<td class="py-3 px-4 text-secondary">ThS. Nguyễn Văn Tuấn</td>
+<td class="py-3 px-4 text-secondary">ThS. Người dùng mẫu 29</td>
 <td class="py-3 px-4 text-secondary font-mono text-[12px]">15/10/2026 09:45</td>
 <td class="py-3 px-4">
 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-800 border border-rose-200">
@@ -606,7 +606,7 @@
 <div class="grid grid-cols-2 md:grid-cols-3 gap-y-2.5 gap-x-4">
 <div>
 <span class="text-slate-600">Họ và tên:</span>
-<strong class="ml-1 text-slate-900 uppercase font-semibold">Nguyễn Văn An</strong>
+<strong class="ml-1 text-slate-900 uppercase font-semibold">Người dùng mẫu 25</strong>
 </div>
 <div>
 <span class="text-slate-600">Mã số sinh viên:</span>
@@ -656,7 +656,7 @@
 <td class="border border-slate-400 py-1.5 px-1 text-center font-bold">3</td>
 <td class="border border-slate-400 py-1.5 px-2 text-center">Thứ 2 (1-3)</td>
 <td class="border border-slate-400 py-1.5 px-1 text-center">A2.301</td>
-<td class="border border-slate-400 py-1.5 px-2">TS. Trần Hoàng Nam</td>
+<td class="border border-slate-400 py-1.5 px-2">TS. Người dùng mẫu 38</td>
 <td class="border border-slate-400 py-1.5 px-1 text-center italic text-slate-500">Đã duyệt</td>
 </tr>
 <tr>
@@ -666,7 +666,7 @@
 <td class="border border-slate-400 py-1.5 px-1 text-center font-bold">4</td>
 <td class="border border-slate-400 py-1.5 px-2 text-center">Thứ 3 (4-6)</td>
 <td class="border border-slate-400 py-1.5 px-1 text-center">B.204</td>
-<td class="border border-slate-400 py-1.5 px-2">ThS. Lê Quang Huy</td>
+<td class="border border-slate-400 py-1.5 px-2">ThS. Người dùng mẫu 11</td>
 <td class="border border-slate-400 py-1.5 px-1 text-center italic text-slate-500">Đã duyệt</td>
 </tr>
 <tr>
@@ -676,7 +676,7 @@
 <td class="border border-slate-400 py-1.5 px-1 text-center font-bold">3</td>
 <td class="border border-slate-400 py-1.5 px-2 text-center">Thứ 4 (1-3)</td>
 <td class="border border-slate-400 py-1.5 px-1 text-center">A1.102</td>
-<td class="border border-slate-400 py-1.5 px-2">TS. Võ Văn Hùng</td>
+<td class="border border-slate-400 py-1.5 px-2">TS. Người dùng mẫu 46</td>
 <td class="border border-slate-400 py-1.5 px-1 text-center italic text-slate-500">Đã duyệt</td>
 </tr>
 <tr>
@@ -686,7 +686,7 @@
 <td class="border border-slate-400 py-1.5 px-1 text-center font-bold">3</td>
 <td class="border border-slate-400 py-1.5 px-2 text-center">Thứ 6 (1-3)</td>
 <td class="border border-slate-400 py-1.5 px-1 text-center">B.105</td>
-<td class="border border-slate-400 py-1.5 px-2">ThS. Đỗ Văn Cường</td>
+<td class="border border-slate-400 py-1.5 px-2">ThS. Người dùng mẫu 56</td>
 <td class="border border-slate-400 py-1.5 px-1 text-center italic text-slate-500">Đã duyệt</td>
 </tr>
 <tr>
@@ -696,7 +696,7 @@
 <td class="border border-slate-400 py-1.5 px-1 text-center font-bold">3</td>
 <td class="border border-slate-400 py-1.5 px-2 text-center">Thứ 5 (7-9)</td>
 <td class="border border-slate-400 py-1.5 px-1 text-center">Lab PM04</td>
-<td class="border border-slate-400 py-1.5 px-2">PGS.TS. Vũ Đình Trọng</td>
+<td class="border border-slate-400 py-1.5 px-2">PGS.TS. Người dùng mẫu 49</td>
 <td class="border border-slate-400 py-1.5 px-1 text-center italic text-slate-500">Đã duyệt</td>
 </tr>
 <tr>
@@ -706,7 +706,7 @@
 <td class="border border-slate-400 py-1.5 px-1 text-center font-bold">2</td>
 <td class="border border-slate-400 py-1.5 px-2 text-center">Thứ 7 (1-3)</td>
 <td class="border border-slate-400 py-1.5 px-1 text-center">A2.205</td>
-<td class="border border-slate-400 py-1.5 px-2">ThS. Hoàng Minh Đức</td>
+<td class="border border-slate-400 py-1.5 px-2">ThS. Người dùng mẫu 05</td>
 <td class="border border-slate-400 py-1.5 px-1 text-center italic text-slate-500">Đã duyệt</td>
 </tr>
 </tbody>
@@ -733,7 +733,7 @@
 <span class="text-[8px] mt-1 text-slate-700">16-10-2026</span>
 </div>
 </div>
-<div class="text-xs font-bold text-slate-900 uppercase">PGS. TS. Lê Trung Đạo</div>
+<div class="text-xs font-bold text-slate-900 uppercase">PGS. TS. Người dùng mẫu 17</div>
 </div>
 <!-- Bên phải: Sinh viên ký tên -->
 <div>
@@ -743,7 +743,7 @@
 <div class="h-28 flex flex-col items-center justify-center">
 <span class="font-serif italic text-2xl text-blue-900 tracking-wider">NguyenVanAn</span>
 </div>
-<div class="text-xs font-bold text-slate-900 uppercase">Nguyễn Văn An</div>
+<div class="text-xs font-bold text-slate-900 uppercase">Người dùng mẫu 25</div>
 </div>
 </div>
 </div>
@@ -775,7 +775,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

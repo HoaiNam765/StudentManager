@@ -198,7 +198,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -241,7 +241,7 @@
           </div>
 <div class="hidden sm:block text-left">
 <div class="text-xs font-semibold text-slate-900 leading-tight">Phòng Đào tạo</div>
-<div class="text-[11px] text-slate-500">admin@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung015@example.test</div>
 </div>
 </div>
 </div>
@@ -298,7 +298,7 @@ Phòng Đào tạo - Trường Đại học Công Thương TP.HCM</textarea>
 </label>
 <label class="flex items-center gap-2 cursor-pointer">
 <input aria-label="Chọn dòng" checked="" class="rounded text-primary" type="checkbox"/>
-<span>Gửi thư điện tử qua Email sinh viên (@huit.edu.vn)</span>
+<span>Gửi thư điện tử qua Email sinh viên (@example.test)</span>
 </label>
 </div>
 </div>
@@ -318,8 +318,8 @@ Phòng Đào tạo - Trường Đại học Công Thương TP.HCM</textarea>
 <!-- Mock Email Client Window -->
 <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-3 text-xs">
 <div class="space-y-1 border-b border-slate-200 pb-2.5 text-slate-600">
-<div>Từ: <strong>Phòng Đào tạo HUIT &lt;daotao@huit.edu.vn&gt;</strong></div>
-<div>Đến: <strong>Nguyễn Văn An &lt;2001210123@huit.edu.vn&gt;</strong></div>
+<div>Từ: <strong>Phòng Đào tạo HUIT &lt;nguoidung025@example.test&gt;</strong></div>
+<div>Đến: <strong>Người dùng mẫu 25 &lt;nguoidung006@example.test&gt;</strong></div>
 <div>Tiêu đề: <strong class="text-slate-900" id="previewTitle">[HUIT] Nhắc nhở hoàn thành nộp học phí Học kỳ 1 • 2026-2027</strong></div>
 </div>
 <!-- Rendered Email Body -->
@@ -332,7 +332,7 @@ Phòng Đào tạo - Trường Đại học Công Thương TP.HCM</textarea>
 </div>
 </div>
 <div class="whitespace-pre-line text-xs" id="previewBody">
-            Kính gửi sinh viên Nguyễn Văn An (MSSV: 2001210123),
+            Kính gửi sinh viên Người dùng mẫu 25 (MSSV: 2001210123),
 
             Phòng Đào tạo thông báo về việc thu học phí Học kỳ 1 • 2026-2027. Theo dữ liệu ghi nhận, bạn hiện còn khoản nợ học phí là: 9.450.000 đ.
 
@@ -360,7 +360,7 @@ Phòng Đào tạo - Trường Đại học Công Thương TP.HCM</textarea>
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

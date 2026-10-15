@@ -198,7 +198,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -241,7 +241,7 @@
           </div>
 <div class="hidden sm:block text-left">
 <div class="text-xs font-semibold text-slate-900 leading-tight">Phòng Đào tạo</div>
-<div class="text-[11px] text-slate-500">admin@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung015@example.test</div>
 </div>
 </div>
 </div>
@@ -300,10 +300,10 @@
 <tr class="hover:bg-slate-50">
 <td class="py-3 px-4 text-slate-500">11/10/2026 14:20</td>
 <td class="py-3 px-4 font-mono font-bold text-slate-900">2001210123</td>
-<td class="py-3 px-4 font-bold text-slate-900">Nguyễn Văn An</td>
+<td class="py-3 px-4 font-bold text-slate-900">Người dùng mẫu 25</td>
 <td class="py-3 px-4">Giấy khám sức khỏe định kỳ</td>
 <td class="py-3 px-4">
-<a class="text-primary hover:underline flex items-center gap-1 font-semibold" href="#" onclick="openPreviewDoc('Giấy khám sức khỏe', 'Nguyễn Văn An'); return false;">
+<a class="text-primary hover:underline flex items-center gap-1 font-semibold" href="#" onclick="openPreviewDoc('Giấy khám sức khỏe', 'Người dùng mẫu 25'); return false;">
 <span class="material-symbols-outlined text-[16px]">picture_as_pdf</span>
 <span>gksk_an.pdf (2.2 MB)</span>
 </a>
@@ -312,10 +312,10 @@
 <span class="px-2 py-0.5 rounded font-bold bg-amber-100 text-amber-800 border border-amber-300">Chờ duyệt</span>
 </td>
 <td class="py-3 px-4 text-center space-x-1">
-<button class="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px]" onclick="approveDoc('Nguyễn Văn An')">
+<button class="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px]" onclick="approveDoc('Người dùng mẫu 25')">
                 Duyệt
               </button>
-<button class="px-2.5 py-1 rounded bg-red-100 hover:bg-red-200 text-red-700 font-bold text-[11px]" onclick="openRejectModal('Nguyễn Văn An')">
+<button class="px-2.5 py-1 rounded bg-red-100 hover:bg-red-200 text-red-700 font-bold text-[11px]" onclick="openRejectModal('Người dùng mẫu 25')">
                 Từ chối
               </button>
 </td>
@@ -334,7 +334,7 @@
 </button>
 </div>
 <div class="space-y-3 text-xs">
-<div>Sinh viên: <strong class="text-slate-900" id="rejectStudentName">Nguyễn Văn An</strong></div>
+<div>Sinh viên: <strong class="text-slate-900" id="rejectStudentName">Người dùng mẫu 25</strong></div>
 <div>
 <label class="block font-semibold text-slate-700 mb-1" for="reject-reason-txt">Lý do từ chối cụ thể (Bắt buộc gửi đến sinh viên) *</label>
 <textarea class="w-full p-2.5 rounded-lg border border-slate-300 bg-slate-50 text-xs" id="reject-reason-txt" placeholder="VD: Ảnh chụp bị mờ không rõ dấu mộc bệnh viện, yêu cầu chụp lại..." required="" rows="3"></textarea>
@@ -378,7 +378,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

@@ -198,7 +198,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -241,7 +241,7 @@
           </div>
 <div class="hidden sm:block text-left">
 <div class="text-xs font-semibold text-slate-900 leading-tight">Phòng Đào tạo</div>
-<div class="text-[11px] text-slate-500">admin@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung015@example.test</div>
 </div>
 </div>
 </div>
@@ -266,7 +266,7 @@
 </div>
 <div>
 <label class="block font-semibold text-slate-700 mb-1" for="bu-gv-inp">Giảng viên phụ trách</label>
-<input class="w-full h-9 px-3 rounded-lg border border-slate-200 bg-slate-100 text-slate-600" id="bu-gv-inp" readonly="" type="text" value="TS. Trần Hoàng Nam (GV-2018042)"/>
+<input class="w-full h-9 px-3 rounded-lg border border-slate-200 bg-slate-100 text-slate-600" id="bu-gv-inp" readonly="" type="text" value="TS. Người dùng mẫu 38 (GV-2018042)"/>
 </div>
 <div>
 <label class="block font-semibold text-slate-700 mb-1" for="bu-date-inp">Ngày dạy bù</label>
@@ -301,7 +301,7 @@
 <div class="p-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
 <div>
 <h3 class="font-bold text-slate-900 text-sm">Lịch sử dụng phòng học &amp; Tra cứu phòng trống</h3>
-<p class="text-xs text-slate-500 mt-0.5">Cơ sở chính 140 Lê Trọng Tấn, P. Tây Thạnh, Q. Tân Phú</p>
+<p class="text-xs text-slate-500 mt-0.5">Cơ sở chính 140 Người dùng mẫu 18, P. Tây Thạnh, Q. Tân Phú</p>
 </div>
 <div class="flex items-center gap-2">
 <select aria-label="Tòa nhà B" class="h-8 px-2.5 rounded-lg border border-slate-300 text-xs bg-slate-50">
@@ -368,7 +368,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

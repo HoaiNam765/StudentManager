@@ -226,7 +226,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -269,7 +269,7 @@
           </div>
 <div class="hidden sm:block text-left">
 <div class="text-xs font-semibold text-slate-900 leading-tight">Phòng Đào tạo</div>
-<div class="text-[11px] text-slate-500">admin@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung015@example.test</div>
 </div>
 </div>
 </div>
@@ -476,9 +476,9 @@
                     </span>
 </td>
 <td class="py-3 px-3 font-mono font-semibold text-on-surface">GV201801</td>
-<td class="py-3 px-4 font-medium text-on-surface">PGS.TS. Đỗ Văn Cường</td>
+<td class="py-3 px-4 font-medium text-on-surface">PGS.TS. Người dùng mẫu 56</td>
 <td class="py-3 px-3 text-on-surface">Phó Giáo sư</td>
-<td class="py-3 px-4 text-on-surface font-mono">cuong.dv@huit.edu.vn</td>
+<td class="py-3 px-4 text-on-surface font-mono">nguoidung024@example.test</td>
 <td class="py-3 px-3 text-on-surface-variant font-mono">0903123456</td>
 <td class="py-3 px-4 text-on-surface">Khoa Công nghệ Thông tin</td>
 <td class="py-3 px-3 text-on-surface">Kỹ thuật phần mềm</td>
@@ -503,7 +503,7 @@
                     </span>
 </td>
 <td class="py-3 px-3 font-mono font-semibold text-on-surface">GV202412</td>
-<td class="py-3 px-4 font-medium text-on-surface">ThS. Nguyễn Văn Tuấn</td>
+<td class="py-3 px-4 font-medium text-on-surface">ThS. Người dùng mẫu 29</td>
 <td class="py-3 px-3 text-on-surface">Thạc sĩ</td>
 <!-- Bôi đỏ email sai -->
 <td class="py-3 px-4">
@@ -521,7 +521,7 @@
 <span class="material-symbols-outlined text-error text-[18px] flex-shrink-0 mt-0.5">error</span>
 <div>
 <p class="font-medium">Dòng 12, cột Email: email '<span class="font-mono underline">tuan.nv-huit.edu.vn</span>' không đúng định dạng.</p>
-<p class="text-xs text-red-700 mt-0.5">💡 <strong>Cách sửa:</strong> Thêm ký tự '@' hợp lệ (VD: <span class="font-mono">tuan.nv@huit.edu.vn</span>).</p>
+<p class="text-xs text-red-700 mt-0.5">💡 <strong>Cách sửa:</strong> Thêm ký tự '@' hợp lệ (VD: <span class="font-mono">nguoidung039@example.test</span>).</p>
 </div>
 </div>
 </td>
@@ -546,9 +546,9 @@
                     </span>
 </td>
 <td class="py-3 px-3 font-mono font-semibold text-on-surface">GV201805</td>
-<td class="py-3 px-4 font-medium text-on-surface">TS. Lê Thị Mai Hương</td>
+<td class="py-3 px-4 font-medium text-on-surface">TS. Người dùng mẫu 15</td>
 <td class="py-3 px-3 text-on-surface">Tiến sĩ</td>
-<td class="py-3 px-4 text-on-surface font-mono">huong.ltm@huit.edu.vn</td>
+<td class="py-3 px-4 text-on-surface font-mono">nguoidung033@example.test</td>
 <td class="py-3 px-3 text-on-surface-variant font-mono">0987654321</td>
 <td class="py-3 px-4 text-on-surface">Khoa Công nghệ Thông tin</td>
 <td class="py-3 px-3 text-on-surface">Hệ thống thông tin</td>
@@ -578,9 +578,9 @@
                       GV201809
                     </span>
 </td>
-<td class="py-3 px-4 font-medium text-on-surface">TS. Trần Hoàng Nam</td>
+<td class="py-3 px-4 font-medium text-on-surface">TS. Người dùng mẫu 38</td>
 <td class="py-3 px-3 text-on-surface">Tiến sĩ</td>
-<td class="py-3 px-4 text-on-surface font-mono">nam.th@huit.edu.vn</td>
+<td class="py-3 px-4 text-on-surface font-mono">nguoidung037@example.test</td>
 <td class="py-3 px-3 text-on-surface font-mono">0790860012</td>
 <td class="py-3 px-4 text-on-surface">Khoa Công nghệ Thông tin</td>
 <td class="py-3 px-3 text-on-surface">Kỹ thuật máy tính</td>
@@ -590,7 +590,7 @@
 <div class="text-red-900 font-semibold flex items-start gap-1.5">
 <span class="material-symbols-outlined text-error text-[18px] flex-shrink-0 mt-0.5">error</span>
 <div>
-<p class="font-medium">Dòng 27, cột Mã GV: '<span class="font-mono">GV201809</span>' đã tồn tại trong hệ thống (Trùng với TS. Trần Hoàng Nam - Khoa CNTT).</p>
+<p class="font-medium">Dòng 27, cột Mã GV: '<span class="font-mono">GV201809</span>' đã tồn tại trong hệ thống (Trùng với TS. Người dùng mẫu 38 - Khoa CNTT).</p>
 <p class="text-xs text-red-700 mt-0.5">💡 <strong>Cách sửa:</strong> Đổi mã GV mới hoặc chọn tùy chọn 'Ghi đè cập nhật hồ sơ'.</p>
 </div>
 </div>
@@ -616,9 +616,9 @@
                     </span>
 </td>
 <td class="py-3 px-3 font-mono font-semibold text-on-surface">GV202115</td>
-<td class="py-3 px-4 font-medium text-on-surface">ThS. Phạm Thị Thu Hằng</td>
+<td class="py-3 px-4 font-medium text-on-surface">ThS. Người dùng mẫu 33</td>
 <td class="py-3 px-3 text-on-surface">Thạc sĩ</td>
-<td class="py-3 px-4 text-on-surface font-mono">hang.pt@huit.edu.vn</td>
+<td class="py-3 px-4 text-on-surface font-mono">nguoidung030@example.test</td>
 <td class="py-3 px-3 text-on-surface-variant font-mono">0912345678</td>
 <td class="py-3 px-4 text-on-surface">Khoa Công nghệ Thực phẩm</td>
 <td class="py-3 px-3 text-on-surface">Hóa sinh</td>
@@ -643,9 +643,9 @@
                     </span>
 </td>
 <td class="py-3 px-3 font-mono font-semibold text-on-surface">GV202445</td>
-<td class="py-3 px-4 font-medium text-on-surface">ThS. Vũ Minh Khang</td>
+<td class="py-3 px-4 font-medium text-on-surface">ThS. Người dùng mẫu 47</td>
 <td class="py-3 px-3 text-on-surface">Thạc sĩ</td>
-<td class="py-3 px-4 text-on-surface font-mono">khang.vm@huit.edu.vn</td>
+<td class="py-3 px-4 text-on-surface font-mono">nguoidung034@example.test</td>
 <td class="py-3 px-3 text-on-surface font-mono">0934567890</td>
 <!-- Bôi đỏ Khoa sai danh mục -->
 <td class="py-3 px-4">
@@ -708,7 +708,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

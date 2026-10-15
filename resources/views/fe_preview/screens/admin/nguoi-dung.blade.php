@@ -226,7 +226,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -269,7 +269,7 @@
           </div>
 <div class="hidden sm:block text-left">
 <div class="text-xs font-semibold text-slate-900 leading-tight">Phòng Đào tạo</div>
-<div class="text-[11px] text-slate-500">admin@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung015@example.test</div>
 </div>
 </div>
 </div>
@@ -370,7 +370,7 @@
 <!-- Search Box -->
 <div class="relative flex-1 min-w-[280px]">
 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[20px] text-slate-500">search</span>
-<input aria-label="Tìm kiếm theo họ tên, email (@huit.edu.vn), mã số..." class="w-full h-10 pl-10 pr-9 bg-white border border-[#CBD5E1] rounded-lg text-body-md font-body-md text-slate-900 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all" placeholder="Tìm kiếm theo họ tên, email (@huit.edu.vn), mã số..." type="text"/>
+<input aria-label="Tìm kiếm theo họ tên, email (@example.test), mã số..." class="w-full h-10 pl-10 pr-9 bg-white border border-[#CBD5E1] rounded-lg text-body-md font-body-md text-slate-900 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all" placeholder="Tìm kiếm theo họ tên, email (@example.test), mã số..." type="text"/>
 <button class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600 p-0.5 rounded">
 <span class="material-symbols-outlined text-[18px]">cancel</span>
 </button>
@@ -457,7 +457,7 @@
 </thead>
 <!-- Table Body: 48px standard row heights, subtle hover -->
 <tbody class="divide-y divide-[#F1F5F9] font-body-md text-body-md text-slate-800">
-<!-- ROW 1: TS. Nguyễn Văn Tuấn -->
+<!-- ROW 1: TS. Người dùng mẫu 29 -->
 <tr class="hover:bg-[#F8FAFC] transition-colors group">
 <td class="px-4 py-3 text-center">
 <input aria-label="Chọn dòng" class="w-4 h-4 rounded border-[#CBD5E1] text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer" type="checkbox"/>
@@ -468,8 +468,8 @@
                           NT
                         </div>
 <div class="flex flex-col min-w-0">
-<span class="font-semibold text-slate-900 group-hover:text-primary transition-colors truncate">TS. Nguyễn Văn Tuấn</span>
-<span class="text-body-sm font-body-sm text-slate-500 truncate">tuan.nv@huit.edu.vn</span>
+<span class="font-semibold text-slate-900 group-hover:text-primary transition-colors truncate">TS. Người dùng mẫu 29</span>
+<span class="text-body-sm font-body-sm text-slate-500 truncate">nguoidung039@example.test</span>
 </div>
 </div>
 </td>
@@ -510,7 +510,7 @@
 </div>
 </td>
 </tr>
-<!-- ROW 2: ThS. Lê Thị Mai Hương -->
+<!-- ROW 2: ThS. Người dùng mẫu 15 -->
 <tr class="hover:bg-[#F8FAFC] transition-colors group">
 <td class="px-4 py-3 text-center">
 <input aria-label="Chọn dòng" class="w-4 h-4 rounded border-[#CBD5E1] text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer" type="checkbox"/>
@@ -521,8 +521,8 @@
                           LH
                         </div>
 <div class="flex flex-col min-w-0">
-<span class="font-semibold text-slate-900 group-hover:text-primary transition-colors truncate">ThS. Lê Thị Mai Hương</span>
-<span class="text-body-sm font-body-sm text-slate-500 truncate">huong.ltm@huit.edu.vn</span>
+<span class="font-semibold text-slate-900 group-hover:text-primary transition-colors truncate">ThS. Người dùng mẫu 15</span>
+<span class="text-body-sm font-body-sm text-slate-500 truncate">nguoidung033@example.test</span>
 </div>
 </div>
 </td>
@@ -563,7 +563,7 @@
 </div>
 </td>
 </tr>
-<!-- ROW 3: TS. Trần Hoàng Nam -->
+<!-- ROW 3: TS. Người dùng mẫu 38 -->
 <tr class="hover:bg-[#F8FAFC] transition-colors group">
 <td class="px-4 py-3 text-center">
 <input aria-label="Chọn dòng" class="w-4 h-4 rounded border-[#CBD5E1] text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer" type="checkbox"/>
@@ -574,8 +574,8 @@
                           TN
                         </div>
 <div class="flex flex-col min-w-0">
-<span class="font-semibold text-slate-900 group-hover:text-primary transition-colors truncate">TS. Trần Hoàng Nam</span>
-<span class="text-body-sm font-body-sm text-slate-500 truncate">nam.th@huit.edu.vn</span>
+<span class="font-semibold text-slate-900 group-hover:text-primary transition-colors truncate">TS. Người dùng mẫu 38</span>
+<span class="text-body-sm font-body-sm text-slate-500 truncate">nguoidung037@example.test</span>
 </div>
 </div>
 </td>
@@ -616,7 +616,7 @@
 </div>
 </td>
 </tr>
-<!-- ROW 4: Nguyễn Văn An -->
+<!-- ROW 4: Người dùng mẫu 25 -->
 <tr class="hover:bg-[#F8FAFC] transition-colors group">
 <td class="px-4 py-3 text-center">
 <input aria-label="Chọn dòng" class="w-4 h-4 rounded border-[#CBD5E1] text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer" type="checkbox"/>
@@ -627,8 +627,8 @@
                           NA
                         </div>
 <div class="flex flex-col min-w-0">
-<span class="font-semibold text-slate-900 group-hover:text-primary transition-colors truncate">Nguyễn Văn An</span>
-<span class="text-body-sm font-body-sm text-slate-500 truncate">an.nv@huit.edu.vn</span>
+<span class="font-semibold text-slate-900 group-hover:text-primary transition-colors truncate">Người dùng mẫu 25</span>
+<span class="text-body-sm font-body-sm text-slate-500 truncate">nguoidung019@example.test</span>
 </div>
 </div>
 </td>
@@ -669,7 +669,7 @@
 </div>
 </td>
 </tr>
-<!-- ROW 5: Đặng Quốc Bảo -->
+<!-- ROW 5: Người dùng mẫu 52 -->
 <tr class="hover:bg-[#F8FAFC] transition-colors group bg-rose-50/20">
 <td class="px-4 py-3 text-center">
 <input aria-label="Chọn dòng" class="w-4 h-4 rounded border-[#CBD5E1] text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer" type="checkbox"/>
@@ -680,8 +680,8 @@
                           ĐB
                         </div>
 <div class="flex flex-col min-w-0">
-<span class="font-semibold text-slate-900 group-hover:text-primary transition-colors truncate">Đặng Quốc Bảo</span>
-<span class="text-body-sm font-body-sm text-slate-500 truncate">bao.dq@huit.edu.vn</span>
+<span class="font-semibold text-slate-900 group-hover:text-primary transition-colors truncate">Người dùng mẫu 52</span>
+<span class="text-body-sm font-body-sm text-slate-500 truncate">nguoidung020@example.test</span>
 </div>
 </div>
 </td>
@@ -722,7 +722,7 @@
 </div>
 </td>
 </tr>
-<!-- ROW 6: ThS. Hoàng Minh Đức -->
+<!-- ROW 6: ThS. Người dùng mẫu 05 -->
 <tr class="hover:bg-[#F8FAFC] transition-colors group">
 <td class="px-4 py-3 text-center">
 <input aria-label="Chọn dòng" class="w-4 h-4 rounded border-[#CBD5E1] text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer" type="checkbox"/>
@@ -733,8 +733,8 @@
                           HĐ
                         </div>
 <div class="flex flex-col min-w-0">
-<span class="font-semibold text-slate-900 group-hover:text-primary transition-colors truncate">ThS. Hoàng Minh Đức</span>
-<span class="text-body-sm font-body-sm text-slate-500 truncate">duc.hm@huit.edu.vn</span>
+<span class="font-semibold text-slate-900 group-hover:text-primary transition-colors truncate">ThS. Người dùng mẫu 05</span>
+<span class="text-body-sm font-body-sm text-slate-500 truncate">nguoidung026@example.test</span>
 </div>
 </div>
 </td>
@@ -824,7 +824,7 @@
 <span class="material-symbols-outlined text-primary text-[20px] shrink-0 mt-0.5">info</span>
 <div class="text-body-sm font-body-sm leading-relaxed">
 <span class="font-semibold text-slate-900">Lưu ý quản trị:</span> 
-              Tài khoản tân sinh viên và cán bộ giảng viên mới tạo sẽ ở trạng thái <strong class="text-amber-700 font-semibold">Chờ kích hoạt</strong> cho đến khi hoàn tất xác thực email <code class="text-xs bg-white px-1.5 py-0.5 rounded border border-blue-200">@huit.edu.vn</code> và cập nhật mật khẩu lần đầu. Mọi thay đổi về quyền truy cập được đồng bộ tự động với cổng đăng ký học phần trong vòng 5 phút.
+              Tài khoản tân sinh viên và cán bộ giảng viên mới tạo sẽ ở trạng thái <strong class="text-amber-700 font-semibold">Chờ kích hoạt</strong> cho đến khi hoàn tất xác thực email <code class="text-xs bg-white px-1.5 py-0.5 rounded border border-blue-200">@example.test</code> và cập nhật mật khẩu lần đầu. Mọi thay đổi về quyền truy cập được đồng bộ tự động với cổng đăng ký học phần trong vòng 5 phút.
             </div>
 </div>
 </div>
@@ -835,7 +835,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

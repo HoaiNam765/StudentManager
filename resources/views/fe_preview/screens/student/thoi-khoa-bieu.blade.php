@@ -168,7 +168,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -211,7 +211,7 @@
             NVA
           </div>
 <div class="hidden sm:block text-left">
-<div class="text-xs font-semibold text-slate-900 leading-tight">Nguyễn Văn An</div>
+<div class="text-xs font-semibold text-slate-900 leading-tight">Người dùng mẫu 25</div>
 <div class="text-[11px] text-slate-500">2001210123 • 12DHTH01</div>
 </div>
 </div>
@@ -361,9 +361,9 @@
 <span class="font-semibold text-blue-950">P.A2.301</span>
 <span class="text-[10px] text-slate-500">(Cơ sở Tân Phú)</span>
 </div>
-<div class="flex items-center gap-1 truncate" title="TS. Trần Hoàng Nam">
+<div class="flex items-center gap-1 truncate" title="TS. Người dùng mẫu 38">
 <span class="material-symbols-outlined text-xs text-blue-600" data-icon="person">person</span>
-<span class="truncate">TS. Trần Hoàng Nam</span>
+<span class="truncate">TS. Người dùng mẫu 38</span>
 </div>
 </div>
 </div>
@@ -388,9 +388,9 @@
 <span class="font-semibold text-emerald-950">P.B.102</span>
 <span class="text-[10px] text-slate-500">(Cơ sở Tân Phú)</span>
 </div>
-<div class="flex items-center gap-1 truncate" title="ThS. Đỗ Văn Cường">
+<div class="flex items-center gap-1 truncate" title="ThS. Người dùng mẫu 56">
 <span class="material-symbols-outlined text-xs text-emerald-700" data-icon="person">person</span>
-<span class="truncate font-medium">ThS. Đỗ Văn Cường</span>
+<span class="truncate font-medium">ThS. Người dùng mẫu 56</span>
 </div>
 </div>
 </div>
@@ -419,9 +419,9 @@
 <span class="material-symbols-outlined text-xs text-sky-600" data-icon="location_on">location_on</span>
 <span class="font-semibold text-sky-950">P.B.204</span>
 </div>
-<div class="flex items-center gap-1 truncate" title="ThS. Lê Quang Huy">
+<div class="flex items-center gap-1 truncate" title="ThS. Người dùng mẫu 11">
 <span class="material-symbols-outlined text-xs text-sky-600" data-icon="person">person</span>
-<span class="truncate">ThS. Lê Quang Huy</span>
+<span class="truncate">ThS. Người dùng mẫu 11</span>
 </div>
 </div>
 </div>
@@ -525,9 +525,9 @@
 <span class="material-symbols-outlined text-xs text-purple-700" data-icon="location_on">location_on</span>
 <span class="font-semibold text-purple-950">P.A1.201</span>
 </div>
-<div class="flex items-center gap-1 truncate" title="TS. Võ Văn Hùng">
+<div class="flex items-center gap-1 truncate" title="TS. Người dùng mẫu 46">
 <span class="material-symbols-outlined text-xs text-purple-700" data-icon="person">person</span>
-<span class="truncate">TS. Võ Văn Hùng</span>
+<span class="truncate">TS. Người dùng mẫu 46</span>
 </div>
 </div>
 </div>
@@ -549,9 +549,9 @@
 <span class="font-semibold text-orange-950">Lab PM04</span>
 <span class="text-[10px] text-slate-500">(Nhà B)</span>
 </div>
-<div class="flex items-center gap-1 truncate" title="ThS. Hoàng Minh Đức">
+<div class="flex items-center gap-1 truncate" title="ThS. Người dùng mẫu 05">
 <span class="material-symbols-outlined text-xs text-orange-600" data-icon="person">person</span>
-<span class="truncate">ThS. Hoàng Minh Đức</span>
+<span class="truncate">ThS. Người dùng mẫu 05</span>
 </div>
 </div>
 </div>
@@ -707,7 +707,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

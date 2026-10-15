@@ -168,7 +168,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -211,7 +211,7 @@
             NVA
           </div>
 <div class="hidden sm:block text-left">
-<div class="text-xs font-semibold text-slate-900 leading-tight">Nguyễn Văn An</div>
+<div class="text-xs font-semibold text-slate-900 leading-tight">Người dùng mẫu 25</div>
 <div class="text-[11px] text-slate-500">2001210123 • 12DHTH01</div>
 </div>
 </div>
@@ -227,7 +227,7 @@
 <span class="text-xs font-bold text-slate-600">Tiến độ: <strong id="progText">40%</strong> (2/5 phần)</span>
 </div>
 <h2 class="text-base sm:text-lg font-bold text-slate-900">Khảo sát ý kiến sinh viên về hoạt động giảng dạy của giảng viên</h2>
-<p class="text-xs text-slate-500">Học phần: Lập trình Java • Giảng viên: TS. Trần Hoàng Nam • Học kỳ 1 2026-2027</p>
+<p class="text-xs text-slate-500">Học phần: Lập trình Java • Giảng viên: TS. Người dùng mẫu 38 • Học kỳ 1 2026-2027</p>
 <!-- Progress Bar -->
 <div class="w-full bg-slate-100 rounded-full h-2.5">
 <div class="bg-primary h-2.5 rounded-full transition-all duration-300" id="progBar" style="width: 40%;"></div>
@@ -325,7 +325,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

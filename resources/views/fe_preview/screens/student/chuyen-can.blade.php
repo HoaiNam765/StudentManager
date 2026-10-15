@@ -152,7 +152,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -195,7 +195,7 @@
             NVA
           </div>
 <div class="hidden sm:block text-left">
-<div class="text-xs font-semibold text-slate-900 leading-tight">Nguyễn Văn An</div>
+<div class="text-xs font-semibold text-slate-900 leading-tight">Người dùng mẫu 25</div>
 <div class="text-[11px] text-slate-500">2001210123 • 12DHTH01</div>
 </div>
 </div>
@@ -248,7 +248,7 @@
 <span class="text-xs text-slate-500">Mã LHP: 241_71ITEC3201_01</span>
 </div>
 <h3 class="text-base font-bold text-slate-900">Lập trình Java (3 tín chỉ)</h3>
-<p class="text-xs text-slate-600">Giảng viên: TS. Trần Hoàng Nam • Phòng B.302</p>
+<p class="text-xs text-slate-600">Giảng viên: TS. Người dùng mẫu 38 • Phòng B.302</p>
 </div>
 <div class="flex items-center gap-6">
 <div class="text-left md:text-right">
@@ -309,7 +309,7 @@
 <span class="text-xs text-slate-500">Mã LHP: 241_71ITEC2202_02</span>
 </div>
 <h3 class="text-base font-bold text-slate-900">Cơ sở dữ liệu nâng cao (3 tín chỉ)</h3>
-<p class="text-xs text-slate-600">Giảng viên: ThS. Lê Thị Mai • Phòng C.205</p>
+<p class="text-xs text-slate-600">Giảng viên: ThS. Người dùng mẫu 13 • Phòng C.205</p>
 </div>
 <div class="flex items-center gap-6">
 <div class="text-left md:text-right">
@@ -345,7 +345,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

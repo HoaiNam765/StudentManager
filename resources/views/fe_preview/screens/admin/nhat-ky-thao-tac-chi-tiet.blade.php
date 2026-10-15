@@ -226,7 +226,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -269,7 +269,7 @@
           </div>
 <div class="hidden sm:block text-left">
 <div class="text-xs font-semibold text-slate-900 leading-tight">Phòng Đào tạo</div>
-<div class="text-[11px] text-slate-500">admin@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung015@example.test</div>
 </div>
 </div>
 </div>
@@ -353,12 +353,12 @@
 <div class="w-6 h-6 rounded-full bg-rose-100 text-rose-700 font-bold text-[10px] flex items-center justify-center">
                     LH
                   </div>
-<span class="font-semibold text-text-main">Lê Thị Mai Hương</span>
+<span class="font-semibold text-text-main">Người dùng mẫu 15</span>
 </div>
 </div>
 <div>
 <span class="text-text-sub block text-[11px] mb-0.5">Email cán bộ</span>
-<span class="font-medium text-slate-800">huong.ltm@huit.edu.vn</span>
+<span class="font-medium text-slate-800">nguoidung033@example.test</span>
 </div>
 <div>
 <span class="text-text-sub block text-[11px] mb-0.5">Mã người dùng (User ID)</span>
@@ -619,7 +619,7 @@
   <span class="text-amber-400">"actor"</span>: {
     <span class="text-amber-400">"user_id"</span>: <span class="text-emerald-400">"CB199412"</span>,
     <span class="text-amber-400">"username"</span>: <span class="text-emerald-400">"huong.ltm"</span>,
-    <span class="text-amber-400">"email"</span>: <span class="text-emerald-400">"huong.ltm@huit.edu.vn"</span>,
+    <span class="text-amber-400">"email"</span>: <span class="text-emerald-400">"nguoidung033@example.test"</span>,
     <span class="text-amber-400">"role"</span>: <span class="text-emerald-400">"ROLE_ADMIN_DEPT_HEAD"</span>,
     <span class="text-amber-400">"ip_address"</span>: <span class="text-emerald-400">"115.79.44.18"</span>,
     <span class="text-amber-400">"user_agent"</span>: <span class="text-emerald-400">"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Chrome/129.0.0.0"</span>,
@@ -658,7 +658,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

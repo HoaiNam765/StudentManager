@@ -226,7 +226,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -269,7 +269,7 @@
           </div>
 <div class="hidden sm:block text-left">
 <div class="text-xs font-semibold text-slate-900 leading-tight">Phòng Đào tạo</div>
-<div class="text-[11px] text-slate-500">admin@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung015@example.test</div>
 </div>
 </div>
 </div>
@@ -559,8 +559,8 @@
                       NA
                     </div>
 <div>
-<p class="font-semibold text-on-surface group-hover:text-primary transition-colors">Nguyễn Văn An</p>
-<p class="text-[11px] text-secondary">2001210123@huit.edu.vn</p>
+<p class="font-semibold text-on-surface group-hover:text-primary transition-colors">Người dùng mẫu 25</p>
+<p class="text-[11px] text-secondary">nguoidung006@example.test</p>
 </div>
 </div>
 </td>
@@ -604,8 +604,8 @@
                       TT
                     </div>
 <div>
-<p class="font-semibold text-on-surface group-hover:text-primary transition-colors">Lê Thị Thu Thảo</p>
-<p class="text-[11px] text-secondary">2001210045@huit.edu.vn</p>
+<p class="font-semibold text-on-surface group-hover:text-primary transition-colors">Người dùng mẫu 16</p>
+<p class="text-[11px] text-secondary">nguoidung004@example.test</p>
 </div>
 </div>
 </td>
@@ -649,8 +649,8 @@
                       QB
                     </div>
 <div>
-<p class="font-semibold text-on-surface group-hover:text-primary transition-colors">Trần Quốc Bảo</p>
-<p class="text-[11px] text-secondary">2001220189@huit.edu.vn</p>
+<p class="font-semibold text-on-surface group-hover:text-primary transition-colors">Người dùng mẫu 40</p>
+<p class="text-[11px] text-secondary">nguoidung012@example.test</p>
 </div>
 </div>
 </td>
@@ -694,8 +694,8 @@
                       MH
                     </div>
 <div>
-<p class="font-semibold text-on-surface group-hover:text-primary transition-colors">Phạm Minh Hoàng</p>
-<p class="text-[11px] text-secondary">2001240012@huit.edu.vn</p>
+<p class="font-semibold text-on-surface group-hover:text-primary transition-colors">Người dùng mẫu 30</p>
+<p class="text-[11px] text-secondary">nguoidung014@example.test</p>
 </div>
 </div>
 </td>
@@ -739,8 +739,8 @@
                       HM
                     </div>
 <div>
-<p class="font-semibold text-on-surface group-hover:text-primary transition-colors">Hoàng Thị Mai</p>
-<p class="text-[11px] text-secondary">2001200567@huit.edu.vn</p>
+<p class="font-semibold text-on-surface group-hover:text-primary transition-colors">Người dùng mẫu 06</p>
+<p class="text-[11px] text-secondary">nguoidung002@example.test</p>
 </div>
 </div>
 </td>
@@ -784,8 +784,8 @@
                       DT
                     </div>
 <div>
-<p class="font-semibold text-on-surface group-hover:text-primary transition-colors">Đỗ Thành Trung</p>
-<p class="text-[11px] text-secondary">2001190234@huit.edu.vn</p>
+<p class="font-semibold text-on-surface group-hover:text-primary transition-colors">Người dùng mẫu 54</p>
+<p class="text-[11px] text-secondary">nguoidung001@example.test</p>
 </div>
 </div>
 </td>
@@ -829,8 +829,8 @@
                       VT
                     </div>
 <div>
-<p class="font-semibold text-on-surface group-hover:text-primary transition-colors">Vũ Tiến Dũng</p>
-<p class="text-[11px] text-secondary">2001210889@huit.edu.vn</p>
+<p class="font-semibold text-on-surface group-hover:text-primary transition-colors">Người dùng mẫu 48</p>
+<p class="text-[11px] text-secondary">nguoidung011@example.test</p>
 </div>
 </div>
 </td>
@@ -874,8 +874,8 @@
                       BH
                     </div>
 <div>
-<p class="font-semibold text-on-surface group-hover:text-primary transition-colors">Bùi Hồng Ngọc</p>
-<p class="text-[11px] text-secondary">2001230415@huit.edu.vn</p>
+<p class="font-semibold text-on-surface group-hover:text-primary transition-colors">Người dùng mẫu 01</p>
+<p class="text-[11px] text-secondary">nguoidung013@example.test</p>
 </div>
 </div>
 </td>
@@ -954,7 +954,7 @@
 <!-- Bottom Quick Summary Info Card (Institutional Footer Note) -->
 <footer class="pt-2 pb-6 flex items-center justify-between text-secondary font-body-sm text-[11px] border-t border-outline-variant/20">
 <div>
-          Trường Đại học Công Thương TP. Hồ Chí Minh (HUIT) • 140 Lê Trọng Tấn, P. Tây Thạnh, Q. Tân Phú, TP. HCM
+          Trường Đại học Công Thương TP. Hồ Chí Minh (HUIT) • 140 Người dùng mẫu 18, P. Tây Thạnh, Q. Tân Phú, TP. HCM
         </div>
 <div class="flex items-center gap-4">
 <a class="hover:text-primary transition-colors" href="#">Quy chế đào tạo theo học chế tín chỉ</a>
@@ -971,7 +971,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

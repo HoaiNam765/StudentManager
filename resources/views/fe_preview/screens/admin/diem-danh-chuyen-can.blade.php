@@ -198,7 +198,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -241,7 +241,7 @@
           </div>
 <div class="hidden sm:block text-left">
 <div class="text-xs font-semibold text-slate-900 leading-tight">Phòng Đào tạo</div>
-<div class="text-[11px] text-slate-500">admin@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung015@example.test</div>
 </div>
 </div>
 </div>
@@ -328,32 +328,32 @@
 <tbody class="divide-y divide-slate-100 text-xs font-medium text-slate-700">
 <tr class="bg-red-50/30 hover:bg-red-50/50 transition-colors">
 <td class="py-3 px-4 font-mono font-bold text-slate-900">2001210888</td>
-<td class="py-3 px-4 font-bold text-slate-900">Phạm Văn Hùng</td>
+<td class="py-3 px-4 font-bold text-slate-900">Người dùng mẫu 35</td>
 <td class="py-3 px-4">241_71ITEC3201_01</td>
-<td class="py-3 px-4">TS. Trần Hoàng Nam</td>
+<td class="py-3 px-4">TS. Người dùng mẫu 38</td>
 <td class="py-3 px-4 text-center font-bold text-red-700">3 / 12 buổi</td>
 <td class="py-3 px-4 text-center font-extrabold text-red-700">25.0%</td>
 <td class="py-3 px-4 text-center">
 <span class="px-2 py-0.5 rounded font-extrabold bg-red-100 text-red-800 border border-red-300">CẤM THI</span>
 </td>
 <td class="py-3 px-4 text-center">
-<button class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-[11px]" onclick="openAdjustModal('Phạm Văn Hùng', '2001210888')">
+<button class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-[11px]" onclick="openAdjustModal('Người dùng mẫu 35', '2001210888')">
                 Điều chỉnh
               </button>
 </td>
 </tr>
 <tr class="bg-amber-50/20 hover:bg-amber-50/40 transition-colors">
 <td class="py-3 px-4 font-mono font-bold text-slate-900">2001210123</td>
-<td class="py-3 px-4 font-bold text-slate-900">Nguyễn Văn An</td>
+<td class="py-3 px-4 font-bold text-slate-900">Người dùng mẫu 25</td>
 <td class="py-3 px-4">241_71ITEC3201_01</td>
-<td class="py-3 px-4">TS. Trần Hoàng Nam</td>
+<td class="py-3 px-4">TS. Người dùng mẫu 38</td>
 <td class="py-3 px-4 text-center font-bold text-amber-700">2 / 12 buổi</td>
 <td class="py-3 px-4 text-center font-extrabold text-amber-700">16.7%</td>
 <td class="py-3 px-4 text-center">
 <span class="px-2 py-0.5 rounded font-extrabold bg-amber-100 text-amber-800 border border-amber-300">CẢNH BÁO</span>
 </td>
 <td class="py-3 px-4 text-center">
-<button class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-[11px]" onclick="openAdjustModal('Nguyễn Văn An', '2001210123')">
+<button class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-[11px]" onclick="openAdjustModal('Người dùng mẫu 25', '2001210123')">
                 Điều chỉnh
               </button>
 </td>
@@ -374,7 +374,7 @@
 <div class="space-y-3 text-xs">
 <div>
 <span class="text-slate-500 block">Sinh viên:</span>
-<strong class="text-slate-900 text-sm" id="modalStudentName">Nguyễn Văn An (2001210123)</strong>
+<strong class="text-slate-900 text-sm" id="modalStudentName">Người dùng mẫu 25 (2001210123)</strong>
 </div>
 <div>
 <label class="block font-semibold text-slate-700 mb-1" for="modal-session-sel">Buổi học cần điều chỉnh</label>
@@ -430,7 +430,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

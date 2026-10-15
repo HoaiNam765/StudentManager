@@ -168,7 +168,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -211,7 +211,7 @@
             NVA
           </div>
 <div class="hidden sm:block text-left">
-<div class="text-xs font-semibold text-slate-900 leading-tight">Nguyễn Văn An</div>
+<div class="text-xs font-semibold text-slate-900 leading-tight">Người dùng mẫu 25</div>
 <div class="text-[11px] text-slate-500">2001210123 • 12DHTH01</div>
 </div>
 </div>
@@ -251,11 +251,11 @@
 <!-- Cố vấn học tập -->
 <div class="flex items-center gap-2 pt-1 font-body-sm text-body-sm text-secondary">
 <span class="material-symbols-outlined text-[16px] text-primary" data-icon="school">school</span>
-<span>Cố vấn học tập: <strong class="text-on-surface">ThS. Lê Hoàng Tuấn</strong></span>
+<span>Cố vấn học tập: <strong class="text-on-surface">ThS. Người dùng mẫu 10</strong></span>
 <span class="text-outline-variant">|</span>
-<a class="hover:text-primary flex items-center gap-1 text-[11px]" href="mailto:tuanlh@huit.edu.vn" title="Gửi thư cho CVHT">
+<a class="hover:text-primary flex items-center gap-1 text-[11px]" href="mailto:nguoidung041@example.test" title="Gửi thư cho CVHT">
 <span class="material-symbols-outlined text-[14px]" data-icon="mail">mail</span>
-                tuanlh@huit.edu.vn
+                nguoidung041@example.test
               </a>
 <span class="text-outline-variant">|</span>
 <span class="flex items-center gap-1 text-[11px]">
@@ -358,7 +358,7 @@
 </button>
 </div>
 <div class="relative">
-<input aria-label="Ô nhập liệu" class="w-full bg-slate-100 border border-slate-300 rounded-lg px-3 py-2 text-on-surface font-medium cursor-not-allowed pr-8 text-sm" disabled="" type="text" value="Nguyễn Văn An"/>
+<input aria-label="Ô nhập liệu" class="w-full bg-slate-100 border border-slate-300 rounded-lg px-3 py-2 text-on-surface font-medium cursor-not-allowed pr-8 text-sm" disabled="" type="text" value="Người dùng mẫu 25"/>
 <span class="material-symbols-outlined text-[16px] text-slate-500 absolute right-2.5 top-2.5" data-icon="lock" title="Chỉ đọc">lock</span>
 </div>
 </div>
@@ -436,7 +436,7 @@
 <div class="space-y-1">
 <label class="font-label-md text-label-md text-on-surface-variant font-medium">Email sinh viên (Cấp bởi trường)</label>
 <div class="relative">
-<input aria-label="Ô nhập liệu" class="w-full bg-slate-100 border border-slate-300 rounded-lg px-3 py-2 text-on-surface font-medium cursor-not-allowed pr-8 text-sm" disabled="" type="email" value="2001210123@huit.edu.vn"/>
+<input aria-label="Ô nhập liệu" class="w-full bg-slate-100 border border-slate-300 rounded-lg px-3 py-2 text-on-surface font-medium cursor-not-allowed pr-8 text-sm" disabled="" type="email" value="nguoidung006@example.test"/>
 <span class="material-symbols-outlined text-[16px] text-slate-500 absolute right-2.5 top-2.5" data-icon="lock">lock</span>
 </div>
 </div>
@@ -449,7 +449,7 @@
                     Đã xác thực
                   </span>
 </div>
-<input aria-label="Ô nhập liệu" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm" type="email" value="an.nguyen2003@gmail.com"/>
+<input aria-label="Ô nhập liệu" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm" type="email" value="nguoidung016@example.test"/>
 </div>
 <!-- SĐT di động (Có thể sửa) -->
 <div class="space-y-1 sm:col-span-2">
@@ -463,7 +463,7 @@
 <div class="space-y-1 sm:col-span-2">
 <label class="font-label-md text-label-md text-on-surface-variant font-medium">Địa chỉ thường trú / Hộ khẩu hiện tại</label>
 <div class="relative">
-<input aria-label="Ô nhập liệu" class="w-full bg-white border border-slate-300 rounded-lg pl-10 pr-3 py-2 text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm" type="text" value="140 Lê Trọng Tấn, P. Tây Thạnh, Q. Tân Phú, TP. Hồ Chí Minh"/>
+<input aria-label="Ô nhập liệu" class="w-full bg-white border border-slate-300 rounded-lg pl-10 pr-3 py-2 text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm" type="text" value="140 Người dùng mẫu 18, P. Tây Thạnh, Q. Tân Phú, TP. Hồ Chí Minh"/>
 <span class="material-symbols-outlined text-[18px] text-slate-500 absolute left-3 top-2.5" data-icon="location_on">location_on</span>
 </div>
 </div>
@@ -494,7 +494,7 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 <div class="space-y-1">
 <label class="font-label-md text-label-md text-on-surface-variant font-medium">Họ và tên người liên hệ / Phụ huynh</label>
-<input aria-label="Ô nhập liệu" class="w-full bg-slate-100 border border-slate-300 rounded-lg px-3 py-2 text-on-surface font-medium cursor-not-allowed text-sm" disabled="" type="text" value="Nguyễn Văn Bình"/>
+<input aria-label="Ô nhập liệu" class="w-full bg-slate-100 border border-slate-300 rounded-lg px-3 py-2 text-on-surface font-medium cursor-not-allowed text-sm" disabled="" type="text" value="Người dùng mẫu 26"/>
 </div>
 <div class="space-y-1">
 <label class="font-label-md text-label-md text-on-surface-variant font-medium">Mối quan hệ</label>
@@ -627,7 +627,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

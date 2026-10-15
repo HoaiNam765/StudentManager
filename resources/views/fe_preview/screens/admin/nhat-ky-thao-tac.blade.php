@@ -226,7 +226,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -269,7 +269,7 @@
           </div>
 <div class="hidden sm:block text-left">
 <div class="text-xs font-semibold text-slate-900 leading-tight">Phòng Đào tạo</div>
-<div class="text-[11px] text-slate-500">admin@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung015@example.test</div>
 </div>
 </div>
 </div>
@@ -478,8 +478,8 @@
                       LH
                     </div>
 <div class="min-w-0">
-<p class="font-medium text-slate-900 truncate">Lê Thị Mai Hương</p>
-<p class="text-[11px] text-slate-500 truncate">huong.ltm@huit.edu.vn</p>
+<p class="font-medium text-slate-900 truncate">Người dùng mẫu 15</p>
+<p class="text-[11px] text-slate-500 truncate">nguoidung033@example.test</p>
 </div>
 </div>
 </td>
@@ -525,8 +525,8 @@
                       TT
                     </div>
 <div class="min-w-0">
-<p class="font-medium text-slate-900 truncate">TS. Trần Anh Tuấn</p>
-<p class="text-[11px] text-slate-500 truncate">tuan.ta@huit.edu.vn</p>
+<p class="font-medium text-slate-900 truncate">TS. Người dùng mẫu 36</p>
+<p class="text-[11px] text-slate-500 truncate">nguoidung040@example.test</p>
 </div>
 </div>
 </td>
@@ -573,7 +573,7 @@
 </div>
 <div class="min-w-0">
 <p class="font-medium text-slate-900 truncate">Hệ thống tự động (Cron Job)</p>
-<p class="text-[11px] text-slate-500 truncate">huit-scheduler@sys.internal</p>
+<p class="text-[11px] text-slate-500 truncate">nguoidung032@example.test</p>
 </div>
 </div>
 </td>
@@ -619,8 +619,8 @@
                       NT
                     </div>
 <div class="min-w-0">
-<p class="font-medium text-slate-900 truncate">Nguyễn Văn Tuấn</p>
-<p class="text-[11px] text-slate-500 truncate">tuan.nv@huit.edu.vn</p>
+<p class="font-medium text-slate-900 truncate">Người dùng mẫu 29</p>
+<p class="text-[11px] text-slate-500 truncate">nguoidung039@example.test</p>
 </div>
 </div>
 </td>
@@ -683,7 +683,7 @@
 </td>
 <td class="py-3 px-4">
 <div class="leading-tight">
-<span class="font-medium text-slate-900">Tài khoản admin@huit.edu.vn</span>
+<span class="font-medium text-slate-900">Tài khoản nguoidung015@example.test</span>
 <span class="ml-1 text-[11px] text-red-500">(Sai MK lần 3)</span>
 </div>
 </td>
@@ -758,7 +758,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

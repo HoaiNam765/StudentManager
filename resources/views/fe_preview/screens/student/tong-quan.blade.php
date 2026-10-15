@@ -168,7 +168,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -211,7 +211,7 @@
             NVA
           </div>
 <div class="hidden sm:block text-left">
-<div class="text-xs font-semibold text-slate-900 leading-tight">Nguyễn Văn An</div>
+<div class="text-xs font-semibold text-slate-900 leading-tight">Người dùng mẫu 25</div>
 <div class="text-[11px] text-slate-500">2001210123 • 12DHTH01</div>
 </div>
 </div>
@@ -224,7 +224,7 @@
 <div class="space-y-1">
 <div class="flex flex-wrap items-center gap-3">
 <h1 class="text-2xl lg:text-[28px] font-bold text-on-surface tracking-tight">
-            Xin chào, Nguyễn Văn An 👋
+            Xin chào, Người dùng mẫu 25 👋
           </h1>
 <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 flex items-center gap-1">
 <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span> Sinh viên chính quy
@@ -410,7 +410,7 @@
 <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-on-surface-variant">
 <span>Phòng: <strong class="text-primary font-semibold">B.301</strong></span>
 <span class="text-outline-variant">•</span>
-<span>Giảng viên: <strong class="text-on-surface">TS. Lê Thị Mai Hương</strong></span>
+<span>Giảng viên: <strong class="text-on-surface">TS. Người dùng mẫu 15</strong></span>
 <span class="text-outline-variant">•</span>
 <span>Hình thức: <span class="font-medium text-on-surface">Trực tiếp</span></span>
 </div>
@@ -435,7 +435,7 @@
 <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-on-surface-variant">
 <span>Phòng: <strong class="text-primary font-semibold">PM04 (Phòng máy)</strong></span>
 <span class="text-outline-variant">•</span>
-<span>Giảng viên: <strong class="text-on-surface">ThS. Trần Hoàng Nam</strong></span>
+<span>Giảng viên: <strong class="text-on-surface">ThS. Người dùng mẫu 38</strong></span>
 <span class="text-outline-variant">•</span>
 <span>Hình thức: <span class="font-medium text-on-surface">Thực hành tại lab</span></span>
 </div>
@@ -595,7 +595,7 @@
 </div>
 <div class="flex items-center gap-2">
 <span class="material-symbols-outlined text-[16px] text-primary">mail</span>
-<span>Email: <strong class="font-semibold">daotao@huit.edu.vn</strong></span>
+<span>Email: <strong class="font-semibold">nguoidung025@example.test</strong></span>
 </div>
 <div class="flex items-center gap-2">
 <span class="material-symbols-outlined text-[16px] text-primary">location_on</span>
@@ -612,7 +612,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

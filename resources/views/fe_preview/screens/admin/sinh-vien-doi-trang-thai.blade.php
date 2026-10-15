@@ -226,7 +226,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -269,7 +269,7 @@
           </div>
 <div class="hidden sm:block text-left">
 <div class="text-xs font-semibold text-slate-900 leading-tight">Phòng Đào tạo</div>
-<div class="text-[11px] text-slate-500">admin@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung015@example.test</div>
 </div>
 </div>
 </div>
@@ -288,7 +288,7 @@
 <div class="space-y-1">
 <div class="flex flex-wrap items-center gap-3">
 <h1 class="font-headline-lg text-headline-lg text-on-surface font-semibold tracking-tight">
-                  Chỉnh sửa hồ sơ sinh viên: Nguyễn Văn An (MSSV: 2001210123)
+                  Chỉnh sửa hồ sơ sinh viên: Người dùng mẫu 25 (MSSV: 2001210123)
                 </h1>
 <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-[#DCFCE7] text-[#15803D] font-semibold border border-[#BBF7D0]">
 <span class="w-1.5 h-1.5 rounded-full bg-[#15803D]"></span>
@@ -383,7 +383,7 @@
 <!-- Cố vấn học tập -->
 <div>
 <label class="block font-label-md text-label-md text-on-surface-variant mb-1.5">Cố vấn học tập</label>
-<input aria-label="Ô nhập liệu" class="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-on-surface font-medium focus:border-primary focus:ring-2 focus:ring-primary/20" type="text" value="TS. Trần Hoàng Nam (Khoa CNTT)"/>
+<input aria-label="Ô nhập liệu" class="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-on-surface font-medium focus:border-primary focus:ring-2 focus:ring-primary/20" type="text" value="TS. Người dùng mẫu 38 (Khoa CNTT)"/>
 </div>
 <!-- Tình trạng học vụ -->
 <div>
@@ -430,7 +430,7 @@
 <label class="block font-label-md text-label-md text-on-surface-variant mb-1">
                         Họ và tên khai sinh <span class="text-error">*</span>
 </label>
-<input aria-label="Ô nhập liệu" class="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-on-surface font-semibold focus:border-primary focus:ring-2 focus:ring-primary/20" type="text" value="Nguyễn Văn An"/>
+<input aria-label="Ô nhập liệu" class="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-on-surface font-semibold focus:border-primary focus:ring-2 focus:ring-primary/20" type="text" value="Người dùng mẫu 25"/>
 </div>
 <div>
 <button class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-outline-variant bg-surface-container-low hover:bg-surface-container text-on-surface text-label-sm font-label-sm transition-colors" type="button">
@@ -517,7 +517,7 @@
                       Email trường (HUIT cấp)
                     </label>
 <div class="relative">
-<input aria-label="Ô nhập liệu" class="w-full h-10 px-3 pr-24 bg-surface-container-low/70 border border-outline-variant rounded-lg text-on-surface font-medium cursor-not-allowed" readonly="" type="text" value="2001210123@huit.edu.vn"/>
+<input aria-label="Ô nhập liệu" class="w-full h-10 px-3 pr-24 bg-surface-container-low/70 border border-outline-variant rounded-lg text-on-surface font-medium cursor-not-allowed" readonly="" type="text" value="nguoidung006@example.test"/>
 <span class="absolute right-2 top-2 px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800">Office 365</span>
 </div>
 </div>
@@ -539,13 +539,13 @@
 <!-- Error banner warning -->
 <p class="mt-1.5 text-body-sm font-body-sm text-error flex items-start gap-1 leading-snug">
 <span class="material-symbols-outlined text-[16px] shrink-0 mt-0.5" data-icon="error">error</span>
-<span><strong>Email sai định dạng:</strong> Địa chỉ email chứa ký tự trùng lặp không hợp lệ (@@). Ví dụ chuẩn: example@domain.com</span>
+<span><strong>Email sai định dạng:</strong> Địa chỉ email chứa ký tự trùng lặp không hợp lệ (@@). Ví dụ chuẩn: nguoidung029@example.test</span>
 </p>
 </div>
 <!-- Địa chỉ thường trú -->
 <div>
 <label class="block font-label-md text-label-md text-on-surface-variant mb-1">Địa chỉ thường trú (Theo sổ hộ khẩu / CCCD)</label>
-<input aria-label="Ô nhập liệu" class="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-on-surface font-medium focus:border-primary focus:ring-2 focus:ring-primary/20" type="text" value="140 Lê Trọng Tấn, P. Tây Thạnh, Q. Tân Phú, TP. Hồ Chí Minh"/>
+<input aria-label="Ô nhập liệu" class="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-on-surface font-medium focus:border-primary focus:ring-2 focus:ring-primary/20" type="text" value="140 Người dùng mẫu 18, P. Tây Thạnh, Q. Tân Phú, TP. Hồ Chí Minh"/>
 </div>
 <!-- Địa chỉ tạm trú -->
 <div>
@@ -575,7 +575,7 @@
                       Họ tên phụ huynh / Người bảo hộ
                     </label>
 <div class="grid grid-cols-3 gap-2">
-<input aria-label="Ô nhập liệu" class="col-span-2 h-10 px-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-on-surface font-medium focus:border-primary focus:ring-2 focus:ring-primary/20" type="text" value="Nguyễn Văn Bình"/>
+<input aria-label="Ô nhập liệu" class="col-span-2 h-10 px-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-on-surface font-medium focus:border-primary focus:ring-2 focus:ring-primary/20" type="text" value="Người dùng mẫu 26"/>
 <input aria-label="Ô nhập liệu" class="h-10 px-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-on-surface text-center font-medium" type="text" value="Cha"/>
 </div>
 </div>
@@ -595,7 +595,7 @@
 <!-- Địa chỉ liên hệ -->
 <div>
 <label class="block font-label-md text-label-md text-on-surface-variant mb-1">Địa chỉ liên hệ người giám hộ</label>
-<input aria-label="Ô nhập liệu" class="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-on-surface font-medium" type="text" value="140 Lê Trọng Tấn, P. Tây Thạnh, TP.HCM"/>
+<input aria-label="Ô nhập liệu" class="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-on-surface font-medium" type="text" value="140 Người dùng mẫu 18, P. Tây Thạnh, TP.HCM"/>
 </div>
 </div>
 </div>
@@ -613,7 +613,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

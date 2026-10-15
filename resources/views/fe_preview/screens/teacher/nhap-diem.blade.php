@@ -1,4 +1,4 @@
-﻿@extends('fe_preview.layouts.teacher')
+@extends('fe_preview.layouts.teacher')
 @section('page_title', 'Giáº£ng viÃªn - HUIT Há»c Vá»¥')
 @section('html_attributes')lang="vi" class="['light']"@endsection
 @section('body_attributes')class="['bg-[#f8f9ff]', 'text-slate-800', 'antialiased', 'min-h-screen', 'flex', 'selection:bg-blue-100', 'selection:text-blue-900']"@endsection
@@ -141,7 +141,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Há»— trá»£ ká»¹ thuáº­t: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -656,7 +656,7 @@
 <!-- Footer báº£n quyá»n HUIT -->
 <footer class="pt-2 pb-6 text-center text-xs text-slate-500">
 <p>Â© 2026 TrÆ°á»ng Äáº¡i há»c CÃ´ng ThÆ°Æ¡ng TP. Há»“ ChÃ­ Minh (HUIT) â€¢ Cá»•ng ThÃ´ng tin Giáº£ng viÃªn &amp; Quáº£n lÃ½ Há»c vá»¥.</p>
-<p class="mt-1 text-slate-500">Há»— trá»£ ká»¹ thuáº­t nháº­p Ä‘iá»ƒm: PhÃ²ng ÄÃ o táº¡o (028.38161673 - daotao@huit.edu.vn)</p>
+<p class="mt-1 text-slate-500">Há»— trá»£ ká»¹ thuáº­t nháº­p Ä‘iá»ƒm: PhÃ²ng ÄÃ o táº¡o (028.38161673 - nguoidung025@example.test)</p>
 </footer>
 </div>
 </main>
@@ -666,7 +666,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Há»— trá»£: 028 3816 1673</span>
 <span>â€¢</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

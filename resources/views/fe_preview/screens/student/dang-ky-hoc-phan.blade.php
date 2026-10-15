@@ -168,7 +168,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -211,7 +211,7 @@
             NVA
           </div>
 <div class="hidden sm:block text-left">
-<div class="text-xs font-semibold text-slate-900 leading-tight">Nguyễn Văn An</div>
+<div class="text-xs font-semibold text-slate-900 leading-tight">Người dùng mẫu 25</div>
 <div class="text-[11px] text-slate-500">2001210123 • 12DHTH01</div>
 </div>
 </div>
@@ -329,7 +329,7 @@
 <p class="font-body-sm text-body-sm text-secondary flex items-center gap-2">
 <span class="flex items-center gap-1">
 <span class="material-symbols-outlined text-[16px]" data-icon="person_outline">person_outline</span>
-                      TS. Trần Hoàng Nam
+                      TS. Người dùng mẫu 38
                     </span>
 <span>•</span>
 <span class="flex items-center gap-1 text-on-surface">
@@ -376,7 +376,7 @@
 <p class="font-body-sm text-body-sm text-secondary flex items-center gap-2">
 <span class="flex items-center gap-1">
 <span class="material-symbols-outlined text-[16px]" data-icon="person_outline">person_outline</span>
-                      ThS. Lê Quang Huy
+                      ThS. Người dùng mẫu 11
                     </span>
 <span>•</span>
 <span class="flex items-center gap-1 text-red-700 font-medium">
@@ -432,7 +432,7 @@
 <p class="font-body-sm text-body-sm text-secondary flex items-center gap-2">
 <span class="flex items-center gap-1">
 <span class="material-symbols-outlined text-[16px]" data-icon="person_outline">person_outline</span>
-                      TS. Nguyễn Thanh Tùng
+                      TS. Người dùng mẫu 22
                     </span>
 <span>•</span>
 <span class="flex items-center gap-1">
@@ -498,7 +498,7 @@
 <p class="font-body-sm text-body-sm text-secondary flex items-center gap-2">
 <span class="flex items-center gap-1">
 <span class="material-symbols-outlined text-[16px]" data-icon="person_outline">person_outline</span>
-                      ThS. Đỗ Văn Cường
+                      ThS. Người dùng mẫu 56
                     </span>
 <span>•</span>
 <span class="flex items-center gap-1 text-on-surface">
@@ -674,7 +674,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

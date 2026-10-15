@@ -226,7 +226,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -269,7 +269,7 @@
           </div>
 <div class="hidden sm:block text-left">
 <div class="text-xs font-semibold text-slate-900 leading-tight">Phòng Đào tạo</div>
-<div class="text-[11px] text-slate-500">admin@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung015@example.test</div>
 </div>
 </div>
 </div>
@@ -284,7 +284,7 @@
 <!-- Ô tìm kiếm MSSV, họ tên -->
 <div class="col-span-5 relative">
 <span class="material-symbols-outlined absolute left-3 top-2.5 text-[20px] text-outline">search</span>
-<input aria-label="Tìm theo MSSV, Họ tên sinh viên..." class="w-full bg-white border border-[#cbd5e1] rounded-lg pl-10 pr-4 py-2 text-body-md text-on-surface placeholder:text-[#94a3b8] focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="Tìm theo MSSV, Họ tên sinh viên..." type="text" value="Nguyễn Văn An"/>
+<input aria-label="Tìm theo MSSV, Họ tên sinh viên..." class="w-full bg-white border border-[#cbd5e1] rounded-lg pl-10 pr-4 py-2 text-body-md text-on-surface placeholder:text-[#94a3b8] focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="Tìm theo MSSV, Họ tên sinh viên..." type="text" value="Người dùng mẫu 25"/>
 </div>
 <!-- Bộ lọc Lớp học phần -->
 <div class="col-span-3">
@@ -346,13 +346,13 @@
 </tr>
 </thead>
 <tbody class="divide-y divide-[#f1f5f9]">
-<!-- Dòng 1: Đang chọn (Nguyễn Văn An) -->
+<!-- Dòng 1: Đang chọn (Người dùng mẫu 25) -->
 <tr class="bg-[#eff4ff]/70 hover:bg-[#eff4ff] transition-colors group cursor-pointer border-l-4 border-l-primary">
 <td class="py-3 px-4 text-center font-medium text-secondary">01</td>
 <td class="py-3 px-4 sticky left-0 bg-[#eff4ff] group-hover:bg-[#eff4ff] z-10 font-bold text-primary shadow-[1px_0_0_0_#e2e8f0]">
                       2001210123
                     </td>
-<td class="py-3 px-4 font-semibold text-on-surface">Nguyễn Văn An</td>
+<td class="py-3 px-4 font-semibold text-on-surface">Người dùng mẫu 25</td>
 <td class="py-3 px-4 text-secondary">12DHTH01</td>
 <td class="py-3 px-4 text-center font-medium">6 học phần</td>
 <td class="py-3 px-4 text-center">
@@ -378,13 +378,13 @@
 </div>
 </td>
 </tr>
-<!-- Dòng 2: Lê Thị Thu Thảo -->
+<!-- Dòng 2: Người dùng mẫu 16 -->
 <tr class="hover:bg-[#f8fafc] transition-colors group">
 <td class="py-3 px-4 text-center text-secondary">02</td>
 <td class="py-3 px-4 sticky left-0 bg-white group-hover:bg-[#f8fafc] z-10 font-semibold text-on-surface shadow-[1px_0_0_0_#e2e8f0]">
                       2001210045
                     </td>
-<td class="py-3 px-4 text-on-surface">Lê Thị Thu Thảo</td>
+<td class="py-3 px-4 text-on-surface">Người dùng mẫu 16</td>
 <td class="py-3 px-4 text-secondary">12DHTH02</td>
 <td class="py-3 px-4 text-center">5 học phần</td>
 <td class="py-3 px-4 text-center">
@@ -410,13 +410,13 @@
 </div>
 </td>
 </tr>
-<!-- Dòng 3: Trần Quốc Bảo (Cảnh báo trùng lịch) -->
+<!-- Dòng 3: Người dùng mẫu 40 (Cảnh báo trùng lịch) -->
 <tr class="hover:bg-[#f8fafc] transition-colors group">
 <td class="py-3 px-4 text-center text-secondary">03</td>
 <td class="py-3 px-4 sticky left-0 bg-white group-hover:bg-[#f8fafc] z-10 font-semibold text-on-surface shadow-[1px_0_0_0_#e2e8f0]">
                       2001210189
                     </td>
-<td class="py-3 px-4 text-on-surface">Trần Quốc Bảo</td>
+<td class="py-3 px-4 text-on-surface">Người dùng mẫu 40</td>
 <td class="py-3 px-4 text-secondary">12DHPM01</td>
 <td class="py-3 px-4 text-center">7 học phần</td>
 <td class="py-3 px-4 text-center">
@@ -442,13 +442,13 @@
 </div>
 </td>
 </tr>
-<!-- Dòng 4: Phạm Minh Hoàng -->
+<!-- Dòng 4: Người dùng mẫu 30 -->
 <tr class="hover:bg-[#f8fafc] transition-colors group">
 <td class="py-3 px-4 text-center text-secondary">04</td>
 <td class="py-3 px-4 sticky left-0 bg-white group-hover:bg-[#f8fafc] z-10 font-semibold text-on-surface shadow-[1px_0_0_0_#e2e8f0]">
                       2001210344
                     </td>
-<td class="py-3 px-4 text-on-surface">Phạm Minh Hoàng</td>
+<td class="py-3 px-4 text-on-surface">Người dùng mẫu 30</td>
 <td class="py-3 px-4 text-secondary">12DHTH01</td>
 <td class="py-3 px-4 text-center">6 học phần</td>
 <td class="py-3 px-4 text-center">
@@ -474,13 +474,13 @@
 </div>
 </td>
 </tr>
-<!-- Dòng 5: Hoàng Thị Mai -->
+<!-- Dòng 5: Người dùng mẫu 06 -->
 <tr class="hover:bg-[#f8fafc] transition-colors group">
 <td class="py-3 px-4 text-center text-secondary">05</td>
 <td class="py-3 px-4 sticky left-0 bg-white group-hover:bg-[#f8fafc] z-10 font-semibold text-on-surface shadow-[1px_0_0_0_#e2e8f0]">
                       2001210512
                     </td>
-<td class="py-3 px-4 text-on-surface">Hoàng Thị Mai</td>
+<td class="py-3 px-4 text-on-surface">Người dùng mẫu 06</td>
 <td class="py-3 px-4 text-secondary">12DHPM02</td>
 <td class="py-3 px-4 text-center">7 học phần</td>
 <td class="py-3 px-4 text-center">
@@ -539,7 +539,7 @@
 <span class="inline-block px-2 py-0.5 rounded text-[11px] font-semibold bg-primary/10 text-primary mb-1">
                   Khóa K21 - CNTT Chính quy
                 </span>
-<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Nguyễn Văn An</h3>
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Người dùng mẫu 25</h3>
 <p class="font-body-sm text-body-sm text-secondary">MSSV: <strong class="text-on-surface font-semibold">2001210123</strong> | Lớp: 12DHTH01</p>
 </div>
 <div class="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold">
@@ -638,7 +638,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

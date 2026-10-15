@@ -250,7 +250,7 @@
 </div>
 <input autocomplete="username" class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg pl-10 pr-3.5 py-2.5 text-body-md font-body-md text-on-surface placeholder:text-outline focus:border-[#4776E6] focus:ring-2 focus:ring-[#4776E6]/20 transition-all outline-none" id="username" name="username" placeholder="Nhập mã số / email" required="" type="text"/>
 </div>
-<p class="text-label-sm font-label-sm text-outline mt-1">Ví dụ: 20012000 hoặc canbo@huit.edu.vn</p>
+<p class="text-label-sm font-label-sm text-outline mt-1">Ví dụ: 20012000 hoặc nguoidung021@example.test</p>
 </div>
 <!-- Password Input -->
 <div>
@@ -294,7 +294,7 @@
               </p>
 </div>
 <p class="text-label-sm font-label-sm text-outline text-center mt-2">
-              Hỗ trợ kỹ thuật: <a class="text-primary hover:underline" href="mailto:support@huit.edu.vn">support@huit.edu.vn</a> | Hotline: <span class="font-medium text-on-surface-variant">024.3754.7461</span>
+              Hỗ trợ kỹ thuật: <a class="text-primary hover:underline" href="mailto:nguoidung038@example.test">nguoidung038@example.test</a> | Hotline: <span class="font-medium text-on-surface-variant">024.3754.7461</span>
 </p>
 </div>
 </div>

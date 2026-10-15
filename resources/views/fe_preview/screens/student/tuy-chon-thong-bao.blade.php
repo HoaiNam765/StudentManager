@@ -168,7 +168,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -211,7 +211,7 @@
             NVA
           </div>
 <div class="hidden sm:block text-left">
-<div class="text-xs font-semibold text-slate-900 leading-tight">Nguyễn Văn An</div>
+<div class="text-xs font-semibold text-slate-900 leading-tight">Người dùng mẫu 25</div>
 <div class="text-[11px] text-slate-500">2001210123 • 12DHTH01</div>
 </div>
 </div>
@@ -277,7 +277,7 @@
 <h3 class="font-label-lg text-label-lg font-bold text-on-surface">Email trường</h3>
 <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800">Mặc định</span>
 </div>
-<p class="font-label-md text-label-md text-primary font-mono mt-0.5">an.nv@huit.edu.vn</p>
+<p class="font-label-md text-label-md text-primary font-mono mt-0.5">nguoidung019@example.test</p>
 <p class="font-body-sm text-body-sm text-on-surface-variant mt-1.5">
                     Nhận thông báo qua hòm thư chính thức của sinh viên.
                   </p>
@@ -618,7 +618,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

@@ -198,7 +198,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -241,7 +241,7 @@
           </div>
 <div class="hidden sm:block text-left">
 <div class="text-xs font-semibold text-slate-900 leading-tight">Phòng Đào tạo</div>
-<div class="text-[11px] text-slate-500">admin@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung015@example.test</div>
 </div>
 </div>
 </div>
@@ -258,7 +258,7 @@
 <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-200 text-amber-900">Phát hiện 1 xung đột</span>
 </div>
 <p class="text-xs text-slate-600 mt-0.5 leading-relaxed">
-        Giảng viên <strong>TS. Trần Hoàng Nam</strong> đang bị phân công trùng ca thi: 
+        Giảng viên <strong>TS. Người dùng mẫu 38</strong> đang bị phân công trùng ca thi: 
         <strong>Ca 1 (07:30 - 09:30 ngày 18/11/2026)</strong> tại cả 2 phòng thi <strong>B.302</strong> và <strong>A.204</strong>.
       </p>
 </div>
@@ -313,10 +313,10 @@
 <td class="py-3.5 px-4">Lập trình Java</td>
 <td class="py-3.5 px-4 text-center font-bold">42</td>
 <td class="py-3.5 px-4 font-semibold text-amber-700 flex items-center gap-1">
-<span>TS. Trần Hoàng Nam</span>
+<span>TS. Người dùng mẫu 38</span>
 <span class="material-symbols-outlined text-amber-700 text-[16px]" title="Trùng lịch!">warning</span>
 </td>
-<td class="py-3.5 px-4">ThS. Đỗ Văn Bình</td>
+<td class="py-3.5 px-4">ThS. Người dùng mẫu 55</td>
 <td class="py-3.5 px-4 text-center">
 <button class="px-2.5 py-1 rounded bg-blue-50 hover:bg-blue-100 text-primary font-bold text-[11px]" onclick="printRoomList('B.302', 'Lập trình Java')">
                 In danh sách ký tên
@@ -330,10 +330,10 @@
 <td class="py-3.5 px-4">Kỹ thuật lập trình C++</td>
 <td class="py-3.5 px-4 text-center font-bold">40</td>
 <td class="py-3.5 px-4 font-semibold text-amber-700 flex items-center gap-1">
-<span>TS. Trần Hoàng Nam</span>
+<span>TS. Người dùng mẫu 38</span>
 <span class="material-symbols-outlined text-amber-700 text-[16px]" title="Trùng lịch!">warning</span>
 </td>
-<td class="py-3.5 px-4">ThS. Nguyễn Thị Lan</td>
+<td class="py-3.5 px-4">ThS. Người dùng mẫu 23</td>
 <td class="py-3.5 px-4 text-center">
 <button class="px-2.5 py-1 rounded bg-blue-50 hover:bg-blue-100 text-primary font-bold text-[11px]" onclick="printRoomList('A.204', 'Kỹ thuật lập trình C++')">
                 In danh sách ký tên
@@ -368,7 +368,7 @@
 <td class="border border-black p-2 text-center">01</td>
 <td class="border border-black p-2 text-center">SBD-001</td>
 <td class="border border-black p-2 text-center font-mono">2001210123</td>
-<td class="border border-black p-2 font-bold">Nguyễn Văn An</td>
+<td class="border border-black p-2 font-bold">Người dùng mẫu 25</td>
 <td class="border border-black p-2 text-center">12DHTH01</td>
 <td class="border border-black p-2"></td>
 <td class="border border-black p-2"></td>
@@ -389,7 +389,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

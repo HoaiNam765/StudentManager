@@ -226,7 +226,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -269,7 +269,7 @@
           </div>
 <div class="hidden sm:block text-left">
 <div class="text-xs font-semibold text-slate-900 leading-tight">Phòng Đào tạo</div>
-<div class="text-[11px] text-slate-500">admin@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung015@example.test</div>
 </div>
 </div>
 </div>
@@ -294,7 +294,7 @@
               </span>
 </div>
 <p class="font-body-md text-body-md text-[#7f1d1d] leading-relaxed">
-<strong>Lý do cụ thể:</strong> Phòng <strong>A2.301</strong> đã được phân bổ cho lớp <strong>241_71ITEC3201_01 (Lập trình Web)</strong> vào Thứ 3, Tiết 3 - 5. Giảng viên <strong>TS. Trần Hoàng Nam</strong> cũng đang có lịch dạy khác tại phòng <strong>B.102</strong> trong cùng khung giờ.
+<strong>Lý do cụ thể:</strong> Phòng <strong>A2.301</strong> đã được phân bổ cho lớp <strong>241_71ITEC3201_01 (Lập trình Web)</strong> vào Thứ 3, Tiết 3 - 5. Giảng viên <strong>TS. Người dùng mẫu 38</strong> cũng đang có lịch dạy khác tại phòng <strong>B.102</strong> trong cùng khung giờ.
             </p>
 <p class="font-body-sm text-body-sm text-[#991b1b]">
 <strong>Cách khắc phục khuyến nghị:</strong> Chuyển lớp <strong>241_71ITEC2104_02</strong> sang phòng <strong>A2.302</strong> (còn trống tiết 3-5, sức chứa 65 chỗ) hoặc dời lịch sang <strong>Thứ 5, Tiết 1 - 3</strong>.
@@ -379,7 +379,7 @@
 </div>
 <div class="flex items-center gap-1.5">
 <span class="material-symbols-outlined text-[15px] text-[#94a3b8]">person</span>
-<span class="font-medium text-on-surface">TS. Trần Hoàng Nam</span>
+<span class="font-medium text-on-surface">TS. Người dùng mẫu 38</span>
 </div>
 </div>
 <button class="w-full py-1.5 px-3 bg-[#eff4ff] hover:bg-primary text-primary hover:text-white rounded-lg text-label-sm font-semibold transition flex items-center justify-center gap-1">
@@ -409,7 +409,7 @@
 </div>
 <div class="flex items-center gap-1.5">
 <span class="material-symbols-outlined text-[15px] text-[#94a3b8]">person</span>
-<span class="font-medium text-on-surface">ThS. Lê Quang Huy</span>
+<span class="font-medium text-on-surface">ThS. Người dùng mẫu 11</span>
 </div>
 </div>
 <button class="w-full py-1.5 px-3 bg-[#eff4ff] hover:bg-primary text-primary hover:text-white rounded-lg text-label-sm font-semibold transition flex items-center justify-center gap-1">
@@ -439,7 +439,7 @@
 </div>
 <div class="flex items-center gap-1.5">
 <span class="material-symbols-outlined text-[15px] text-[#94a3b8]">person</span>
-<span class="font-medium text-on-surface">TS. Nguyễn Thanh Tùng</span>
+<span class="font-medium text-on-surface">TS. Người dùng mẫu 22</span>
 </div>
 </div>
 <button class="w-full py-1.5 px-3 bg-[#eff4ff] hover:bg-primary text-primary hover:text-white rounded-lg text-label-sm font-semibold transition flex items-center justify-center gap-1">
@@ -573,7 +573,7 @@
 </div>
 <div class="text-xs text-secondary flex items-center gap-1">
 <span class="material-symbols-outlined text-[14px]">person</span>
-<span class="font-medium text-on-surface">GV: TS. Trần Hoàng Nam</span>
+<span class="font-medium text-on-surface">GV: TS. Người dùng mẫu 38</span>
 </div>
 </div>
 <div class="text-[10px] text-primary font-semibold mt-2 pt-1 border-t border-[#bfdbfe] flex items-center justify-between">
@@ -619,7 +619,7 @@
 </div>
 <div class="text-xs text-secondary flex items-center gap-1">
 <span class="material-symbols-outlined text-[14px]">person</span>
-<span class="font-medium text-on-surface">GV: ThS. Đỗ Văn Cường</span>
+<span class="font-medium text-on-surface">GV: ThS. Người dùng mẫu 56</span>
 </div>
 </div>
 <div class="text-[10px] text-primary font-semibold mt-2 pt-1 border-t border-[#bfdbfe] flex items-center justify-between">
@@ -706,7 +706,7 @@
 </div>
 <div class="text-xs text-error font-medium flex items-center gap-1">
 <span class="material-symbols-outlined text-[14px]">person</span>
-<span>TS. Trần Hoàng Nam (Trùng B.102)</span>
+<span>TS. Người dùng mẫu 38 (Trùng B.102)</span>
 </div>
 </div>
 <div class="text-[10px] text-error font-semibold mt-2 pt-1 border-t border-[#fca5a5] flex items-center justify-between">
@@ -860,7 +860,7 @@
 </div>
 <div class="text-xs text-secondary flex items-center gap-1">
 <span class="material-symbols-outlined text-[14px]">person</span>
-<span class="font-medium text-on-surface">GV: TS. Võ Văn Hùng</span>
+<span class="font-medium text-on-surface">GV: TS. Người dùng mẫu 46</span>
 </div>
 </div>
 <div class="text-[10px] text-primary font-semibold mt-2 pt-1 border-t border-[#bfdbfe] flex items-center justify-between">
@@ -971,7 +971,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

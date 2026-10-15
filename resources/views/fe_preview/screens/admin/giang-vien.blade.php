@@ -226,7 +226,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -269,7 +269,7 @@
           </div>
 <div class="hidden sm:block text-left">
 <div class="text-xs font-semibold text-slate-900 leading-tight">Phòng Đào tạo</div>
-<div class="text-[11px] text-slate-500">admin@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung015@example.test</div>
 </div>
 </div>
 </div>
@@ -472,7 +472,7 @@
 </tr>
 </thead>
 <tbody class="divide-y divide-outline-variant/70 font-body-sm text-body-sm">
-<!-- Dòng 1: TS. Trần Hoàng Nam (Selected highlight) -->
+<!-- Dòng 1: TS. Người dùng mẫu 38 (Selected highlight) -->
 <tr class="hover:bg-surface-container-low/60 transition-colors bg-surface-container-low/30 group">
 <td class="py-3.5 px-3 sticky left-0 z-10 bg-surface-container-lowest group-hover:bg-surface-container-low/60 border-r border-outline-variant/60 text-center">
 <input aria-label="Chọn dòng" checked="" class="rounded border-outline-variant text-primary focus:ring-primary/20 h-4 w-4" type="checkbox"/>
@@ -484,8 +484,8 @@
 <div class="flex items-center gap-3">
 <img alt="" class="w-9 h-9 rounded-full object-cover border border-outline-variant shrink-0" data-alt="A distinguished Vietnamese male professor in his late thirties wearing modern academic glasses and a sharp navy blue blazer against an architectural university background with clean institutional blue tones and professional soft daylight." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAlW5Gaz4l5_NHbITOoccJ60-psjepeBQHpzmqEXWxLjOIK3gJLJsER1B7ahXzfb6qu9QxQ7I4OXcrCG8tPKYC0ERcGbVAz2o7Hbbw2deo8-dierXSW4zuj-WbWaVCVEN_iZ1WZPjBVOvuW0Z8T7ZOVUhanQgGOClrlEtEQkbIbesFkuLorwUVo_AB-bZkLt5P7LPrZk9ig9Rir24EciKWAuTTUdiql2eHLMWPCYAKVKbO6yZIOM4LDFPSd5wRMCAY1JjZNXC9clc"/>
 <div class="min-w-0">
-<p class="font-label-lg text-label-lg font-bold text-on-surface truncate">TS. Trần Hoàng Nam</p>
-<p class="text-xs text-on-surface-variant truncate">nam.th@huit.edu.vn</p>
+<p class="font-label-lg text-label-lg font-bold text-on-surface truncate">TS. Người dùng mẫu 38</p>
+<p class="text-xs text-on-surface-variant truncate">nguoidung037@example.test</p>
 </div>
 </div>
 </td>
@@ -529,7 +529,7 @@
 </div>
 </td>
 </tr>
-<!-- Dòng 2: PGS.TS. Lê Thị Mai Hương -->
+<!-- Dòng 2: PGS.TS. Người dùng mẫu 15 -->
 <tr class="hover:bg-surface-container-low/60 transition-colors group">
 <td class="py-3.5 px-3 sticky left-0 z-10 bg-surface-container-lowest group-hover:bg-surface-container-low/60 border-r border-outline-variant/60 text-center">
 <input aria-label="Chọn dòng" class="rounded border-outline-variant text-primary focus:ring-primary/20 h-4 w-4" type="checkbox"/>
@@ -541,8 +541,8 @@
 <div class="flex items-center gap-3">
 <img alt="" class="w-9 h-9 rounded-full object-cover border border-outline-variant shrink-0" data-alt="A senior Vietnamese female associate professor with warm authoritative expression dressed in a formal beige silk blouse inside a modern academic campus library illuminated by soft natural light with a collegiate backdrop." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCC0XakoeHTPCkuHdZPMjg4mRyQwt9GxTk_xGHG8ShmhidgBA5XACtKJcnn1vpu_ylbRt7ZS1q2JPWZGLCrNL8ZMWgMu87KBv6w8k4NN3_uQrkyJA2iLKal3kDooSabuUsjJsJ4L8H2Dxcztnv_MHvflWttEpju6ZUVtGDETzpHlAhKBS7YVKIGuC2uaVuCS52Zwh1DsjFw-q9kwnn-Cb4vL1f4MolVw6AZ08_rn3LHjBYamZudKK0ss-zjd589Cb-xChUoXyHhdU0"/>
 <div class="min-w-0">
-<p class="font-label-lg text-label-lg font-bold text-on-surface truncate">PGS.TS. Lê Thị Mai Hương</p>
-<p class="text-xs text-on-surface-variant truncate">huong.ltm@huit.edu.vn</p>
+<p class="font-label-lg text-label-lg font-bold text-on-surface truncate">PGS.TS. Người dùng mẫu 15</p>
+<p class="text-xs text-on-surface-variant truncate">nguoidung033@example.test</p>
 </div>
 </div>
 </td>
@@ -586,7 +586,7 @@
 </div>
 </td>
 </tr>
-<!-- Dòng 3: ThS. Nguyễn Văn Tuấn -->
+<!-- Dòng 3: ThS. Người dùng mẫu 29 -->
 <tr class="hover:bg-surface-container-low/60 transition-colors group">
 <td class="py-3.5 px-3 sticky left-0 z-10 bg-surface-container-lowest group-hover:bg-surface-container-low/60 border-r border-outline-variant/60 text-center">
 <input aria-label="Chọn dòng" class="rounded border-outline-variant text-primary focus:ring-primary/20 h-4 w-4" type="checkbox"/>
@@ -598,8 +598,8 @@
 <div class="flex items-center gap-3">
 <img alt="" class="w-9 h-9 rounded-full object-cover border border-outline-variant shrink-0" data-alt="A young dynamic Asian software engineering lecturer in his early thirties with clean hair cut wearing smart casual light blue shirt in front of an IT laboratory setting with high key cool educational ambient lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_lCM4GQPjUXL0a0eUKGR-AqZkn-GwG9GjcqvKWQpObzHZ8j7oT7G-peTuOH3nyEj0QHy3Eg6dmNre5qa99spS-1eCcx7a2lyjXMvBgXEDjrXcWaa0tNKo9yaqRsrxK8kQERF2jK7NxwNjx65J_pJhdxjoc7rAt8FXY-FlPzTGOGxpRceHfKyNzD4SZ9p3pzMdBBZYsKNm65sy4QkQZ3tlWPvnLvaZItd60iBDDN2hLETK2pdauOd2l54figLZkYx1-gjAeeGuRPw"/>
 <div class="min-w-0">
-<p class="font-label-lg text-label-lg font-bold text-on-surface truncate">ThS. Nguyễn Văn Tuấn</p>
-<p class="text-xs text-on-surface-variant truncate">tuan.nv@huit.edu.vn</p>
+<p class="font-label-lg text-label-lg font-bold text-on-surface truncate">ThS. Người dùng mẫu 29</p>
+<p class="text-xs text-on-surface-variant truncate">nguoidung039@example.test</p>
 </div>
 </div>
 </td>
@@ -643,7 +643,7 @@
 </div>
 </td>
 </tr>
-<!-- Dòng 4: ThS. Phạm Thị Thu Hằng (Tạm nghỉ) -->
+<!-- Dòng 4: ThS. Người dùng mẫu 33 (Tạm nghỉ) -->
 <tr class="hover:bg-surface-container-low/60 transition-colors group">
 <td class="py-3.5 px-3 sticky left-0 z-10 bg-surface-container-lowest group-hover:bg-surface-container-low/60 border-r border-outline-variant/60 text-center">
 <input aria-label="Chọn dòng" class="rounded border-outline-variant text-primary focus:ring-primary/20 h-4 w-4" type="checkbox"/>
@@ -655,8 +655,8 @@
 <div class="flex items-center gap-3">
 <img alt="" class="w-9 h-9 rounded-full object-cover border border-outline-variant shrink-0" data-alt="A portrait of a Vietnamese female food technology university lecturer smiling politely with polite neat hair style against a research laboratory glass wall with bright diffuse natural lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWPvDY-vNZY7bluVFkQbMNwtEAWjPLyz1IgBZN7s-dRNDVqJwFmrargLeUNayU07RYUt1uQyouEwDn-Yac5v9IetinFKR6fnQil0-r2VQ-xqHjNE-dNmxRlfe1yKR8BFuco-mSyZcK9niL0v3hTgbLRvQE9Ns2SHA_daBYb0PBr0zrt9B6ruYN3odkV55siEBZIf8m6KtMCCyryIlx-rkMnuwEGaXSxgXKGwJ0tKeNdO8052nXd499UFZL__EykotLqSeMkt2K24M"/>
 <div class="min-w-0">
-<p class="font-label-lg text-label-lg font-bold text-on-surface truncate">ThS. Phạm Thị Thu Hằng</p>
-<p class="text-xs text-on-surface-variant truncate">hang.pt@huit.edu.vn</p>
+<p class="font-label-lg text-label-lg font-bold text-on-surface truncate">ThS. Người dùng mẫu 33</p>
+<p class="text-xs text-on-surface-variant truncate">nguoidung030@example.test</p>
 </div>
 </div>
 </td>
@@ -700,7 +700,7 @@
 </div>
 </td>
 </tr>
-<!-- Dòng 5: TS. Đặng Quốc Bảo (Đã nghỉ việc) -->
+<!-- Dòng 5: TS. Người dùng mẫu 52 (Đã nghỉ việc) -->
 <tr class="hover:bg-surface-container-low/60 transition-colors group opacity-80">
 <td class="py-3.5 px-3 sticky left-0 z-10 bg-surface-container-lowest group-hover:bg-surface-container-low/60 border-r border-outline-variant/60 text-center">
 <input aria-label="Chọn dòng" class="rounded border-outline-variant text-primary focus:ring-primary/20 h-4 w-4" type="checkbox"/>
@@ -712,8 +712,8 @@
 <div class="flex items-center gap-3">
 <img alt="" class="w-9 h-9 rounded-full object-cover border border-outline-variant shrink-0 grayscale" data-alt="A portrait of a male business administration scholar in his forties with grey rimmed glasses and formal grey suit against an understated modern lecture hall background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTtcACtrev-m_SidELV816vwzu-nuI5-TD9liUdV6OCfT7d81V-IH2Pzp-EzaDA8X-ka28BrraiwbQBcvqD9_fKhVss3WyVodAOg45PTasFmo5wKBmQKKilpNVSnybJGj6nOHgIoLXKanjDvWwt_93vJWZp4W1_AUogx3_CMoE77qSVx3hX4OGaLeHG0i0pqHNzSnXPfsEWm_rUxB0UShrjQJYs0kYmkQwnhYw3sTE8xkIDSdH_temNWag1Ebzy2HD9oYtboro4fc"/>
 <div class="min-w-0">
-<p class="font-label-lg text-label-lg font-bold text-on-surface truncate">TS. Đặng Quốc Bảo</p>
-<p class="text-xs text-on-surface-variant truncate">bao.dq@huit.edu.vn</p>
+<p class="font-label-lg text-label-lg font-bold text-on-surface truncate">TS. Người dùng mẫu 52</p>
+<p class="text-xs text-on-surface-variant truncate">nguoidung020@example.test</p>
 </div>
 </div>
 </td>
@@ -838,7 +838,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

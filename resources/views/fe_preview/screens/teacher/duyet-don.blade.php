@@ -1,4 +1,4 @@
-﻿@extends('fe_preview.layouts.teacher')
+@extends('fe_preview.layouts.teacher')
 @section('page_title', 'Há»™p thÆ° duyá»‡t Ä‘Æ¡n tá»« sinh viÃªn - HUIT Há»c Vá»¥')
 @section('html_attributes')lang="vi" class="['light']"@endsection
 @section('body_attributes')class="['bg-[#f8f9ff]', 'text-slate-800', 'antialiased', 'min-h-screen', 'flex', 'selection:bg-blue-100', 'selection:text-blue-900']"@endsection
@@ -137,7 +137,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Há»— trá»£ ká»¹ thuáº­t: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -317,7 +317,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Há»— trá»£: 028 3816 1673</span>
 <span>â€¢</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

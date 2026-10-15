@@ -168,7 +168,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -211,7 +211,7 @@
             NVA
           </div>
 <div class="hidden sm:block text-left">
-<div class="text-xs font-semibold text-slate-900 leading-tight">Nguyễn Văn An</div>
+<div class="text-xs font-semibold text-slate-900 leading-tight">Người dùng mẫu 25</div>
 <div class="text-[11px] text-slate-500">2001210123 • 12DHTH01</div>
 </div>
 </div>
@@ -232,7 +232,7 @@
 <div class="p-4 bg-slate-50 rounded-xl space-y-2 text-xs">
 <div class="flex justify-between">
 <span class="text-slate-600">Sinh viên:</span>
-<strong class="text-slate-900">Nguyễn Văn An (MSSV: 2001210123)</strong>
+<strong class="text-slate-900">Người dùng mẫu 25 (MSSV: 2001210123)</strong>
 </div>
 <div class="flex justify-between">
 <span class="text-slate-600">Số tiền thanh toán:</span>
@@ -282,7 +282,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

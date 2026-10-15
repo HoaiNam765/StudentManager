@@ -168,7 +168,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -211,7 +211,7 @@
             NVA
           </div>
 <div class="hidden sm:block text-left">
-<div class="text-xs font-semibold text-slate-900 leading-tight">Nguyễn Văn An</div>
+<div class="text-xs font-semibold text-slate-900 leading-tight">Người dùng mẫu 25</div>
 <div class="text-[11px] text-slate-500">2001210123 • 12DHTH01</div>
 </div>
 </div>
@@ -1062,7 +1062,7 @@
           © 2026 Trường Đại học Công Thương TP. Hồ Chí Minh (HUIT) • Cổng thông tin Sinh viên &amp; Quản lý Học vụ
         </p>
 <p class="mt-1 text-outline">
-          Hỗ trợ kỹ thuật: <a class="text-primary hover:underline font-medium" href="mailto:hotro@huit.edu.vn">hotro@huit.edu.vn</a> • Hotline: <span class="font-medium text-on-surface-variant">(028) 3816 1673</span> • Phòng Đào tạo (A102, 140 Lê Trọng Tấn, P. Tây Thạnh, Q. Tân Phú)
+          Hỗ trợ kỹ thuật: <a class="text-primary hover:underline font-medium" href="mailto:nguoidung031@example.test">nguoidung031@example.test</a> • Hotline: <span class="font-medium text-on-surface-variant">(028) 3816 1673</span> • Phòng Đào tạo (A102, 140 Người dùng mẫu 18, P. Tây Thạnh, Q. Tân Phú)
         </p>
 </footer>
 </div>
@@ -1073,7 +1073,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

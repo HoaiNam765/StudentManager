@@ -226,7 +226,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -269,7 +269,7 @@
           </div>
 <div class="hidden sm:block text-left">
 <div class="text-xs font-semibold text-slate-900 leading-tight">Phòng Đào tạo</div>
-<div class="text-[11px] text-slate-500">admin@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung015@example.test</div>
 </div>
 </div>
 </div>
@@ -471,7 +471,7 @@
 <td class="sticky left-16 z-10 bg-[#fff5f5] px-4 py-3 font-semibold text-on-surface border-r border-[#fecaca]">
                   2480201018
                 </td>
-<td class="px-4 py-3 font-medium text-on-surface">Nguyễn Hoàng Nam</td>
+<td class="px-4 py-3 font-medium text-on-surface">Người dùng mẫu 21</td>
 <td class="px-4 py-3 text-on-surface-variant">15/09/2006</td>
 <td class="px-4 py-3 font-mono text-xs font-semibold">15DHTH01</td>
 <td class="px-4 py-3 text-on-surface-variant">Công nghệ thông tin</td>
@@ -486,7 +486,7 @@
                       Cột Email: email "nam.nh-huit.edu.vn" không đúng định dạng.
                     </p>
 <p class="text-on-surface-variant">
-<strong class="text-on-surface">Cách sửa:</strong> Thêm ký tự "@" hợp lệ (vd: <span class="text-primary font-mono">nam.nh@huit.edu.vn</span>).
+<strong class="text-on-surface">Cách sửa:</strong> Thêm ký tự "@" hợp lệ (vd: <span class="text-primary font-mono">nguoidung036@example.test</span>).
                     </p>
 </div>
 </td>
@@ -505,12 +505,12 @@
 <td class="sticky left-16 z-10 bg-[#fff5f5] px-4 py-3 font-semibold text-error border-r border-[#fecaca]">
                   2001210123
                 </td>
-<td class="px-4 py-3 font-medium text-on-surface">Trần Văn Minh</td>
+<td class="px-4 py-3 font-medium text-on-surface">Người dùng mẫu 44</td>
 <td class="px-4 py-3 text-on-surface-variant">20/04/2006</td>
 <td class="px-4 py-3 font-mono text-xs font-semibold">15DHTH02</td>
 <td class="px-4 py-3 text-on-surface-variant">Công nghệ thông tin</td>
 <td class="px-4 py-3 text-on-surface-variant">Khóa 2024</td>
-<td class="px-4 py-3 text-on-surface-variant">minh.tv24@huit.edu.vn</td>
+<td class="px-4 py-3 text-on-surface-variant">nguoidung035@example.test</td>
 <td class="px-4 py-3">
 <div class="p-2 rounded bg-white/80 border border-error/30 text-xs space-y-0.5">
 <p class="font-semibold text-error flex items-center gap-1">
@@ -537,12 +537,12 @@
 <td class="sticky left-16 z-10 bg-[#fff5f5] px-4 py-3 font-semibold text-on-surface border-r border-[#fecaca]">
                   2480201089
                 </td>
-<td class="px-4 py-3 font-medium text-on-surface">Lê Thị Mai Chi</td>
+<td class="px-4 py-3 font-medium text-on-surface">Người dùng mẫu 14</td>
 <td class="px-4 py-3 text-on-surface-variant">11/12/2006</td>
 <td class="px-4 py-3 font-mono text-xs font-semibold text-error">15DHTH99</td>
 <td class="px-4 py-3 text-on-surface-variant">Công nghệ thông tin</td>
 <td class="px-4 py-3 text-on-surface-variant">Khóa 2024</td>
-<td class="px-4 py-3 text-on-surface-variant">chi.ltm24@huit.edu.vn</td>
+<td class="px-4 py-3 text-on-surface-variant">nguoidung023@example.test</td>
 <td class="px-4 py-3">
 <div class="p-2 rounded bg-white/80 border border-error/30 text-xs space-y-0.5">
 <p class="font-semibold text-error flex items-center gap-1">
@@ -569,12 +569,12 @@
 <td class="sticky left-16 z-10 bg-surface-container-lowest hover:bg-[#f8fafc] px-4 py-3 font-semibold text-on-surface border-r border-[#f1f5f9]">
                   2480201001
                 </td>
-<td class="px-4 py-3 font-medium text-on-surface">Nguyễn Văn An</td>
+<td class="px-4 py-3 font-medium text-on-surface">Người dùng mẫu 25</td>
 <td class="px-4 py-3 text-on-surface-variant">02/01/2006</td>
 <td class="px-4 py-3 font-mono text-xs font-semibold">15DHTH01</td>
 <td class="px-4 py-3 text-on-surface-variant">Công nghệ thông tin</td>
 <td class="px-4 py-3 text-on-surface-variant">Khóa 2024</td>
-<td class="px-4 py-3 text-on-surface-variant">an.nv24@huit.edu.vn</td>
+<td class="px-4 py-3 text-on-surface-variant">nguoidung018@example.test</td>
 <td class="px-4 py-3 text-[#15803d] font-medium flex items-center gap-1.5 pt-4">
 <span class="material-symbols-outlined text-[16px]">check_circle</span>
                   Dữ liệu hoàn toàn hợp lệ
@@ -594,12 +594,12 @@
 <td class="sticky left-16 z-10 bg-surface-container-lowest hover:bg-[#f8fafc] px-4 py-3 font-semibold text-on-surface border-r border-[#f1f5f9]">
                   2480201002
                 </td>
-<td class="px-4 py-3 font-medium text-on-surface">Trần Bảo Châu</td>
+<td class="px-4 py-3 font-medium text-on-surface">Người dùng mẫu 37</td>
 <td class="px-4 py-3 text-on-surface-variant">14/05/2006</td>
 <td class="px-4 py-3 font-mono text-xs font-semibold">15DHTH01</td>
 <td class="px-4 py-3 text-on-surface-variant">Công nghệ thông tin</td>
 <td class="px-4 py-3 text-on-surface-variant">Khóa 2024</td>
-<td class="px-4 py-3 text-on-surface-variant">chau.tb24@huit.edu.vn</td>
+<td class="px-4 py-3 text-on-surface-variant">nguoidung022@example.test</td>
 <td class="px-4 py-3 text-[#15803d] font-medium flex items-center gap-1.5 pt-4">
 <span class="material-symbols-outlined text-[16px]">check_circle</span>
                   Dữ liệu hoàn toàn hợp lệ
@@ -619,12 +619,12 @@
 <td class="sticky left-16 z-10 bg-surface-container-lowest hover:bg-[#f8fafc] px-4 py-3 font-semibold text-on-surface border-r border-[#f1f5f9]">
                   2480201003
                 </td>
-<td class="px-4 py-3 font-medium text-on-surface">Lê Hoàng Dũng</td>
+<td class="px-4 py-3 font-medium text-on-surface">Người dùng mẫu 08</td>
 <td class="px-4 py-3 text-on-surface-variant">29/08/2006</td>
 <td class="px-4 py-3 font-mono text-xs font-semibold">15DHTH02</td>
 <td class="px-4 py-3 text-on-surface-variant">Công nghệ thông tin</td>
 <td class="px-4 py-3 text-on-surface-variant">Khóa 2024</td>
-<td class="px-4 py-3 text-on-surface-variant">dung.lh24@huit.edu.vn</td>
+<td class="px-4 py-3 text-on-surface-variant">nguoidung027@example.test</td>
 <td class="px-4 py-3 text-[#15803d] font-medium flex items-center gap-1.5 pt-4">
 <span class="material-symbols-outlined text-[16px]">check_circle</span>
                   Dữ liệu hoàn toàn hợp lệ
@@ -650,7 +650,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

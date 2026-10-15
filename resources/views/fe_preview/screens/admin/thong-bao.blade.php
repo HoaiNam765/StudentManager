@@ -226,7 +226,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -269,7 +269,7 @@
           </div>
 <div class="hidden sm:block text-left">
 <div class="text-xs font-semibold text-slate-900 leading-tight">Phòng Đào tạo</div>
-<div class="text-[11px] text-slate-500">admin@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung015@example.test</div>
 </div>
 </div>
 </div>
@@ -581,7 +581,7 @@ Nhằm tạo điều kiện tối đa cho các sinh viên bổ sung học phần
 </label>
 <label class="inline-flex items-center gap-2 cursor-pointer text-body-md text-on-surface">
 <input aria-label="Chọn dòng" checked="" class="w-4 h-4 rounded text-primary border-slate-300" type="checkbox"/>
-<span class="font-medium">Gửi email thông báo (@huit.edu.vn)</span>
+<span class="font-medium">Gửi email thông báo (@example.test)</span>
 </label>
 </div>
 </div>
@@ -661,7 +661,7 @@ Nhằm tạo điều kiện tối đa cho các sinh viên bổ sung học phần
 <!-- Sender info -->
 <div class="text-[11px] text-slate-500 flex items-center gap-1 pb-1 border-b border-slate-100">
 <span class="material-symbols-outlined text-[14px] text-slate-500" data-icon="person">person</span>
-<span>Người ký duyệt: <strong>ThS. Lê Thị Mai Hương</strong> - Trưởng phòng Đào tạo</span>
+<span>Người ký duyệt: <strong>ThS. Người dùng mẫu 15</strong> - Trưởng phòng Đào tạo</span>
 </div>
 <!-- Body snippet preview -->
 <div class="text-body-sm text-slate-700 leading-relaxed space-y-2">
@@ -733,7 +733,7 @@ Nhằm tạo điều kiện tối đa cho các sinh viên bổ sung học phần
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

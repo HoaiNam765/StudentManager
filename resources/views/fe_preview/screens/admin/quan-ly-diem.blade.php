@@ -226,7 +226,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -269,7 +269,7 @@
           </div>
 <div class="hidden sm:block text-left">
 <div class="text-xs font-semibold text-slate-900 leading-tight">Phòng Đào tạo</div>
-<div class="text-[11px] text-slate-500">admin@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung015@example.test</div>
 </div>
 </div>
 </div>
@@ -456,7 +456,7 @@
 <div class="text-[11px] text-on-surface-variant">3 Tín chỉ (2 LT + 1 TH)</div>
 </td>
 <td class="py-3 px-4">
-<div class="font-medium text-on-surface">TS. Trần Hoàng Nam</div>
+<div class="font-medium text-on-surface">TS. Người dùng mẫu 38</div>
 <div class="text-[11px] text-on-surface-variant">Bộ môn Công nghệ Phần mềm</div>
 </td>
 <td class="py-3 px-3 text-center font-semibold">60/60</td>
@@ -506,7 +506,7 @@
 <div class="text-[11px] text-on-surface-variant">4 Tín chỉ (3 LT + 1 TH)</div>
 </td>
 <td class="py-3 px-4">
-<div class="font-medium text-on-surface">ThS. Lê Quang Huy</div>
+<div class="font-medium text-on-surface">ThS. Người dùng mẫu 11</div>
 <div class="text-[11px] text-on-surface-variant">Bộ môn Khoa học Máy tính</div>
 </td>
 <td class="py-3 px-3 text-center font-semibold">58/60</td>
@@ -556,7 +556,7 @@
 <div class="text-[11px] text-on-surface-variant">3 Tín chỉ (2 LT + 1 TH)</div>
 </td>
 <td class="py-3 px-4">
-<div class="font-medium text-on-surface">ThS. Đỗ Văn Cường</div>
+<div class="font-medium text-on-surface">ThS. Người dùng mẫu 56</div>
 <div class="text-[11px] text-on-surface-variant">Bộ môn Mạng &amp; ATTT</div>
 </td>
 <td class="py-3 px-3 text-center font-semibold">55/60</td>
@@ -606,7 +606,7 @@
 <div class="text-[11px] text-on-surface-variant">3 Tín chỉ (3 LT + 0 TH)</div>
 </td>
 <td class="py-3 px-4">
-<div class="font-medium text-on-surface">PGS.TS. Vũ Đình Trọng</div>
+<div class="font-medium text-on-surface">PGS.TS. Người dùng mẫu 49</div>
 <div class="text-[11px] text-on-surface-variant">Bộ môn Khoa học Máy tính</div>
 </td>
 <td class="py-3 px-3 text-center font-semibold">45/60</td>
@@ -694,7 +694,7 @@
                   </span>
 </div>
 <p class="font-label-sm text-label-sm text-on-surface-variant">
-                  Giảng viên: TS. Trần Hoàng Nam • Bộ môn Công nghệ Phần mềm • Ngày nộp điểm: 29/11/2026 16:45
+                  Giảng viên: TS. Người dùng mẫu 38 • Bộ môn Công nghệ Phần mềm • Ngày nộp điểm: 29/11/2026 16:45
                 </p>
 </div>
 </div>
@@ -753,7 +753,7 @@
 <tr class="hover:bg-surface-container-low/30">
 <td class="py-2.5 px-3 text-center font-medium">1</td>
 <td class="py-2.5 px-4 font-mono font-medium text-primary">2001210123</td>
-<td class="py-2.5 px-4 font-semibold text-on-surface">Nguyễn Văn An</td>
+<td class="py-2.5 px-4 font-semibold text-on-surface">Người dùng mẫu 25</td>
 <td class="py-2.5 px-3 text-center font-medium">9.0</td>
 <td class="py-2.5 px-3 text-center font-medium">8.5</td>
 <td class="py-2.5 px-3 text-center font-medium">8.0</td>
@@ -769,7 +769,7 @@
 <tr class="hover:bg-surface-container-low/30">
 <td class="py-2.5 px-3 text-center font-medium">2</td>
 <td class="py-2.5 px-4 font-mono font-medium text-primary">2001210045</td>
-<td class="py-2.5 px-4 font-semibold text-on-surface">Trần Thị Bích</td>
+<td class="py-2.5 px-4 font-semibold text-on-surface">Người dùng mẫu 41</td>
 <td class="py-2.5 px-3 text-center font-medium">10.0</td>
 <td class="py-2.5 px-3 text-center font-medium">9.0</td>
 <td class="py-2.5 px-3 text-center font-medium">8.5</td>
@@ -785,7 +785,7 @@
 <tr class="hover:bg-surface-container-low/30">
 <td class="py-2.5 px-3 text-center font-medium">3</td>
 <td class="py-2.5 px-4 font-mono font-medium text-primary">2001210189</td>
-<td class="py-2.5 px-4 font-semibold text-on-surface">Lê Hoàng Cường</td>
+<td class="py-2.5 px-4 font-semibold text-on-surface">Người dùng mẫu 07</td>
 <td class="py-2.5 px-3 text-center font-medium">8.0</td>
 <td class="py-2.5 px-3 text-center font-medium">7.0</td>
 <td class="py-2.5 px-3 text-center font-medium">6.5</td>
@@ -801,7 +801,7 @@
 <tr class="hover:bg-surface-container-low/30 bg-rose-50/10">
 <td class="py-2.5 px-3 text-center font-medium">4</td>
 <td class="py-2.5 px-4 font-mono font-medium text-primary">2001210311</td>
-<td class="py-2.5 px-4 font-semibold text-on-surface">Phạm Quốc Dũng</td>
+<td class="py-2.5 px-4 font-semibold text-on-surface">Người dùng mẫu 31</td>
 <td class="py-2.5 px-3 text-center font-medium">5.0</td>
 <td class="py-2.5 px-3 text-center font-medium">4.5</td>
 <td class="py-2.5 px-3 text-center font-medium">4.0</td>
@@ -828,7 +828,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

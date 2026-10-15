@@ -226,7 +226,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -269,7 +269,7 @@
           </div>
 <div class="hidden sm:block text-left">
 <div class="text-xs font-semibold text-slate-900 leading-tight">Phòng Đào tạo</div>
-<div class="text-[11px] text-slate-500">admin@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung015@example.test</div>
 </div>
 </div>
 </div>
@@ -500,7 +500,7 @@
                         TN
                       </div>
 <div>
-<p class="font-label-lg text-label-lg text-on-surface font-semibold">TS. Trần Hoàng Nam</p>
+<p class="font-label-lg text-label-lg text-on-surface font-semibold">TS. Người dùng mẫu 38</p>
 <p class="font-body-sm text-body-sm text-on-surface-variant text-[11px]">Bộ môn CNPM • Khoa CNTT</p>
 </div>
 </div>
@@ -576,7 +576,7 @@
                         MH
                       </div>
 <div>
-<p class="font-label-lg text-label-lg text-on-surface font-semibold">ThS. Lê Thị Mai Hương</p>
+<p class="font-label-lg text-label-lg text-on-surface font-semibold">ThS. Người dùng mẫu 15</p>
 <p class="font-body-sm text-body-sm text-on-surface-variant text-[11px]">Bộ môn Khoa học máy tính</p>
 </div>
 </div>
@@ -651,7 +651,7 @@
                         VT
                       </div>
 <div>
-<p class="font-label-lg text-label-lg text-on-surface font-semibold">PGS.TS. Vũ Đình Trọng</p>
+<p class="font-label-lg text-label-lg text-on-surface font-semibold">PGS.TS. Người dùng mẫu 49</p>
 <p class="font-body-sm text-body-sm text-on-surface-variant text-[11px]">Bộ môn An ninh mạng</p>
 </div>
 </div>
@@ -885,7 +885,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

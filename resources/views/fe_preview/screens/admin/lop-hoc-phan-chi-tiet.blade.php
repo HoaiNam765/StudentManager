@@ -226,7 +226,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -269,7 +269,7 @@
           </div>
 <div class="hidden sm:block text-left">
 <div class="text-xs font-semibold text-slate-900 leading-tight">Phòng Đào tạo</div>
-<div class="text-[11px] text-slate-500">admin@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung015@example.test</div>
 </div>
 </div>
 </div>
@@ -348,7 +348,7 @@
 </div>
 <div>
 <span class="block text-slate-500 text-xs">Cơ sở giảng dạy</span>
-<span class="font-semibold text-on-surface">Tân Phú (140 Lê Trọng Tấn)</span>
+<span class="font-semibold text-on-surface">Tân Phú (140 Người dùng mẫu 18)</span>
 </div>
 <div>
 <span class="block text-slate-500 text-xs">Hạn hủy đăng ký</span>
@@ -393,7 +393,7 @@
 </div>
 <div class="min-w-0">
 <p class="font-body-sm text-body-sm text-outline">Giảng viên phụ trách</p>
-<h4 class="font-label-lg text-label-lg text-on-surface mt-1 truncate">TS. Trần Hoàng Nam</h4>
+<h4 class="font-label-lg text-label-lg text-on-surface mt-1 truncate">TS. Người dùng mẫu 38</h4>
 <p class="font-body-sm text-body-sm text-purple-700 font-medium mt-0.5 truncate">Khoa CNTT • Bộ môn Mạng &amp; ATTT</p>
 </div>
 </div>
@@ -516,7 +516,7 @@
 <td class="py-3 px-3 text-center text-outline sticky left-10 bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">1</td>
 <td class="py-3 px-4 font-mono font-medium text-primary sticky left-[88px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">2001210123</td>
 <td class="py-3 px-4 font-semibold text-on-surface sticky left-[216px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.04)]">
-                      Nguyễn Văn An
+                      Người dùng mẫu 25
                     </td>
 <td class="py-3 px-4 text-secondary font-medium">12DHTH01</td>
 <td class="py-3 px-4 text-on-surface">Công nghệ Thông tin</td>
@@ -530,7 +530,7 @@
 </td>
 <td class="py-3 px-4 text-center">
 <div class="flex items-center justify-center gap-1.5">
-<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Nguyễn Văn An', '2001210123')" title="Hủy đăng ký học phần">
+<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Người dùng mẫu 25', '2001210123')" title="Hủy đăng ký học phần">
 <span class="material-symbols-outlined text-[18px]">person_remove</span>
 </button>
 <button class="p-1.5 text-outline hover:text-primary hover:bg-surface-container-low rounded transition-colors" title="Xem hồ sơ sinh viên">
@@ -547,7 +547,7 @@
 <td class="py-3 px-3 text-center text-outline sticky left-10 bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">2</td>
 <td class="py-3 px-4 font-mono font-medium text-primary sticky left-[88px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">2001210045</td>
 <td class="py-3 px-4 font-semibold text-on-surface sticky left-[216px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.04)]">
-                      Lê Thị Thu Thảo
+                      Người dùng mẫu 16
                     </td>
 <td class="py-3 px-4 text-secondary font-medium">12DHTH01</td>
 <td class="py-3 px-4 text-on-surface">Công nghệ Thông tin</td>
@@ -561,7 +561,7 @@
 </td>
 <td class="py-3 px-4 text-center">
 <div class="flex items-center justify-center gap-1.5">
-<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Lê Thị Thu Thảo', '2001210045')" title="Hủy đăng ký học phần">
+<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Người dùng mẫu 16', '2001210045')" title="Hủy đăng ký học phần">
 <span class="material-symbols-outlined text-[18px]">person_remove</span>
 </button>
 <button class="p-1.5 text-outline hover:text-primary hover:bg-surface-container-low rounded transition-colors" title="Xem hồ sơ sinh viên">
@@ -578,7 +578,7 @@
 <td class="py-3 px-3 text-center text-outline sticky left-10 bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">3</td>
 <td class="py-3 px-4 font-mono font-medium text-primary sticky left-[88px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">2001210189</td>
 <td class="py-3 px-4 font-semibold text-on-surface sticky left-[216px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.04)]">
-                      Trần Quốc Bảo
+                      Người dùng mẫu 40
                     </td>
 <td class="py-3 px-4 text-secondary font-medium">12DHPM01</td>
 <td class="py-3 px-4 text-on-surface">Kỹ thuật Phần mềm</td>
@@ -592,7 +592,7 @@
 </td>
 <td class="py-3 px-4 text-center">
 <div class="flex items-center justify-center gap-1.5">
-<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Trần Quốc Bảo', '2001210189')" title="Hủy đăng ký học phần">
+<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Người dùng mẫu 40', '2001210189')" title="Hủy đăng ký học phần">
 <span class="material-symbols-outlined text-[18px]">person_remove</span>
 </button>
 <button class="p-1.5 text-outline hover:text-primary hover:bg-surface-container-low rounded transition-colors" title="Xem hồ sơ sinh viên">
@@ -609,7 +609,7 @@
 <td class="py-3 px-3 text-center text-outline sticky left-10 bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">4</td>
 <td class="py-3 px-4 font-mono font-medium text-primary sticky left-[88px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">2001210012</td>
 <td class="py-3 px-4 font-semibold text-on-surface sticky left-[216px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.04)]">
-                      Phạm Minh Hoàng
+                      Người dùng mẫu 30
                     </td>
 <td class="py-3 px-4 text-secondary font-medium">12DHTH02</td>
 <td class="py-3 px-4 text-on-surface">Công nghệ Thông tin</td>
@@ -623,7 +623,7 @@
 </td>
 <td class="py-3 px-4 text-center">
 <div class="flex items-center justify-center gap-1.5">
-<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Phạm Minh Hoàng', '2001210012')" title="Hủy đăng ký học phần">
+<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Người dùng mẫu 30', '2001210012')" title="Hủy đăng ký học phần">
 <span class="material-symbols-outlined text-[18px]">person_remove</span>
 </button>
 <button class="p-1.5 text-outline hover:text-primary hover:bg-surface-container-low rounded transition-colors" title="Xem hồ sơ sinh viên">
@@ -640,7 +640,7 @@
 <td class="py-3 px-3 text-center text-outline sticky left-10 bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">5</td>
 <td class="py-3 px-4 font-mono font-medium text-primary sticky left-[88px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">2001210341</td>
 <td class="py-3 px-4 font-semibold text-on-surface sticky left-[216px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.04)]">
-                      Vũ Đình Trọng
+                      Người dùng mẫu 49
                     </td>
 <td class="py-3 px-4 text-secondary font-medium">12DHTH01</td>
 <td class="py-3 px-4 text-on-surface">Công nghệ Thông tin</td>
@@ -654,7 +654,7 @@
 </td>
 <td class="py-3 px-4 text-center">
 <div class="flex items-center justify-center gap-1.5">
-<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Vũ Đình Trọng', '2001210341')" title="Hủy đăng ký học phần">
+<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Người dùng mẫu 49', '2001210341')" title="Hủy đăng ký học phần">
 <span class="material-symbols-outlined text-[18px]">person_remove</span>
 </button>
 <button class="p-1.5 text-outline hover:text-primary hover:bg-surface-container-low rounded transition-colors" title="Xem hồ sơ sinh viên">
@@ -671,7 +671,7 @@
 <td class="py-3 px-3 text-center text-outline sticky left-10 bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">6</td>
 <td class="py-3 px-4 font-mono font-medium text-primary sticky left-[88px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">2001210419</td>
 <td class="py-3 px-4 font-semibold text-on-surface sticky left-[216px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.04)]">
-                      Đặng Phương Nam
+                      Người dùng mẫu 51
                     </td>
 <td class="py-3 px-4 text-secondary font-medium">12DHTH02</td>
 <td class="py-3 px-4 text-on-surface">Công nghệ Thông tin</td>
@@ -685,7 +685,7 @@
 </td>
 <td class="py-3 px-4 text-center">
 <div class="flex items-center justify-center gap-1.5">
-<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Đặng Phương Nam', '2001210419')" title="Hủy đăng ký học phần">
+<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Người dùng mẫu 51', '2001210419')" title="Hủy đăng ký học phần">
 <span class="material-symbols-outlined text-[18px]">person_remove</span>
 </button>
 <button class="p-1.5 text-outline hover:text-primary hover:bg-surface-container-low rounded transition-colors" title="Xem hồ sơ sinh viên">
@@ -702,7 +702,7 @@
 <td class="py-3 px-3 text-center text-outline sticky left-10 bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">7</td>
 <td class="py-3 px-4 font-mono font-medium text-primary sticky left-[88px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">2001210512</td>
 <td class="py-3 px-4 font-semibold text-on-surface sticky left-[216px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.04)]">
-                      Hoàng Kim Tuyến
+                      Người dùng mẫu 04
                     </td>
 <td class="py-3 px-4 text-secondary font-medium">12DHPM01</td>
 <td class="py-3 px-4 text-on-surface">Kỹ thuật Phần mềm</td>
@@ -716,7 +716,7 @@
 </td>
 <td class="py-3 px-4 text-center">
 <div class="flex items-center justify-center gap-1.5">
-<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Hoàng Kim Tuyến', '2001210512')" title="Hủy đăng ký học phần">
+<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Người dùng mẫu 04', '2001210512')" title="Hủy đăng ký học phần">
 <span class="material-symbols-outlined text-[18px]">person_remove</span>
 </button>
 <button class="p-1.5 text-outline hover:text-primary hover:bg-surface-container-low rounded transition-colors" title="Xem hồ sơ sinh viên">
@@ -733,7 +733,7 @@
 <td class="py-3 px-3 text-center text-outline sticky left-10 bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">8</td>
 <td class="py-3 px-4 font-mono font-medium text-primary sticky left-[88px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">2001210603</td>
 <td class="py-3 px-4 font-semibold text-on-surface sticky left-[216px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.04)]">
-                      Bùi Ngọc Mai
+                      Người dùng mẫu 02
                     </td>
 <td class="py-3 px-4 text-secondary font-medium">12DHTH03</td>
 <td class="py-3 px-4 text-on-surface">Công nghệ Thông tin</td>
@@ -747,7 +747,7 @@
 </td>
 <td class="py-3 px-4 text-center">
 <div class="flex items-center justify-center gap-1.5">
-<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Bùi Ngọc Mai', '2001210603')" title="Hủy đăng ký học phần">
+<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Người dùng mẫu 02', '2001210603')" title="Hủy đăng ký học phần">
 <span class="material-symbols-outlined text-[18px]">person_remove</span>
 </button>
 <button class="p-1.5 text-outline hover:text-primary hover:bg-surface-container-low rounded transition-colors" title="Xem hồ sơ sinh viên">
@@ -764,7 +764,7 @@
 <td class="py-3 px-3 text-center text-outline sticky left-10 bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">9</td>
 <td class="py-3 px-4 font-mono font-medium text-primary sticky left-[88px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">2001210724</td>
 <td class="py-3 px-4 font-semibold text-on-surface sticky left-[216px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.04)]">
-                      Lý Gia Hân
+                      Người dùng mẫu 19
                     </td>
 <td class="py-3 px-4 text-secondary font-medium">12DHTH01</td>
 <td class="py-3 px-4 text-on-surface">Công nghệ Thông tin</td>
@@ -778,7 +778,7 @@
 </td>
 <td class="py-3 px-4 text-center">
 <div class="flex items-center justify-center gap-1.5">
-<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Lý Gia Hân', '2001210724')" title="Hủy đăng ký học phần">
+<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Người dùng mẫu 19', '2001210724')" title="Hủy đăng ký học phần">
 <span class="material-symbols-outlined text-[18px]">person_remove</span>
 </button>
 <button class="p-1.5 text-outline hover:text-primary hover:bg-surface-container-low rounded transition-colors" title="Xem hồ sơ sinh viên">
@@ -795,7 +795,7 @@
 <td class="py-3 px-3 text-center text-outline sticky left-10 bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">10</td>
 <td class="py-3 px-4 font-mono font-medium text-primary sticky left-[88px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">2001210889</td>
 <td class="py-3 px-4 font-semibold text-on-surface sticky left-[216px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.04)]">
-                      Dương Tuấn Khang
+                      Người dùng mẫu 03
                     </td>
 <td class="py-3 px-4 text-secondary font-medium">12DHTH02</td>
 <td class="py-3 px-4 text-on-surface">Công nghệ Thông tin</td>
@@ -809,7 +809,7 @@
 </td>
 <td class="py-3 px-4 text-center">
 <div class="flex items-center justify-center gap-1.5">
-<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Dương Tuấn Khang', '2001210889')" title="Hủy đăng ký học phần">
+<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Người dùng mẫu 03', '2001210889')" title="Hủy đăng ký học phần">
 <span class="material-symbols-outlined text-[18px]">person_remove</span>
 </button>
 <button class="p-1.5 text-outline hover:text-primary hover:bg-surface-container-low rounded transition-colors" title="Xem hồ sơ sinh viên">
@@ -850,7 +850,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

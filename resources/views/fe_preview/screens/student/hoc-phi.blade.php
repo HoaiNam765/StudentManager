@@ -152,7 +152,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -195,7 +195,7 @@
             NVA
           </div>
 <div class="hidden sm:block text-left">
-<div class="text-xs font-semibold text-slate-900 leading-tight">Nguyễn Văn An</div>
+<div class="text-xs font-semibold text-slate-900 leading-tight">Người dùng mẫu 25</div>
 <div class="text-[11px] text-slate-500">2001210123 • 12DHTH01</div>
 </div>
 </div>
@@ -341,7 +341,7 @@
 <div>Tên thụ hưởng: <strong>TRUONG DAI HOC CONG THUONG TP.HCM</strong></div>
 <div>Số tài khoản: <strong class="font-mono text-primary text-sm">0071000888999</strong></div>
 <div class="pt-1 text-slate-600">
-          Cú pháp bắt buộc: <code class="px-2 py-1 bg-white border border-slate-300 rounded font-bold text-red-700">HOCPHI 2001210123 Nguyen Van An</code>
+          Cú pháp bắt buộc: <code class="px-2 py-1 bg-white border border-slate-300 rounded font-bold text-red-700">HOCPHI 2001210123 Người dùng mẫu 20</code>
 </div>
 </div>
 <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 flex items-center gap-3">
@@ -364,7 +364,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

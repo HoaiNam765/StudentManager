@@ -168,7 +168,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -211,7 +211,7 @@
             NVA
           </div>
 <div class="hidden sm:block text-left">
-<div class="text-xs font-semibold text-slate-900 leading-tight">Nguyễn Văn An</div>
+<div class="text-xs font-semibold text-slate-900 leading-tight">Người dùng mẫu 25</div>
 <div class="text-[11px] text-slate-500">2001210123 • 12DHTH01</div>
 </div>
 </div>
@@ -353,7 +353,7 @@
 </div>
 <!-- Footer Section -->
 <footer class="w-full max-w-[1440px] mx-auto mt-12 pt-6 border-t border-outline-variant text-center font-body-sm text-body-sm text-on-surface-variant">
-<p>© 2026 Trường Đại học Công Thương TP. Hồ Chí Minh (HUIT) - Cổng Quản lý Học vụ &amp; Khảo thí | Hỗ trợ kỹ thuật: <a class="text-primary hover:underline" href="mailto:daotao@huit.edu.vn">daotao@huit.edu.vn</a></p>
+<p>© 2026 Trường Đại học Công Thương TP. Hồ Chí Minh (HUIT) - Cổng Quản lý Học vụ &amp; Khảo thí | Hỗ trợ kỹ thuật: <a class="text-primary hover:underline" href="mailto:nguoidung025@example.test">nguoidung025@example.test</a></p>
 </footer>
 </main>
 <!-- FOOTER -->
@@ -362,7 +362,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

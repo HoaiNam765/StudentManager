@@ -226,7 +226,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -269,7 +269,7 @@
           </div>
 <div class="hidden sm:block text-left">
 <div class="text-xs font-semibold text-slate-900 leading-tight">Phòng Đào tạo</div>
-<div class="text-[11px] text-slate-500">admin@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung015@example.test</div>
 </div>
 </div>
 </div>
@@ -390,7 +390,7 @@
 <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-outline">
 <span class="material-symbols-outlined text-[18px]">location_on</span>
 </span>
-<input aria-label="Ô nhập liệu" class="w-full h-10 pl-9 pr-3 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" type="text" value="140 Lê Trọng Tấn, Phường Tây Thạnh, Quận Tân Phú, TP. Hồ Chí Minh"/>
+<input aria-label="Ô nhập liệu" class="w-full h-10 pl-9 pr-3 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" type="text" value="140 Người dùng mẫu 18, Phường Tây Thạnh, Quận Tân Phú, TP. Hồ Chí Minh"/>
 </div>
 </div>
 <!-- Số điện thoại / Hotline -->
@@ -410,7 +410,7 @@
 <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-outline">
 <span class="material-symbols-outlined text-[18px]">mail</span>
 </span>
-<input aria-label="Ô nhập liệu" class="w-full h-10 pl-9 pr-3 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" type="email" value="daotao@huit.edu.vn"/>
+<input aria-label="Ô nhập liệu" class="w-full h-10 pl-9 pr-3 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" type="email" value="nguoidung025@example.test"/>
 </div>
 </div>
 <!-- Website chính thức (Span 2 col) -->
@@ -420,7 +420,7 @@
 <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-outline">
 <span class="material-symbols-outlined text-[18px]">language</span>
 </span>
-<input aria-label="Ô nhập liệu" class="w-full h-10 pl-9 pr-3 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" type="url" value="https://huit.edu.vn"/>
+<input aria-label="Ô nhập liệu" class="w-full h-10 pl-9 pr-3 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" type="url" value="https://school.example.test/"/>
 </div>
 </div>
 </div>
@@ -661,7 +661,7 @@
 <!-- Footer Văn bản Bản quyền -->
 <footer class="pt-6 pb-12 text-center border-t border-outline-variant/60 text-body-sm text-on-surface-variant">
 <p>© 2026 Trường Đại học Công Thương TP. Hồ Chí Minh (HUIT) - Hệ thống Quản lý Học vụ.</p>
-<p class="mt-1 text-[11px] text-outline">Hỗ trợ kỹ thuật: daotao@huit.edu.vn | Hotline: (028) 38161673 | Trung tâm CNTT &amp; Chuyển đổi số</p>
+<p class="mt-1 text-[11px] text-outline">Hỗ trợ kỹ thuật: nguoidung025@example.test | Hotline: (028) 38161673 | Trung tâm CNTT &amp; Chuyển đổi số</p>
 </footer>
 </div>
 </main>
@@ -671,7 +671,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

@@ -168,7 +168,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -211,7 +211,7 @@
             NVA
           </div>
 <div class="hidden sm:block text-left">
-<div class="text-xs font-semibold text-slate-900 leading-tight">Nguyễn Văn An</div>
+<div class="text-xs font-semibold text-slate-900 leading-tight">Người dùng mẫu 25</div>
 <div class="text-[11px] text-slate-500">2001210123 • 12DHTH01</div>
 </div>
 </div>
@@ -247,7 +247,7 @@
 <span class="px-1.5 py-0.5 bg-blue-50 text-[#1c55c4] font-semibold rounded text-[10px]">3 Tín chỉ</span>
 <span class="flex items-center gap-0.5 text-slate-500">
 <span class="material-symbols-outlined text-[14px]">person</span>
-            TS. Trần Hoàng Nam
+            TS. Người dùng mẫu 38
           </span>
 </div>
 <!-- Chi tiết lịch & sĩ số -->
@@ -282,7 +282,7 @@
 <div class="flex items-center gap-2 mb-2 text-[11px] text-slate-600">
 <span class="flex items-center gap-0.5 text-slate-500">
 <span class="material-symbols-outlined text-[14px]">person</span>
-            ThS. Lê Quang Huy
+            ThS. Người dùng mẫu 11
           </span>
 <span>•</span>
 <span class="text-slate-600">Thứ 3, Tiết 4 - 6 (P. B.204)</span>
@@ -313,7 +313,7 @@
 <div class="flex items-center gap-2 mb-2 text-[11px] text-slate-500">
 <span class="flex items-center gap-0.5">
 <span class="material-symbols-outlined text-[14px]">person</span>
-            TS. Nguyễn Thanh Tùng
+            TS. Người dùng mẫu 22
           </span>
 <span>•</span>
 <span>Thứ 4, Tiết 1 - 3</span>
@@ -341,7 +341,7 @@
 <div class="flex items-center gap-2 mb-2 text-[11px] text-slate-600">
 <span class="flex items-center gap-0.5 text-slate-500">
 <span class="material-symbols-outlined text-[14px]">person</span>
-            ThS. Đỗ Văn Cường
+            ThS. Người dùng mẫu 56
           </span>
 </div>
 <!-- Thông tin lớp học -->
@@ -371,7 +371,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

@@ -1,4 +1,4 @@
-﻿@extends('fe_preview.layouts.teacher')
+@extends('fe_preview.layouts.teacher')
 @section('page_title', 'Cá»•ng ThÃ´ng tin Giáº£ng viÃªn - HUIT Há»c Vá»¥')
 @section('html_attributes')lang="vi" class="['light']"@endsection
 @section('body_attributes')class="['bg-[#f8f9ff]', 'text-slate-800', 'antialiased', 'min-h-screen', 'flex', 'selection:bg-blue-100', 'selection:text-blue-900']"@endsection
@@ -141,7 +141,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Há»— trá»£ ká»¹ thuáº­t: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -633,7 +633,7 @@ Tháº§y Nam.</textarea>
 <span>Há»‡ thá»‘ng Quáº£n lÃ½ Há»c vá»¥ &amp; Giáº£ng dáº¡y</span>
 </div>
 <div class="flex items-center gap-4 text-outline">
-<span>Há»— trá»£ ká»¹ thuáº­t: hotro@huit.edu.vn</span>
+<span>Há»— trá»£ ká»¹ thuáº­t: nguoidung031@example.test</span>
 <span>â€¢</span>
 <span>Hotline: (028) 3816 1673</span>
 </div>
@@ -645,7 +645,7 @@ Tháº§y Nam.</textarea>
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Há»— trá»£: 028 3816 1673</span>
 <span>â€¢</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

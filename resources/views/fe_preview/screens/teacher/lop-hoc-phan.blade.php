@@ -1,4 +1,4 @@
-﻿@extends('fe_preview.layouts.teacher')
+@extends('fe_preview.layouts.teacher')
 @section('page_title', 'Cá»•ng Giáº£ng viÃªn HUIT - HUIT Há»c Vá»¥')
 @section('html_attributes')lang="vi" class="['light']"@endsection
 @section('body_attributes')class="['bg-[#f8f9ff]', 'text-slate-800', 'antialiased', 'min-h-screen', 'flex', 'selection:bg-blue-100', 'selection:text-blue-900']"@endsection
@@ -141,7 +141,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Há»— trá»£ ká»¹ thuáº­t: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -560,7 +560,7 @@
 </td>
 <td class="py-3 px-4 font-medium">12DHTH01</td>
 <td class="py-3 px-4 text-on-surface-variant">14/05/2003</td>
-<td class="py-3 px-4 text-on-surface-variant font-mono text-xs">2001210123@huit.edu.vn</td>
+<td class="py-3 px-4 text-on-surface-variant font-mono text-xs">nguoidung006@example.test</td>
 <td class="py-3 px-4 text-center font-semibold text-slate-700">0 / 15</td>
 <td class="py-3 px-4">
 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-label-sm text-label-sm font-semibold">
@@ -595,7 +595,7 @@
 </td>
 <td class="py-3 px-4 font-medium">12DHTH01</td>
 <td class="py-3 px-4 text-on-surface-variant">22/08/2003</td>
-<td class="py-3 px-4 text-on-surface-variant font-mono text-xs">2001210045@huit.edu.vn</td>
+<td class="py-3 px-4 text-on-surface-variant font-mono text-xs">nguoidung004@example.test</td>
 <td class="py-3 px-4 text-center font-semibold text-slate-700">1 / 15</td>
 <td class="py-3 px-4">
 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-label-sm text-label-sm font-semibold">
@@ -630,7 +630,7 @@
 </td>
 <td class="py-3 px-4 font-medium">12DHTH02</td>
 <td class="py-3 px-4 text-on-surface-variant">05/11/2003</td>
-<td class="py-3 px-4 text-on-surface-variant font-mono text-xs">2001210189@huit.edu.vn</td>
+<td class="py-3 px-4 text-on-surface-variant font-mono text-xs">nguoidung007@example.test</td>
 <td class="py-3 px-4 text-center font-bold text-red-700">3 / 15</td>
 <td class="py-3 px-4">
 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-rose-100 text-rose-800 border border-rose-300 font-label-sm text-label-sm font-bold">
@@ -665,7 +665,7 @@
 </td>
 <td class="py-3 px-4 font-medium">12DHTH01</td>
 <td class="py-3 px-4 text-on-surface-variant">19/02/2003</td>
-<td class="py-3 px-4 text-on-surface-variant font-mono text-xs">2001210012@huit.edu.vn</td>
+<td class="py-3 px-4 text-on-surface-variant font-mono text-xs">nguoidung003@example.test</td>
 <td class="py-3 px-4 text-center font-semibold text-slate-700">0 / 15</td>
 <td class="py-3 px-4">
 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-label-sm text-label-sm font-semibold">
@@ -700,7 +700,7 @@
 </td>
 <td class="py-3 px-4 font-medium">12DHTH02</td>
 <td class="py-3 px-4 text-on-surface-variant">30/09/2003</td>
-<td class="py-3 px-4 text-on-surface-variant font-mono text-xs">2001210356@huit.edu.vn</td>
+<td class="py-3 px-4 text-on-surface-variant font-mono text-xs">nguoidung008@example.test</td>
 <td class="py-3 px-4 text-center font-semibold text-slate-700">1 / 15</td>
 <td class="py-3 px-4">
 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-label-sm text-label-sm font-semibold">
@@ -735,7 +735,7 @@
 </td>
 <td class="py-3 px-4 font-medium">12DHTH01</td>
 <td class="py-3 px-4 text-on-surface-variant">11/04/2003</td>
-<td class="py-3 px-4 text-on-surface-variant font-mono text-xs">2001210411@huit.edu.vn</td>
+<td class="py-3 px-4 text-on-surface-variant font-mono text-xs">nguoidung009@example.test</td>
 <td class="py-3 px-4 text-center font-semibold text-slate-700">0 / 15</td>
 <td class="py-3 px-4">
 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-label-sm text-label-sm font-semibold">
@@ -770,7 +770,7 @@
 </td>
 <td class="py-3 px-4 font-medium">12DHTH02</td>
 <td class="py-3 px-4 text-on-surface-variant">17/12/2003</td>
-<td class="py-3 px-4 text-on-surface-variant font-mono text-xs">2001210098@huit.edu.vn</td>
+<td class="py-3 px-4 text-on-surface-variant font-mono text-xs">nguoidung005@example.test</td>
 <td class="py-3 px-4 text-center font-semibold text-slate-700">2 / 15</td>
 <td class="py-3 px-4">
 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 font-label-sm text-label-sm font-semibold">
@@ -805,7 +805,7 @@
 </td>
 <td class="py-3 px-4 font-medium">12DHTH01</td>
 <td class="py-3 px-4 text-on-surface-variant">08/07/2003</td>
-<td class="py-3 px-4 text-on-surface-variant font-mono text-xs">2001210512@huit.edu.vn</td>
+<td class="py-3 px-4 text-on-surface-variant font-mono text-xs">nguoidung010@example.test</td>
 <td class="py-3 px-4 text-center font-semibold text-slate-700">0 / 15</td>
 <td class="py-3 px-4">
 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-label-sm text-label-sm font-semibold">
@@ -867,7 +867,7 @@
           TrÆ°á»ng Äáº¡i há»c CÃ´ng ThÆ°Æ¡ng TP. Há»“ ChÃ­ Minh (HUIT) â€¢ Cá»•ng ThÃ´ng tin Giáº£ng viÃªn &amp; Quáº£n lÃ½ ÄÃ o táº¡o
         </p>
 <p class="font-body-sm text-body-sm">
-          Äá»‹a chá»‰: 140 LÃª Trá»ng Táº¥n, P. TÃ¢y Tháº¡nh, Q. TÃ¢n PhÃº, TP. Há»“ ChÃ­ Minh | PhÃ²ng Quáº£n lÃ½ ÄÃ o táº¡o: (028) 3816 1673 - daotao@huit.edu.vn
+          Äá»‹a chá»‰: 140 LÃª Trá»ng Táº¥n, P. TÃ¢y Tháº¡nh, Q. TÃ¢n PhÃº, TP. Há»“ ChÃ­ Minh | PhÃ²ng Quáº£n lÃ½ ÄÃ o táº¡o: (028) 3816 1673 - nguoidung025@example.test
         </p>
 <p class="font-label-sm text-label-sm text-slate-500">
           PhiÃªn báº£n há»‡ thá»‘ng: 4.8.2-ERP â€¢ Báº£n quyá»n Â© 2026 HUIT. Táº¥t cáº£ cÃ¡c quyá»n Ä‘Æ°á»£c báº£o lÆ°u.
@@ -880,7 +880,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Há»— trá»£: 028 3816 1673</span>
 <span>â€¢</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

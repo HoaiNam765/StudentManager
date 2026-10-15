@@ -226,7 +226,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -269,7 +269,7 @@
           </div>
 <div class="hidden sm:block text-left">
 <div class="text-xs font-semibold text-slate-900 leading-tight">Phòng Đào tạo</div>
-<div class="text-[11px] text-slate-500">admin@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung015@example.test</div>
 </div>
 </div>
 </div>
@@ -295,7 +295,7 @@
 <div class="flex items-start md:items-center gap-5">
 <!-- Student Avatar -->
 <div class="relative group flex-shrink-0">
-<img alt="" class="w-20 h-20 rounded-xl object-cover ring-2 ring-primary/20 shadow-sm border border-outline-variant/30" data-alt="High quality professional front-facing studio student identification portrait photo of a 21-year-old Vietnamese male university engineering student named Nguyen Van An with smart clean-cut hairstyle and white collared shirt against a pale sky-blue studio background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAveUswnYLUDhwqYKsaL09bSoJpc5ZGfnE6BMjurEUompTHzLAXjcNwG5u2eds9kOl0jAsERT_3D360ME_PYrzNNJE60hwI7vJI0oVFW_MX3jAh7yF25n7dd1XBar9qgAw8WDQ40ZwBwvV8hGqOMyI6L4-p5YfUHoY-xgkF46tAH8g46AttE5LlBVGdNgAMnsdDP4ev2YFFEvgE9ytO-KNR0sqzrPS0ptLSCv84iagfiayD-3CqXI1Fed_XMXq1AiF47n_k0s6IMzA"/>
+<img alt="" class="w-20 h-20 rounded-xl object-cover ring-2 ring-primary/20 shadow-sm border border-outline-variant/30" data-alt="High quality professional front-facing studio student identification portrait photo of a 21-year-old Vietnamese male university engineering student named Người dùng mẫu 20 with smart clean-cut hairstyle and white collared shirt against a pale sky-blue studio background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAveUswnYLUDhwqYKsaL09bSoJpc5ZGfnE6BMjurEUompTHzLAXjcNwG5u2eds9kOl0jAsERT_3D360ME_PYrzNNJE60hwI7vJI0oVFW_MX3jAh7yF25n7dd1XBar9qgAw8WDQ40ZwBwvV8hGqOMyI6L4-p5YfUHoY-xgkF46tAH8g46AttE5LlBVGdNgAMnsdDP4ev2YFFEvgE9ytO-KNR0sqzrPS0ptLSCv84iagfiayD-3CqXI1Fed_XMXq1AiF47n_k0s6IMzA"/>
 <button class="absolute -bottom-1 -right-1 bg-surface-container-lowest text-primary p-1 rounded-md shadow-md border border-outline-variant/40 hover:bg-surface-container-low transition-colors" title="Cập nhật ảnh đại diện thẻ" type="button">
 <span class="material-symbols-outlined text-xs" data-icon="photo_camera">photo_camera</span>
 </button>
@@ -303,7 +303,7 @@
 <!-- Student Bio & Class -->
 <div class="space-y-1.5">
 <div class="flex flex-wrap items-center gap-3">
-<h1 class="font-headline-xl text-headline-xl font-bold text-on-background tracking-tight">Nguyễn Văn An</h1>
+<h1 class="font-headline-xl text-headline-xl font-bold text-on-background tracking-tight">Người dùng mẫu 25</h1>
 <!-- Student Status Badge -->
 <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -429,7 +429,7 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-6 text-xs">
 <div>
 <label class="block text-outline font-medium text-[11px] mb-0.5">Họ và tên khai sinh</label>
-<div class="font-semibold text-on-surface text-sm">Nguyễn Văn An</div>
+<div class="font-semibold text-on-surface text-sm">Người dùng mẫu 25</div>
 </div>
 <div>
 <label class="block text-outline font-medium text-[11px] mb-0.5">Ngày sinh</label>
@@ -492,7 +492,7 @@
 <span class="material-symbols-outlined text-xs" data-icon="mail">mail</span>
                   Email sinh viên (Trường HUIT cấp)
                 </div>
-<div class="font-semibold text-primary select-all font-mono">2001210123@huit.edu.vn</div>
+<div class="font-semibold text-primary select-all font-mono">nguoidung006@example.test</div>
 <span class="inline-block mt-1 text-[10px] text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded font-semibold">Đã liên kết SSO Office365</span>
 </div>
 <!-- Email cá nhân -->
@@ -501,7 +501,7 @@
 <span class="material-symbols-outlined text-xs" data-icon="alternate_email">alternate_email</span>
                   Email cá nhân
                 </div>
-<div class="font-semibold text-on-surface font-mono">an.nguyenvan2003@gmail.com</div>
+<div class="font-semibold text-on-surface font-mono">nguoidung017@example.test</div>
 <span class="inline-block mt-1 text-[10px] text-secondary bg-surface-container px-1.5 py-0.2 rounded font-medium">Email dự phòng kích hoạt</span>
 </div>
 <!-- Điện thoại di động -->
@@ -521,7 +521,7 @@
 <div class="sm:col-span-2 space-y-1">
 <label class="block text-outline font-medium text-[11px]">Địa chỉ thường trú (Hộ khẩu)</label>
 <div class="p-2.5 rounded-lg border border-outline-variant/30 bg-surface-container-lowest font-medium text-on-surface leading-relaxed">
-                  Số 140 Lê Trọng Tấn, Phường Tây Thạnh, Quận Tân Phú, TP. Hồ Chí Minh
+                  Số 140 Người dùng mẫu 18, Phường Tây Thạnh, Quận Tân Phú, TP. Hồ Chí Minh
                 </div>
 </div>
 <!-- Địa chỉ tạm trú -->
@@ -556,7 +556,7 @@
 <span class="font-bold text-on-surface text-[12px]">Họ tên Cha</span>
 <span class="text-[11px] bg-surface-container px-1.5 py-0.5 rounded">Sinh năm: 1975</span>
 </div>
-<div class="font-semibold text-sm text-on-surface">Nguyễn Văn Bình</div>
+<div class="font-semibold text-sm text-on-surface">Người dùng mẫu 26</div>
 <div class="text-on-surface-variant flex items-center gap-1.5">
 <span class="material-symbols-outlined text-sm text-outline" data-icon="engineering">engineering</span>
                   Nghề nghiệp: Kỹ sư xây dựng
@@ -572,7 +572,7 @@
 <span class="font-bold text-on-surface text-[12px]">Họ tên Mẹ</span>
 <span class="text-[11px] bg-surface-container px-1.5 py-0.5 rounded">Sinh năm: 1978</span>
 </div>
-<div class="font-semibold text-sm text-on-surface">Trần Thị Mai</div>
+<div class="font-semibold text-sm text-on-surface">Người dùng mẫu 42</div>
 <div class="text-on-surface-variant flex items-center gap-1.5">
 <span class="material-symbols-outlined text-sm text-outline" data-icon="school">school</span>
                   Nghề nghiệp: Giáo viên THPT
@@ -588,9 +588,9 @@
 <div class="space-y-0.5 text-xs">
 <div class="font-bold text-amber-900">Người chỉ định liên hệ khẩn cấp khi cần báo tin học vụ:</div>
 <div class="text-amber-800">
-<strong>Nguyễn Văn Bình</strong> (Quan hệ: Phụ huynh - Cha) • SĐT khẩn cấp: <strong class="font-mono text-amber-950 font-bold">0903 111 222</strong>
+<strong>Người dùng mẫu 26</strong> (Quan hệ: Phụ huynh - Cha) • SĐT khẩn cấp: <strong class="font-mono text-amber-950 font-bold">0903 111 222</strong>
 </div>
-<div class="text-[11px] text-amber-700">Địa chỉ liên hệ: 140 Lê Trọng Tấn, P. Tây Thạnh, Q. Tân Phú, TP.HCM</div>
+<div class="text-[11px] text-amber-700">Địa chỉ liên hệ: 140 Người dùng mẫu 18, P. Tây Thạnh, Q. Tân Phú, TP.HCM</div>
 </div>
 </div>
 </div>
@@ -795,7 +795,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

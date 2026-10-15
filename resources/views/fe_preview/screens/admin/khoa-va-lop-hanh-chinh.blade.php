@@ -226,7 +226,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -269,7 +269,7 @@
           </div>
 <div class="hidden sm:block text-left">
 <div class="text-xs font-semibold text-slate-900 leading-tight">Phòng Đào tạo</div>
-<div class="text-[11px] text-slate-500">admin@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung015@example.test</div>
 </div>
 </div>
 </div>
@@ -464,7 +464,7 @@
 <span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">Khóa 21</span>
 </td>
 <td class="py-3.5 px-4">
-<div class="font-medium text-on-surface">ThS. Lê Hoàng Tuấn</div>
+<div class="font-medium text-on-surface">ThS. Người dùng mẫu 10</div>
 <div class="text-[11px] text-on-surface-variant">SĐT: 0908 123 456</div>
 </td>
 <td class="py-3.5 px-4 text-center">
@@ -499,7 +499,7 @@
 <span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">Khóa 21</span>
 </td>
 <td class="py-3.5 px-4">
-<div class="font-medium text-on-surface">TS. Nguyễn Văn Dũng</div>
+<div class="font-medium text-on-surface">TS. Người dùng mẫu 28</div>
 <div class="text-[11px] text-on-surface-variant">SĐT: 0913 888 999</div>
 </td>
 <td class="py-3.5 px-4 text-center">
@@ -534,7 +534,7 @@
 <span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">Khóa 21</span>
 </td>
 <td class="py-3.5 px-4">
-<div class="font-medium text-on-surface">TS. Trần Minh Tâm</div>
+<div class="font-medium text-on-surface">TS. Người dùng mẫu 39</div>
 <div class="text-[11px] text-on-surface-variant">SĐT: 0903 555 777</div>
 </td>
 <td class="py-3.5 px-4 text-center">
@@ -569,7 +569,7 @@
 <span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">Khóa 20</span>
 </td>
 <td class="py-3.5 px-4">
-<div class="font-medium text-on-surface">PGS.TS Phạm Văn An</div>
+<div class="font-medium text-on-surface">PGS.TS Người dùng mẫu 34</div>
 <div class="text-[11px] text-on-surface-variant">SĐT: 0918 333 222</div>
 </td>
 <td class="py-3.5 px-4 text-center">
@@ -604,7 +604,7 @@
 <span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">Khóa 22</span>
 </td>
 <td class="py-3.5 px-4">
-<div class="font-medium text-on-surface">ThS. Vũ Đức Trí</div>
+<div class="font-medium text-on-surface">ThS. Người dùng mẫu 50</div>
 <div class="text-[11px] text-on-surface-variant">SĐT: 0977 444 111</div>
 </td>
 <td class="py-3.5 px-4 text-center">
@@ -659,7 +659,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

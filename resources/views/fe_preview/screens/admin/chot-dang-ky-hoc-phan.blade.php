@@ -226,7 +226,7 @@
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
 <div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
-<div class="text-[11px] text-slate-500">support@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
 </div>
@@ -269,7 +269,7 @@
           </div>
 <div class="hidden sm:block text-left">
 <div class="text-xs font-semibold text-slate-900 leading-tight">Phòng Đào tạo</div>
-<div class="text-[11px] text-slate-500">admin@huit.edu.vn</div>
+<div class="text-[11px] text-slate-500">nguoidung015@example.test</div>
 </div>
 </div>
 </div>
@@ -483,7 +483,7 @@
                   Khoa CNSH &amp; TP
                 </td>
 <td class="py-3.5 px-4 font-body-sm text-body-sm text-on-surface">
-                  TS. Trần Đình Nam
+                  TS. Người dùng mẫu 45
                 </td>
 <td class="py-3.5 px-4 text-center">
 <span class="font-label-md text-label-md font-bold text-error">8</span>
@@ -519,7 +519,7 @@
                   Khoa CNTT
                 </td>
 <td class="py-3.5 px-4 font-body-sm text-body-sm text-on-surface">
-                  ThS. Lê Hoàng Tuấn
+                  ThS. Người dùng mẫu 10
                 </td>
 <td class="py-3.5 px-4 text-center">
 <span class="font-label-md text-label-md font-bold text-error">12</span>
@@ -555,7 +555,7 @@
                   Khoa Khoa học ứng dụng
                 </td>
 <td class="py-3.5 px-4 font-body-sm text-body-sm text-on-surface">
-                  GVC. Nguyễn Thị Minh
+                  GVC. Người dùng mẫu 24
                 </td>
 <td class="py-3.5 px-4 text-center">
 <span class="font-label-md text-label-md font-bold text-error">14</span>
@@ -591,7 +591,7 @@
                   Khoa Cơ khí động lực
                 </td>
 <td class="py-3.5 px-4 font-body-sm text-body-sm text-on-surface">
-                  TS. Đặng Quốc Bảo
+                  TS. Người dùng mẫu 52
                 </td>
 <td class="py-3.5 px-4 text-center">
 <span class="font-label-md text-label-md font-bold text-error">11</span>
@@ -642,7 +642,7 @@
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
 <span>Hỗ trợ: 028 3816 1673</span>
 <span>•</span>
-<span>support@huit.edu.vn</span>
+<span>nguoidung038@example.test</span>
 </div>
 </footer>
 </div>

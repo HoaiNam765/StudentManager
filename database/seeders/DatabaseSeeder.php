@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
         FacultySeeder::class,         // FAC: khoa, bộ môn, ngành
         AcademicYearSeeder::class,    // ACY: năm học, học kỳ, lịch học vụ
         RoomSeeder::class,            // ROM: phòng học
-        // SubjectSeeder::class,      // SUB: học phần, quan hệ, cơ cấu điểm
+        SubjectSeeder::class,         // SUB: học phần, quan hệ, cơ cấu điểm
         // CurriculumSeeder::class,   // CUR: chương trình đào tạo
         // TeacherSeeder::class,      // TCH: giảng viên
         // SchoolClassSeeder::class,  // CLS: khóa, lớp hành chính, lớp học phần

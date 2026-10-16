@@ -45,3 +45,8 @@ Route::middleware(['auth', 'password.changed'])->prefix('danh-muc')->name('looku
     Route::get('/don-vi-hanh-chinh', [LookupOptionController::class, 'administrativeUnits'])->name('administrative-units');
     Route::get('/{category}', [LookupOptionController::class, 'options'])->where('category', '[A-Z][A-Z0-9_]*')->name('options');
 });
+
+// Chỉ cho phép truy cập các màn UI mock trên môi trường local
+if (app()->environment('local')) {
+    require __DIR__.'/fe-preview.php';
+}

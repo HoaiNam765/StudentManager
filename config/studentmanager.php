@@ -76,6 +76,11 @@ return [
     | BR-FAC-04: trưởng khoa, trưởng bộ môn phải là giảng viên hoặc cán bộ đang hoạt động thuộc đơn vị đó,
     | trừ khi bật ngoại lệ. Lớp kiểm tra thật do TCH cài (LeaderEligibility).
     */
+    // Giảng viên (TCH): dung lượng ảnh hồ sơ tối đa (KB)
+    'teacher' => [
+        'photo_max_kb' => (int) env('TEACHER_PHOTO_MAX_KB', 2048),
+    ],
+
     'faculty' => [
         'allow_leader_outside_unit' => (bool) env('FACULTY_ALLOW_LEADER_OUTSIDE_UNIT', false),
     ],

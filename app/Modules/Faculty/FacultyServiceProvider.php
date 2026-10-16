@@ -30,7 +30,7 @@ class FacultyServiceProvider extends ServiceProvider
         // Đơn vị người dùng quản lý được nhớ trong một yêu cầu
         $this->app->scoped(FacultyAccess::class);
 
-        // Chưa có module TCH: chưa kiểm tra người được giao chức vụ có thuộc đơn vị không (TCH #88 bind lại)
+        // Mặc định không kiểm tra người được giao chức vụ; TeacherServiceProvider bind lớp thật (BR-FAC-04, BR-TCH-06)
         $this->app->bindIf(LeaderEligibility::class, AnyUserIsEligible::class);
     }
 

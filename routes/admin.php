@@ -11,6 +11,7 @@ use App\Modules\Faculty\Http\Controllers\LeadershipController;
 use App\Modules\Faculty\Http\Controllers\UnitController;
 use App\Modules\Room\Http\Controllers\FacilityController;
 use App\Modules\Room\Http\Controllers\RoomController;
+use App\Modules\Subject\Http\Controllers\SubjectController;
 use App\Modules\System\Http\Controllers\AdministrativeUnitController;
 use App\Modules\System\Http\Controllers\ImportController;
 use App\Modules\System\Http\Controllers\LookupController;
@@ -260,6 +261,18 @@ Route::middleware('auth')->group(function (): void {
         Route::delete('buildings/{building}', [FacilityController::class, 'destroyBuilding'])->name('buildings.destroy');
         Route::delete('rooms/{room}', [RoomController::class, 'destroy'])->name('rooms.destroy');
     });
+
+    // Học phần (SUB, FR-SUB-001..003): xem = SUB.view (DEAN, LEC theo phạm vi), thêm = SUB.create, sửa / ngừng = SUB.update,
+    // xóa = SUB.delete, xuất = SUB.export. Phạm vi FACULTY (DEAN) kiểm tra tiếp trên từng bản ghi trong SubjectController.
+    Route::middleware('permission:SUB.view')->group(function (): void {
+        Route::get('subjects', [SubjectController::class, 'index'])->name('subjects.index');
+        Route::get('subjects/{subject}', [SubjectController::class, 'show'])->whereNumber('subject')->name('subjects.show');
+    });
+
+    Route::get('subjects/export', [SubjectController::class, 'export'])->middleware('permission:SUB.export')->name('subjects.export');
+    Route::post('subjects', [SubjectController::class, 'store'])->middleware('permission:SUB.create')->name('subjects.store');
+    Route::put('subjects/{subject}', [SubjectController::class, 'update'])->whereNumber('subject')->middleware('permission:SUB.update')->name('subjects.update');
+    Route::delete('subjects/{subject}', [SubjectController::class, 'destroy'])->whereNumber('subject')->middleware('permission:SUB.delete')->name('subjects.destroy');
 
     // Lãnh đạo đơn vị theo nhiệm kỳ (FAC, FR-FAC-006): xem = FAC.view; giao, kết thúc, hủy = FAC.update toàn trường (ACAD, ADMIN)
     Route::get('leadership-terms', [LeadershipController::class, 'index'])->middleware('permission:FAC.view')->name('leadership-terms.index');

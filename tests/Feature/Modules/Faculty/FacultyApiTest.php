@@ -27,11 +27,13 @@ class FacultyApiTest extends TestCase
         $this->seed(FacultySeeder::class);
     }
 
-    public function test_seeder_3_khoa_6_nganh_va_he_chinh_quy_mac_dinh(): void
+    public function test_seeder_3_khoa_dao_tao_6_nganh_khoa_co_ban_va_he_chinh_quy_mac_dinh(): void
     {
         $this->seed(FacultySeeder::class);
 
-        $this->assertSame(3, Faculty::count());
+        // 3 khoa đào tạo + khoa Khoa học cơ bản (không có ngành, quản lý học phần đại cương)
+        $this->assertSame(4, Faculty::count());
+        $this->assertSame(3, Faculty::query()->has('majors')->count());
         $this->assertSame(6, Major::count());
         $this->assertSame('CQ', TrainingType::default()->code);
     }
@@ -78,7 +80,7 @@ class FacultyApiTest extends TestCase
         $this->actingAs($this->userWithRoles('STU'));
         $faculty = Faculty::query()->firstOrFail();
 
-        $this->getJson('/admin/faculties')->assertOk()->assertJsonPath('total', 3);
+        $this->getJson('/admin/faculties')->assertOk()->assertJsonPath('total', Faculty::count());
         $this->getJson('/admin/specializations')->assertOk()->assertJsonPath('total', Specialization::count());
         $this->postJson('/admin/faculties', ['code' => 'X', 'name' => 'X'])->assertForbidden();
         $this->putJson("/admin/faculties/{$faculty->id}", ['name' => 'X'])->assertForbidden();

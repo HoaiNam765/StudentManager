@@ -10,8 +10,11 @@ use App\Modules\Faculty\Models\TrainingType;
 use Illuminate\Database\Seeder;
 
 /**
- * Dữ liệu mẫu cơ cấu tổ chức (docs/BA.md mục 11.2: 3 khoa, 6 ngành) và hệ đào tạo. Mã ngành theo danh mục
+ * Dữ liệu mẫu cơ cấu tổ chức (docs/BA.md mục 11.2: 3 khoa đào tạo, 6 ngành) và hệ đào tạo. Mã ngành theo danh mục
  * ngành đào tạo trình độ đại học (7 chữ số). Chạy lặp lại an toàn theo mã.
+ *
+ * Thêm khoa Khoa học cơ bản (không có ngành) quản lý học phần đại cương: lý luận chính trị, toán,
+ * giáo dục thể chất – quốc phòng (dùng cho SubjectSeeder).
  */
 class FacultySeeder extends Seeder
 {
@@ -46,6 +49,11 @@ class FacultySeeder extends Seeder
             '7220201' => ['Ngôn ngữ Anh', 130, 8, ['NNA-TM' => 'Tiếng Anh thương mại']],
             '7220204' => ['Ngôn ngữ Trung Quốc', 130, 8, []],
         ]],
+        'KHCB' => ['Khoa Khoa học cơ bản', 'Faculty of Basic Sciences', [
+            'BM-LLCT' => 'Bộ môn Lý luận chính trị',
+            'BM-TOAN' => 'Bộ môn Toán',
+            'BM-GDTC' => 'Bộ môn Giáo dục thể chất – Quốc phòng',
+        ], []],
     ];
 
     public function run(): void

@@ -80,6 +80,16 @@ return [
         'allow_leader_outside_unit' => (bool) env('FACULTY_ALLOW_LEADER_OUTSIDE_UNIT', false),
     ],
 
+    // Học phần (SUB, FR-SUB-002): giới hạn tín chỉ và định mức số tiết / giờ tự học dùng làm giá trị gợi ý
+    'subject' => [
+        'max_credits' => (int) env('SUBJECT_MAX_CREDITS', 20),
+        'periods_per_credit' => [
+            'theory' => (int) env('SUBJECT_THEORY_PERIODS_PER_CREDIT', 15),
+            'practice' => (int) env('SUBJECT_PRACTICE_PERIODS_PER_CREDIT', 30),
+        ],
+        'self_study_hours_per_credit' => (int) env('SUBJECT_SELF_STUDY_HOURS_PER_CREDIT', 30),
+    ],
+
     'import' => [
         // Disk lưu file tải lên
         'disk' => env('IMPORT_DISK', 'local'),

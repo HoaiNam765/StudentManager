@@ -1,7 +1,7 @@
 @extends('fe_preview.layouts.guest')
 @section('page_title', 'Hệ thống Quản lý Học vụ - HUIT Học Vụ')
-@section('html_attributes')lang="vi" class="['light']"@endsection
-@section('body_attributes')class="['bg-surface', 'text-on-surface', 'antialiased', 'min-h-screen', 'flex', 'flex-col', 'font-body-md', 'text-body-md', 'selection:bg-primary-container', 'selection:text-on-primary-container']"@endsection
+@section('html_attributes')lang="vi" class="light"@endsection
+@section('body_attributes')class="bg-surface text-on-surface antialiased min-h-screen flex flex-col font-body-md text-body-md selection:bg-primary-container selection:text-on-primary-container"@endsection
 @section('head')
 
 <meta charset="utf-8"/>

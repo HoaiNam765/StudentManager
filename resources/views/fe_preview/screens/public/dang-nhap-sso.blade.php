@@ -1,7 +1,7 @@
 @extends('fe_preview.layouts.guest')
 @section('page_title', 'Đăng nhập một lần SSO - HUIT Học Vụ')
-@section('html_attributes')lang="vi" class="['light']"@endsection
-@section('body_attributes')class="['bg-[#f8f9ff]', 'text-slate-800', 'antialiased', 'min-h-screen', 'flex', 'flex-col']"@endsection
+@section('html_attributes')lang="vi" class="light"@endsection
+@section('body_attributes')class="bg-[#f8f9ff] text-slate-800 antialiased min-h-screen flex flex-col"@endsection
 @section('head')
 
 <meta charset="utf-8"/>
@@ -55,7 +55,7 @@
     {CONTENT}
   </main>
 <footer class="py-4 text-center text-xs text-slate-500 border-t border-slate-200 bg-white">
-    © 2026 Trường Đại học Công Thương TP.HCM (HUIT) • Hỗ trợ: 028 3816 1673
+    © 2026 Trường Đại học Công Thương TP.HCM (HUIT) • Hỗ trợ: 028 0000 0000
   </footer>
 
 @endsection

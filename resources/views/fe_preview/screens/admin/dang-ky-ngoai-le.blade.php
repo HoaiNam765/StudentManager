@@ -1,7 +1,7 @@
 @extends('fe_preview.layouts.admin')
 @section('page_title', 'Admin - HUIT Học Vụ')
-@section('html_attributes')lang="vi" class="['light']"@endsection
-@section('body_attributes')class="['bg-[#f8f9ff]', 'text-slate-800', 'antialiased', 'min-h-screen', 'flex', 'selection:bg-blue-100', 'selection:text-blue-900']"@endsection
+@section('html_attributes')lang="vi" class="light"@endsection
+@section('body_attributes')class="bg-[#f8f9ff] text-slate-800 antialiased min-h-screen flex selection:bg-blue-100 selection:text-blue-900"@endsection
 @section('head')
 
 <meta charset="utf-8"/>
@@ -225,7 +225,7 @@
 <div class="flex items-center gap-2.5 text-xs text-slate-600">
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
-<div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
+<div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 0000 0000</div>
 <div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
@@ -350,7 +350,7 @@
 <tr class="bg-[#eff4ff]/70 hover:bg-[#eff4ff] transition-colors group cursor-pointer border-l-4 border-l-primary">
 <td class="py-3 px-4 text-center font-medium text-secondary">01</td>
 <td class="py-3 px-4 sticky left-0 bg-[#eff4ff] group-hover:bg-[#eff4ff] z-10 font-bold text-primary shadow-[1px_0_0_0_#e2e8f0]">
-                      2001210123
+                      2400000007
                     </td>
 <td class="py-3 px-4 font-semibold text-on-surface">Người dùng mẫu 25</td>
 <td class="py-3 px-4 text-secondary">12DHTH01</td>
@@ -382,7 +382,7 @@
 <tr class="hover:bg-[#f8fafc] transition-colors group">
 <td class="py-3 px-4 text-center text-secondary">02</td>
 <td class="py-3 px-4 sticky left-0 bg-white group-hover:bg-[#f8fafc] z-10 font-semibold text-on-surface shadow-[1px_0_0_0_#e2e8f0]">
-                      2001210045
+                      2400000005
                     </td>
 <td class="py-3 px-4 text-on-surface">Người dùng mẫu 16</td>
 <td class="py-3 px-4 text-secondary">12DHTH02</td>
@@ -414,7 +414,7 @@
 <tr class="hover:bg-[#f8fafc] transition-colors group">
 <td class="py-3 px-4 text-center text-secondary">03</td>
 <td class="py-3 px-4 sticky left-0 bg-white group-hover:bg-[#f8fafc] z-10 font-semibold text-on-surface shadow-[1px_0_0_0_#e2e8f0]">
-                      2001210189
+                      2400000009
                     </td>
 <td class="py-3 px-4 text-on-surface">Người dùng mẫu 40</td>
 <td class="py-3 px-4 text-secondary">12DHPM01</td>
@@ -446,7 +446,7 @@
 <tr class="hover:bg-[#f8fafc] transition-colors group">
 <td class="py-3 px-4 text-center text-secondary">04</td>
 <td class="py-3 px-4 sticky left-0 bg-white group-hover:bg-[#f8fafc] z-10 font-semibold text-on-surface shadow-[1px_0_0_0_#e2e8f0]">
-                      2001210344
+                      2400000012
                     </td>
 <td class="py-3 px-4 text-on-surface">Người dùng mẫu 30</td>
 <td class="py-3 px-4 text-secondary">12DHTH01</td>
@@ -478,7 +478,7 @@
 <tr class="hover:bg-[#f8fafc] transition-colors group">
 <td class="py-3 px-4 text-center text-secondary">05</td>
 <td class="py-3 px-4 sticky left-0 bg-white group-hover:bg-[#f8fafc] z-10 font-semibold text-on-surface shadow-[1px_0_0_0_#e2e8f0]">
-                      2001210512
+                      2400000017
                     </td>
 <td class="py-3 px-4 text-on-surface">Người dùng mẫu 06</td>
 <td class="py-3 px-4 text-secondary">12DHPM02</td>
@@ -540,7 +540,7 @@
                   Khóa K21 - CNTT Chính quy
                 </span>
 <h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Người dùng mẫu 25</h3>
-<p class="font-body-sm text-body-sm text-secondary">MSSV: <strong class="text-on-surface font-semibold">2001210123</strong> | Lớp: 12DHTH01</p>
+<p class="font-body-sm text-body-sm text-secondary">MSSV: <strong class="text-on-surface font-semibold">2400000007</strong> | Lớp: 12DHTH01</p>
 </div>
 <div class="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold">
                 AN
@@ -636,7 +636,7 @@
 <footer class="py-4 px-6 bg-white border-t border-slate-200/80 text-center text-xs text-slate-500 no-print flex flex-col sm:flex-row items-center justify-between gap-2">
 <div>© 2026 <strong>Trường Đại học Công Thương TP.HCM (HUIT)</strong> — Hệ thống Quản lý Học vụ.</div>
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
-<span>Hỗ trợ: 028 3816 1673</span>
+<span>Hỗ trợ: 028 0000 0000</span>
 <span>•</span>
 <span>nguoidung038@example.test</span>
 </div>

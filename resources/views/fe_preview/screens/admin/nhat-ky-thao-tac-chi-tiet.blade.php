@@ -1,7 +1,7 @@
 @extends('fe_preview.layouts.admin')
 @section('page_title', 'Admin - HUIT Học Vụ')
-@section('html_attributes')lang="vi" class="['light']"@endsection
-@section('body_attributes')class="['bg-[#f8f9ff]', 'text-slate-800', 'antialiased', 'min-h-screen', 'flex', 'selection:bg-blue-100', 'selection:text-blue-900']"@endsection
+@section('html_attributes')lang="vi" class="light"@endsection
+@section('body_attributes')class="bg-[#f8f9ff] text-slate-800 antialiased min-h-screen flex selection:bg-blue-100 selection:text-blue-900"@endsection
 @section('head')
 
 <meta charset="utf-8"/>
@@ -225,7 +225,7 @@
 <div class="flex items-center gap-2.5 text-xs text-slate-600">
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
-<div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
+<div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 0000 0000</div>
 <div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
@@ -656,7 +656,7 @@
 <footer class="py-4 px-6 bg-white border-t border-slate-200/80 text-center text-xs text-slate-500 no-print flex flex-col sm:flex-row items-center justify-between gap-2">
 <div>© 2026 <strong>Trường Đại học Công Thương TP.HCM (HUIT)</strong> — Hệ thống Quản lý Học vụ.</div>
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
-<span>Hỗ trợ: 028 3816 1673</span>
+<span>Hỗ trợ: 028 0000 0000</span>
 <span>•</span>
 <span>nguoidung038@example.test</span>
 </div>

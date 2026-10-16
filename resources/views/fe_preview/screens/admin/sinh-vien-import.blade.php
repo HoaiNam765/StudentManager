@@ -1,7 +1,7 @@
 @extends('fe_preview.layouts.admin')
 @section('page_title', 'Admin - HUIT Học Vụ')
-@section('html_attributes')lang="vi" class="['light']"@endsection
-@section('body_attributes')class="['bg-[#f8f9ff]', 'text-slate-800', 'antialiased', 'min-h-screen', 'flex', 'selection:bg-blue-100', 'selection:text-blue-900']"@endsection
+@section('html_attributes')lang="vi" class="light"@endsection
+@section('body_attributes')class="bg-[#f8f9ff] text-slate-800 antialiased min-h-screen flex selection:bg-blue-100 selection:text-blue-900"@endsection
 @section('head')
 
 <meta charset="utf-8"/>
@@ -225,7 +225,7 @@
 <div class="flex items-center gap-2.5 text-xs text-slate-600">
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
-<div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
+<div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 0000 0000</div>
 <div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
@@ -503,7 +503,7 @@
                   </span>
 </td>
 <td class="sticky left-16 z-10 bg-[#fff5f5] px-4 py-3 font-semibold text-error border-r border-[#fecaca]">
-                  2001210123
+                  2400000007
                 </td>
 <td class="px-4 py-3 font-medium text-on-surface">Người dùng mẫu 44</td>
 <td class="px-4 py-3 text-on-surface-variant">20/04/2006</td>
@@ -515,7 +515,7 @@
 <div class="p-2 rounded bg-white/80 border border-error/30 text-xs space-y-0.5">
 <p class="font-semibold text-error flex items-center gap-1">
 <span class="material-symbols-outlined text-[14px]">error</span>
-                      Cột MSSV: "2001210123" đã tồn tại trong hệ thống (trùng sinh viên khóa K21).
+                      Cột MSSV: "2400000007" đã tồn tại trong hệ thống (trùng sinh viên khóa K21).
                     </p>
 <p class="text-on-surface-variant">
 <strong class="text-on-surface">Cách sửa:</strong> Đổi MSSV mới hoặc chọn chế độ cập nhật ghi đè.
@@ -648,7 +648,7 @@
 <footer class="py-4 px-6 bg-white border-t border-slate-200/80 text-center text-xs text-slate-500 no-print flex flex-col sm:flex-row items-center justify-between gap-2">
 <div>© 2026 <strong>Trường Đại học Công Thương TP.HCM (HUIT)</strong> — Hệ thống Quản lý Học vụ.</div>
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
-<span>Hỗ trợ: 028 3816 1673</span>
+<span>Hỗ trợ: 028 0000 0000</span>
 <span>•</span>
 <span>nguoidung038@example.test</span>
 </div>

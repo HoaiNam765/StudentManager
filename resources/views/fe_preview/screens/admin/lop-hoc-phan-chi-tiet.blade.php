@@ -1,7 +1,7 @@
 @extends('fe_preview.layouts.admin')
 @section('page_title', 'Chi tiết Lớp học phần - HUIT Học Vụ')
-@section('html_attributes')lang="vi" class="['light']"@endsection
-@section('body_attributes')class="['bg-[#f8f9ff]', 'text-slate-800', 'antialiased', 'min-h-screen', 'flex', 'selection:bg-blue-100', 'selection:text-blue-900']"@endsection
+@section('html_attributes')lang="vi" class="light"@endsection
+@section('body_attributes')class="bg-[#f8f9ff] text-slate-800 antialiased min-h-screen flex selection:bg-blue-100 selection:text-blue-900"@endsection
 @section('head')
 
 <meta charset="utf-8"/>
@@ -225,7 +225,7 @@
 <div class="flex items-center gap-2.5 text-xs text-slate-600">
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
-<div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
+<div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 0000 0000</div>
 <div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
@@ -514,7 +514,7 @@
 <input aria-label="Chọn dòng" class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary" type="checkbox"/>
 </td>
 <td class="py-3 px-3 text-center text-outline sticky left-10 bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">1</td>
-<td class="py-3 px-4 font-mono font-medium text-primary sticky left-[88px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">2001210123</td>
+<td class="py-3 px-4 font-mono font-medium text-primary sticky left-[88px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">2400000007</td>
 <td class="py-3 px-4 font-semibold text-on-surface sticky left-[216px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.04)]">
                       Người dùng mẫu 25
                     </td>
@@ -530,7 +530,7 @@
 </td>
 <td class="py-3 px-4 text-center">
 <div class="flex items-center justify-center gap-1.5">
-<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Người dùng mẫu 25', '2001210123')" title="Hủy đăng ký học phần">
+<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Người dùng mẫu 25', '2400000007')" title="Hủy đăng ký học phần">
 <span class="material-symbols-outlined text-[18px]">person_remove</span>
 </button>
 <button class="p-1.5 text-outline hover:text-primary hover:bg-surface-container-low rounded transition-colors" title="Xem hồ sơ sinh viên">
@@ -545,7 +545,7 @@
 <input aria-label="Chọn dòng" class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary" type="checkbox"/>
 </td>
 <td class="py-3 px-3 text-center text-outline sticky left-10 bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">2</td>
-<td class="py-3 px-4 font-mono font-medium text-primary sticky left-[88px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">2001210045</td>
+<td class="py-3 px-4 font-mono font-medium text-primary sticky left-[88px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">2400000005</td>
 <td class="py-3 px-4 font-semibold text-on-surface sticky left-[216px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.04)]">
                       Người dùng mẫu 16
                     </td>
@@ -561,7 +561,7 @@
 </td>
 <td class="py-3 px-4 text-center">
 <div class="flex items-center justify-center gap-1.5">
-<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Người dùng mẫu 16', '2001210045')" title="Hủy đăng ký học phần">
+<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Người dùng mẫu 16', '2400000005')" title="Hủy đăng ký học phần">
 <span class="material-symbols-outlined text-[18px]">person_remove</span>
 </button>
 <button class="p-1.5 text-outline hover:text-primary hover:bg-surface-container-low rounded transition-colors" title="Xem hồ sơ sinh viên">
@@ -576,7 +576,7 @@
 <input aria-label="Chọn dòng" class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary" type="checkbox"/>
 </td>
 <td class="py-3 px-3 text-center text-outline sticky left-10 bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">3</td>
-<td class="py-3 px-4 font-mono font-medium text-primary sticky left-[88px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">2001210189</td>
+<td class="py-3 px-4 font-mono font-medium text-primary sticky left-[88px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">2400000009</td>
 <td class="py-3 px-4 font-semibold text-on-surface sticky left-[216px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.04)]">
                       Người dùng mẫu 40
                     </td>
@@ -592,7 +592,7 @@
 </td>
 <td class="py-3 px-4 text-center">
 <div class="flex items-center justify-center gap-1.5">
-<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Người dùng mẫu 40', '2001210189')" title="Hủy đăng ký học phần">
+<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Người dùng mẫu 40', '2400000009')" title="Hủy đăng ký học phần">
 <span class="material-symbols-outlined text-[18px]">person_remove</span>
 </button>
 <button class="p-1.5 text-outline hover:text-primary hover:bg-surface-container-low rounded transition-colors" title="Xem hồ sơ sinh viên">
@@ -607,7 +607,7 @@
 <input aria-label="Chọn dòng" class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary" type="checkbox"/>
 </td>
 <td class="py-3 px-3 text-center text-outline sticky left-10 bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">4</td>
-<td class="py-3 px-4 font-mono font-medium text-primary sticky left-[88px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">2001210012</td>
+<td class="py-3 px-4 font-mono font-medium text-primary sticky left-[88px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">2400000004</td>
 <td class="py-3 px-4 font-semibold text-on-surface sticky left-[216px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.04)]">
                       Người dùng mẫu 30
                     </td>
@@ -623,7 +623,7 @@
 </td>
 <td class="py-3 px-4 text-center">
 <div class="flex items-center justify-center gap-1.5">
-<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Người dùng mẫu 30', '2001210012')" title="Hủy đăng ký học phần">
+<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Người dùng mẫu 30', '2400000004')" title="Hủy đăng ký học phần">
 <span class="material-symbols-outlined text-[18px]">person_remove</span>
 </button>
 <button class="p-1.5 text-outline hover:text-primary hover:bg-surface-container-low rounded transition-colors" title="Xem hồ sơ sinh viên">
@@ -638,7 +638,7 @@
 <input aria-label="Chọn dòng" class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary" type="checkbox"/>
 </td>
 <td class="py-3 px-3 text-center text-outline sticky left-10 bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">5</td>
-<td class="py-3 px-4 font-mono font-medium text-primary sticky left-[88px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">2001210341</td>
+<td class="py-3 px-4 font-mono font-medium text-primary sticky left-[88px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">2400000011</td>
 <td class="py-3 px-4 font-semibold text-on-surface sticky left-[216px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.04)]">
                       Người dùng mẫu 49
                     </td>
@@ -654,7 +654,7 @@
 </td>
 <td class="py-3 px-4 text-center">
 <div class="flex items-center justify-center gap-1.5">
-<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Người dùng mẫu 49', '2001210341')" title="Hủy đăng ký học phần">
+<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Người dùng mẫu 49', '2400000011')" title="Hủy đăng ký học phần">
 <span class="material-symbols-outlined text-[18px]">person_remove</span>
 </button>
 <button class="p-1.5 text-outline hover:text-primary hover:bg-surface-container-low rounded transition-colors" title="Xem hồ sơ sinh viên">
@@ -669,7 +669,7 @@
 <input aria-label="Chọn dòng" class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary" type="checkbox"/>
 </td>
 <td class="py-3 px-3 text-center text-outline sticky left-10 bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">6</td>
-<td class="py-3 px-4 font-mono font-medium text-primary sticky left-[88px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">2001210419</td>
+<td class="py-3 px-4 font-mono font-medium text-primary sticky left-[88px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">2400000015</td>
 <td class="py-3 px-4 font-semibold text-on-surface sticky left-[216px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.04)]">
                       Người dùng mẫu 51
                     </td>
@@ -685,7 +685,7 @@
 </td>
 <td class="py-3 px-4 text-center">
 <div class="flex items-center justify-center gap-1.5">
-<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Người dùng mẫu 51', '2001210419')" title="Hủy đăng ký học phần">
+<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Người dùng mẫu 51', '2400000015')" title="Hủy đăng ký học phần">
 <span class="material-symbols-outlined text-[18px]">person_remove</span>
 </button>
 <button class="p-1.5 text-outline hover:text-primary hover:bg-surface-container-low rounded transition-colors" title="Xem hồ sơ sinh viên">
@@ -700,7 +700,7 @@
 <input aria-label="Chọn dòng" class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary" type="checkbox"/>
 </td>
 <td class="py-3 px-3 text-center text-outline sticky left-10 bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">7</td>
-<td class="py-3 px-4 font-mono font-medium text-primary sticky left-[88px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">2001210512</td>
+<td class="py-3 px-4 font-mono font-medium text-primary sticky left-[88px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">2400000017</td>
 <td class="py-3 px-4 font-semibold text-on-surface sticky left-[216px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.04)]">
                       Người dùng mẫu 04
                     </td>
@@ -716,7 +716,7 @@
 </td>
 <td class="py-3 px-4 text-center">
 <div class="flex items-center justify-center gap-1.5">
-<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Người dùng mẫu 04', '2001210512')" title="Hủy đăng ký học phần">
+<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Người dùng mẫu 04', '2400000017')" title="Hủy đăng ký học phần">
 <span class="material-symbols-outlined text-[18px]">person_remove</span>
 </button>
 <button class="p-1.5 text-outline hover:text-primary hover:bg-surface-container-low rounded transition-colors" title="Xem hồ sơ sinh viên">
@@ -731,7 +731,7 @@
 <input aria-label="Chọn dòng" class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary" type="checkbox"/>
 </td>
 <td class="py-3 px-3 text-center text-outline sticky left-10 bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">8</td>
-<td class="py-3 px-4 font-mono font-medium text-primary sticky left-[88px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">2001210603</td>
+<td class="py-3 px-4 font-mono font-medium text-primary sticky left-[88px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">2400000018</td>
 <td class="py-3 px-4 font-semibold text-on-surface sticky left-[216px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.04)]">
                       Người dùng mẫu 02
                     </td>
@@ -747,7 +747,7 @@
 </td>
 <td class="py-3 px-4 text-center">
 <div class="flex items-center justify-center gap-1.5">
-<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Người dùng mẫu 02', '2001210603')" title="Hủy đăng ký học phần">
+<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Người dùng mẫu 02', '2400000018')" title="Hủy đăng ký học phần">
 <span class="material-symbols-outlined text-[18px]">person_remove</span>
 </button>
 <button class="p-1.5 text-outline hover:text-primary hover:bg-surface-container-low rounded transition-colors" title="Xem hồ sơ sinh viên">
@@ -762,7 +762,7 @@
 <input aria-label="Chọn dòng" class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary" type="checkbox"/>
 </td>
 <td class="py-3 px-3 text-center text-outline sticky left-10 bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">9</td>
-<td class="py-3 px-4 font-mono font-medium text-primary sticky left-[88px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">2001210724</td>
+<td class="py-3 px-4 font-mono font-medium text-primary sticky left-[88px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">2400000019</td>
 <td class="py-3 px-4 font-semibold text-on-surface sticky left-[216px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.04)]">
                       Người dùng mẫu 19
                     </td>
@@ -778,7 +778,7 @@
 </td>
 <td class="py-3 px-4 text-center">
 <div class="flex items-center justify-center gap-1.5">
-<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Người dùng mẫu 19', '2001210724')" title="Hủy đăng ký học phần">
+<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Người dùng mẫu 19', '2400000019')" title="Hủy đăng ký học phần">
 <span class="material-symbols-outlined text-[18px]">person_remove</span>
 </button>
 <button class="p-1.5 text-outline hover:text-primary hover:bg-surface-container-low rounded transition-colors" title="Xem hồ sơ sinh viên">
@@ -793,7 +793,7 @@
 <input aria-label="Chọn dòng" class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary" type="checkbox"/>
 </td>
 <td class="py-3 px-3 text-center text-outline sticky left-10 bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">10</td>
-<td class="py-3 px-4 font-mono font-medium text-primary sticky left-[88px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">2001210889</td>
+<td class="py-3 px-4 font-mono font-medium text-primary sticky left-[88px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[1px_0_0_0_#e2e8f0]">2400000021</td>
 <td class="py-3 px-4 font-semibold text-on-surface sticky left-[216px] bg-white group-hover:bg-slate-50/80 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.04)]">
                       Người dùng mẫu 03
                     </td>
@@ -809,7 +809,7 @@
 </td>
 <td class="py-3 px-4 text-center">
 <div class="flex items-center justify-center gap-1.5">
-<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Người dùng mẫu 03', '2001210889')" title="Hủy đăng ký học phần">
+<button class="p-1.5 text-outline hover:text-error hover:bg-error-container/20 rounded transition-colors" onclick="openDeregisterModal('Người dùng mẫu 03', '2400000021')" title="Hủy đăng ký học phần">
 <span class="material-symbols-outlined text-[18px]">person_remove</span>
 </button>
 <button class="p-1.5 text-outline hover:text-primary hover:bg-surface-container-low rounded transition-colors" title="Xem hồ sơ sinh viên">
@@ -848,7 +848,7 @@
 <footer class="py-4 px-6 bg-white border-t border-slate-200/80 text-center text-xs text-slate-500 no-print flex flex-col sm:flex-row items-center justify-between gap-2">
 <div>© 2026 <strong>Trường Đại học Công Thương TP.HCM (HUIT)</strong> — Hệ thống Quản lý Học vụ.</div>
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
-<span>Hỗ trợ: 028 3816 1673</span>
+<span>Hỗ trợ: 028 0000 0000</span>
 <span>•</span>
 <span>nguoidung038@example.test</span>
 </div>

@@ -1,7 +1,7 @@
 @extends('fe_preview.layouts.admin')
 @section('page_title', 'Điểm danh & Chuyên cần toàn trường - HUIT Học Vụ')
-@section('html_attributes')lang="vi" class="['light']"@endsection
-@section('body_attributes')class="['bg-[#f8f9ff]', 'text-slate-800', 'antialiased', 'min-h-screen', 'flex', 'selection:bg-blue-100', 'selection:text-blue-900']"@endsection
+@section('html_attributes')lang="vi" class="light"@endsection
+@section('body_attributes')class="bg-[#f8f9ff] text-slate-800 antialiased min-h-screen flex selection:bg-blue-100 selection:text-blue-900"@endsection
 @section('head')
 
 <meta charset="utf-8"/>
@@ -197,7 +197,7 @@
 <div class="flex items-center gap-2.5 text-xs text-slate-600">
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
-<div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
+<div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 0000 0000</div>
 <div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
@@ -327,7 +327,7 @@
 </thead>
 <tbody class="divide-y divide-slate-100 text-xs font-medium text-slate-700">
 <tr class="bg-red-50/30 hover:bg-red-50/50 transition-colors">
-<td class="py-3 px-4 font-mono font-bold text-slate-900">2001210888</td>
+<td class="py-3 px-4 font-mono font-bold text-slate-900">2400000020</td>
 <td class="py-3 px-4 font-bold text-slate-900">Người dùng mẫu 35</td>
 <td class="py-3 px-4">241_71ITEC3201_01</td>
 <td class="py-3 px-4">TS. Người dùng mẫu 38</td>
@@ -337,13 +337,13 @@
 <span class="px-2 py-0.5 rounded font-extrabold bg-red-100 text-red-800 border border-red-300">CẤM THI</span>
 </td>
 <td class="py-3 px-4 text-center">
-<button class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-[11px]" onclick="openAdjustModal('Người dùng mẫu 35', '2001210888')">
+<button class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-[11px]" onclick="openAdjustModal('Người dùng mẫu 35', '2400000020')">
                 Điều chỉnh
               </button>
 </td>
 </tr>
 <tr class="bg-amber-50/20 hover:bg-amber-50/40 transition-colors">
-<td class="py-3 px-4 font-mono font-bold text-slate-900">2001210123</td>
+<td class="py-3 px-4 font-mono font-bold text-slate-900">2400000007</td>
 <td class="py-3 px-4 font-bold text-slate-900">Người dùng mẫu 25</td>
 <td class="py-3 px-4">241_71ITEC3201_01</td>
 <td class="py-3 px-4">TS. Người dùng mẫu 38</td>
@@ -353,7 +353,7 @@
 <span class="px-2 py-0.5 rounded font-extrabold bg-amber-100 text-amber-800 border border-amber-300">CẢNH BÁO</span>
 </td>
 <td class="py-3 px-4 text-center">
-<button class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-[11px]" onclick="openAdjustModal('Người dùng mẫu 25', '2001210123')">
+<button class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-[11px]" onclick="openAdjustModal('Người dùng mẫu 25', '2400000007')">
                 Điều chỉnh
               </button>
 </td>
@@ -374,7 +374,7 @@
 <div class="space-y-3 text-xs">
 <div>
 <span class="text-slate-500 block">Sinh viên:</span>
-<strong class="text-slate-900 text-sm" id="modalStudentName">Người dùng mẫu 25 (2001210123)</strong>
+<strong class="text-slate-900 text-sm" id="modalStudentName">Người dùng mẫu 25 (2400000007)</strong>
 </div>
 <div>
 <label class="block font-semibold text-slate-700 mb-1" for="modal-session-sel">Buổi học cần điều chỉnh</label>
@@ -428,7 +428,7 @@
 <footer class="py-4 px-6 bg-white border-t border-slate-200/80 text-center text-xs text-slate-500 no-print flex flex-col sm:flex-row items-center justify-between gap-2">
 <div>© 2026 <strong>Trường Đại học Công Thương TP.HCM (HUIT)</strong> — Hệ thống Quản lý Học vụ.</div>
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
-<span>Hỗ trợ: 028 3816 1673</span>
+<span>Hỗ trợ: 028 0000 0000</span>
 <span>•</span>
 <span>nguoidung038@example.test</span>
 </div>

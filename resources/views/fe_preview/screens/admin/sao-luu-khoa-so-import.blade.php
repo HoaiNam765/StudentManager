@@ -1,7 +1,7 @@
 @extends('fe_preview.layouts.admin')
 @section('page_title', 'Sao lưu, phục hồi & Khóa sổ học kỳ - HUIT Học Vụ')
-@section('html_attributes')lang="vi" class="['light']"@endsection
-@section('body_attributes')class="['bg-[#f8f9ff]', 'text-slate-800', 'antialiased', 'min-h-screen', 'flex', 'selection:bg-blue-100', 'selection:text-blue-900']"@endsection
+@section('html_attributes')lang="vi" class="light"@endsection
+@section('body_attributes')class="bg-[#f8f9ff] text-slate-800 antialiased min-h-screen flex selection:bg-blue-100 selection:text-blue-900"@endsection
 @section('head')
 
 <meta charset="utf-8"/>
@@ -213,7 +213,7 @@
 <div class="flex items-center gap-2.5 text-xs text-slate-600">
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
-<div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
+<div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 0000 0000</div>
 <div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
@@ -352,7 +352,7 @@
 <span>Phát hiện 2 dòng dữ liệu bị lỗi trong file tải lên:</span>
 </div>
 <ul class="list-disc list-inside space-y-1 text-red-700 pl-2">
-<li><strong>Dòng 14:</strong> Mã sinh viên <code class="font-mono bg-white px-1 py-0.5 rounded">2001210999</code> đã tồn tại trong hệ thống (Trùng khóa chính).</li>
+<li><strong>Dòng 14:</strong> Mã sinh viên <code class="font-mono bg-white px-1 py-0.5 rounded">2400000022</code> đã tồn tại trong hệ thống (Trùng khóa chính).</li>
 <li><strong>Dòng 28:</strong> Ngày sinh <code class="font-mono bg-white px-1 py-0.5 rounded">31/02/2003</code> sai định dạng ngày hợp lệ.</li>
 </ul>
 </div>
@@ -395,7 +395,7 @@
 <footer class="py-4 px-6 bg-white border-t border-slate-200/80 text-center text-xs text-slate-500 no-print flex flex-col sm:flex-row items-center justify-between gap-2">
 <div>© 2026 <strong>Trường Đại học Công Thương TP.HCM (HUIT)</strong> — Hệ thống Quản lý Học vụ.</div>
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
-<span>Hỗ trợ: 028 3816 1673</span>
+<span>Hỗ trợ: 028 0000 0000</span>
 <span>•</span>
 <span>nguoidung038@example.test</span>
 </div>

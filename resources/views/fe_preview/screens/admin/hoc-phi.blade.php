@@ -1,7 +1,7 @@
 @extends('fe_preview.layouts.admin')
 @section('page_title', 'Quản lý Học phí & Thu công nợ - HUIT Học Vụ')
-@section('html_attributes')lang="vi" class="['light']"@endsection
-@section('body_attributes')class="['bg-[#f8f9ff]', 'text-slate-800', 'antialiased', 'min-h-screen', 'flex', 'selection:bg-blue-100', 'selection:text-blue-900']"@endsection
+@section('html_attributes')lang="vi" class="light"@endsection
+@section('body_attributes')class="bg-[#f8f9ff] text-slate-800 antialiased min-h-screen flex selection:bg-blue-100 selection:text-blue-900"@endsection
 @section('head')
 
 <meta charset="utf-8"/>
@@ -197,7 +197,7 @@
 <div class="flex items-center gap-2.5 text-xs text-slate-600">
 <span class="material-symbols-outlined text-primary text-[18px]">support_agent</span>
 <div>
-<div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 3816 1673</div>
+<div class="font-semibold text-slate-800 text-[11.5px]">Hỗ trợ kỹ thuật: 028 0000 0000</div>
 <div class="text-[11px] text-slate-500">nguoidung038@example.test</div>
 </div>
 </div>
@@ -322,7 +322,7 @@
 <tbody class="divide-y divide-slate-100 text-xs font-medium text-slate-700">
 <tr>
 <td class="py-3 px-4 font-mono font-bold text-primary">HD2026-08129</td>
-<td class="py-3 px-4 font-mono font-bold text-slate-900">2001210123</td>
+<td class="py-3 px-4 font-mono font-bold text-slate-900">2400000007</td>
 <td class="py-3 px-4 font-bold text-slate-900">Người dùng mẫu 25</td>
 <td class="py-3 px-4">12DHTH01</td>
 <td class="py-3 px-4 text-center">15</td>
@@ -339,7 +339,7 @@
 </tr>
 <tr class="bg-amber-50/20">
 <td class="py-3 px-4 font-mono font-bold text-primary">HD2026-08130</td>
-<td class="py-3 px-4 font-mono font-bold text-slate-900">2001210888</td>
+<td class="py-3 px-4 font-mono font-bold text-slate-900">2400000020</td>
 <td class="py-3 px-4 font-bold text-slate-900">Người dùng mẫu 35</td>
 <td class="py-3 px-4">12DHTH01</td>
 <td class="py-3 px-4 text-center">16</td>
@@ -349,7 +349,7 @@
 <span class="px-2 py-0.5 rounded font-bold bg-amber-100 text-amber-800 border border-amber-300">Còn nợ</span>
 </td>
 <td class="py-3 px-4 text-center">
-<button class="px-2 py-1 rounded bg-blue-50 hover:bg-blue-100 text-primary font-bold text-[11px]" onclick="recordForStudent('2001210888', 'Người dùng mẫu 35', '10.080.000 đ')">
+<button class="px-2 py-1 rounded bg-blue-50 hover:bg-blue-100 text-primary font-bold text-[11px]" onclick="recordForStudent('2400000020', 'Người dùng mẫu 35', '10.080.000 đ')">
                 Thu tiền
               </button>
 </td>
@@ -370,7 +370,7 @@
 <form class="space-y-3 text-xs" onsubmit="handleConfirmPayment(event)">
 <div>
 <label class="block font-semibold text-slate-700 mb-1" for="pay-mssv">Mã số sinh viên (MSSV)</label>
-<input class="w-full h-9 px-3 rounded-lg border border-slate-300 bg-slate-50" id="pay-mssv" required="" type="text" value="2001210888"/>
+<input class="w-full h-9 px-3 rounded-lg border border-slate-300 bg-slate-50" id="pay-mssv" required="" type="text" value="2400000020"/>
 </div>
 <div>
 <label class="block font-semibold text-slate-700 mb-1" for="pay-name">Họ và tên</label>
@@ -420,7 +420,7 @@
 <footer class="py-4 px-6 bg-white border-t border-slate-200/80 text-center text-xs text-slate-500 no-print flex flex-col sm:flex-row items-center justify-between gap-2">
 <div>© 2026 <strong>Trường Đại học Công Thương TP.HCM (HUIT)</strong> — Hệ thống Quản lý Học vụ.</div>
 <div class="flex items-center gap-3 text-slate-500 text-[11px]">
-<span>Hỗ trợ: 028 3816 1673</span>
+<span>Hỗ trợ: 028 0000 0000</span>
 <span>•</span>
 <span>nguoidung038@example.test</span>
 </div>

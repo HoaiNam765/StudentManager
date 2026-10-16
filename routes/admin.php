@@ -17,6 +17,7 @@ use App\Modules\System\Http\Controllers\ImportController;
 use App\Modules\System\Http\Controllers\LookupController;
 use App\Modules\System\Http\Controllers\PolicySetController;
 use App\Modules\System\Http\Controllers\SettingController;
+use App\Modules\Teacher\Http\Controllers\LecturerController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -156,6 +157,29 @@ Route::middleware('auth')->group(function (): void {
 
     Route::post('holidays', [AcademicCalendarController::class, 'storeHoliday'])->middleware('permission:ACY.create')->name('holidays.store');
     Route::delete('holidays/{holiday}', [AcademicCalendarController::class, 'destroyHoliday'])->middleware('permission:ACY.delete')->name('holidays.destroy');
+
+    // Hồ sơ giảng viên (TCH, FR-TCH-001, 003): xem = TCH.view (LEC, ADV chỉ hồ sơ của mình), thêm = TCH.create,
+    // sửa / tình trạng / kiêm nhiệm / cấp tài khoản / xác nhận đề nghị = TCH.update. Phạm vi kiểm tra tiếp trong LecturerController.
+    Route::middleware('permission:TCH.view')->group(function (): void {
+        Route::get('lecturers', [LecturerController::class, 'index'])->name('lecturers.index');
+        Route::get('lecturers/{lecturer}', [LecturerController::class, 'show'])->name('lecturers.show');
+        Route::get('lecturers/{lecturer}/units', [LecturerController::class, 'units'])->name('lecturers.units.index');
+        Route::get('lecturer-change-requests', [LecturerController::class, 'changeRequests'])->name('lecturer-change-requests.index');
+    });
+
+    Route::post('lecturers', [LecturerController::class, 'store'])->middleware('permission:TCH.create')->name('lecturers.store');
+
+    Route::middleware('permission:TCH.update')->group(function (): void {
+        Route::put('lecturers/{lecturer}', [LecturerController::class, 'update'])->name('lecturers.update');
+        Route::get('lecturers/{lecturer}/handover', [LecturerController::class, 'handover'])->name('lecturers.handover');
+        Route::post('lecturers/{lecturer}/status', [LecturerController::class, 'changeStatus'])->name('lecturers.status');
+        Route::post('lecturers/{lecturer}/account', [LecturerController::class, 'createAccount'])->name('lecturers.account');
+        Route::post('lecturers/{lecturer}/units', [LecturerController::class, 'storeUnit'])->name('lecturers.units.store');
+        Route::post('lecturer-units/{lecturerUnit}/end', [LecturerController::class, 'endUnit'])->name('lecturer-units.end');
+        Route::delete('lecturer-units/{lecturerUnit}', [LecturerController::class, 'destroyUnit'])->name('lecturer-units.destroy');
+        Route::post('lecturer-change-requests/{lecturerChangeRequest}/approve', [LecturerController::class, 'approve'])->name('lecturer-change-requests.approve');
+        Route::post('lecturer-change-requests/{lecturerChangeRequest}/reject', [LecturerController::class, 'reject'])->name('lecturer-change-requests.reject');
+    });
 
     // Trung tâm import (SYS, FR-SYS-007): xem = SYS.view, tải lên/kiểm tra/lưu = SYS.create, hoàn tác/xóa = SYS.delete.
     // Quyền trên từng lô (phạm vi dữ liệu) kiểm tra tiếp bằng ImportBatchPolicy.

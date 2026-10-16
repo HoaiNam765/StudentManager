@@ -63,7 +63,7 @@ class LeadershipService extends BaseService
             $this->fail("Đơn vị {$unit->code} đang ngừng hoạt động.", 'Chỉ giao chức vụ cho đơn vị đang hoạt động.');
         }
 
-        $reason = $this->eligibility->reasonIneligible($user, $unit, $position);
+        $reason = $this->eligibility->reasonIneligible($user, $unit, $position, $startsOn, $endsOn);
 
         if ($reason !== null) {
             $this->fail($reason, 'Chọn giảng viên hoặc cán bộ đang hoạt động thuộc đơn vị (BR-FAC-04).');

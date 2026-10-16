@@ -141,13 +141,14 @@ class LeadershipTest extends TestCase
         $person = User::factory()->create();
         $deanTerm = $this->assignDean($person, $this->day(-30));
         $accounting = Department::query()->where('code', 'BM-KTKT')->firstOrFail();
-        $this->leadership->assign(['unit_type' => 'department', 'unit_id' => $accounting->id, 'user_id' => $person->id, 'position' => 'head', 'starts_on' => $this->day(-5)]);
+        // Chức thứ hai là phó trưởng bộ môn: không ai giữ hai chức vụ trưởng cùng lúc (BR-TCH-06)
+        $this->leadership->assign(['unit_type' => 'department', 'unit_id' => $accounting->id, 'user_id' => $person->id, 'position' => 'vice_head', 'starts_on' => $this->day(-5)]);
 
         $access = app(FacultyAccess::class);
         $this->assertSame([$this->cntt->id], $access->facultyIds($person));
         $this->assertCount(4, $access->departmentIds($person)); // 3 bộ môn của khoa CNTT + bộ môn Kế toán – Kiểm toán
 
-        // Kết thúc chức trưởng khoa từ hôm qua: vẫn là trưởng bộ môn nên vẫn có DEAN, nhưng chỉ còn bộ môn đó
+        // Kết thúc chức trưởng khoa từ hôm qua: vẫn là phó trưởng bộ môn nên vẫn có DEAN, nhưng chỉ còn bộ môn đó
         $this->leadership->end($deanTerm, $this->day(-1));
         $this->fresh();
 

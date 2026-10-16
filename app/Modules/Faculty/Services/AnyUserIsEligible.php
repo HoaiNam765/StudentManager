@@ -9,12 +9,12 @@ use App\Modules\Faculty\Models\Department;
 use App\Modules\Faculty\Models\Faculty;
 
 /**
- * Bản mặc định khi chưa có hồ sơ giảng viên (TCH): chưa kiểm tra người được giao có thuộc đơn vị hay không.
- * TCH (#88) thay bằng lớp kiểm tra thật (BR-FAC-04).
+ * Bản mặc định khi không cài module TCH: không kiểm tra người được giao có thuộc đơn vị hay không.
+ * TCH (#88) bind lớp kiểm tra thật `TeacherLeaderEligibility` (BR-FAC-04, BR-TCH-06).
  */
 class AnyUserIsEligible implements LeaderEligibility
 {
-    public function reasonIneligible(User $user, Faculty|Department $unit, LeadershipPosition $position): ?string
+    public function reasonIneligible(User $user, Faculty|Department $unit, LeadershipPosition $position, ?string $startsOn = null, ?string $endsOn = null): ?string
     {
         return null;
     }

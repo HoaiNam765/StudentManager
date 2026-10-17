@@ -79,6 +79,9 @@ return [
     // Giảng viên (TCH): dung lượng ảnh hồ sơ tối đa (KB)
     'teacher' => [
         'photo_max_kb' => (int) env('TEACHER_PHOTO_MAX_KB', 2048),
+
+        // Số tiết tối đa trong ngày, dùng kiểm tra lịch bận (khung tiết học chính thức thuộc TTB, FR-TTB-001)
+        'periods_per_day' => (int) env('TEACHER_PERIODS_PER_DAY', 15),
     ],
 
     'faculty' => [

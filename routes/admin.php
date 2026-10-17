@@ -11,6 +11,7 @@ use App\Modules\Faculty\Http\Controllers\LeadershipController;
 use App\Modules\Faculty\Http\Controllers\UnitController;
 use App\Modules\Room\Http\Controllers\FacilityController;
 use App\Modules\Room\Http\Controllers\RoomController;
+use App\Modules\Subject\Http\Controllers\GradeStructureController;
 use App\Modules\Subject\Http\Controllers\SubjectController;
 use App\Modules\System\Http\Controllers\AdministrativeUnitController;
 use App\Modules\System\Http\Controllers\ImportController;
@@ -295,6 +296,8 @@ Route::middleware('auth')->group(function (): void {
 
     Route::get('subjects/export', [SubjectController::class, 'export'])->middleware('permission:SUB.export')->name('subjects.export');
     Route::post('subjects', [SubjectController::class, 'store'])->middleware('permission:SUB.create')->name('subjects.store');
+    Route::get('subjects/{subject}/grade-components', [GradeStructureController::class, 'show'])->whereNumber('subject')->middleware('permission:SUB.view')->name('subjects.grade-components.show');
+    Route::put('subjects/{subject}/grade-components', [GradeStructureController::class, 'update'])->whereNumber('subject')->middleware('permission:SUB.update')->name('subjects.grade-components.update');
     Route::put('subjects/{subject}', [SubjectController::class, 'update'])->whereNumber('subject')->middleware('permission:SUB.update')->name('subjects.update');
     Route::delete('subjects/{subject}', [SubjectController::class, 'destroy'])->whereNumber('subject')->middleware('permission:SUB.delete')->name('subjects.destroy');
 

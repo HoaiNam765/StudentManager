@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
         SubjectRelationSeeder::class, // SUB: tiên quyết, học trước, song hành
         // CurriculumSeeder::class,   // CUR: chương trình đào tạo
         TeacherSeeder::class,         // TCH: giảng viên
+        GradeStructureSeeder::class,  // SUB: cơ cấu điểm mặc định của học phần
         // SchoolClassSeeder::class,  // CLS: khóa, lớp hành chính, lớp học phần
         // StudentSeeder::class,      // STU: sinh viên
         // TimetableSeeder::class,    // TTB: thời khóa biểu, buổi học

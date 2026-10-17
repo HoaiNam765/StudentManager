@@ -18,12 +18,15 @@ use App\Modules\Teacher\Services\LecturerProfileService;
 use App\Modules\Teacher\Services\LecturerService;
 use App\Support\Audit\AuditEvent;
 use App\Support\Audit\AuditLogger;
+use App\Support\Exports\ExportColumn;
+use App\Support\Services\ExportService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 /**
  * API quản lý hồ sơ giảng viên (FR-TCH-001, 003; BR-TCH-01, 02, 07). Quyền: middleware `permission:TCH.*` chặn cả route;
@@ -134,6 +137,39 @@ class LecturerController extends Controller
         $lecturer = $this->lecturers->createAccount($lecturer, $request->user(), $email);
 
         return response()->json($this->present($lecturer->load('department.faculty', 'user'), $request->user()), 201);
+    }
+
+    /**
+     * Xuất danh sách đang lọc (khoa, bộ môn, chức danh, học vị, tình trạng) ra Excel / CSV / PDF (FR-TCH-013).
+     * Cần quyền TCH.export (ACAD toàn trường, DEAN đơn vị mình); điện thoại, ngày sinh là cột nhạy cảm.
+     */
+    public function export(Request $request, ExportService $exports): SymfonyResponse
+    {
+        $result = $exports->export(
+            $this->listQuery($request)->with('department.faculty:id,code,name'),
+            [
+                new ExportColumn('code', 'Mã giảng viên'),
+                new ExportColumn('full_name', 'Họ và tên'),
+                new ExportColumn('department.code', 'Mã bộ môn'),
+                new ExportColumn('department.name', 'Bộ môn'),
+                new ExportColumn('department.faculty.name', 'Khoa'),
+                new ExportColumn('academic_title_label', 'Chức danh'),
+                new ExportColumn('academic_degree_label', 'Học vị'),
+                new ExportColumn('expertise', 'Chuyên môn'),
+                new ExportColumn('email', 'Email'),
+                new ExportColumn('phone', 'Điện thoại', sensitive: true),
+                new ExportColumn('date_of_birth', 'Ngày sinh', sensitive: true),
+                new ExportColumn('status_label', 'Tình trạng'),
+            ],
+            'TCH',
+            $request->user(),
+            $request->string('format', 'xlsx')->toString(),
+            'danh-sach-giang-vien',
+        );
+
+        return $result->isQueued()
+            ? response()->json(['id' => $result->requestId, 'row_count' => $result->rowCount], 202)
+            : $result->download;
     }
 
     // ---------------------------------------------------------------------

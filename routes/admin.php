@@ -162,6 +162,7 @@ Route::middleware('auth')->group(function (): void {
     // sửa / tình trạng / kiêm nhiệm / cấp tài khoản / xác nhận đề nghị = TCH.update. Phạm vi kiểm tra tiếp trong LecturerController.
     Route::middleware('permission:TCH.view')->group(function (): void {
         Route::get('lecturers', [LecturerController::class, 'index'])->name('lecturers.index');
+        Route::get('lecturers/export', [LecturerController::class, 'export'])->middleware('permission:TCH.export')->name('lecturers.export');
         Route::get('lecturers/{lecturer}', [LecturerController::class, 'show'])->name('lecturers.show');
         Route::get('lecturers/{lecturer}/units', [LecturerController::class, 'units'])->name('lecturers.units.index');
         Route::get('lecturer-change-requests', [LecturerController::class, 'changeRequests'])->name('lecturer-change-requests.index');

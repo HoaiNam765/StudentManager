@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Modules\Teacher\Http\Controllers\LecturerProfileController;
+use App\Modules\Teacher\Http\Controllers\LecturerScheduleController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -22,4 +23,14 @@ Route::middleware('auth')->group(function (): void {
     Route::put('profile', [LecturerProfileController::class, 'update'])->name('profile.update');
     Route::post('profile/photo', [LecturerProfileController::class, 'photo'])->name('profile.photo');
     Route::delete('profile/change-requests/{lecturerChangeRequest}', [LecturerProfileController::class, 'cancelRequest'])->name('profile.change-requests.cancel');
+
+    // Lịch bận, nguyện vọng học phần kỳ tới, nghỉ phép / công tác của chính giảng viên (FR-TCH-008, 012; phạm vi OWN)
+    Route::get('availability', [LecturerScheduleController::class, 'myAvailability'])->name('availability.index');
+    Route::post('availability', [LecturerScheduleController::class, 'storeAvailability'])->name('availability.store');
+    Route::delete('availability/{lecturerAvailability}', [LecturerScheduleController::class, 'destroyAvailability'])->name('availability.destroy');
+    Route::get('preferences', [LecturerScheduleController::class, 'myPreferences'])->name('preferences.show');
+    Route::put('preferences', [LecturerScheduleController::class, 'updatePreferences'])->name('preferences.update');
+    Route::get('leaves', [LecturerScheduleController::class, 'myLeaves'])->name('leaves.index');
+    Route::post('leaves', [LecturerScheduleController::class, 'storeLeave'])->name('leaves.store');
+    Route::post('leaves/{lecturerLeave}/cancel', [LecturerScheduleController::class, 'cancelLeave'])->name('leaves.cancel');
 });

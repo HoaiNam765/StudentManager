@@ -72,6 +72,21 @@ class Lecturer extends StandardModel implements HasDataScope
         return $this->hasMany(LecturerChangeRequest::class);
     }
 
+    public function availabilities(): HasMany
+    {
+        return $this->hasMany(LecturerAvailability::class);
+    }
+
+    public function preferences(): HasMany
+    {
+        return $this->hasMany(TeachingPreference::class);
+    }
+
+    public function leaves(): HasMany
+    {
+        return $this->hasMany(LecturerLeave::class);
+    }
+
     /** Được phân công giảng dạy, cố vấn mới không (BR-TCH-02, BR-TCH-09). */
     public function isAssignable(): bool
     {

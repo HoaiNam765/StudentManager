@@ -20,6 +20,7 @@ use App\Modules\System\Http\Controllers\LookupController;
 use App\Modules\System\Http\Controllers\PolicySetController;
 use App\Modules\System\Http\Controllers\SettingController;
 use App\Modules\Teacher\Http\Controllers\LecturerController;
+use App\Modules\Teacher\Http\Controllers\LecturerScheduleController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -167,6 +168,10 @@ Route::middleware('auth')->group(function (): void {
         Route::get('lecturers/{lecturer}', [LecturerController::class, 'show'])->name('lecturers.show');
         Route::get('lecturers/{lecturer}/units', [LecturerController::class, 'units'])->name('lecturers.units.index');
         Route::get('lecturer-change-requests', [LecturerController::class, 'changeRequests'])->name('lecturer-change-requests.index');
+        // Lịch bận, nguyện vọng, nghỉ phép (FR-TCH-008, 012)
+        Route::get('lecturers/{lecturer}/availability', [LecturerScheduleController::class, 'availabilityOfLecturer'])->name('lecturers.availability');
+        Route::get('teaching-preferences', [LecturerScheduleController::class, 'preferencesForTerm'])->name('teaching-preferences.index');
+        Route::get('lecturer-leaves', [LecturerScheduleController::class, 'leaves'])->name('lecturer-leaves.index');
     });
 
     Route::post('lecturers', [LecturerController::class, 'store'])->middleware('permission:TCH.create')->name('lecturers.store');
@@ -181,6 +186,8 @@ Route::middleware('auth')->group(function (): void {
         Route::delete('lecturer-units/{lecturerUnit}', [LecturerController::class, 'destroyUnit'])->name('lecturer-units.destroy');
         Route::post('lecturer-change-requests/{lecturerChangeRequest}/approve', [LecturerController::class, 'approve'])->name('lecturer-change-requests.approve');
         Route::post('lecturer-change-requests/{lecturerChangeRequest}/reject', [LecturerController::class, 'reject'])->name('lecturer-change-requests.reject');
+        Route::post('lecturer-leaves/{lecturerLeave}/approve', [LecturerScheduleController::class, 'approveLeave'])->name('lecturer-leaves.approve');
+        Route::post('lecturer-leaves/{lecturerLeave}/reject', [LecturerScheduleController::class, 'rejectLeave'])->name('lecturer-leaves.reject');
     });
 
     // Trung tâm import (SYS, FR-SYS-007): xem = SYS.view, tải lên/kiểm tra/lưu = SYS.create, hoàn tác/xóa = SYS.delete.

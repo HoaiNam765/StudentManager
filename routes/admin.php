@@ -12,6 +12,7 @@ use App\Modules\Faculty\Http\Controllers\UnitController;
 use App\Modules\Room\Http\Controllers\FacilityController;
 use App\Modules\Room\Http\Controllers\RoomController;
 use App\Modules\Subject\Http\Controllers\SubjectController;
+use App\Modules\Subject\Http\Controllers\SubjectRelationController;
 use App\Modules\System\Http\Controllers\AdministrativeUnitController;
 use App\Modules\System\Http\Controllers\ImportController;
 use App\Modules\System\Http\Controllers\LookupController;
@@ -291,12 +292,21 @@ Route::middleware('auth')->group(function (): void {
     Route::middleware('permission:SUB.view')->group(function (): void {
         Route::get('subjects', [SubjectController::class, 'index'])->name('subjects.index');
         Route::get('subjects/{subject}', [SubjectController::class, 'show'])->whereNumber('subject')->name('subjects.show');
+        Route::get('subjects/{subject}/relations', [SubjectRelationController::class, 'index'])->name('subjects.relations.index');
+        Route::get('subjects/{subject}/prerequisites', [SubjectRelationController::class, 'prerequisites'])->name('subjects.prerequisites');
     });
 
     Route::get('subjects/export', [SubjectController::class, 'export'])->middleware('permission:SUB.export')->name('subjects.export');
     Route::post('subjects', [SubjectController::class, 'store'])->middleware('permission:SUB.create')->name('subjects.store');
     Route::put('subjects/{subject}', [SubjectController::class, 'update'])->whereNumber('subject')->middleware('permission:SUB.update')->name('subjects.update');
     Route::delete('subjects/{subject}', [SubjectController::class, 'destroy'])->whereNumber('subject')->middleware('permission:SUB.delete')->name('subjects.destroy');
+
+    // Quan hệ học phần (FR-SUB-004): thêm, kết thúc, xóa = SUB.update trên học phần của quan hệ
+    Route::middleware('permission:SUB.update')->group(function (): void {
+        Route::post('subjects/{subject}/relations', [SubjectRelationController::class, 'store'])->name('subjects.relations.store');
+        Route::post('subject-relations/{subjectRelation}/end', [SubjectRelationController::class, 'end'])->name('subject-relations.end');
+        Route::delete('subject-relations/{subjectRelation}', [SubjectRelationController::class, 'destroy'])->name('subject-relations.destroy');
+    });
 
     // Lãnh đạo đơn vị theo nhiệm kỳ (FAC, FR-FAC-006): xem = FAC.view; giao, kết thúc, hủy = FAC.update toàn trường (ACAD, ADMIN)
     Route::get('leadership-terms', [LeadershipController::class, 'index'])->middleware('permission:FAC.view')->name('leadership-terms.index');

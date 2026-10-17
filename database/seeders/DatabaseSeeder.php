@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
         AcademicYearSeeder::class,    // ACY: năm học, học kỳ, lịch học vụ
         RoomSeeder::class,            // ROM: phòng học
         SubjectSeeder::class,         // SUB: học phần, quan hệ, cơ cấu điểm
+        SubjectRelationSeeder::class, // SUB: tiên quyết, học trước, song hành
         // CurriculumSeeder::class,   // CUR: chương trình đào tạo
         TeacherSeeder::class,         // TCH: giảng viên
         // SchoolClassSeeder::class,  // CLS: khóa, lớp hành chính, lớp học phần

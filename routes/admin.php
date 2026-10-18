@@ -425,6 +425,7 @@ Route::middleware('auth')->group(function (): void {
     Route::put('periods/{period}', [PeriodController::class, 'update'])->middleware('permission:TTB.update,ALL')->name('periods.update');
     Route::delete('periods/{period}', [PeriodController::class, 'destroy'])->middleware('permission:TTB.delete,ALL')->name('periods.destroy');
     Route::get('course-sections/{courseSection}/schedule', [ScheduleRuleController::class, 'index'])->whereNumber('courseSection')->name('course-sections.schedule.index');
+    Route::get('course-sections/{courseSection}/schedule-conflicts', [ScheduleRuleController::class, 'conflicts'])->whereNumber('courseSection')->name('course-sections.schedule.conflicts');
     Route::post('course-sections/{courseSection}/schedule', [ScheduleRuleController::class, 'store'])->whereNumber('courseSection')->name('course-sections.schedule.store');
     Route::put('schedule-rules/{scheduleRule}', [ScheduleRuleController::class, 'update'])->name('schedule-rules.update');
     Route::delete('schedule-rules/{scheduleRule}', [ScheduleRuleController::class, 'destroy'])->name('schedule-rules.destroy');

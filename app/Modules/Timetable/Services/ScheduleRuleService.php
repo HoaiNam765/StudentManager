@@ -20,7 +20,8 @@ use Carbon\CarbonImmutable;
  *   `studentmanager.timetable.latest_end` (BR-TTB-03).
  * - Các buổi nằm trong học kỳ (tuần ≤ số tuần, ngày trong khoảng bắt đầu – kết thúc; BR-TTB-07).
  * - Lớp học trực tiếp phải có phòng; phòng xếp được trong cả khoảng (BR-ROM-02) và đủ sức chứa sĩ số tối đa (BR-TTB-02).
- * - Hai dòng lịch của cùng lớp không chồng nhau. Trùng phòng / giảng viên giữa các lớp là FR-TTB-003.
+ * - Hai dòng lịch của cùng lớp không chồng nhau; trùng phòng / giảng viên / lịch sinh viên, sai loại phòng giữa các lớp
+ *   kiểm tra ở ScheduleConflictService (FR-TTB-003), chặn hay cảnh báo theo cấu hình.
  * - Tổng số tiết lệch số tiết quy định của học phần thì **cảnh báo**, không chặn (BR-TTB-04).
  */
 class ScheduleRuleService extends BaseService
@@ -28,15 +29,17 @@ class ScheduleRuleService extends BaseService
     public function __construct(
         private readonly PeriodService $periods,
         private readonly RoomAvailability $rooms,
+        private readonly ScheduleConflictService $conflicts,
     ) {}
 
     /** @return array{rule: ScheduleRule, warnings: list<string>} */
     public function create(CourseSection $section, array $data): array
     {
         $attributes = $this->check($section, $data);
+        $conflicts = $this->assertNoConflict($section, new ScheduleRule(['course_section_id' => $section->id, ...$attributes]));
         $rule = ScheduleRule::create(['course_section_id' => $section->id, ...$attributes]);
 
-        return ['rule' => $rule->load('room:id,code,capacity'), 'warnings' => $this->summary($section)['warnings']];
+        return ['rule' => $rule->load('room:id,code,capacity'), 'warnings' => [...$conflicts, ...$this->summary($section)['warnings']]];
     }
 
     /** @return array{rule: ScheduleRule, warnings: list<string>} */
@@ -54,9 +57,16 @@ class ScheduleRuleService extends BaseService
             'note' => array_key_exists('note', $data) ? $data['note'] : $rule->note,
         ], $rule->id);
 
+        $conflicts = $this->assertNoConflict($section, (clone $rule)->fill($attributes));
         $rule->update($attributes);
 
-        return ['rule' => $rule->refresh()->load('room:id,code,capacity'), 'warnings' => $this->summary($section)['warnings']];
+        // BR-TTB-08: sinh viên đã đăng ký bị trùng lịch với lớp khác của họ sau khi đổi
+        $affected = array_map(
+            fn (array $a) => "Sinh viên #{$a['student_id']} bị trùng lịch: {$a['clash']}.",
+            $this->conflicts->affectedStudents($section),
+        );
+
+        return ['rule' => $rule->refresh()->load('room:id,code,capacity'), 'warnings' => [...$conflicts, ...$affected, ...$this->summary($section)['warnings']]];
     }
 
     public function delete(ScheduleRule $rule): void
@@ -212,6 +222,22 @@ class ScheduleRuleService extends BaseService
             'week_parity' => $parity,
             'note' => $data['note'] ?? null,
         ];
+    }
+
+    /**
+     * Chặn xung đột loại "block", trả các xung đột loại "warn" để hiển thị (FR-TTB-003).
+     *
+     * @return list<string>
+     */
+    private function assertNoConflict(CourseSection $section, ScheduleRule $candidate): array
+    {
+        $found = $this->conflicts->check($section, $candidate);
+
+        if ($found['block'] !== []) {
+            $this->fail('Lịch bị xung đột: '.implode(' ', $found['block']), 'Đổi phòng, thứ, tiết hoặc tuần học; xem lớp gây xung đột nêu ở trên (BR-TTB-01, 02).');
+        }
+
+        return $found['warn'];
     }
 
     private function assertEditable(CourseSection $section): void

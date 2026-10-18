@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Modules\Enrollment\Http\Controllers\RegistrationOptionsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,4 +17,7 @@ Route::middleware('auth')->group(function (): void {
     // Dashboard dùng dữ liệu mẫu của nhóm FE; thay bằng dữ liệu thật khi có (FR-RPT-009)
     Route::get('/', [DashboardController::class, 'student'])->name('home');
     Route::get('/mobile', [DashboardController::class, 'studentMobile'])->name('mobile');
+
+    // Đăng ký học phần (ENR, FR-ENR-002): đợt đang mở của sinh viên và các lớp được chọn (JSON)
+    Route::get('/registration/options', [RegistrationOptionsController::class, 'mine'])->middleware('permission:ENR.view')->name('registration.options');
 });

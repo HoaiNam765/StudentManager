@@ -4,6 +4,7 @@ use App\Modules\Auth\AuthServiceProvider;
 use App\Modules\Curriculum\CurriculumServiceProvider;
 use App\Modules\Faculty\FacultyServiceProvider;
 use App\Modules\Room\RoomServiceProvider;
+use App\Modules\Student\StudentServiceProvider;
 use App\Modules\Subject\SubjectServiceProvider;
 use App\Modules\System\SystemServiceProvider;
 use App\Modules\Teacher\TeacherServiceProvider;
@@ -18,4 +19,5 @@ return [
     AuthServiceProvider::class,
     SubjectServiceProvider::class,
     CurriculumServiceProvider::class,
+    StudentServiceProvider::class,
 ];

@@ -283,6 +283,14 @@ $resolver->setFor($khoa, $ngay)->code;            // bộ quy chế đang áp d�
 - Phạm vi: CTSV, ACAD toàn trường; DEAN (FACULTY) sinh viên thuộc ngành của khoa mình; STU (OWN) hồ sơ của mình qua `user_id` (cấp ở #102); LEC (SECTION), ADV (ADVISEE) chưa có dữ liệu cho tới ENR và #99. Ngành, chuyên ngành, hệ đào tạo, CTĐT còn sinh viên đang học thì không ngừng được.
 - API: `/admin/students` (lọc `q` không dấu hoặc số giấy tờ, `status`, `major_id`, `faculty_id`, `cohort`, `training_type_id`; danh sách đầy đủ / xuất ở #94), `/admin/students/{id}` (+ `/change-logs`, `/sensitive`, `/contacts`), `/admin/student-contacts/{id}`. Seeder: 36 thí sinh khóa 2026 (mỗi ngành 6) ở trạng thái Chờ nhập học, dữ liệu giả.
 
+## Gán CTĐT cho sinh viên (CUR, FR-CUR-006; BR-CUR-01, BR-STU-04)
+
+- Bảng `student_curricula` (sinh viên, CTĐT, `effective_from`, `effective_to`, lý do): lịch sử gán; `students.curriculum_id` luôn là CTĐT hiện hành.
+- `StudentCurriculumService::assignDefault($sv)`: CTĐT đang áp dụng cho ngành – khóa – hệ (ưu tiên chuyên ngành, `CurriculumCatalog::forStudent`); không có thì từ chối kèm hướng dẫn. **Xác nhận nhập học (#102) gọi hàm này.** Gán lại khi CTĐT không đổi thì giữ nguyên.
+- `change($sv, $ctdt, $tuNgay, $lyDo)`: chỗ cắm cho chuyển ngành / đổi phiên bản (STU ở P3). CTĐT phải đã ban hành, đúng ngành – hệ hiện tại của sinh viên (đổi ngành trước rồi mới gán), ngày hiệu lực sau lần gán trước, có lý do; lần gán cũ kết thúc trước một ngày.
+- **ENR, GRA đọc CTĐT hiện hành bằng `StudentCurriculumService::current($sv, $ngay)`** (BR-CUR-01).
+- STU (OWN) xem được CTĐT đang / đã gán cho mình (`Curriculum::applyDataScope`). API `GET|POST /admin/students/{id}/curricula` (POST không gửi `curriculum_id` thì gán theo ngành – khóa).
+
 ## Khoa, bộ môn, ngành (FAC, FR-FAC-001..005, 010)
 
 - Bảng `faculties` → `departments`; `faculties` → `majors` → `specializations`; `training_types` (đúng một hệ mặc định: chính quy). Lấy hệ mặc định: `TrainingType::default()`.

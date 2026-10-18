@@ -128,6 +128,14 @@ return [
         'admin_class_max_size' => (int) env('CLASS_ADMIN_CLASS_MAX_SIZE', 120),
     ],
 
+    // Lớp học phần (CLS, FR-CLS-009, 011; BR-CLS-02): sĩ số mặc định, mức tối đa; định mức số tiết một giảng viên trong học kỳ
+    'course_section' => [
+        'default_min_size' => (int) env('SECTION_DEFAULT_MIN_SIZE', 15),
+        'default_max_size' => (int) env('SECTION_DEFAULT_MAX_SIZE', 60),
+        'max_size' => (int) env('SECTION_MAX_SIZE', 200),
+        'max_periods_per_term' => (int) env('SECTION_MAX_PERIODS_PER_TERM', 400),
+    ],
+
     'import' => [
         // Disk lưu file tải lên
         'disk' => env('IMPORT_DISK', 'local'),

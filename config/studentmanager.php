@@ -136,6 +136,17 @@ return [
         'max_periods_per_term' => (int) env('SECTION_MAX_PERIODS_PER_TERM', 400),
     ],
 
+    // Đăng ký học phần (ENR): khung tín chỉ riêng (BR-ENR-02; khung thường tính từ quy chế registration.load_*_ratio),
+    // cùng học phần hai lớp (BR-ENR-04), chặn khi nợ quá hạn (BR-ENR-09)
+    'enrollment' => [
+        'probation_max_credits' => (int) env('ENR_PROBATION_MAX_CREDITS', 14),
+        'good_standing_extra_credits' => (int) env('ENR_GOOD_STANDING_EXTRA_CREDITS', 3),
+        'final_term_max_credits' => (int) env('ENR_FINAL_TERM_MAX_CREDITS', 30),
+        'allow_same_subject_twice' => (bool) env('ENR_ALLOW_SAME_SUBJECT_TWICE', false),
+        'block_on_debt' => (bool) env('ENR_BLOCK_ON_DEBT', false),
+        'debt_threshold' => (int) env('ENR_DEBT_THRESHOLD', 0),
+    ],
+
     // Thời khóa biểu (TTB): buổi học không kết thúc muộn hơn giờ này (BR-TTB-03)
     'timetable' => [
         'latest_end' => env('TIMETABLE_LATEST_END', '21:00'),

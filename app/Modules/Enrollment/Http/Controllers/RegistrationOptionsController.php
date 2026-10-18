@@ -5,6 +5,7 @@ namespace App\Modules\Enrollment\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Modules\Enrollment\Models\RegistrationPeriod;
 use App\Modules\Enrollment\Services\AvailableSections;
+use App\Modules\Enrollment\Services\CreditLimits;
 use App\Modules\Enrollment\Services\RegistrationAccess;
 use App\Modules\Student\Models\Student;
 use Illuminate\Http\JsonResponse;
@@ -20,6 +21,7 @@ class RegistrationOptionsController extends Controller
     public function __construct(
         private readonly RegistrationAccess $access,
         private readonly AvailableSections $sections,
+        private readonly CreditLimits $limits,
     ) {}
 
     public function mine(Request $request): JsonResponse
@@ -65,6 +67,7 @@ class RegistrationOptionsController extends Controller
                 'max_credits' => $period->max_credits,
             ],
             'open_periods' => $open->map(fn (RegistrationPeriod $p) => $p->only('id', 'name'))->values(),
+            'credit_limits' => $this->limits->for($student, $period),
             'problems' => $this->access->problems($period, $student),
             'sections' => $this->sections->listFor($student, $period),
         ]);

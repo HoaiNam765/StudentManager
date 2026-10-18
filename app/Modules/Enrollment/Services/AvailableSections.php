@@ -9,21 +9,19 @@ use App\Modules\SchoolClass\Models\CourseSection;
 use App\Modules\SchoolClass\Models\SectionInstructor;
 use App\Modules\Student\Models\Student;
 use App\Modules\Student\Services\StudentCurriculumService;
-use App\Modules\Timetable\Contracts\SectionStudents;
 use App\Modules\Timetable\Models\ScheduleRule;
 
 /**
  * Danh sách lớp học phần sinh viên được chọn trong đợt (FR-ENR-002): lớp của học kỳ thuộc học phần trong CTĐT hiện hành
  * của sinh viên, kèm sĩ số còn lại, lịch, giảng viên, phòng. Lớp không đăng ký được vẫn hiện, đánh dấu kèm lý do.
  *
- * Lý do ở bước này: lớp chưa / không còn mở đăng ký, hết chỗ. Điều kiện của từng sinh viên (tiên quyết, trùng lịch,
- * tín chỉ tối đa…) do EnrollmentRules (#104) bổ sung qua `reasonsFor()`.
+ * Lý do lấy từ EnrollmentRules (FR-ENR-004): lớp chưa mở / hết chỗ, đã đạt, trùng lịch, tiên quyết, tín chỉ tối đa…
  */
 class AvailableSections
 {
     public function __construct(
         private readonly StudentCurriculumService $curricula,
-        private readonly SectionStudents $students,
+        private readonly EnrollmentRules $rules,
     ) {}
 
     /** @return list<array<string, mixed>> */
@@ -47,10 +45,10 @@ class AvailableSections
 
         $rules = ScheduleRule::query()->with('room:id,code')->whereIn('course_section_id', $sections->pluck('id'))->get()->groupBy('course_section_id');
 
-        return $sections->map(function (CourseSection $section) use ($items, $rules, $student): array {
+        return $sections->map(function (CourseSection $section) use ($items, $rules, $student, $period): array {
             $item = $items->get($section->subject_id);
-            $remaining = max(0, $section->max_size - count($this->students->studentIdsOf($section)));
-            $reasons = $this->reasonsFor($section, $student, $remaining);
+            $remaining = $this->rules->remaining($section);
+            $reasons = $this->rules->check($student, $section, $period);
 
             return [
                 'id' => $section->id,
@@ -75,21 +73,5 @@ class AvailableSections
                 'reasons' => $reasons,
             ];
         })->sortBy([['eligible', 'desc'], ['planned_term', 'asc'], ['code', 'asc']])->values()->all();
-    }
-
-    /** @return list<string> lý do không đăng ký được lớp này */
-    public function reasonsFor(CourseSection $section, Student $student, int $remaining): array
-    {
-        $reasons = [];
-
-        if ($section->status !== SectionStatus::RegistrationOpen) {
-            $reasons[] = "Lớp đang ở trạng thái {$section->status->label()}, chưa / không còn mở đăng ký.";
-        }
-
-        if ($remaining <= 0) {
-            $reasons[] = "Lớp đã đủ {$section->max_size} sinh viên.";
-        }
-
-        return $reasons;
     }
 }

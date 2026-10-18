@@ -3,8 +3,12 @@
 namespace App\Modules\Enrollment;
 
 use App\Modules\AcademicYear\Models\Term;
+use App\Modules\Enrollment\Contracts\AcademicRecord;
+use App\Modules\Enrollment\Contracts\TuitionStatus;
 use App\Modules\Enrollment\Models\RegistrationPeriod;
 use App\Modules\Enrollment\Policies\EnrollmentPolicy;
+use App\Modules\Enrollment\Services\EmptyAcademicRecord;
+use App\Modules\Enrollment\Services\NoTuitionDebt;
 use App\Modules\Faculty\Models\Major;
 use App\Modules\SchoolClass\Models\AdminClass;
 use App\Modules\SchoolClass\Models\Cohort;
@@ -15,6 +19,13 @@ use Illuminate\Support\ServiceProvider;
 /** Đăng ký học phần (ENR): đợt đăng ký, danh sách lớp được chọn. */
 class EnrollmentServiceProvider extends ServiceProvider
 {
+    public function register(): void
+    {
+        // GRD, FEE bind cài đặt thật khi có
+        $this->app->bindIf(AcademicRecord::class, EmptyAcademicRecord::class);
+        $this->app->bindIf(TuitionStatus::class, NoTuitionDebt::class);
+    }
+
     public function boot(): void
     {
         Gate::policy(RegistrationPeriod::class, EnrollmentPolicy::class);

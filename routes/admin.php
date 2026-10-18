@@ -13,6 +13,7 @@ use App\Modules\Faculty\Http\Controllers\LeadershipController;
 use App\Modules\Faculty\Http\Controllers\UnitController;
 use App\Modules\Room\Http\Controllers\FacilityController;
 use App\Modules\Room\Http\Controllers\RoomController;
+use App\Modules\SchoolClass\Http\Controllers\AdminClassController;
 use App\Modules\Subject\Http\Controllers\GradeStructureController;
 use App\Modules\Subject\Http\Controllers\SubjectController;
 use App\Modules\Subject\Http\Controllers\SubjectRelationController;
@@ -346,6 +347,21 @@ Route::middleware('auth')->group(function (): void {
         Route::delete('buildings/{building}', [FacilityController::class, 'destroyBuilding'])->name('buildings.destroy');
         Route::delete('rooms/{room}', [RoomController::class, 'destroy'])->name('rooms.destroy');
     });
+
+    // Khóa tuyển sinh và lớp hành chính (CLS, FR-CLS-001, 002): xem = CLS.view (DEAN theo khoa); khóa: thêm, sửa, xóa = CLS.* toàn trường (ACAD);
+    // lớp: thêm = CLS.create, sửa / đóng lớp = CLS.update, xóa = CLS.delete. Phạm vi kiểm tra tiếp trong AdminClassController.
+    Route::middleware('permission:CLS.view')->group(function (): void {
+        Route::get('cohorts', [AdminClassController::class, 'cohorts'])->name('cohorts.index');
+        Route::get('admin-classes', [AdminClassController::class, 'index'])->name('admin-classes.index');
+        Route::get('admin-classes/{adminClass}', [AdminClassController::class, 'show'])->whereNumber('adminClass')->name('admin-classes.show');
+    });
+
+    Route::post('cohorts', [AdminClassController::class, 'storeCohort'])->middleware('permission:CLS.create,ALL')->name('cohorts.store');
+    Route::put('cohorts/{cohort}', [AdminClassController::class, 'updateCohort'])->middleware('permission:CLS.update,ALL')->name('cohorts.update');
+    Route::delete('cohorts/{cohort}', [AdminClassController::class, 'destroyCohort'])->middleware('permission:CLS.delete,ALL')->name('cohorts.destroy');
+    Route::post('admin-classes', [AdminClassController::class, 'store'])->middleware('permission:CLS.create')->name('admin-classes.store');
+    Route::put('admin-classes/{adminClass}', [AdminClassController::class, 'update'])->whereNumber('adminClass')->middleware('permission:CLS.update')->name('admin-classes.update');
+    Route::delete('admin-classes/{adminClass}', [AdminClassController::class, 'destroy'])->whereNumber('adminClass')->middleware('permission:CLS.delete')->name('admin-classes.destroy');
 
     // Học phần (SUB, FR-SUB-001..003): xem = SUB.view (DEAN, LEC theo phạm vi), thêm = SUB.create, sửa / ngừng = SUB.update,
     // xóa = SUB.delete, xuất = SUB.export. Phạm vi FACULTY (DEAN) kiểm tra tiếp trên từng bản ghi trong SubjectController.

@@ -251,6 +251,14 @@ $resolver->setFor($khoa, $ngay)->code;            // bộ quy chế đang áp d�
 - **Module lưu `room_id` (buổi học, ca thi…) phải đăng ký với `ReferenceRegistry`** trong ServiceProvider của mình, khi đó phòng đã có lịch sử sử dụng chỉ ngừng được, không xóa, không đổi mã (BR-ROM-04).
 - API: `/admin/campuses`, `/admin/buildings`, `/admin/room-types`, `/admin/rooms`, `/admin/rooms/{id}/availability?from=&to=`, `/admin/rooms/{id}/maintenances` (quyền `ROM.*`; mọi vai trò được xem theo ma trận). Seeder: 1 cơ sở, 2 tòa nhà, 20 phòng mẫu.
 
+## Khóa và lớp hành chính (CLS, FR-CLS-001, 002)
+
+- Bảng `cohorts` (mã khóa ví dụ K2026, **năm bắt đầu duy nhất** = "khóa" mà STU, CUR, SYS dùng dạng số, năm kết thúc dự kiến, bộ quy chế `policy_set_id`), `admin_classes` (mã lớp duy nhất kể cả lớp đã xóa, tên, khóa, ngành, chuyên ngành tùy chọn, hệ đào tạo, sĩ số tối đa, trạng thái hoạt động / đã đóng).
+- `AdminClassService`: tạo khóa (mã mặc định `K{năm}`, năm kết thúc mặc định + `studentmanager.school_class.default_cohort_years`); bộ quy chế gắn cho khóa phải **đã ban hành và áp dụng cho năm bắt đầu**, để trống thì `Cohort::effectivePolicySet()` lấy theo `PolicyResolver`. Khóa đã có lớp thì không đổi năm bắt đầu, không xóa; còn lớp đang hoạt động thì không ngừng.
+- Lớp: đúng một khóa và một ngành đang hoạt động, chuyên ngành phải thuộc ngành (BR-CLS-01); sĩ số 1–`admin_class_max_size` (mặc định 120, sĩ số gợi ý 60). **Module có khóa ngoại tới `admin_classes` (thành viên lớp, cố vấn — #99) đăng ký `ReferenceRegistry` kèm `active:`** để: lớp đã có dữ liệu không đổi mã / khóa / ngành và không xóa; lớp còn sinh viên đang học không đóng được.
+- Phạm vi: ACAD quản lý toàn trường (khóa chỉ người có quyền CLS toàn trường thêm / sửa / xóa); DEAN (FACULTY) xem lớp thuộc ngành của khoa mình; ADV, STU chưa có dữ liệu cho tới #99. Danh sách khóa là danh mục chung, ai có CLS.view cũng xem được.
+- API: `/admin/cohorts` (+ `/{id}`), `/admin/admin-classes` (lọc `q`, `cohort_id`, `major_id`, `faculty_id`, `status`; `+ /{id}`). Ngành, chuyên ngành, hệ đào tạo còn lớp đang hoạt động thì không ngừng được. Seeder: khóa K2023–K2026, mỗi ngành một lớp K2026 (`26DH<chữ đầu tên ngành>01`).
+
 ## Giảng viên (TCH, FR-TCH-001, 003)
 
 - Bảng `lecturers`: mã giảng viên (duy nhất, không cấp lại, cũng là tên đăng nhập), **đúng một đơn vị chính là bộ môn** (BR-FAC-03), chức danh (`AcademicTitle`), học vị (`AcademicDegree`), chuyên môn, liên hệ, ảnh, CCCD (nhạy cảm, che trong nhật ký), tình trạng (`LecturerStatus`: đang làm việc / nghỉ việc / nghỉ hưu). `lecturer_units`: kiêm nhiệm ở bộ môn hoặc khoa khác, có ngày hiệu lực. Chức vụ quản lý vẫn là nhiệm kỳ lãnh đạo của FAC.

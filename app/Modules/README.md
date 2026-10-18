@@ -291,6 +291,14 @@ $resolver->setFor($khoa, $ngay)->code;            // bộ quy chế đang áp d�
 - **ENR, GRA đọc CTĐT hiện hành bằng `StudentCurriculumService::current($sv, $ngay)`** (BR-CUR-01).
 - STU (OWN) xem được CTĐT đang / đã gán cho mình (`Curriculum::applyDataScope`). API `GET|POST /admin/students/{id}/curricula` (POST không gửi `curriculum_id` thì gán theo ngành – khóa).
 
+## Xác nhận nhập học (STU, FR-STU-002; BR-STU-01, 02, 04; EV-STU-01; UAT-04)
+
+- `AdmissionService::admit($sv, $lop?, $ngay?)` trong **một giao dịch**: cấp MSSV, email trường `{MSSV}@{STUDENT_EMAIL_DOMAIN}`, tài khoản (`UserService::create`, tên đăng nhập = MSSV, vai trò STU, mật khẩu tạm gửi email), gán CTĐT (`StudentCurriculumService::assignDefault`), xếp lớp hành chính, chuyển sang Đang học. Bước nào lỗi thì hoàn tác hết; xong mới phát `StudentAdmitted` (EV-STU-01).
+- MSSV = 2 số cuối của khóa + `code_major_digits` số cuối mã ngành + số thứ tự `code_sequence_digits` chữ số trong khóa – ngành (cấu hình `studentmanager.student`). Số thứ tự tính cả hồ sơ đã xóa mềm nên không tái sử dụng (BR-STU-01).
+- Lớp hành chính: gửi `admin_class_id` hoặc để hệ thống chọn lớp đang hoạt động cùng khóa – ngành – hệ còn chỗ (theo mã lớp). Bảng `admin_class_members` có ngày hiệu lực (BR-CLS-08); dòng hiện hành có `effective_to` trống. Gán / chuyển lớp hàng loạt, cố vấn học tập ở #99.
+- Hủy nhập học: hồ sơ Chờ nhập học xóa mềm kèm lý do (đi qua `StudentService::delete`, BR-STU-07).
+- API (quyền `STU.approve`: ACAD, CTSV): `POST /admin/students/{id}/admit`, `POST /admin/students/{id}/cancel-admission` (bắt buộc `reason`).
+
 ## Khoa, bộ môn, ngành (FAC, FR-FAC-001..005, 010)
 
 - Bảng `faculties` → `departments`; `faculties` → `majors` → `specializations`; `training_types` (đúng một hệ mặc định: chính quy). Lấy hệ mặc định: `TrainingType::default()`.

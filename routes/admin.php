@@ -15,6 +15,7 @@ use App\Modules\Faculty\Http\Controllers\UnitController;
 use App\Modules\Room\Http\Controllers\FacilityController;
 use App\Modules\Room\Http\Controllers\RoomController;
 use App\Modules\SchoolClass\Http\Controllers\AdminClassController;
+use App\Modules\Student\Http\Controllers\AdmissionController;
 use App\Modules\Student\Http\Controllers\StudentController;
 use App\Modules\Student\Http\Controllers\StudentCurriculumController;
 use App\Modules\Subject\Http\Controllers\GradeStructureController;
@@ -221,6 +222,12 @@ Route::middleware('auth')->group(function (): void {
     // Gán CTĐT cho sinh viên (CUR, FR-CUR-006): xem lịch sử = STU.view; gán theo ngành – khóa hoặc đổi CTĐT = STU.update (kiểm tra phạm vi trên hồ sơ)
     Route::get('students/{student}/curricula', [StudentCurriculumController::class, 'index'])->whereNumber('student')->middleware('permission:STU.view')->name('students.curricula.index');
     Route::post('students/{student}/curricula', [StudentCurriculumController::class, 'store'])->whereNumber('student')->middleware('permission:STU.update')->name('students.curricula.store');
+
+    // Xác nhận / hủy nhập học (STU, FR-STU-002): STU.approve (ACAD, CTSV). Cấp MSSV, email, tài khoản, CTĐT, lớp hành chính trong một giao dịch.
+    Route::middleware('permission:STU.approve')->group(function (): void {
+        Route::post('students/{student}/admit', [AdmissionController::class, 'admit'])->whereNumber('student')->name('students.admit');
+        Route::post('students/{student}/cancel-admission', [AdmissionController::class, 'cancel'])->whereNumber('student')->name('students.cancel-admission');
+    });
 
     // Hồ sơ giảng viên (TCH, FR-TCH-001, 003): xem = TCH.view (LEC, ADV chỉ hồ sơ của mình), thêm = TCH.create,
     // sửa / tình trạng / kiêm nhiệm / cấp tài khoản / xác nhận đề nghị = TCH.update. Phạm vi kiểm tra tiếp trong LecturerController.

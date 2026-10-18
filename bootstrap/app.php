@@ -52,7 +52,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Vi phạm quy tắc nghiệp vụ không phải lỗi hệ thống: báo lý do và cách khắc phục (GC-04, UX-09)
         $exceptions->render(function (BusinessRuleException $e, Request $request) {
             if ($request->expectsJson()) {
-                return response()->json(['message' => $e->userMessage()], 422);
+                return response()->json(array_filter(['message' => $e->userMessage(), 'reasons' => $e->reasons]), 422);
             }
 
             return back()->withInput()->withErrors(['business_rule' => $e->userMessage()]);

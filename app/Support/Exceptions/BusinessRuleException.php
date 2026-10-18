@@ -15,7 +15,8 @@ use RuntimeException;
  */
 class BusinessRuleException extends RuntimeException
 {
-    public function __construct(string $message, protected ?string $hint = null)
+    /** @param list<string> $reasons danh sách lý do riêng lẻ (ví dụ các điều kiện đăng ký không đạt), trả kèm trong JSON */
+    public function __construct(string $message, protected ?string $hint = null, public readonly array $reasons = [])
     {
         parent::__construct($message);
     }

@@ -5,18 +5,23 @@ namespace App\Modules\Enrollment;
 use App\Modules\AcademicYear\Models\Term;
 use App\Modules\Enrollment\Contracts\AcademicRecord;
 use App\Modules\Enrollment\Contracts\TuitionStatus;
+use App\Modules\Enrollment\Enums\EnrollmentStatus;
 use App\Modules\Enrollment\Models\RegistrationPeriod;
 use App\Modules\Enrollment\Policies\EnrollmentPolicy;
 use App\Modules\Enrollment\Services\EmptyAcademicRecord;
+use App\Modules\Enrollment\Services\EnrollmentSectionStudents;
 use App\Modules\Enrollment\Services\NoTuitionDebt;
 use App\Modules\Faculty\Models\Major;
 use App\Modules\SchoolClass\Models\AdminClass;
 use App\Modules\SchoolClass\Models\Cohort;
+use App\Modules\SchoolClass\Models\CourseSection;
+use App\Modules\Student\Models\Student;
+use App\Modules\Timetable\Contracts\SectionStudents;
 use App\Support\References\ReferenceRegistry;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
-/** Đăng ký học phần (ENR): đợt đăng ký, danh sách lớp được chọn. */
+/** Đăng ký học phần (ENR): đợt đăng ký, điều kiện, đăng ký / hủy / rút / đổi lớp. */
 class EnrollmentServiceProvider extends ServiceProvider
 {
     public function register(): void
@@ -24,6 +29,9 @@ class EnrollmentServiceProvider extends ServiceProvider
         // GRD, FEE bind cài đặt thật khi có
         $this->app->bindIf(AcademicRecord::class, EmptyAcademicRecord::class);
         $this->app->bindIf(TuitionStatus::class, NoTuitionDebt::class);
+
+        // Thay cài đặt tạm của TTB: sinh viên của lớp lấy từ bảng enrollments (BR-TTB-08, sĩ số, trùng lịch)
+        $this->app->bind(SectionStudents::class, EnrollmentSectionStudents::class);
     }
 
     public function boot(): void
@@ -35,5 +43,7 @@ class EnrollmentServiceProvider extends ServiceProvider
         $references->register(Cohort::class, 'registration_period_targets', 'cohort_id', 'đối tượng đợt đăng ký');
         $references->register(Major::class, 'registration_period_targets', 'major_id', 'đối tượng đợt đăng ký');
         $references->register(AdminClass::class, 'registration_period_targets', 'admin_class_id', 'đối tượng đợt đăng ký');
+        $references->register(CourseSection::class, 'enrollments', 'course_section_id', 'lượt đăng ký', active: fn ($q) => $q->whereIn('status', EnrollmentStatus::activeValues()));
+        $references->register(Student::class, 'enrollments', 'student_id', 'lượt đăng ký học phần');
     }
 }

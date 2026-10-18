@@ -7,6 +7,7 @@ use App\Modules\Room\Models\Room;
 use App\Modules\Room\Services\RoomAvailability;
 use App\Modules\SchoolClass\Enums\SectionStatus;
 use App\Modules\SchoolClass\Models\CourseSection;
+use App\Modules\Student\Models\Student;
 use App\Modules\Timetable\Enums\WeekParity;
 use App\Modules\Timetable\Models\ScheduleRule;
 use App\Support\Services\BaseService;
@@ -61,9 +62,11 @@ class ScheduleRuleService extends BaseService
         $rule->update($attributes);
 
         // BR-TTB-08: sinh viên đã đăng ký bị trùng lịch với lớp khác của họ sau khi đổi
+        $found = $this->conflicts->affectedStudents($section);
+        $codes = Student::query()->whereIn('id', array_column($found, 'student_id'))->pluck('student_code', 'id');
         $affected = array_map(
-            fn (array $a) => "Sinh viên #{$a['student_id']} bị trùng lịch: {$a['clash']}.",
-            $this->conflicts->affectedStudents($section),
+            fn (array $a) => 'Sinh viên '.($codes[$a['student_id']] ?? "#{$a['student_id']}")." bị trùng lịch: {$a['clash']}.",
+            $found,
         );
 
         return ['rule' => $rule->refresh()->load('room:id,code,capacity'), 'warnings' => [...$conflicts, ...$affected, ...$this->summary($section)['warnings']]];

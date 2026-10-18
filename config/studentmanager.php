@@ -47,6 +47,10 @@ return [
 
         // "Ghi nhớ đăng nhập" có hiệu lực tối đa N ngày; 0 = tắt (FR-AUTH-007). Quản trị viên đổi được ở tham số hệ thống
         'remember_days' => (int) env('AUTH_REMEMBER_DAYS', 30),
+        // Hết hạn phiên khi không hoạt động: dùng `session.lifetime` (SESSION_LIFETIME, phút; tham số hệ thống `session.lifetime`)
+
+        // Đăng nhập bất thường (EV-AUTH-02): IP và thiết bị đều chưa từng đăng nhập thành công trong N ngày gần đây; 0 = tắt
+        'unusual_login_lookback_days' => (int) env('AUTH_UNUSUAL_LOGIN_LOOKBACK_DAYS', 90),
 
         // Sinh viên thôi học, buộc thôi học, chuyển trường: ngừng tài khoản sau N ngày (BR-AUTH-07); 0 = ngừng ngay
         'student_deactivate_after_days' => (int) env('AUTH_STUDENT_DEACTIVATE_AFTER_DAYS', 30),

@@ -4,6 +4,7 @@ namespace App\Modules\Auth\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Modules\Auth\Http\Requests\LoginRequest;
+use App\Modules\Auth\Services\LoginHistoryService;
 use App\Modules\Auth\Services\LoginService;
 use App\Modules\Auth\Services\PasswordService;
 use App\Modules\Auth\Services\PortalResolver;
@@ -29,7 +30,7 @@ class LoginController extends Controller
         return view('auth.login');
     }
 
-    public function store(LoginRequest $request): RedirectResponse|JsonResponse
+    public function store(LoginRequest $request, LoginHistoryService $history): RedirectResponse|JsonResponse
     {
         $user = $this->login->attempt(
             $request->string('login')->toString(),
@@ -38,6 +39,8 @@ class LoginController extends Controller
         );
 
         $request->session()->regenerate();
+        // Nối lịch sử đăng nhập với phiên mới để trang "Phiên đăng nhập" biết phiên bắt đầu lúc nào (FR-AUTH-007)
+        $history->bindSession($request->session()->getId());
 
         $target = $this->passwords->mustChange($user)
             ? route('password.change')

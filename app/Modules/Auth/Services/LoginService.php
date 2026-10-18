@@ -18,7 +18,8 @@ use Illuminate\Validation\ValidationException;
  * - Đăng nhập bằng tên đăng nhập (MSSV, mã cán bộ) hoặc email.
  * - Sai, không tồn tại hay đang bị khóa đều nhận CÙNG một thông báo, để không lộ tài khoản có tồn tại.
  * - Sai N lần liên tiếp trong khoảng thời gian cấu hình thì khóa tạm; đang khóa thì đúng mật khẩu cũng bị từ chối.
- * - Mọi lần đăng nhập thành công/thất bại và lần khóa đều ghi nhật ký kiểm toán.
+ * - Mọi lần đăng nhập thành công/thất bại và lần khóa đều ghi nhật ký kiểm toán và lịch sử đăng nhập (FR-AUTH-016).
+ * - "Ghi nhớ đăng nhập" có hiệu lực tối đa `studentmanager.auth.remember_days` ngày; 0 = tắt (FR-AUTH-007).
  *
  * Cảnh báo cho chủ tài khoản khi bị khóa (sự kiện EV-AUTH-02) sẽ nối khi có module NOT.
  * Tài khoản bị khóa hẳn, ngừng hoạt động hoặc đã tới ngày hẹn ngừng (User::canSignIn) bị chặn sau khi đúng mật khẩu.
@@ -30,6 +31,7 @@ class LoginService
     public function __construct(
         private readonly AuditLogger $audit,
         private readonly PortalResolver $portals,
+        private readonly LoginHistoryService $history,
     ) {}
 
     /** @throws ValidationException với lỗi ở trường `login` */
@@ -42,18 +44,21 @@ class LoginService
             // Vẫn băm để thời gian phản hồi giống như khi tài khoản tồn tại
             Hash::check($password, self::dummyHash());
             $this->audit->record(AuditEvent::LoginFailed, newValues: ['login' => Str::limit($login, 100, '')], reason: 'Tài khoản không tồn tại');
+            $this->history->recordFailure(null, $login, 'Tài khoản không tồn tại');
 
             throw $this->invalidCredentials();
         }
 
         if ($user->isLockedOut()) {
             $this->audit->record(AuditEvent::LoginFailed, $user, reason: 'Tài khoản đang tạm khóa');
+            $this->history->recordFailure($user, $login, 'Tài khoản đang tạm khóa');
 
             throw $this->invalidCredentials();
         }
 
         if (! Hash::check($password, $user->password)) {
             $this->registerFailure($user);
+            $this->history->recordFailure($user, $login, 'Sai mật khẩu');
 
             throw $this->invalidCredentials();
         }
@@ -61,7 +66,9 @@ class LoginService
         // Từ đây người dùng đã chứng minh đúng mật khẩu: được phép biết lý do cụ thể
         if (! $user->canSignIn()) {
             $locked = $user->status === AccountStatus::Locked;
-            $this->audit->record(AuditEvent::LoginFailed, $user, reason: $locked ? 'Tài khoản đã bị khóa' : 'Tài khoản đã ngừng hoạt động');
+            $reason = $locked ? 'Tài khoản đã bị khóa' : 'Tài khoản đã ngừng hoạt động';
+            $this->audit->record(AuditEvent::LoginFailed, $user, reason: $reason);
+            $this->history->recordFailure($user, $login, $reason);
 
             throw ValidationException::withMessages(['login' => $locked
                 ? 'Tài khoản đã bị khóa. Liên hệ quản trị viên để được mở khóa.'
@@ -70,12 +77,14 @@ class LoginService
 
         if ($user->must_change_password && $user->temporary_password_expires_at?->isPast()) {
             $this->audit->record(AuditEvent::LoginFailed, $user, reason: 'Mật khẩu tạm đã hết hạn');
+            $this->history->recordFailure($user, $login, 'Mật khẩu tạm đã hết hạn');
 
             throw ValidationException::withMessages(['login' => 'Mật khẩu tạm đã hết hạn. Liên hệ quản trị viên hoặc dùng chức năng quên mật khẩu để nhận mật khẩu mới.']);
         }
 
         if ($this->portals->homeRouteFor($user) === null) {
             $this->audit->record(AuditEvent::LoginFailed, $user, reason: 'Tài khoản chưa được gán vai trò');
+            $this->history->recordFailure($user, $login, 'Tài khoản chưa được gán vai trò');
 
             throw ValidationException::withMessages(['login' => 'Tài khoản chưa được cấp quyền truy cập. Liên hệ phòng Đào tạo hoặc quản trị viên.']);
         }
@@ -93,8 +102,16 @@ class LoginService
 
         $user->save();
 
+        $rememberDays = (int) config('studentmanager.auth.remember_days');
+        $remember = $remember && $rememberDays > 0;
+
+        if ($remember) {
+            Auth::guard('web')->setRememberDuration($rememberDays * 24 * 60);
+        }
+
         Auth::login($user, $remember);
         $this->audit->record(AuditEvent::Login, $user);
+        $this->history->recordSuccess($user, $login);
 
         return $user;
     }

@@ -15,6 +15,7 @@ use App\Support\Models\StandardModel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * Chương trình đào tạo (FR-CUR-001). Phạm vi dữ liệu (BA 4.2, hàng CUR): DEAN xây dựng CTĐT của ngành thuộc khoa mình
@@ -35,6 +36,7 @@ class Curriculum extends StandardModel implements HasDataScope
         return [
             'status' => CurriculumStatus::class,
             'published_at' => 'datetime',
+            'effective_from' => 'date',
             'version' => 'integer',
             'cohort_from' => 'integer',
             'cohort_to' => 'integer',
@@ -71,6 +73,16 @@ class Curriculum extends StandardModel implements HasDataScope
     public function items(): HasMany
     {
         return $this->hasMany(CurriculumSubject::class);
+    }
+
+    public function graduationRequirement(): HasOne
+    {
+        return $this->hasOne(GraduationRequirement::class);
+    }
+
+    public function basedOn(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'based_on_id');
     }
 
     public function isDraft(): bool

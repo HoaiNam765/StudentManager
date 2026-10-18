@@ -219,6 +219,7 @@ class CurriculumController extends Controller
             'training_type_id' => [...$required, 'integer', 'exists:training_types,id'],
             'cohort_from' => [...$required, 'integer', 'between:2000,2100'],
             'cohort_to' => ['sometimes', 'nullable', 'integer', 'between:2000,2100'],
+            'effective_from' => ['sometimes', 'nullable', 'date_format:Y-m-d'],
             'total_credits' => ['sometimes', 'integer', 'min:1', 'max:400'],
             'standard_terms' => ['sometimes', 'integer', 'min:1', 'max:20'],
             'description' => ['sometimes', 'nullable', 'string', 'max:5000'],
@@ -258,7 +259,7 @@ class CurriculumController extends Controller
     {
         return [
             'code' => 'mã CTĐT', 'name' => 'tên', 'major_id' => 'ngành', 'specialization_id' => 'chuyên ngành',
-            'training_type_id' => 'hệ đào tạo', 'cohort_from' => 'khóa áp dụng từ', 'cohort_to' => 'khóa áp dụng đến',
+            'training_type_id' => 'hệ đào tạo', 'cohort_from' => 'khóa áp dụng từ', 'cohort_to' => 'khóa áp dụng đến', 'effective_from' => 'ngày hiệu lực',
             'total_credits' => 'tổng tín chỉ', 'standard_terms' => 'số học kỳ chuẩn', 'description' => 'mô tả',
             'block_type' => 'loại khối', 'required_credits' => 'số tín chỉ yêu cầu', 'sort_order' => 'thứ tự',
             'curriculum_block_id' => 'khối kiến thức', 'min_credits' => 'số tín chỉ tối thiểu',
@@ -296,6 +297,7 @@ class CurriculumController extends Controller
             'training_type' => $curriculum->trainingType?->only('id', 'code', 'name'),
             'cohort_from' => $curriculum->cohort_from,
             'cohort_to' => $curriculum->cohort_to,
+            'effective_from' => $curriculum->effective_from?->toDateString(),
             'total_credits' => $curriculum->total_credits,
             'standard_terms' => $curriculum->standard_terms,
             'status' => $curriculum->status->value,

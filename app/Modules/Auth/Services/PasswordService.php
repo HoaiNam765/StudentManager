@@ -12,7 +12,7 @@ use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 
 /**
- * Mật khẩu (FR-AUTH-004, FR-AUTH-005; BR-AUTH-02, BR-AUTH-10).
+ * Mật khẩu (FR-AUTH-003, FR-AUTH-004, FR-AUTH-005; BR-AUTH-02, BR-AUTH-03, BR-AUTH-10).
  * Mật khẩu luôn lưu dạng băm (cast `hashed` của User, mặc định bcrypt); không lưu hay hiển thị bản gốc.
  */
 class PasswordService
@@ -54,13 +54,7 @@ class PasswordService
             throw ValidationException::withMessages(['current_password' => 'Mật khẩu hiện tại không đúng.']);
         }
 
-        if ($this->isRecentlyUsed($user, $newPassword)) {
-            $count = config('studentmanager.auth.password.history');
-
-            throw ValidationException::withMessages([
-                'password' => "Không được dùng lại {$count} mật khẩu gần nhất. Hãy chọn một mật khẩu khác.",
-            ]);
-        }
+        $this->assertNotRecentlyUsed($user, $newPassword);
 
         DB::transaction(function () use ($user, $newPassword): void {
             $this->store($user, $newPassword, mustChange: false);
@@ -68,6 +62,25 @@ class PasswordService
         });
 
         $this->logoutOtherSessions($user, $keepSessionId);
+    }
+
+    /**
+     * Đặt lại bằng liên kết quên mật khẩu (FR-AUTH-003, BR-AUTH-03): người dùng tự chọn mật khẩu mới, không trùng
+     * mật khẩu gần đây. Mở khóa tạm do nhập sai (đã chứng minh quyền sở hữu email) và đăng xuất mọi phiên.
+     *
+     * @throws ValidationException
+     */
+    public function reset(User $user, string $newPassword): void
+    {
+        $this->assertNotRecentlyUsed($user, $newPassword);
+
+        DB::transaction(function () use ($user, $newPassword): void {
+            $user->forceFill(['failed_login_count' => 0, 'failed_login_started_at' => null, 'locked_until' => null]);
+            $this->store($user, $newPassword, mustChange: false);
+            $this->audit->record(AuditEvent::PasswordChanged, $user, reason: 'Đặt lại mật khẩu bằng liên kết');
+        });
+
+        $this->logoutOtherSessions($user, null);
     }
 
     /**
@@ -110,6 +123,18 @@ class PasswordService
         ])->save();
 
         $user->passwordHistories()->create(['password' => $user->password]);
+    }
+
+    /** @throws ValidationException */
+    private function assertNotRecentlyUsed(User $user, string $plainPassword): void
+    {
+        if ($this->isRecentlyUsed($user, $plainPassword)) {
+            $count = config('studentmanager.auth.password.history');
+
+            throw ValidationException::withMessages([
+                'password' => "Không được dùng lại {$count} mật khẩu gần nhất. Hãy chọn một mật khẩu khác.",
+            ]);
+        }
     }
 
     private function isRecentlyUsed(User $user, string $plainPassword): bool

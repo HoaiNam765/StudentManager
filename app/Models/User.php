@@ -6,6 +6,7 @@ namespace App\Models;
 use App\Modules\Auth\Concerns\HasRoles;
 use App\Modules\Auth\Enums\AccountStatus;
 use App\Modules\Auth\Enums\ProfileType;
+use App\Modules\Auth\Notifications\ResetPasswordLink;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -73,6 +74,12 @@ class User extends Authenticatable
     public function isReadOnly(): bool
     {
         return $this->status === AccountStatus::ReadOnly;
+    }
+
+    /** Email liên kết đặt lại mật khẩu (FR-AUTH-003); password broker của Laravel gọi hàm này. */
+    public function sendPasswordResetNotification(#[\SensitiveParameter] $token): void
+    {
+        $this->notify(new ResetPasswordLink($token));
     }
 
     public function passwordHistories(): HasMany

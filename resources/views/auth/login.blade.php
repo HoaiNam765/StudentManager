@@ -149,7 +149,7 @@
 <input class="w-4 h-4 rounded border-outline-variant text-[#4776E6] focus:ring-[#4776E6]/20 focus:ring-offset-0 cursor-pointer" name="remember" value="1" type="checkbox" @checked(old('remember'))>
 <span class="text-body-sm font-body-sm text-on-surface-variant">Ghi nhớ đăng nhập</span>
 </label>
-<a class="text-body-sm font-label-md text-[#4776E6] hover:underline cursor-pointer" href="#">
+<a class="text-body-sm font-label-md text-[#4776E6] hover:underline cursor-pointer" href="{{ route('password.request') }}">
                 Quên mật khẩu?
               </a>
 </div>

@@ -42,6 +42,9 @@ return [
         'throttle_per_minute' => (int) env('AUTH_THROTTLE_PER_MINUTE', 10),
         'throttle_per_ip_per_minute' => (int) env('AUTH_THROTTLE_PER_IP_PER_MINUTE', 30),
 
+        // Quên mật khẩu: số lần gửi biểu mẫu mỗi phút từ một địa chỉ IP (chống dò tài khoản, gửi email hàng loạt)
+        'password_reset_per_minute' => (int) env('AUTH_PASSWORD_RESET_PER_MINUTE', 5),
+
         // "Ghi nhớ đăng nhập" có hiệu lực tối đa N ngày; 0 = tắt (FR-AUTH-007). Quản trị viên đổi được ở tham số hệ thống
         'remember_days' => (int) env('AUTH_REMEMBER_DAYS', 30),
 

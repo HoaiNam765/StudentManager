@@ -3,6 +3,7 @@
 use App\Http\Controllers\AccountController;
 use App\Modules\Auth\Http\Controllers\LoginController;
 use App\Modules\Auth\Http\Controllers\PasswordController;
+use App\Modules\Auth\Http\Controllers\PasswordResetController;
 use App\Modules\Auth\Services\PortalResolver;
 use App\Modules\System\Http\Controllers\LookupOptionController;
 use Illuminate\Http\Request;
@@ -25,6 +26,12 @@ Route::get('/', function (Request $request, PortalResolver $portals) {
 Route::middleware('guest')->group(function (): void {
     Route::get('/login', [LoginController::class, 'create'])->name('login');
     Route::post('/login', [LoginController::class, 'store'])->middleware('throttle:login')->name('login.store');
+
+    // Quên mật khẩu (FR-AUTH-003): liên kết đặt lại gửi qua email, dùng một lần, hết hạn sau 30 phút
+    Route::get('/forgot-password', [PasswordResetController::class, 'create'])->name('password.request');
+    Route::post('/forgot-password', [PasswordResetController::class, 'store'])->middleware('throttle:password-reset')->name('password.email');
+    Route::get('/reset-password/{token}', [PasswordResetController::class, 'edit'])->name('password.reset');
+    Route::post('/reset-password', [PasswordResetController::class, 'update'])->middleware('throttle:password-reset')->name('password.store');
 });
 
 Route::middleware('auth')->group(function (): void {

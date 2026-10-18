@@ -5,6 +5,7 @@ namespace App\Modules\Teacher;
 use App\Modules\Faculty\Contracts\LeaderEligibility;
 use App\Modules\Faculty\Models\Department;
 use App\Modules\Faculty\Models\Faculty;
+use App\Modules\Subject\Contracts\SubjectAssignments;
 use App\Modules\System\Models\LookupValue;
 use App\Modules\System\Services\ImportRegistry;
 use App\Modules\Teacher\Contracts\TeachingAssignments;
@@ -13,6 +14,7 @@ use App\Modules\Teacher\Models\Lecturer;
 use App\Modules\Teacher\Models\LecturerChangeRequest;
 use App\Modules\Teacher\Models\LecturerUnit;
 use App\Modules\Teacher\Policies\LecturerPolicy;
+use App\Modules\Teacher\Services\DepartmentSubjectAssignments;
 use App\Modules\Teacher\Services\NoTeachingAssignments;
 use App\Modules\Teacher\Services\TeacherLeaderEligibility;
 use App\Support\References\ReferenceRegistry;
@@ -32,6 +34,9 @@ class TeacherServiceProvider extends ServiceProvider
     {
         $this->app->bind(LeaderEligibility::class, TeacherLeaderEligibility::class);
         $this->app->bindIf(TeachingAssignments::class, NoTeachingAssignments::class);
+
+        // Học phần giảng viên phụ trách (phạm vi SECTION): tạm theo bộ môn, chờ CLS (#107)
+        $this->app->bind(SubjectAssignments::class, DepartmentSubjectAssignments::class);
     }
 
     public function boot(): void

@@ -7,6 +7,7 @@ use App\Modules\Auth\Contracts\HasDataScope;
 use App\Modules\Auth\Enums\DataScope;
 use App\Modules\Faculty\Models\Department;
 use App\Modules\Faculty\Services\FacultyAccess;
+use App\Modules\Subject\Contracts\SubjectAssignments;
 use App\Modules\Subject\Enums\KnowledgeBlock;
 use App\Modules\Subject\Enums\SubjectRequirement;
 use App\Modules\Subject\Enums\TeachingLanguage;
@@ -20,8 +21,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * Học phần trong danh mục dùng chung (FR-SUB-001..003).
  *
  * Phạm vi dữ liệu (BA 4.2, hàng SUB): DEAN quản lý học phần của các bộ môn mình phụ trách (FACULTY);
- * LEC chỉ thấy học phần của lớp được phân công (SECTION) — chưa có lớp học phần nên tạm thời không thấy gì,
- * CLS (#107) bổ sung điều kiện. Các vai trò còn lại xem toàn trường.
+ * LEC chỉ thấy, chỉ sửa (đề cương) học phần mình phụ trách (SECTION, qua `SubjectAssignments`: tạm thời là học phần
+ * của bộ môn giảng viên, CLS #107 đổi thành học phần của lớp được phân công). Các vai trò còn lại xem toàn trường.
  */
 class Subject extends StandardModel implements HasDataScope
 {
@@ -92,6 +93,7 @@ class Subject extends StandardModel implements HasDataScope
     {
         match ($scope) {
             DataScope::Faculty => $query->whereIn('department_id', app(FacultyAccess::class)->departmentIds($user)),
+            DataScope::Section => $query->whereIn($this->qualifyColumn('id'), app(SubjectAssignments::class)->subjectIdsFor($user)),
             default => $query->whereRaw('1 = 0'),
         };
     }

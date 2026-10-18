@@ -3,8 +3,10 @@
 namespace App\Modules\Subject;
 
 use App\Modules\Faculty\Models\Department;
+use App\Modules\Subject\Contracts\SubjectAssignments;
 use App\Modules\Subject\Models\Subject;
 use App\Modules\Subject\Policies\SubjectPolicy;
+use App\Modules\Subject\Services\NoSubjectAssignments;
 use App\Support\References\ReferenceRegistry;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -20,6 +22,12 @@ use Illuminate\Support\ServiceProvider;
  */
 class SubjectServiceProvider extends ServiceProvider
 {
+    public function register(): void
+    {
+        // Phạm vi SECTION của giảng viên: TCH cài tạm theo bộ môn, CLS cài theo lớp được phân công
+        $this->app->bindIf(SubjectAssignments::class, NoSubjectAssignments::class);
+    }
+
     public function boot(): void
     {
         Gate::policy(Subject::class, SubjectPolicy::class);

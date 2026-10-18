@@ -8,6 +8,7 @@ use App\Modules\Auth\Services\AccessControl;
 use App\Modules\SchoolClass\Models\CourseSection;
 use App\Modules\Timetable\Enums\WeekParity;
 use App\Modules\Timetable\Models\ScheduleRule;
+use App\Modules\Timetable\Services\ScheduleConflictService;
 use App\Modules\Timetable\Services\ScheduleRuleService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -43,6 +44,14 @@ class ScheduleRuleController extends Controller
                 ->get()
                 ->map(fn (ScheduleRule $r) => $this->present($r, $courseSection)),
         ]);
+    }
+
+    /** Xung đột hiện có của lớp với các lớp khác cùng học kỳ (FR-TTB-003). */
+    public function conflicts(Request $request, CourseSection $courseSection, ScheduleConflictService $conflicts): JsonResponse
+    {
+        $this->authorizeOn($request, PermissionAction::View, $courseSection);
+
+        return response()->json($conflicts->sectionConflicts($courseSection));
     }
 
     public function store(Request $request, CourseSection $courseSection): JsonResponse

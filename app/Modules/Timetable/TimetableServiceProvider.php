@@ -5,9 +5,11 @@ namespace App\Modules\Timetable;
 use App\Modules\Room\Models\Campus;
 use App\Modules\Room\Models\Room;
 use App\Modules\SchoolClass\Models\CourseSection;
+use App\Modules\Timetable\Contracts\SectionStudents;
 use App\Modules\Timetable\Models\Period;
 use App\Modules\Timetable\Models\ScheduleRule;
 use App\Modules\Timetable\Policies\TimetablePolicy;
+use App\Modules\Timetable\Services\NoSectionStudents;
 use App\Support\References\ReferenceRegistry;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -15,6 +17,12 @@ use Illuminate\Support\ServiceProvider;
 /** Thời khóa biểu (TTB): khung tiết học, mẫu lịch lớp học phần. */
 class TimetableServiceProvider extends ServiceProvider
 {
+    public function register(): void
+    {
+        // ENR bind lại khi có đăng ký học phần
+        $this->app->bindIf(SectionStudents::class, NoSectionStudents::class);
+    }
+
     public function boot(): void
     {
         Gate::policy(Period::class, TimetablePolicy::class);

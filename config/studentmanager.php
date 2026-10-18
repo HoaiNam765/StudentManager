@@ -139,6 +139,15 @@ return [
     // Thời khóa biểu (TTB): buổi học không kết thúc muộn hơn giờ này (BR-TTB-03)
     'timetable' => [
         'latest_end' => env('TIMETABLE_LATEST_END', '21:00'),
+        // Loại phòng dùng cho lớp thực hành (BR-ROM-03)
+        'practice_room_types' => array_filter(explode(',', env('TIMETABLE_PRACTICE_ROOM_TYPES', 'MT,TN'))),
+        // Xung đột chặn (block) hay chỉ cảnh báo (warn) (FR-TTB-003)
+        'conflicts' => [
+            'room' => env('TIMETABLE_CONFLICT_ROOM', 'block'),
+            'lecturer' => env('TIMETABLE_CONFLICT_LECTURER', 'block'),
+            'student' => env('TIMETABLE_CONFLICT_STUDENT', 'warn'),
+            'room_type' => env('TIMETABLE_CONFLICT_ROOM_TYPE', 'block'),
+        ],
     ],
 
     'import' => [

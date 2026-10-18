@@ -17,7 +17,7 @@ use App\Support\Services\BaseService;
 /**
  * Xây dựng và ban hành chương trình đào tạo (FR-CUR-001, 002, 003; BR-CUR-02, 03, 04, 06).
  *
- * - CTĐT nháp mới sửa được; đã ban hành thì không sửa trực tiếp (BR-CUR-04, phiên bản mới ở #86).
+ * - CTĐT nháp mới sửa được; đã ban hành thì không sửa trực tiếp mà tạo phiên bản mới (BR-CUR-04, CurriculumVersionService).
  * - Thời gian đào tạo chuẩn khớp với ngành (BR-CUR-06); tổng tín chỉ mặc định theo ngành.
  * - Mỗi học phần chỉ một lần trong CTĐT; tiên quyết phải thuộc CTĐT (hoặc được xác nhận là điều kiện ngoài chương trình)
  *   và có học kỳ dự kiến sớm hơn: khi lưu thì trả về cảnh báo, khi ban hành thì bắt buộc đã xử lý (BR-CUR-03).
@@ -26,7 +26,11 @@ use App\Support\Services\BaseService;
  */
 class CurriculumService extends BaseService
 {
-    public function __construct(private readonly CurriculumAnalyzer $analyzer) {}
+    public function __construct(
+        private readonly CurriculumAnalyzer $analyzer,
+        private readonly GraduationRequirementService $graduation,
+        private readonly CurriculumVersionService $versions,
+    ) {}
 
     /** @param  array<string, mixed>  $data */
     public function create(array $data): Curriculum
@@ -209,7 +213,7 @@ class CurriculumService extends BaseService
     {
         $this->assertDraft($curriculum);
 
-        $problems = $this->analyzer->publishProblems($curriculum);
+        $problems = [...$this->analyzer->publishProblems($curriculum), ...$this->graduation->problems($curriculum)];
 
         if ($problems !== []) {
             $this->fail(
@@ -236,11 +240,18 @@ class CurriculumService extends BaseService
             );
         }
 
-        $curriculum->update([
-            'status' => CurriculumStatus::Published,
-            'published_at' => now(),
-            'published_by' => $actor?->id,
-        ]);
+        // Ban hành: lưu cố định điều kiện tốt nghiệp, phiên bản trước (cùng mã) dừng ở khóa liền trước (FR-CUR-005)
+        $this->transaction(function () use ($curriculum, $actor): void {
+            $curriculum->update([
+                'status' => CurriculumStatus::Published,
+                'published_at' => now(),
+                'published_by' => $actor?->id,
+                'effective_from' => $curriculum->effective_from ?? now(config('studentmanager.display_timezone'))->toDateString(),
+            ]);
+
+            $this->graduation->freeze($curriculum);
+            $this->versions->closePrevious($curriculum);
+        });
 
         return $curriculum->refresh();
     }

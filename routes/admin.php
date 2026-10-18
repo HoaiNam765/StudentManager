@@ -9,6 +9,7 @@ use App\Modules\Auth\Http\Controllers\RolePermissionController;
 use App\Modules\Auth\Http\Controllers\UserController;
 use App\Modules\Auth\Http\Controllers\UserRoleController;
 use App\Modules\Curriculum\Http\Controllers\CurriculumController;
+use App\Modules\Curriculum\Http\Controllers\CurriculumVersionController;
 use App\Modules\Faculty\Http\Controllers\LeadershipController;
 use App\Modules\Faculty\Http\Controllers\UnitController;
 use App\Modules\Room\Http\Controllers\FacilityController;
@@ -172,14 +173,18 @@ Route::middleware('auth')->group(function (): void {
         Route::get('curricula', [CurriculumController::class, 'index'])->name('curricula.index');
         Route::get('curricula/{curriculum}', [CurriculumController::class, 'show'])->name('curricula.show');
         Route::get('curricula/{curriculum}/check', [CurriculumController::class, 'check'])->name('curricula.check');
+        Route::get('curricula/{curriculum}/versions', [CurriculumVersionController::class, 'index'])->name('curricula.versions.index');
+        Route::get('curricula/{curriculum}/graduation-requirements', [CurriculumVersionController::class, 'showRequirements'])->name('curricula.graduation-requirements.show');
     });
 
     Route::post('curricula', [CurriculumController::class, 'store'])->middleware('permission:CUR.create')->name('curricula.store');
+    Route::post('curricula/{curriculum}/versions', [CurriculumVersionController::class, 'store'])->middleware('permission:CUR.create')->name('curricula.versions.store');
     Route::delete('curricula/{curriculum}', [CurriculumController::class, 'destroy'])->middleware('permission:CUR.delete')->name('curricula.destroy');
     Route::post('curricula/{curriculum}/publish', [CurriculumController::class, 'publish'])->middleware('permission:CUR.approve,ALL')->name('curricula.publish');
 
     Route::middleware('permission:CUR.update')->group(function (): void {
         Route::put('curricula/{curriculum}', [CurriculumController::class, 'update'])->name('curricula.update');
+        Route::put('curricula/{curriculum}/graduation-requirements', [CurriculumVersionController::class, 'updateRequirements'])->name('curricula.graduation-requirements.update');
         Route::post('curricula/{curriculum}/blocks', [CurriculumController::class, 'storeBlock'])->name('curricula.blocks.store');
         Route::put('curriculum-blocks/{curriculumBlock}', [CurriculumController::class, 'updateBlock'])->name('curriculum-blocks.update');
         Route::delete('curriculum-blocks/{curriculumBlock}', [CurriculumController::class, 'destroyBlock'])->name('curriculum-blocks.destroy');

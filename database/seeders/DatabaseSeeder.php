@@ -25,7 +25,7 @@ class DatabaseSeeder extends Seeder
         RoomSeeder::class,            // ROM: phòng học
         SubjectSeeder::class,         // SUB: học phần, quan hệ, cơ cấu điểm
         SubjectRelationSeeder::class, // SUB: tiên quyết, học trước, song hành
-        // CurriculumSeeder::class,   // CUR: chương trình đào tạo
+        CurriculumSeeder::class,      // CUR: chương trình đào tạo
         TeacherSeeder::class,         // TCH: giảng viên
         GradeStructureSeeder::class,  // SUB: cơ cấu điểm mặc định của học phần
         // SchoolClassSeeder::class,  // CLS: khóa, lớp hành chính, lớp học phần

@@ -8,6 +8,7 @@ use App\Modules\Auth\Http\Controllers\RoleController;
 use App\Modules\Auth\Http\Controllers\RolePermissionController;
 use App\Modules\Auth\Http\Controllers\UserController;
 use App\Modules\Auth\Http\Controllers\UserRoleController;
+use App\Modules\Curriculum\Http\Controllers\CurriculumController;
 use App\Modules\Faculty\Http\Controllers\LeadershipController;
 use App\Modules\Faculty\Http\Controllers\UnitController;
 use App\Modules\Room\Http\Controllers\FacilityController;
@@ -164,6 +165,31 @@ Route::middleware('auth')->group(function (): void {
 
     Route::post('holidays', [AcademicCalendarController::class, 'storeHoliday'])->middleware('permission:ACY.create')->name('holidays.store');
     Route::delete('holidays/{holiday}', [AcademicCalendarController::class, 'destroyHoliday'])->middleware('permission:ACY.delete')->name('holidays.destroy');
+
+    // Chương trình đào tạo (CUR, FR-CUR-001..003): xem = CUR.view, thêm = CUR.create, sửa nháp (khối, nhóm tự chọn, học phần) = CUR.update,
+    // xóa nháp = CUR.delete, ban hành = CUR.approve toàn trường (ACAD). Phạm vi FACULTY (DEAN) kiểm tra tiếp trong CurriculumController.
+    Route::middleware('permission:CUR.view')->group(function (): void {
+        Route::get('curricula', [CurriculumController::class, 'index'])->name('curricula.index');
+        Route::get('curricula/{curriculum}', [CurriculumController::class, 'show'])->name('curricula.show');
+        Route::get('curricula/{curriculum}/check', [CurriculumController::class, 'check'])->name('curricula.check');
+    });
+
+    Route::post('curricula', [CurriculumController::class, 'store'])->middleware('permission:CUR.create')->name('curricula.store');
+    Route::delete('curricula/{curriculum}', [CurriculumController::class, 'destroy'])->middleware('permission:CUR.delete')->name('curricula.destroy');
+    Route::post('curricula/{curriculum}/publish', [CurriculumController::class, 'publish'])->middleware('permission:CUR.approve,ALL')->name('curricula.publish');
+
+    Route::middleware('permission:CUR.update')->group(function (): void {
+        Route::put('curricula/{curriculum}', [CurriculumController::class, 'update'])->name('curricula.update');
+        Route::post('curricula/{curriculum}/blocks', [CurriculumController::class, 'storeBlock'])->name('curricula.blocks.store');
+        Route::put('curriculum-blocks/{curriculumBlock}', [CurriculumController::class, 'updateBlock'])->name('curriculum-blocks.update');
+        Route::delete('curriculum-blocks/{curriculumBlock}', [CurriculumController::class, 'destroyBlock'])->name('curriculum-blocks.destroy');
+        Route::post('curricula/{curriculum}/elective-groups', [CurriculumController::class, 'storeGroup'])->name('curricula.elective-groups.store');
+        Route::put('curriculum-elective-groups/{electiveGroup}', [CurriculumController::class, 'updateGroup'])->name('curriculum-elective-groups.update');
+        Route::delete('curriculum-elective-groups/{electiveGroup}', [CurriculumController::class, 'destroyGroup'])->name('curriculum-elective-groups.destroy');
+        Route::post('curricula/{curriculum}/subjects', [CurriculumController::class, 'storeSubject'])->name('curricula.subjects.store');
+        Route::put('curriculum-subjects/{curriculumSubject}', [CurriculumController::class, 'updateSubject'])->name('curriculum-subjects.update');
+        Route::delete('curriculum-subjects/{curriculumSubject}', [CurriculumController::class, 'destroySubject'])->name('curriculum-subjects.destroy');
+    });
 
     // Hồ sơ giảng viên (TCH, FR-TCH-001, 003): xem = TCH.view (LEC, ADV chỉ hồ sơ của mình), thêm = TCH.create,
     // sửa / tình trạng / kiêm nhiệm / cấp tài khoản / xác nhận đề nghị = TCH.update. Phạm vi kiểm tra tiếp trong LecturerController.

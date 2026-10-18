@@ -4,6 +4,7 @@ use App\Http\Controllers\AccountController;
 use App\Modules\Auth\Http\Controllers\LoginController;
 use App\Modules\Auth\Http\Controllers\PasswordController;
 use App\Modules\Auth\Http\Controllers\PasswordResetController;
+use App\Modules\Auth\Http\Controllers\SessionController;
 use App\Modules\Auth\Services\PortalResolver;
 use App\Modules\System\Http\Controllers\LookupOptionController;
 use Illuminate\Http\Request;
@@ -43,7 +44,10 @@ Route::middleware('auth')->group(function (): void {
 // Trang tài khoản dùng chung cho mọi vai trò; đổi mật khẩu dùng route `password.change` ở trên
 Route::middleware(['auth', 'password.changed'])->prefix('tai-khoan')->name('account.')->group(function (): void {
     Route::get('/cai-dat', [AccountController::class, 'settings'])->name('settings');
-    Route::get('/phien-dang-nhap', [AccountController::class, 'sessions'])->name('sessions');
+    // Phiên đăng nhập và lịch sử đăng nhập của chính mình (FR-AUTH-007, FR-AUTH-016)
+    Route::get('/phien-dang-nhap', [SessionController::class, 'index'])->name('sessions');
+    Route::delete('/phien-dang-nhap', [SessionController::class, 'destroyOthers'])->name('sessions.destroy-others');
+    Route::delete('/phien-dang-nhap/{handle}', [SessionController::class, 'destroy'])->where('handle', '[0-9a-f]{32}')->name('sessions.destroy');
     Route::get('/thong-bao', [AccountController::class, 'notifications'])->name('notifications');
 });
 

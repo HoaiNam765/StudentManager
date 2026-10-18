@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Modules\AcademicYear\Http\Controllers\AcademicCalendarController;
 use App\Modules\AcademicYear\Http\Controllers\AcademicYearController;
+use App\Modules\Auth\Http\Controllers\LoginHistoryController;
 use App\Modules\Auth\Http\Controllers\RoleController;
 use App\Modules\Auth\Http\Controllers\RolePermissionController;
 use App\Modules\Auth\Http\Controllers\UserController;
@@ -62,6 +63,8 @@ Route::middleware('auth')->group(function (): void {
     Route::middleware('permission:AUTH.view,ALL')->group(function (): void {
         Route::get('users', [UserController::class, 'index'])->name('users.index');
         Route::get('users/{user}', [UserController::class, 'show'])->name('users.show');
+        // Lịch sử đăng nhập toàn trường (FR-AUTH-016)
+        Route::get('login-histories', [LoginHistoryController::class, 'index'])->name('login-histories.index');
     });
     Route::post('users', [UserController::class, 'store'])->middleware('permission:AUTH.create,ALL')->name('users.store');
 

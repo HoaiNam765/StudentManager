@@ -6,6 +6,7 @@ namespace App\Models;
 use App\Modules\Auth\Concerns\HasRoles;
 use App\Modules\Auth\Enums\AccountStatus;
 use App\Modules\Auth\Enums\ProfileType;
+use App\Modules\Auth\Models\LoginHistory;
 use App\Modules\Auth\Notifications\ResetPasswordLink;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -85,6 +86,11 @@ class User extends Authenticatable
     public function passwordHistories(): HasMany
     {
         return $this->hasMany(PasswordHistory::class);
+    }
+
+    public function loginHistories(): HasMany
+    {
+        return $this->hasMany(LoginHistory::class);
     }
 
     /** Đang bị khóa tạm vì nhập sai mật khẩu nhiều lần (BR-AUTH-06). */

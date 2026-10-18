@@ -3,6 +3,7 @@
 namespace App\Modules\Auth;
 
 use App\Modules\Auth\Importers\UserImporter;
+use App\Modules\Auth\Services\LoginHistoryService;
 use App\Modules\System\Services\ImportRegistry;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -10,11 +11,17 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
 /**
- * Đăng ký của module Auth: Importer tạo tài khoản hàng loạt (FR-AUTH-009), giới hạn tần suất quên mật khẩu.
+ * Đăng ký của module Auth: Importer tạo tài khoản hàng loạt (FR-AUTH-009), giới hạn tần suất quên mật khẩu,
+ * lịch sử đăng nhập (scoped: nhớ lần đăng nhập vừa ghi trong một yêu cầu).
  * Các dịch vụ scoped của phân quyền (AccessControl, AuditLogger) vẫn ở AppServiceProvider như trước.
  */
 class AuthServiceProvider extends ServiceProvider
 {
+    public function register(): void
+    {
+        $this->app->scoped(LoginHistoryService::class);
+    }
+
     public function boot(): void
     {
         $this->app->make(ImportRegistry::class)

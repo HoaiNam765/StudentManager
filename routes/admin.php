@@ -15,6 +15,7 @@ use App\Modules\Faculty\Http\Controllers\UnitController;
 use App\Modules\Room\Http\Controllers\FacilityController;
 use App\Modules\Room\Http\Controllers\RoomController;
 use App\Modules\SchoolClass\Http\Controllers\AdminClassController;
+use App\Modules\Student\Http\Controllers\StudentController;
 use App\Modules\Subject\Http\Controllers\GradeStructureController;
 use App\Modules\Subject\Http\Controllers\SubjectController;
 use App\Modules\Subject\Http\Controllers\SubjectRelationController;
@@ -195,6 +196,25 @@ Route::middleware('auth')->group(function (): void {
         Route::post('curricula/{curriculum}/subjects', [CurriculumController::class, 'storeSubject'])->name('curricula.subjects.store');
         Route::put('curriculum-subjects/{curriculumSubject}', [CurriculumController::class, 'updateSubject'])->name('curriculum-subjects.update');
         Route::delete('curriculum-subjects/{curriculumSubject}', [CurriculumController::class, 'destroySubject'])->name('curriculum-subjects.destroy');
+    });
+
+    // Hồ sơ sinh viên (STU, FR-STU-001, 004, 005, 013): xem = STU.view (DEAN theo khoa; LEC, ADV khi có lớp), thêm = STU.create,
+    // sửa / người thân / xem đầy đủ trường nhạy cảm = STU.update, xóa hồ sơ nhập sai = STU.delete. Phạm vi kiểm tra tiếp trong StudentController.
+    Route::middleware('permission:STU.view')->group(function (): void {
+        Route::get('students', [StudentController::class, 'index'])->name('students.index');
+        Route::get('students/{student}', [StudentController::class, 'show'])->whereNumber('student')->name('students.show');
+        Route::get('students/{student}/change-logs', [StudentController::class, 'changeLogs'])->whereNumber('student')->name('students.change-logs');
+    });
+
+    Route::post('students', [StudentController::class, 'store'])->middleware('permission:STU.create')->name('students.store');
+    Route::delete('students/{student}', [StudentController::class, 'destroy'])->whereNumber('student')->middleware('permission:STU.delete')->name('students.destroy');
+
+    Route::middleware('permission:STU.update')->group(function (): void {
+        Route::put('students/{student}', [StudentController::class, 'update'])->whereNumber('student')->name('students.update');
+        Route::get('students/{student}/sensitive', [StudentController::class, 'sensitive'])->whereNumber('student')->name('students.sensitive');
+        Route::post('students/{student}/contacts', [StudentController::class, 'storeContact'])->whereNumber('student')->name('students.contacts.store');
+        Route::put('student-contacts/{studentContact}', [StudentController::class, 'updateContact'])->name('student-contacts.update');
+        Route::delete('student-contacts/{studentContact}', [StudentController::class, 'destroyContact'])->name('student-contacts.destroy');
     });
 
     // Hồ sơ giảng viên (TCH, FR-TCH-001, 003): xem = TCH.view (LEC, ADV chỉ hồ sơ của mình), thêm = TCH.create,

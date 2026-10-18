@@ -29,7 +29,7 @@ class DatabaseSeeder extends Seeder
         TeacherSeeder::class,         // TCH: giảng viên
         GradeStructureSeeder::class,  // SUB: cơ cấu điểm mặc định của học phần
         SchoolClassSeeder::class,     // CLS: khóa, lớp hành chính, lớp học phần
-        // StudentSeeder::class,      // STU: sinh viên
+        StudentSeeder::class,         // STU: hồ sơ sinh viên chờ nhập học
         // TimetableSeeder::class,    // TTB: thời khóa biểu, buổi học
         // EnrollmentSeeder::class,   // ENR: đăng ký học phần
         // GradeSeeder::class,        // GRD: điểm

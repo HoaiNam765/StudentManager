@@ -91,6 +91,12 @@ return [
         'periods_per_day' => (int) env('TEACHER_PERIODS_PER_DAY', 15),
     ],
 
+    // Sinh viên (STU): khoảng tuổi khi nhập học (BR-STU-03)
+    'student' => [
+        'min_age' => (int) env('STUDENT_MIN_AGE', 16),
+        'max_age' => (int) env('STUDENT_MAX_AGE', 60),
+    ],
+
     'faculty' => [
         'allow_leader_outside_unit' => (bool) env('FACULTY_ALLOW_LEADER_OUTSIDE_UNIT', false),
     ],

@@ -6,7 +6,9 @@ use App\Modules\Faculty\Contracts\LeaderEligibility;
 use App\Modules\Faculty\Models\Department;
 use App\Modules\Faculty\Models\Faculty;
 use App\Modules\System\Models\LookupValue;
+use App\Modules\System\Services\ImportRegistry;
 use App\Modules\Teacher\Contracts\TeachingAssignments;
+use App\Modules\Teacher\Importers\LecturerImporter;
 use App\Modules\Teacher\Models\Lecturer;
 use App\Modules\Teacher\Models\LecturerChangeRequest;
 use App\Modules\Teacher\Models\LecturerUnit;
@@ -37,6 +39,9 @@ class TeacherServiceProvider extends ServiceProvider
         foreach ([Lecturer::class, LecturerUnit::class, LecturerChangeRequest::class] as $model) {
             Gate::policy($model, LecturerPolicy::class);
         }
+
+        // Nhập danh sách giảng viên qua trung tâm import (FR-TCH-013)
+        $this->app->make(ImportRegistry::class)->registerLazy(LecturerImporter::KEY, fn () => $this->app->make(LecturerImporter::class));
 
         $references = app(ReferenceRegistry::class);
         $working = fn ($q) => $q->where('status', 'working')->whereNull('deleted_at');

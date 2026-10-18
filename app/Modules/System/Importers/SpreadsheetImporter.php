@@ -4,6 +4,7 @@ namespace App\Modules\System\Importers;
 
 use App\Modules\System\Contracts\ImporterContract;
 use App\Support\Exceptions\BusinessRuleException;
+use DateTimeInterface;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -93,7 +94,13 @@ abstract class SpreadsheetImporter implements ImporterContract
 
                     foreach ($header as $index => $column) {
                         $value = $values[$index] ?? '';
-                        $record[$column] = $value === null ? '' : (is_string($value) ? $value : (string) $value);
+                        // Ô định dạng ngày trong Excel được OpenSpout trả về dạng DateTimeImmutable: đổi thành Y-m-d
+                        $record[$column] = match (true) {
+                            $value === null => '',
+                            $value instanceof DateTimeInterface => $value->format('Y-m-d'),
+                            is_string($value) => $value,
+                            default => (string) $value,
+                        };
                     }
 
                     // Khóa = vị trí dòng dữ liệu tính cả dòng trống; trung tâm import đổi thành số dòng trong file

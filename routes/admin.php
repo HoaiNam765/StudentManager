@@ -14,6 +14,7 @@ use App\Modules\Room\Http\Controllers\RoomController;
 use App\Modules\Subject\Http\Controllers\GradeStructureController;
 use App\Modules\Subject\Http\Controllers\SubjectController;
 use App\Modules\Subject\Http\Controllers\SubjectRelationController;
+use App\Modules\Subject\Http\Controllers\SyllabusController;
 use App\Modules\System\Http\Controllers\AdministrativeUnitController;
 use App\Modules\System\Http\Controllers\ImportController;
 use App\Modules\System\Http\Controllers\LookupController;
@@ -189,6 +190,27 @@ Route::middleware('auth')->group(function (): void {
         Route::post('lecturer-change-requests/{lecturerChangeRequest}/reject', [LecturerController::class, 'reject'])->name('lecturer-change-requests.reject');
         Route::post('lecturer-leaves/{lecturerLeave}/approve', [LecturerScheduleController::class, 'approveLeave'])->name('lecturer-leaves.approve');
         Route::post('lecturer-leaves/{lecturerLeave}/reject', [LecturerScheduleController::class, 'rejectLeave'])->name('lecturer-leaves.reject');
+    });
+
+    // Đề cương học phần (SUB, FR-SUB-006, BR-SUB-08): xem = SUB.view; soạn, sửa, đính tệp, gửi duyệt = SUB.update (LEC học phần phụ trách);
+    // duyệt / trả lại = SUB.approve (DEAN, ACAD). Phạm vi kiểm tra trên học phần trong SyllabusController.
+    Route::middleware('permission:SUB.view')->group(function (): void {
+        Route::get('subjects/{subject}/syllabi', [SyllabusController::class, 'index'])->whereNumber('subject')->name('subjects.syllabi.index');
+        Route::get('syllabi/{syllabus}', [SyllabusController::class, 'show'])->name('syllabi.show');
+        Route::get('syllabi/{syllabus}/file', [SyllabusController::class, 'downloadFile'])->name('syllabi.file.download');
+    });
+
+    Route::middleware('permission:SUB.update')->group(function (): void {
+        Route::post('subjects/{subject}/syllabi', [SyllabusController::class, 'store'])->whereNumber('subject')->name('subjects.syllabi.store');
+        Route::put('syllabi/{syllabus}', [SyllabusController::class, 'update'])->name('syllabi.update');
+        Route::post('syllabi/{syllabus}/file', [SyllabusController::class, 'uploadFile'])->name('syllabi.file.upload');
+        Route::post('syllabi/{syllabus}/submit', [SyllabusController::class, 'submit'])->name('syllabi.submit');
+        Route::delete('syllabi/{syllabus}', [SyllabusController::class, 'destroy'])->name('syllabi.destroy');
+    });
+
+    Route::middleware('permission:SUB.approve')->group(function (): void {
+        Route::post('syllabi/{syllabus}/approve', [SyllabusController::class, 'approve'])->name('syllabi.approve');
+        Route::post('syllabi/{syllabus}/reject', [SyllabusController::class, 'reject'])->name('syllabi.reject');
     });
 
     // Trung tâm import (SYS, FR-SYS-007): xem = SYS.view, tải lên/kiểm tra/lưu = SYS.create, hoàn tác/xóa = SYS.delete.

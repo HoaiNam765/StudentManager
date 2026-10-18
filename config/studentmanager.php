@@ -96,6 +96,11 @@ return [
             'practice' => (int) env('SUBJECT_PRACTICE_PERIODS_PER_CREDIT', 30),
         ],
         'self_study_hours_per_credit' => (int) env('SUBJECT_SELF_STUDY_HOURS_PER_CREDIT', 30),
+
+        // Đề cương (FR-SUB-006, BR-SUB-08): bắt buộc được duyệt trước khi áp dụng cho lớp mới; tệp PDF tối đa (KB), lưu ở disk riêng tư
+        'syllabus_requires_approval' => (bool) env('SYLLABUS_REQUIRES_APPROVAL', true),
+        'syllabus_max_kb' => (int) env('SYLLABUS_MAX_KB', 10240),
+        'syllabus_disk' => env('SYLLABUS_DISK', 'local'),
     ],
 
     'import' => [

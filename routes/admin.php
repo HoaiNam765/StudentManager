@@ -15,6 +15,7 @@ use App\Modules\Faculty\Http\Controllers\UnitController;
 use App\Modules\Room\Http\Controllers\FacilityController;
 use App\Modules\Room\Http\Controllers\RoomController;
 use App\Modules\SchoolClass\Http\Controllers\AdminClassController;
+use App\Modules\SchoolClass\Http\Controllers\CourseSectionController;
 use App\Modules\Student\Http\Controllers\AdmissionController;
 use App\Modules\Student\Http\Controllers\StudentController;
 use App\Modules\Student\Http\Controllers\StudentCurriculumController;
@@ -399,6 +400,21 @@ Route::middleware('auth')->group(function (): void {
     Route::post('admin-classes', [AdminClassController::class, 'store'])->middleware('permission:CLS.create')->name('admin-classes.store');
     Route::put('admin-classes/{adminClass}', [AdminClassController::class, 'update'])->whereNumber('adminClass')->middleware('permission:CLS.update')->name('admin-classes.update');
     Route::delete('admin-classes/{adminClass}', [AdminClassController::class, 'destroy'])->whereNumber('adminClass')->middleware('permission:CLS.delete')->name('admin-classes.destroy');
+
+    // Lớp học phần (CLS, FR-CLS-009..012): xem = CLS.view (DEAN đơn vị mình, LEC lớp được phân công); mở, sửa, xóa, đổi trạng thái = CLS toàn trường (ACAD);
+    // phân công giảng viên = ACAD hoặc DEAN trong đơn vị (kiểm tra trong CourseSectionController).
+    Route::middleware('permission:CLS.view')->group(function (): void {
+        Route::get('course-sections', [CourseSectionController::class, 'index'])->name('course-sections.index');
+        Route::get('course-sections/{courseSection}', [CourseSectionController::class, 'show'])->whereNumber('courseSection')->name('course-sections.show');
+        Route::post('course-sections/{courseSection}/instructors', [CourseSectionController::class, 'assign'])->whereNumber('courseSection')->name('course-sections.instructors.store');
+        Route::delete('section-instructors/{sectionInstructor}', [CourseSectionController::class, 'unassign'])->name('section-instructors.destroy');
+    });
+
+    Route::post('course-sections', [CourseSectionController::class, 'store'])->middleware('permission:CLS.create,ALL')->name('course-sections.store');
+    Route::put('course-sections/{courseSection}', [CourseSectionController::class, 'update'])->whereNumber('courseSection')->middleware('permission:CLS.update,ALL')->name('course-sections.update');
+    Route::delete('course-sections/{courseSection}', [CourseSectionController::class, 'destroy'])->whereNumber('courseSection')->middleware('permission:CLS.delete,ALL')->name('course-sections.destroy');
+    Route::post('course-sections/{courseSection}/status/{status}', [CourseSectionController::class, 'transition'])
+        ->whereNumber('courseSection')->middleware('permission:CLS.update,ALL')->name('course-sections.status');
 
     // Học phần (SUB, FR-SUB-001..003): xem = SUB.view (DEAN, LEC theo phạm vi), thêm = SUB.create, sửa / ngừng = SUB.update,
     // xóa = SUB.delete, xuất = SUB.export. Phạm vi FACULTY (DEAN) kiểm tra tiếp trên từng bản ghi trong SubjectController.

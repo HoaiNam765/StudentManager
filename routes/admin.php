@@ -9,10 +9,12 @@ use App\Modules\Auth\Http\Controllers\RolePermissionController;
 use App\Modules\Auth\Http\Controllers\UserController;
 use App\Modules\Auth\Http\Controllers\UserRoleController;
 use App\Modules\Curriculum\Http\Controllers\CurriculumController;
+use App\Modules\Curriculum\Http\Controllers\CurriculumVersionController;
 use App\Modules\Faculty\Http\Controllers\LeadershipController;
 use App\Modules\Faculty\Http\Controllers\UnitController;
 use App\Modules\Room\Http\Controllers\FacilityController;
 use App\Modules\Room\Http\Controllers\RoomController;
+use App\Modules\SchoolClass\Http\Controllers\AdminClassController;
 use App\Modules\Student\Http\Controllers\StudentController;
 use App\Modules\Subject\Http\Controllers\GradeStructureController;
 use App\Modules\Subject\Http\Controllers\SubjectController;
@@ -173,14 +175,18 @@ Route::middleware('auth')->group(function (): void {
         Route::get('curricula', [CurriculumController::class, 'index'])->name('curricula.index');
         Route::get('curricula/{curriculum}', [CurriculumController::class, 'show'])->name('curricula.show');
         Route::get('curricula/{curriculum}/check', [CurriculumController::class, 'check'])->name('curricula.check');
+        Route::get('curricula/{curriculum}/versions', [CurriculumVersionController::class, 'index'])->name('curricula.versions.index');
+        Route::get('curricula/{curriculum}/graduation-requirements', [CurriculumVersionController::class, 'showRequirements'])->name('curricula.graduation-requirements.show');
     });
 
     Route::post('curricula', [CurriculumController::class, 'store'])->middleware('permission:CUR.create')->name('curricula.store');
+    Route::post('curricula/{curriculum}/versions', [CurriculumVersionController::class, 'store'])->middleware('permission:CUR.create')->name('curricula.versions.store');
     Route::delete('curricula/{curriculum}', [CurriculumController::class, 'destroy'])->middleware('permission:CUR.delete')->name('curricula.destroy');
     Route::post('curricula/{curriculum}/publish', [CurriculumController::class, 'publish'])->middleware('permission:CUR.approve,ALL')->name('curricula.publish');
 
     Route::middleware('permission:CUR.update')->group(function (): void {
         Route::put('curricula/{curriculum}', [CurriculumController::class, 'update'])->name('curricula.update');
+        Route::put('curricula/{curriculum}/graduation-requirements', [CurriculumVersionController::class, 'updateRequirements'])->name('curricula.graduation-requirements.update');
         Route::post('curricula/{curriculum}/blocks', [CurriculumController::class, 'storeBlock'])->name('curricula.blocks.store');
         Route::put('curriculum-blocks/{curriculumBlock}', [CurriculumController::class, 'updateBlock'])->name('curriculum-blocks.update');
         Route::delete('curriculum-blocks/{curriculumBlock}', [CurriculumController::class, 'destroyBlock'])->name('curriculum-blocks.destroy');
@@ -366,6 +372,21 @@ Route::middleware('auth')->group(function (): void {
         Route::delete('buildings/{building}', [FacilityController::class, 'destroyBuilding'])->name('buildings.destroy');
         Route::delete('rooms/{room}', [RoomController::class, 'destroy'])->name('rooms.destroy');
     });
+
+    // Khóa tuyển sinh và lớp hành chính (CLS, FR-CLS-001, 002): xem = CLS.view (DEAN theo khoa); khóa: thêm, sửa, xóa = CLS.* toàn trường (ACAD);
+    // lớp: thêm = CLS.create, sửa / đóng lớp = CLS.update, xóa = CLS.delete. Phạm vi kiểm tra tiếp trong AdminClassController.
+    Route::middleware('permission:CLS.view')->group(function (): void {
+        Route::get('cohorts', [AdminClassController::class, 'cohorts'])->name('cohorts.index');
+        Route::get('admin-classes', [AdminClassController::class, 'index'])->name('admin-classes.index');
+        Route::get('admin-classes/{adminClass}', [AdminClassController::class, 'show'])->whereNumber('adminClass')->name('admin-classes.show');
+    });
+
+    Route::post('cohorts', [AdminClassController::class, 'storeCohort'])->middleware('permission:CLS.create,ALL')->name('cohorts.store');
+    Route::put('cohorts/{cohort}', [AdminClassController::class, 'updateCohort'])->middleware('permission:CLS.update,ALL')->name('cohorts.update');
+    Route::delete('cohorts/{cohort}', [AdminClassController::class, 'destroyCohort'])->middleware('permission:CLS.delete,ALL')->name('cohorts.destroy');
+    Route::post('admin-classes', [AdminClassController::class, 'store'])->middleware('permission:CLS.create')->name('admin-classes.store');
+    Route::put('admin-classes/{adminClass}', [AdminClassController::class, 'update'])->whereNumber('adminClass')->middleware('permission:CLS.update')->name('admin-classes.update');
+    Route::delete('admin-classes/{adminClass}', [AdminClassController::class, 'destroy'])->whereNumber('adminClass')->middleware('permission:CLS.delete')->name('admin-classes.destroy');
 
     // Học phần (SUB, FR-SUB-001..003): xem = SUB.view (DEAN, LEC theo phạm vi), thêm = SUB.create, sửa / ngừng = SUB.update,
     // xóa = SUB.delete, xuất = SUB.export. Phạm vi FACULTY (DEAN) kiểm tra tiếp trên từng bản ghi trong SubjectController.

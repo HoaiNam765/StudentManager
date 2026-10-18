@@ -16,6 +16,7 @@ use App\Modules\Room\Http\Controllers\FacilityController;
 use App\Modules\Room\Http\Controllers\RoomController;
 use App\Modules\SchoolClass\Http\Controllers\AdminClassController;
 use App\Modules\Student\Http\Controllers\StudentController;
+use App\Modules\Student\Http\Controllers\StudentCurriculumController;
 use App\Modules\Subject\Http\Controllers\GradeStructureController;
 use App\Modules\Subject\Http\Controllers\SubjectController;
 use App\Modules\Subject\Http\Controllers\SubjectRelationController;
@@ -216,6 +217,10 @@ Route::middleware('auth')->group(function (): void {
         Route::put('student-contacts/{studentContact}', [StudentController::class, 'updateContact'])->name('student-contacts.update');
         Route::delete('student-contacts/{studentContact}', [StudentController::class, 'destroyContact'])->name('student-contacts.destroy');
     });
+
+    // Gán CTĐT cho sinh viên (CUR, FR-CUR-006): xem lịch sử = STU.view; gán theo ngành – khóa hoặc đổi CTĐT = STU.update (kiểm tra phạm vi trên hồ sơ)
+    Route::get('students/{student}/curricula', [StudentCurriculumController::class, 'index'])->whereNumber('student')->middleware('permission:STU.view')->name('students.curricula.index');
+    Route::post('students/{student}/curricula', [StudentCurriculumController::class, 'store'])->whereNumber('student')->middleware('permission:STU.update')->name('students.curricula.store');
 
     // Hồ sơ giảng viên (TCH, FR-TCH-001, 003): xem = TCH.view (LEC, ADV chỉ hồ sơ của mình), thêm = TCH.create,
     // sửa / tình trạng / kiêm nhiệm / cấp tài khoản / xác nhận đề nghị = TCH.update. Phạm vi kiểm tra tiếp trong LecturerController.

@@ -16,10 +16,11 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Chương trình đào tạo (FR-CUR-001). Phạm vi dữ liệu (BA 4.2, hàng CUR): DEAN xây dựng CTĐT của ngành thuộc khoa mình
- * (FACULTY); STU chỉ xem CTĐT của mình (OWN, chờ STU gán CTĐT cho sinh viên); các vai trò khác xem toàn trường.
+ * (FACULTY); STU chỉ xem CTĐT đang / đã gán cho mình (OWN, `student_curricula`, #97); các vai trò khác xem toàn trường.
  */
 class Curriculum extends StandardModel implements HasDataScope
 {
@@ -107,6 +108,11 @@ class Curriculum extends StandardModel implements HasDataScope
     {
         match ($scope) {
             DataScope::Faculty => $query->whereIn('major_id', Major::query()->select('id')->whereIn('faculty_id', app(FacultyAccess::class)->facultyIds($user))),
+            DataScope::Own => $query->whereIn($this->qualifyColumn('id'), DB::table('student_curricula')
+                ->join('students', 'students.id', '=', 'student_curricula.student_id')
+                ->where('students.user_id', $user->id)
+                ->whereNull('student_curricula.deleted_at')
+                ->select('student_curricula.curriculum_id')),
             default => $query->whereRaw('1 = 0'),
         };
     }

@@ -10,6 +10,7 @@ use App\Modules\Auth\Http\Controllers\UserController;
 use App\Modules\Auth\Http\Controllers\UserRoleController;
 use App\Modules\Curriculum\Http\Controllers\CurriculumController;
 use App\Modules\Curriculum\Http\Controllers\CurriculumVersionController;
+use App\Modules\Enrollment\Http\Controllers\EnrollmentController;
 use App\Modules\Enrollment\Http\Controllers\RegistrationOptionsController;
 use App\Modules\Enrollment\Http\Controllers\RegistrationPeriodController;
 use App\Modules\Faculty\Http\Controllers\LeadershipController;
@@ -428,6 +429,7 @@ Route::middleware('auth')->group(function (): void {
     Route::put('registration-periods/{registrationPeriod}', [RegistrationPeriodController::class, 'update'])->middleware('permission:ENR.update,ALL')->name('registration-periods.update');
     Route::post('registration-periods/{registrationPeriod}/publish', [RegistrationPeriodController::class, 'publish'])->middleware('permission:ENR.update,ALL')->name('registration-periods.publish');
     Route::delete('registration-periods/{registrationPeriod}', [RegistrationPeriodController::class, 'destroy'])->middleware('permission:ENR.delete,ALL')->name('registration-periods.destroy');
+    Route::get('course-sections/{courseSection}/enrollments', [EnrollmentController::class, 'roster'])->whereNumber('courseSection')->middleware('permission:ENR.view')->name('course-sections.enrollments');
     Route::get('students/{student}/registration-options', [RegistrationOptionsController::class, 'forStudent'])->whereNumber('student')->middleware('permission:ENR.view')->name('students.registration-options');
 
     // Thời khóa biểu (TTB, FR-TTB-001, 002): khung tiết xem = TTB.view, sửa = ACAD (TTB toàn trường);

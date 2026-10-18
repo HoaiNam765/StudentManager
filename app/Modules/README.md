@@ -308,6 +308,14 @@ $resolver->setFor($khoa, $ngay)->code;            // bộ quy chế đang áp d�
 - Hủy nhập học: hồ sơ Chờ nhập học xóa mềm kèm lý do (đi qua `StudentService::delete`, BR-STU-07).
 - API (quyền `STU.approve`: ACAD, CTSV): `POST /admin/students/{id}/admit`, `POST /admin/students/{id}/cancel-admission` (bắt buộc `reason`).
 
+## Thời khóa biểu cơ bản (TTB, FR-TTB-001, 002; BR-TTB-02, 03, 04, 07)
+
+- Khung tiết `periods`: số tiết, giờ bắt đầu – kết thúc, ca (sáng / chiều / tối; giữa hai ca là giờ nghỉ). Khung chung (`campus_id` trống) hoặc riêng một cơ sở; cơ sở có khung riêng thì dùng khung riêng (`PeriodService::periodsFor($coSo)`). Số tiết không trùng, giờ không chồng và tăng dần; tiết đã có lịch không đổi số / ca, không xóa; cơ sở đã có lịch theo khung chung thì không tạo khung riêng. Seeder: 15 tiết chung.
+- Mẫu lịch `schedule_rules`: lớp học phần, thứ (ISO 1 = Thứ Hai … 7 = Chủ nhật, như `lecturer_availabilities`), tiết từ – đến, phòng, tuần từ – đến, mọi tuần / tuần lẻ / tuần chẵn. Tuần 1 là tuần chứa ngày bắt đầu học kỳ (`ScheduleRuleService::dateOf`).
+- `ScheduleRuleService` từ chối: lớp đã Đang học / Kết thúc / Hủy; tiết không có trong khung; buổi vắt qua hai ca hoặc kết thúc sau `studentmanager.timetable.latest_end` (mặc định 21:00, BR-TTB-03); tuần vượt số tuần hoặc buổi ngoài ngày học kỳ (BR-TTB-07); lớp trực tiếp không có phòng; phòng thiếu chỗ so với sĩ số tối đa (BR-TTB-02) hoặc không xếp được (`RoomAvailability`); chồng với dòng lịch khác của cùng lớp. Tổng tiết lệch số tiết học phần (LT + TH) chỉ **cảnh báo** (`warnings`, BR-TTB-04).
+- Chưa làm (issue sau): trùng phòng / giảng viên giữa các lớp (FR-TTB-003), sinh buổi học theo ngày trừ ngày nghỉ (FR-TTB-005), nháp – công bố – khóa (FR-TTB-006), lịch bận giảng viên (FR-TTB-010).
+- API: `GET /admin/periods[?campus_id=]` (TTB.view), `POST|PUT|DELETE /admin/periods` (ACAD); `GET /admin/course-sections/{id}/schedule` (TTB.view theo phạm vi lớp: DEAN khoa mình, LEC lớp mình dạy), `POST /admin/course-sections/{id}/schedule`, `PUT|DELETE /admin/schedule-rules/{id}` (TTB toàn trường — ACAD; chữ C của DEAN, LEC ở ma trận TTB là đề xuất, không tự xếp lịch).
+
 ## Khoa, bộ môn, ngành (FAC, FR-FAC-001..005, 010)
 
 - Bảng `faculties` → `departments`; `faculties` → `majors` → `specializations`; `training_types` (đúng một hệ mặc định: chính quy). Lấy hệ mặc định: `TrainingType::default()`.

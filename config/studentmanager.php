@@ -136,6 +136,11 @@ return [
         'max_periods_per_term' => (int) env('SECTION_MAX_PERIODS_PER_TERM', 400),
     ],
 
+    // Thời khóa biểu (TTB): buổi học không kết thúc muộn hơn giờ này (BR-TTB-03)
+    'timetable' => [
+        'latest_end' => env('TIMETABLE_LATEST_END', '21:00'),
+    ],
+
     'import' => [
         // Disk lưu file tải lên
         'disk' => env('IMPORT_DISK', 'local'),

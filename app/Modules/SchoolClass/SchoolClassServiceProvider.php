@@ -34,5 +34,6 @@ class SchoolClassServiceProvider extends ServiceProvider
         $references->register(Specialization::class, 'admin_classes', 'specialization_id', 'lớp hành chính', active: $activeClass);
         $references->register(TrainingType::class, 'admin_classes', 'training_type_id', 'lớp hành chính', active: $activeClass);
         $references->register(PolicySet::class, 'cohorts', 'policy_set_id', 'khóa tuyển sinh');
+        $references->register(AdminClass::class, 'admin_class_members', 'admin_class_id', 'sinh viên trong lớp', active: fn ($q) => $q->whereNull('effective_to')->whereNull('deleted_at'));
     }
 }

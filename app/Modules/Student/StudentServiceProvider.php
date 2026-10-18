@@ -44,5 +44,7 @@ class StudentServiceProvider extends ServiceProvider
         $references->register(TrainingType::class, 'students', 'training_type_id', 'sinh viên', active: $enrolled);
         $references->register(Curriculum::class, 'students', 'curriculum_id', 'sinh viên', active: $enrolled);
         $references->register(Curriculum::class, 'student_curricula', 'curriculum_id', 'lịch sử gán CTĐT của sinh viên');
+        $references->register(Student::class, 'student_curricula', 'student_id', 'lịch sử gán CTĐT');
+        $references->register(Student::class, 'admin_class_members', 'student_id', 'lịch sử lớp hành chính');
     }
 }

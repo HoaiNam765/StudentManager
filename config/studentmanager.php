@@ -95,6 +95,11 @@ return [
     'student' => [
         'min_age' => (int) env('STUDENT_MIN_AGE', 16),
         'max_age' => (int) env('STUDENT_MAX_AGE', 60),
+        // MSSV khi xác nhận nhập học (BR-STU-01): 2 số cuối khóa + N số cuối mã ngành + số thứ tự trong khóa – ngành
+        'code_major_digits' => (int) env('STUDENT_CODE_MAJOR_DIGITS', 4),
+        'code_sequence_digits' => (int) env('STUDENT_CODE_SEQUENCE_DIGITS', 4),
+        // Email trường cấp cho sinh viên: {MSSV}@{domain}
+        'email_domain' => env('STUDENT_EMAIL_DOMAIN', 'student.studentmanager.test'),
     ],
 
     'faculty' => [

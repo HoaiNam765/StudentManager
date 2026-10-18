@@ -317,6 +317,14 @@ $resolver->setFor($khoa, $ngay)->code;            // bộ quy chế đang áp d�
 - Chưa làm (issue sau): sinh buổi học theo ngày trừ ngày nghỉ (FR-TTB-005), nháp – công bố – khóa (FR-TTB-006), lịch bận giảng viên (FR-TTB-010).
 - API: `GET /admin/periods[?campus_id=]` (TTB.view), `POST|PUT|DELETE /admin/periods` (ACAD); `GET /admin/course-sections/{id}/schedule` (TTB.view theo phạm vi lớp: DEAN khoa mình, LEC lớp mình dạy), `POST /admin/course-sections/{id}/schedule`, `PUT|DELETE /admin/schedule-rules/{id}` (TTB toàn trường — ACAD; chữ C của DEAN, LEC ở ma trận TTB là đề xuất, không tự xếp lịch).
 
+## Đăng ký học phần (ENR, FR-ENR-001, 002; BR-ENR-01, 11)
+
+- Đợt đăng ký `registration_periods`: học kỳ, vòng (vòng 1 / vòng 2 / bổ sung), mở – đóng (nhập giờ Việt Nam, lưu UTC; không nhập thì lấy mốc "Mở đăng ký" 00:00 và "Đóng đăng ký" 23:59 trong lịch học vụ ACY), khung tín chỉ riêng (trống = theo quy chế, #104), trạng thái nháp → công bố → đã chốt (#113). Đối tượng `registration_period_targets`: mỗi dòng một tổ hợp khóa / ngành / lớp hành chính, không có dòng nào = mọi sinh viên.
+- `RegistrationAccess`: `now()` là giờ máy chủ (BR-ENR-11); `openPeriodsFor($sv)`; `problems($dot, $sv)` / `assertCanRegister()` — Đang học, thuộc đối tượng, đợt đang mở (BR-ENR-01). **#105 gọi trước mỗi lần đăng ký.**
+- `AvailableSections::listFor($sv, $dot)`: lớp của học kỳ thuộc học phần trong CTĐT hiện hành, kèm sĩ số còn lại (qua `SectionStudents` của TTB), lịch, giảng viên, phòng; lớp không chọn được có `reasons` (chưa mở đăng ký, hết chỗ). **#104 bổ sung lý do trong `reasonsFor()`.**
+- API: `/admin/registration-periods` (xem = ENR.view, đợt nháp chỉ ENR toàn trường thấy; thêm / sửa / công bố / xóa nháp = ACAD), `GET /admin/students/{id}/registration-options[?period_id=]`, cổng sinh viên `GET /student/registration/options`.
+- Seeder `EnrollmentSeeder` (dùng thử): xác nhận nhập học 12 thí sinh, mở đăng ký các lớp HK2 có giảng viên chính và lịch, đợt vòng 1 khóa 2026 mở từ hôm qua tới 30 ngày sau.
+
 ## Khoa, bộ môn, ngành (FAC, FR-FAC-001..005, 010)
 
 - Bảng `faculties` → `departments`; `faculties` → `majors` → `specializations`; `training_types` (đúng một hệ mặc định: chính quy). Lấy hệ mặc định: `TrainingType::default()`.

@@ -31,7 +31,7 @@ class DatabaseSeeder extends Seeder
         SchoolClassSeeder::class,     // CLS: khóa, lớp hành chính, lớp học phần
         StudentSeeder::class,         // STU: hồ sơ sinh viên chờ nhập học
         TimetableSeeder::class,       // TTB: khung tiết học, mẫu lịch lớp học phần
-        // EnrollmentSeeder::class,   // ENR: đăng ký học phần
+        EnrollmentSeeder::class,      // ENR: nhập học thử 12 sinh viên, mở đăng ký lớp HK2, đợt vòng 1
         // GradeSeeder::class,        // GRD: điểm
     ];
 

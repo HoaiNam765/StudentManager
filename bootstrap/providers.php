@@ -2,6 +2,7 @@
 
 use App\Modules\Auth\AuthServiceProvider;
 use App\Modules\Curriculum\CurriculumServiceProvider;
+use App\Modules\Enrollment\EnrollmentServiceProvider;
 use App\Modules\Faculty\FacultyServiceProvider;
 use App\Modules\Room\RoomServiceProvider;
 use App\Modules\SchoolClass\SchoolClassServiceProvider;
@@ -24,4 +25,5 @@ return [
     CurriculumServiceProvider::class,
     StudentServiceProvider::class,
     TimetableServiceProvider::class,
+    EnrollmentServiceProvider::class,
 ];

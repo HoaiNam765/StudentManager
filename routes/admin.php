@@ -30,6 +30,8 @@ use App\Modules\System\Http\Controllers\PolicySetController;
 use App\Modules\System\Http\Controllers\SettingController;
 use App\Modules\Teacher\Http\Controllers\LecturerController;
 use App\Modules\Teacher\Http\Controllers\LecturerScheduleController;
+use App\Modules\Timetable\Http\Controllers\PeriodController;
+use App\Modules\Timetable\Http\Controllers\ScheduleRuleController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -415,6 +417,17 @@ Route::middleware('auth')->group(function (): void {
     Route::delete('course-sections/{courseSection}', [CourseSectionController::class, 'destroy'])->whereNumber('courseSection')->middleware('permission:CLS.delete,ALL')->name('course-sections.destroy');
     Route::post('course-sections/{courseSection}/status/{status}', [CourseSectionController::class, 'transition'])
         ->whereNumber('courseSection')->middleware('permission:CLS.update,ALL')->name('course-sections.status');
+
+    // Thời khóa biểu (TTB, FR-TTB-001, 002): khung tiết xem = TTB.view, sửa = ACAD (TTB toàn trường);
+    // mẫu lịch lớp học phần: xem theo phạm vi lớp (DEAN, LEC), thêm / sửa / xóa chỉ ACAD — kiểm tra trong ScheduleRuleController.
+    Route::get('periods', [PeriodController::class, 'index'])->middleware('permission:TTB.view')->name('periods.index');
+    Route::post('periods', [PeriodController::class, 'store'])->middleware('permission:TTB.create,ALL')->name('periods.store');
+    Route::put('periods/{period}', [PeriodController::class, 'update'])->middleware('permission:TTB.update,ALL')->name('periods.update');
+    Route::delete('periods/{period}', [PeriodController::class, 'destroy'])->middleware('permission:TTB.delete,ALL')->name('periods.destroy');
+    Route::get('course-sections/{courseSection}/schedule', [ScheduleRuleController::class, 'index'])->whereNumber('courseSection')->name('course-sections.schedule.index');
+    Route::post('course-sections/{courseSection}/schedule', [ScheduleRuleController::class, 'store'])->whereNumber('courseSection')->name('course-sections.schedule.store');
+    Route::put('schedule-rules/{scheduleRule}', [ScheduleRuleController::class, 'update'])->name('schedule-rules.update');
+    Route::delete('schedule-rules/{scheduleRule}', [ScheduleRuleController::class, 'destroy'])->name('schedule-rules.destroy');
 
     // Học phần (SUB, FR-SUB-001..003): xem = SUB.view (DEAN, LEC theo phạm vi), thêm = SUB.create, sửa / ngừng = SUB.update,
     // xóa = SUB.delete, xuất = SUB.export. Phạm vi FACULTY (DEAN) kiểm tra tiếp trên từng bản ghi trong SubjectController.

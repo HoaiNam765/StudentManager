@@ -9,6 +9,7 @@ use App\Modules\Student\StudentServiceProvider;
 use App\Modules\Subject\SubjectServiceProvider;
 use App\Modules\System\SystemServiceProvider;
 use App\Modules\Teacher\TeacherServiceProvider;
+use App\Modules\Timetable\TimetableServiceProvider;
 use App\Providers\AppServiceProvider;
 
 return [
@@ -22,4 +23,5 @@ return [
     SubjectServiceProvider::class,
     CurriculumServiceProvider::class,
     StudentServiceProvider::class,
+    TimetableServiceProvider::class,
 ];

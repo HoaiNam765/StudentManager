@@ -30,7 +30,7 @@ class DatabaseSeeder extends Seeder
         GradeStructureSeeder::class,  // SUB: cơ cấu điểm mặc định của học phần
         SchoolClassSeeder::class,     // CLS: khóa, lớp hành chính, lớp học phần
         StudentSeeder::class,         // STU: hồ sơ sinh viên chờ nhập học
-        // TimetableSeeder::class,    // TTB: thời khóa biểu, buổi học
+        TimetableSeeder::class,       // TTB: khung tiết học, mẫu lịch lớp học phần
         // EnrollmentSeeder::class,   // ENR: đăng ký học phần
         // GradeSeeder::class,        // GRD: điểm
     ];

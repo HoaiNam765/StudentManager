@@ -110,6 +110,13 @@ return [
         'syllabus_disk' => env('SYLLABUS_DISK', 'local'),
     ],
 
+    // Lớp (CLS): khóa mặc định kéo dài N năm; sĩ số mặc định và tối đa của lớp hành chính (FR-CLS-001, 002)
+    'school_class' => [
+        'default_cohort_years' => (int) env('CLASS_DEFAULT_COHORT_YEARS', 4),
+        'default_max_size' => (int) env('CLASS_DEFAULT_MAX_SIZE', 60),
+        'admin_class_max_size' => (int) env('CLASS_ADMIN_CLASS_MAX_SIZE', 120),
+    ],
+
     'import' => [
         // Disk lưu file tải lên
         'disk' => env('IMPORT_DISK', 'local'),

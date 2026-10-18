@@ -291,3 +291,12 @@ app(ReferenceRegistry::class)->register(LookupValue::class, 'students', 'gender_
 ```
 
 `usages($model)` trả `['sinh viên' => 120]` (tính cả bản ghi đã xóa mềm), `ReferenceRegistry::describe()` ghép thành "120 sinh viên" để đưa vào thông báo lỗi. Bảng chưa tồn tại (module chưa cài) được bỏ qua.
+
+## Chương trình đào tạo (CUR, FR-CUR-001, 002, 003)
+
+- Bảng `curricula` (ngành, chuyên ngành tùy chọn, hệ đào tạo, khóa áp dụng `cohort_from`–`cohort_to`, tổng tín chỉ, số học kỳ chuẩn, `version`, trạng thái nháp / đã ban hành / ngừng), `curriculum_blocks` (khối kiến thức, tín chỉ yêu cầu), `curriculum_elective_groups` (chọn tối thiểu x tín chỉ), `curriculum_subjects` (học phần, khối, nhóm tự chọn hoặc bắt buộc, học kỳ dự kiến, thứ tự).
+- `CurriculumService`: chỉ CTĐT **nháp** mới sửa được, đã ban hành thì phải tạo phiên bản (BR-CUR-04, #86); thời gian chuẩn khớp ngành (BR-CUR-06); mỗi học phần một lần trong CTĐT; thêm/sửa học phần trả về **cảnh báo tiên quyết** (tiên quyết / học trước phải có trong CTĐT và ở học kỳ sớm hơn, song hành cùng kỳ hoặc sớm hơn; được xác nhận "tiên quyết ngoài CTĐT" thì bỏ qua) (BR-CUR-03).
+- **Ban hành** (`publish`, quyền CUR.approve toàn trường = ACAD): từng khối đủ tín chỉ, các khối cộng lại đủ tổng, CTĐT đủ tổng, nhóm tự chọn có đủ học phần để chọn, không còn cảnh báo tiên quyết (BR-CUR-02, 03); không trùng CTĐT đang áp dụng cùng ngành – hệ – khóa (BR-CUR-01). Thiếu thì báo rõ thiếu bao nhiêu tín chỉ (`CurriculumAnalyzer::publishProblems`, API `GET /admin/curricula/{id}/check`). Học phần điều kiện (không tính GPA) không cộng vào tổng tín chỉ.
+- **Module khác dùng `CurriculumCatalog`:** CLS gọi `isInForce($subject)` trước khi mở lớp (BR-CUR-07); STU gọi `forStudent($majorId, $khoa, $heDaoTao, $chuyenNganh)` để gán CTĐT khi nhập học.
+- Học phần thuộc CTĐT đã ban hành thì không đổi mã / tín chỉ, không xóa; CTĐT đang áp dụng thì học phần chưa ngừng được. Ngành, chuyên ngành, hệ đào tạo còn CTĐT đang áp dụng thì không ngừng được (đăng ký `ReferenceRegistry`).
+- Phạm vi: DEAN (FACULTY) xây dựng CTĐT của ngành thuộc khoa mình, không ban hành; STU (OWN) chờ STU gán CTĐT cho sinh viên nên tạm thời không thấy; các vai trò khác xem. API `/admin/curricula` (+ `/{id}`, `/check`, `/publish`, `/blocks`, `/elective-groups`, `/subjects`), `/admin/curriculum-blocks/{id}`, `/admin/curriculum-elective-groups/{id}`, `/admin/curriculum-subjects/{id}`. Seeder: 6 CTĐT mẫu rút gọn (mỗi ngành một), khóa 2026, đã ban hành.

@@ -1,6 +1,7 @@
 <?php
 
 use App\Modules\Auth\AuthServiceProvider;
+use App\Modules\Curriculum\CurriculumServiceProvider;
 use App\Modules\Faculty\FacultyServiceProvider;
 use App\Modules\Room\RoomServiceProvider;
 use App\Modules\Subject\SubjectServiceProvider;
@@ -16,4 +17,5 @@ return [
     TeacherServiceProvider::class,
     AuthServiceProvider::class,
     SubjectServiceProvider::class,
+    CurriculumServiceProvider::class,
 ];

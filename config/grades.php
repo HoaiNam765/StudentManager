@@ -8,8 +8,6 @@ return [
     'import_max_rows' => (int) env('GRD_IMPORT_MAX_ROWS', 5000),
     'import_max_kb' => (int) env('GRD_IMPORT_MAX_KB', 10240),
 
-
-    
     'round_digits' => (int) env('GRD_ROUND_DIGITS', 1),
     'pass_score' => (float) env('GRD_PASS_SCORE', 4.0),
 

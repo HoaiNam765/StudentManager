@@ -2,12 +2,12 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Modules\Grade\Http\Controllers\GradebookController;
+use App\Modules\Grade\Http\Controllers\GradeResultController;
 use App\Modules\SchoolClass\Http\Controllers\TeacherClassRosterController;
 use App\Modules\Teacher\Http\Controllers\LecturerProfileController;
 use App\Modules\Teacher\Http\Controllers\LecturerScheduleController;
 use App\Modules\Timetable\Http\Controllers\TimetableController;
 use Illuminate\Support\Facades\Route;
-use App\Modules\Grade\Http\Controllers\GradeResultController;
 
 /*
 |--------------------------------------------------------------------------

@@ -29,7 +29,7 @@ class CourseGradeService extends BaseService
         }
 
         $totalWeight = $components->sum(
-            fn($c) => (float) $c->weight
+            fn ($c) => (float) $c->weight
         );
 
         if (abs($totalWeight - 100) > 0.001) {
@@ -110,7 +110,7 @@ class CourseGradeService extends BaseService
         // Nếu khóa chưa có thang riêng, dùng thang mặc định.
         if ($scale->isEmpty()) {
             $scale = collect(config('grades.default_scale'))
-                ->map(fn($row) => (object) [
+                ->map(fn ($row) => (object) [
                     'min_score' => $row['min'],
                     'letter' => $row['letter'],
                     'point4' => $row['point4'],
@@ -118,7 +118,7 @@ class CourseGradeService extends BaseService
         }
 
         $grade = $scale->first(
-            fn($row) => $score10 >= (float) $row->min_score
+            fn ($row) => $score10 >= (float) $row->min_score
         );
 
         if (! $grade) {

@@ -323,6 +323,12 @@ $resolver->setFor($khoa, $ngay)->code;            // bộ quy chế đang áp d�
 - Phạm vi xem: DEAN khoa mình (FACULTY), cố vấn lớp mình (ADVISEE, #99), giảng viên sinh viên đang đăng ký lớp mình dạy (SECTION — đọc `enrollments` + `section_instructors` bằng truy vấn), sinh viên chính mình (OWN).
 - `GET /admin/students/export?format=xlsx|csv|pdf&…bộ lọc`: qua ExportService (STU.export, lọc theo phạm vi xuất, audit `exported`); mặc định CCCD đã che; `include_sensitive=1` thêm CCCD và địa chỉ đầy đủ — chỉ người xem STU toàn trường (ACAD, CTSV…), DEAN bị 403.
 
+## Import hồ sơ sinh viên (STU, FR-STU-007; NFR-PERF-04)
+
+- `StudentImporter` (khóa `students`) đăng ký ở trung tâm import (`/admin/imports`, quyền SYS — hiện chỉ ADMIN): cột bắt buộc `full_name`, `date_of_birth`, `major_code`, `training_type_code`, `cohort`; tùy chọn giới tính / dân tộc (tên trong danh mục), CCCD, ngày / nơi cấp, email cá nhân, điện thoại, địa chỉ, chuyên ngành, ngày nhập học, ghi chú. Hồ sơ tạo ở **Chờ nhập học** (chưa MSSV, chưa tài khoản).
+- Kiểm tra theo dòng / cột: định dạng, mã ngành / hệ / chuyên ngành, danh mục, trùng CCCD / email trong cùng file, và mọi quy tắc tạo hồ sơ qua `StudentService::assertCreatable()` (tuổi BR-STU-03, trùng CCCD và email trường BR-STU-02, chuyên ngành đúng ngành). Hoàn tác theo lô chỉ với hồ sơ còn Chờ nhập học, chưa MSSV, chưa phát sinh dữ liệu.
+- Đã đo trên máy dev: 100 dòng / 5 dòng lỗi → lưu đúng 95; 5.000 dòng → kiểm tra 21 giây + lưu 38 giây (job hàng đợi `database`).
+
 ## Trạng thái sinh viên (STU, FR-STU-009, 010; BR-STU-05, 10; BR-AUTH-07; EV-STU-02)
 
 - `StudentStatusService::change($sv, $trangThai, $quyetDinh, $tep)`: chỉ theo sơ đồ BA 6.2 (Đang học → Bảo lưu / Thôi học / Buộc thôi học / Chuyển trường / Đã tốt nghiệp; Bảo lưu → Đang học / Thôi học / Buộc thôi học). Trạng thái cuối chỉ về Đang học bằng `special` (STU.approve toàn trường — ACAD), bắt buộc lý do. Mỗi lần có số quyết định, ngày hiệu lực, lý do, tệp (PDF / ảnh, disk `studentmanager.student.decision_disk`), ghi `student_status_histories` và nhật ký kiểm toán.

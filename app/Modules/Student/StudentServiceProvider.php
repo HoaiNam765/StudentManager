@@ -6,11 +6,13 @@ use App\Modules\Curriculum\Models\Curriculum;
 use App\Modules\Faculty\Models\Major;
 use App\Modules\Faculty\Models\Specialization;
 use App\Modules\Faculty\Models\TrainingType;
+use App\Modules\Student\Importers\StudentImporter;
 use App\Modules\Student\Models\Student;
 use App\Modules\Student\Models\StudentContact;
 use App\Modules\Student\Policies\StudentPolicy;
 use App\Modules\System\Models\AdministrativeUnit;
 use App\Modules\System\Models\LookupValue;
+use App\Modules\System\Services\ImportRegistry;
 use App\Support\References\ReferenceRegistry;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -29,6 +31,9 @@ class StudentServiceProvider extends ServiceProvider
     {
         Gate::policy(Student::class, StudentPolicy::class);
         Gate::policy(StudentContact::class, StudentPolicy::class);
+
+        // Nhập hồ sơ sinh viên qua trung tâm import (FR-STU-007)
+        $this->app->make(ImportRegistry::class)->registerLazy(StudentImporter::KEY, fn () => $this->app->make(StudentImporter::class));
 
         $references = app(ReferenceRegistry::class);
         $enrolled = fn ($q) => $q->whereIn('status', ['pending', 'studying', 'suspended'])->whereNull('deleted_at');

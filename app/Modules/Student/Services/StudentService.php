@@ -84,11 +84,7 @@ class StudentService extends BaseService
     public function create(array $data, ?User $actor = null): Student
     {
         $data = $this->normalize($data);
-        $this->assertAcademicPlacement($data);
-        $this->assertLookups($data);
-        $this->assertAge($data['date_of_birth'], $data['admission_date'] ?? null);
-        $this->assertIdentityFree($data['national_id'] ?? null, $actor);
-        $this->assertSchoolEmailFree($data['school_email'] ?? null, $actor);
+        $this->assertCreatable($data, $actor);
 
         return $this->transaction(function () use ($data): Student {
             $student = Student::create($data + [
@@ -99,6 +95,22 @@ class StudentService extends BaseService
 
             return $student->refresh();
         });
+    }
+
+    /**
+     * Kiểm tra hồ sơ mới theo đủ quy tắc tạo (ngành / chuyên ngành / hệ, danh mục, tuổi, trùng giấy tờ, trùng email trường)
+     * mà không ghi gì — Importer gọi khi xem trước (FR-STU-007).
+     *
+     * @param  array<string, mixed>  $data
+     */
+    public function assertCreatable(array $data, ?User $actor = null): void
+    {
+        $data = $this->normalize($data);
+        $this->assertAcademicPlacement($data);
+        $this->assertLookups($data);
+        $this->assertAge($data['date_of_birth'], $data['admission_date'] ?? null);
+        $this->assertIdentityFree($data['national_id'] ?? null, $actor);
+        $this->assertSchoolEmailFree($data['school_email'] ?? null, $actor);
     }
 
     /**

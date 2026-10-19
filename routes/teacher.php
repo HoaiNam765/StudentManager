@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Modules\SchoolClass\Http\Controllers\TeacherClassRosterController;
 use App\Modules\Teacher\Http\Controllers\LecturerProfileController;
 use App\Modules\Teacher\Http\Controllers\LecturerScheduleController;
 use App\Modules\Timetable\Http\Controllers\TimetableController;
@@ -27,6 +28,14 @@ Route::middleware('auth')->group(function (): void {
 
     // Lịch dạy của tôi theo buổi học cụ thể (FR-TTB-004): ?view=week|month|term&date=&term_id=; chỉ khi đã công bố
     Route::get('timetable', [TimetableController::class, 'mineLecturer'])->middleware('permission:TTB.view')->name('timetable');
+
+    // Danh sách lớp đang dạy và lớp được cố vấn; roster chỉ gồm sinh viên thuộc phạm vi được phân công.
+    Route::middleware('permission:CLS.view')->group(function (): void {
+        Route::get('course-sections', [TeacherClassRosterController::class, 'sections'])->name('course-sections.index');
+        Route::get('course-sections/{courseSection}/students', [TeacherClassRosterController::class, 'sectionStudents'])->whereNumber('courseSection')->name('course-sections.students.index');
+        Route::get('admin-classes', [TeacherClassRosterController::class, 'adviseeClasses'])->name('admin-classes.index');
+        Route::get('admin-classes/{adminClass}/students', [TeacherClassRosterController::class, 'adviseeStudents'])->whereNumber('adminClass')->name('admin-classes.students.index');
+    });
 
     // Lịch bận, nguyện vọng học phần kỳ tới, nghỉ phép / công tác của chính giảng viên (FR-TCH-008, 012; phạm vi OWN)
     Route::get('availability', [LecturerScheduleController::class, 'myAvailability'])->name('availability.index');

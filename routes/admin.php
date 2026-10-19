@@ -15,6 +15,7 @@ use App\Modules\Enrollment\Http\Controllers\EnrollmentResultController;
 use App\Modules\Enrollment\Http\Controllers\RegistrationOptionsController;
 use App\Modules\Enrollment\Http\Controllers\RegistrationPeriodController;
 use App\Modules\Enrollment\Http\Controllers\SectionEnrollmentController;
+use App\Modules\Enrollment\Http\Controllers\StaffEnrollmentController;
 use App\Modules\Faculty\Http\Controllers\LeadershipController;
 use App\Modules\Faculty\Http\Controllers\UnitController;
 use App\Modules\Room\Http\Controllers\FacilityController;
@@ -442,6 +443,11 @@ Route::middleware('auth')->group(function (): void {
     Route::get('students/{student}/registration-result', [EnrollmentResultController::class, 'forStudent'])->whereNumber('student')->middleware('permission:ENR.view')->name('students.registration-result');
     Route::get('students/{student}/registration-result/slip', [EnrollmentResultController::class, 'studentSlip'])->whereNumber('student')->middleware('permission:ENR.view')->name('students.registration-slip');
     Route::get('enrollment-stats', [EnrollmentResultController::class, 'stats'])->middleware('permission:ENR.view')->name('enrollment-stats');
+    // Đăng ký / hủy thay, ngoại lệ, chốt đăng ký (FR-ENR-009, 012; BR-ENR-08): ENR toàn trường (ACAD)
+    Route::post('students/{student}/enrollments', [StaffEnrollmentController::class, 'store'])->whereNumber('student')->middleware('permission:ENR.create,ALL')->name('students.enrollments.store');
+    Route::post('enrollments/{enrollment}/cancel', [StaffEnrollmentController::class, 'cancel'])->middleware('permission:ENR.delete,ALL')->name('enrollments.cancel');
+    Route::get('terms/{term}/registration/finalize', [StaffEnrollmentController::class, 'preview'])->middleware('permission:ENR.approve,ALL')->name('terms.registration.finalize-preview');
+    Route::post('terms/{term}/registration/finalize', [StaffEnrollmentController::class, 'finalize'])->middleware('permission:ENR.approve,ALL')->name('terms.registration.finalize');
     Route::get('students/{student}/registration-options', [RegistrationOptionsController::class, 'forStudent'])->whereNumber('student')->middleware('permission:ENR.view')->name('students.registration-options');
 
     // Thời khóa biểu (TTB, FR-TTB-001, 002): khung tiết xem = TTB.view, sửa = ACAD (TTB toàn trường);

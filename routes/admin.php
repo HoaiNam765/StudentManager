@@ -34,6 +34,7 @@ use App\Modules\System\Http\Controllers\PolicySetController;
 use App\Modules\System\Http\Controllers\SettingController;
 use App\Modules\Teacher\Http\Controllers\LecturerController;
 use App\Modules\Teacher\Http\Controllers\LecturerScheduleController;
+use App\Modules\Timetable\Http\Controllers\ClassSessionController;
 use App\Modules\Timetable\Http\Controllers\PeriodController;
 use App\Modules\Timetable\Http\Controllers\ScheduleRuleController;
 use Illuminate\Support\Facades\Route;
@@ -443,6 +444,11 @@ Route::middleware('auth')->group(function (): void {
     Route::put('periods/{period}', [PeriodController::class, 'update'])->middleware('permission:TTB.update,ALL')->name('periods.update');
     Route::delete('periods/{period}', [PeriodController::class, 'destroy'])->middleware('permission:TTB.delete,ALL')->name('periods.destroy');
     Route::get('course-sections/{courseSection}/schedule', [ScheduleRuleController::class, 'index'])->whereNumber('courseSection')->name('course-sections.schedule.index');
+    // Buổi học cụ thể (FR-TTB-005, 009): xem theo phạm vi lớp; sinh lại, dạy bù, hủy buổi = ACAD
+    Route::get('course-sections/{courseSection}/sessions', [ClassSessionController::class, 'index'])->whereNumber('courseSection')->middleware('permission:TTB.view')->name('course-sections.sessions.index');
+    Route::post('course-sections/{courseSection}/sessions/generate', [ClassSessionController::class, 'generate'])->whereNumber('courseSection')->middleware('permission:TTB.update,ALL')->name('course-sections.sessions.generate');
+    Route::post('class-sessions/{classSession}/makeup', [ClassSessionController::class, 'makeup'])->middleware('permission:TTB.create,ALL')->name('class-sessions.makeup');
+    Route::post('class-sessions/{classSession}/cancel', [ClassSessionController::class, 'cancel'])->middleware('permission:TTB.update,ALL')->name('class-sessions.cancel');
     Route::get('course-sections/{courseSection}/schedule-conflicts', [ScheduleRuleController::class, 'conflicts'])->whereNumber('courseSection')->name('course-sections.schedule.conflicts');
     Route::post('course-sections/{courseSection}/schedule', [ScheduleRuleController::class, 'store'])->whereNumber('courseSection')->name('course-sections.schedule.store');
     Route::put('schedule-rules/{scheduleRule}', [ScheduleRuleController::class, 'update'])->name('schedule-rules.update');

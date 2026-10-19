@@ -13,6 +13,7 @@ use App\Modules\Faculty\Services\FacultyAccess;
 use App\Modules\SchoolClass\Models\AdminClassMember;
 use App\Modules\Student\Enums\IdType;
 use App\Modules\Student\Enums\StudentStatus;
+use App\Modules\Student\Services\IdentityNumber;
 use App\Modules\System\Models\AdministrativeUnit;
 use App\Modules\System\Models\LookupValue;
 use App\Support\Concerns\HasVietnameseSearch;
@@ -20,6 +21,7 @@ use App\Support\Models\StandardModel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Hồ sơ sinh viên (FR-STU-001, 004). Số giấy tờ lưu mã hóa (`encrypted`), kiểm tra trùng qua `national_id_hash`.
@@ -150,7 +152,29 @@ class Student extends StandardModel implements HasDataScope
                 ->whereHas('adminClass.advisorAssignments', fn (Builder $assignments) => $assignments
                     ->current()
                     ->whereHas('lecturer', fn (Builder $lecturers) => $lecturers->where('user_id', $user->id)))),
+            // LEC: sinh viên đang đăng ký các lớp học phần mình được phân công (bảng của ENR / CLS, đọc bằng truy vấn để
+            // không phụ thuộc vòng giữa module)
+            DataScope::Section => $query->whereIn($this->qualifyColumn('id'), DB::table('enrollments')
+                ->select('enrollments.student_id')
+                ->whereIn('enrollments.status', ['registered', 'confirmed', 'completed'])
+                ->whereNull('enrollments.deleted_at')
+                ->whereIn('enrollments.course_section_id', DB::table('section_instructors')
+                    ->select('section_instructors.course_section_id')
+                    ->join('lecturers', 'lecturers.id', '=', 'section_instructors.lecturer_id')
+                    ->where('lecturers.user_id', $user->id)
+                    ->whereNull('section_instructors.deleted_at'))),
             default => $query->whereRaw('1 = 0'),
         };
+    }
+
+    /** CCCD / số giấy tờ đã che (BR-STU-11), dùng cho danh sách và xuất thường. */
+    public function getNationalIdMaskedAttribute(): ?string
+    {
+        return IdentityNumber::mask($this->national_id);
+    }
+
+    public function getPermanentAddressMaskedAttribute(): ?string
+    {
+        return IdentityNumber::maskAddress($this->permanent_address);
     }
 }

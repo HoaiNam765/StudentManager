@@ -317,6 +317,12 @@ $resolver->setFor($khoa, $ngay)->code;            // bộ quy chế đang áp d�
 - Hủy nhập học: hồ sơ Chờ nhập học xóa mềm kèm lý do (đi qua `StudentService::delete`, BR-STU-07).
 - API (quyền `STU.approve`: ACAD, CTSV): `POST /admin/students/{id}/admit`, `POST /admin/students/{id}/cancel-admission` (bắt buộc `reason`).
 
+## Danh sách, tìm kiếm, xuất sinh viên (STU, FR-STU-003, 008; BR-STU-11)
+
+- `GET /admin/students`: tìm `q` theo MSSV, họ tên không dấu, hoặc số CCCD đầy đủ (so bằng `national_id_hash`); lọc `faculty_id`, `major_id`, `cohort`, `training_type_id`, `admin_class_id` (lớp hiện tại), `status`; `sort` = student_code | full_name (collation tiếng Việt) | cohort | status, `dir`, `per_page` ≤ 100. Mỗi dòng có `national_id_masked` (che, BR-STU-11); xem đầy đủ qua `/sensitive` (ghi `view_sensitive`, #101).
+- Phạm vi xem: DEAN khoa mình (FACULTY), cố vấn lớp mình (ADVISEE, #99), giảng viên sinh viên đang đăng ký lớp mình dạy (SECTION — đọc `enrollments` + `section_instructors` bằng truy vấn), sinh viên chính mình (OWN).
+- `GET /admin/students/export?format=xlsx|csv|pdf&…bộ lọc`: qua ExportService (STU.export, lọc theo phạm vi xuất, audit `exported`); mặc định CCCD đã che; `include_sensitive=1` thêm CCCD và địa chỉ đầy đủ — chỉ người xem STU toàn trường (ACAD, CTSV…), DEAN bị 403.
+
 ## Trạng thái sinh viên (STU, FR-STU-009, 010; BR-STU-05, 10; BR-AUTH-07; EV-STU-02)
 
 - `StudentStatusService::change($sv, $trangThai, $quyetDinh, $tep)`: chỉ theo sơ đồ BA 6.2 (Đang học → Bảo lưu / Thôi học / Buộc thôi học / Chuyển trường / Đã tốt nghiệp; Bảo lưu → Đang học / Thôi học / Buộc thôi học). Trạng thái cuối chỉ về Đang học bằng `special` (STU.approve toàn trường — ACAD), bắt buộc lý do. Mỗi lần có số quyết định, ngày hiệu lực, lý do, tệp (PDF / ảnh, disk `studentmanager.student.decision_disk`), ghi `student_status_histories` và nhật ký kiểm toán.

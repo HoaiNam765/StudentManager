@@ -6,7 +6,6 @@ use App\Modules\Auth\Enums\PermissionAction;
 use App\Modules\Auth\Services\AccessControl;
 use App\Modules\SchoolClass\Models\AdminClass;
 use Illuminate\Contracts\View\View;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 
 /** Only registered for local environment via routes/fe-preview.php. */
@@ -19,7 +18,11 @@ class FePreviewController extends Controller
         return view('fe_preview.index', ['screens' => config('fe_preview', [])]);
     }
 
-    public function show(string $screen, Request $request, AccessControl $access): View
+    /**
+     * Giữ chữ ký một tham số: routes/fe-preview.php gọi trực tiếp show($key) trong closure, nên Request và
+     * AccessControl lấy từ container thay vì inject vào tham số.
+     */
+    public function show(string $screen): View
     {
         abort_unless(App::environment('local'), 404);
 
@@ -29,6 +32,9 @@ class FePreviewController extends Controller
         if ($screen !== 'admin/khoa-va-lop-hanh-chinh') {
             return view($item['view']);
         }
+
+        $request = request();
+        $access = app(AccessControl::class);
 
         $query = $access->constrain(AdminClass::query(), $request->user(), 'CLS', PermissionAction::View);
         $with = [

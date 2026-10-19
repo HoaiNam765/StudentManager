@@ -123,6 +123,7 @@ class GradebookController extends Controller
                             throw new BusinessRuleException('File không đúng mẫu cột nhập điểm.',
                                 'Tải lại mẫu Excel từ chức năng xuất mẫu, không sửa tên hoặc thứ tự cột.');
                         }
+
                         continue;
                     }
                     if (count(array_filter($cols, fn ($v) => $v !== null && $v !== '')) === 0) {

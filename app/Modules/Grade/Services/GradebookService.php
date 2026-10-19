@@ -90,7 +90,7 @@ class GradebookService extends BaseService
     }
 
     /** @param list<array<string, mixed>> $items
-     *  @return Collection<int, SectionGradeComponent>
+     * @return Collection<int, SectionGradeComponent>
      */
     public function replaceStructure(CourseSection $section, User $actor, array $items): Collection
     {
@@ -206,6 +206,7 @@ class GradebookService extends BaseService
             'students' => $enrollments->map(function (Enrollment $enrollment) use ($components, $entries): array {
                 $scores = $components->map(function (SectionGradeComponent $component) use ($entries, $enrollment): array {
                     $entry = $entries->get($enrollment->id.':'.$component->id);
+
                     return [
                         'component_id' => $component->id,
                         'score' => $entry?->score,
@@ -215,6 +216,7 @@ class GradebookService extends BaseService
                 $incomplete = $components->isEmpty() || $components->contains(
                     fn (SectionGradeComponent $c) => $c->is_required && $scores->firstWhere('component_id', $c->id)['score'] === null
                 );
+
                 return [
                     'enrollment_id' => $enrollment->id,
                     'student' => $enrollment->student?->only('id', 'student_code', 'full_name'),
@@ -268,6 +270,7 @@ class GradebookService extends BaseService
             $this->fail("Điểm {$score} không hợp lệ.",
                 "Điểm phải từ {$min} đến {$max}, theo bước {$step}. Ví dụ 7.0, 7.1, 7.2.");
         }
+
         return round($value, 2);
     }
 }

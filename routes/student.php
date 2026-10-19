@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Modules\Enrollment\Http\Controllers\EnrollmentController;
+use App\Modules\Enrollment\Http\Controllers\EnrollmentResultController;
 use App\Modules\Enrollment\Http\Controllers\RegistrationOptionsController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,4 +29,8 @@ Route::middleware('auth')->group(function (): void {
     Route::post('/registration/enrollments/{enrollment}/cancel', [EnrollmentController::class, 'cancel'])->middleware('permission:ENR.delete')->name('registration.cancel');
     Route::post('/registration/enrollments/{enrollment}/withdraw', [EnrollmentController::class, 'withdraw'])->middleware('permission:ENR.delete')->name('registration.withdraw');
     Route::post('/registration/enrollments/{enrollment}/change', [EnrollmentController::class, 'change'])->middleware('permission:ENR.create')->name('registration.change');
+
+    // Kết quả đăng ký, thời khóa biểu cá nhân, phiếu đăng ký PDF (FR-ENR-010)
+    Route::get('/registration/result', [EnrollmentResultController::class, 'mine'])->middleware('permission:ENR.view')->name('registration.result');
+    Route::get('/registration/result/slip', [EnrollmentResultController::class, 'mineSlip'])->middleware('permission:ENR.view')->name('registration.slip');
 });

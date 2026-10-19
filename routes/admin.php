@@ -11,6 +11,7 @@ use App\Modules\Auth\Http\Controllers\UserRoleController;
 use App\Modules\Curriculum\Http\Controllers\CurriculumController;
 use App\Modules\Curriculum\Http\Controllers\CurriculumVersionController;
 use App\Modules\Enrollment\Http\Controllers\EnrollmentController;
+use App\Modules\Enrollment\Http\Controllers\EnrollmentResultController;
 use App\Modules\Enrollment\Http\Controllers\RegistrationOptionsController;
 use App\Modules\Enrollment\Http\Controllers\RegistrationPeriodController;
 use App\Modules\Faculty\Http\Controllers\LeadershipController;
@@ -430,6 +431,9 @@ Route::middleware('auth')->group(function (): void {
     Route::post('registration-periods/{registrationPeriod}/publish', [RegistrationPeriodController::class, 'publish'])->middleware('permission:ENR.update,ALL')->name('registration-periods.publish');
     Route::delete('registration-periods/{registrationPeriod}', [RegistrationPeriodController::class, 'destroy'])->middleware('permission:ENR.delete,ALL')->name('registration-periods.destroy');
     Route::get('course-sections/{courseSection}/enrollments', [EnrollmentController::class, 'roster'])->whereNumber('courseSection')->middleware('permission:ENR.view')->name('course-sections.enrollments');
+    Route::get('students/{student}/registration-result', [EnrollmentResultController::class, 'forStudent'])->whereNumber('student')->middleware('permission:ENR.view')->name('students.registration-result');
+    Route::get('students/{student}/registration-result/slip', [EnrollmentResultController::class, 'studentSlip'])->whereNumber('student')->middleware('permission:ENR.view')->name('students.registration-slip');
+    Route::get('enrollment-stats', [EnrollmentResultController::class, 'stats'])->middleware('permission:ENR.view')->name('enrollment-stats');
     Route::get('students/{student}/registration-options', [RegistrationOptionsController::class, 'forStudent'])->whereNumber('student')->middleware('permission:ENR.view')->name('students.registration-options');
 
     // Thời khóa biểu (TTB, FR-TTB-001, 002): khung tiết xem = TTB.view, sửa = ACAD (TTB toàn trường);

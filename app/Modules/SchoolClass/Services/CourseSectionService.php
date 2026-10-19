@@ -7,11 +7,14 @@ use App\Modules\AcademicYear\Models\TermStatus;
 use App\Modules\Curriculum\Services\CurriculumCatalog;
 use App\Modules\Room\Models\Room;
 use App\Modules\SchoolClass\Enums\SectionStatus;
+use App\Modules\SchoolClass\Events\CourseSectionCancelled;
 use App\Modules\SchoolClass\Models\CourseSection;
 use App\Modules\SchoolClass\Models\SectionInstructor;
 use App\Modules\Subject\Models\Subject;
 use App\Modules\Subject\Services\SyllabusService;
 use App\Modules\Teacher\Models\Lecturer;
+use App\Modules\Timetable\Contracts\SectionStudents;
+use App\Support\Audit\AuditEvent;
 use App\Support\Audit\AuditLogger;
 use App\Support\References\ReferenceRegistry;
 use App\Support\Services\BaseService;
@@ -201,12 +204,77 @@ class CourseSectionService extends BaseService
             );
         }
 
-        // Hủy đăng ký, điều chỉnh học phí, thông báo sinh viên (BR-CLS-09) do ENR, FEE, NOT xử lý khi có (#108)
-        return $this->audit->withReason("Hủy lớp: {$reason}", function () use ($section, $reason): CourseSection {
+        // Một giao dịch: lớp Hủy + sự kiện nghe đồng bộ (ENR hủy đăng ký và phát EV-ENR-03, TTB hủy buổi học; BR-CLS-09)
+        return $this->audit->withReason("Hủy lớp: {$reason}", fn (): CourseSection => $this->transaction(function () use ($section, $reason): CourseSection {
+            $section = CourseSection::query()->lockForUpdate()->findOrFail($section->id);
             $section->update(['status' => SectionStatus::Cancelled, 'cancel_reason' => $reason]);
+            CourseSectionCancelled::dispatch($section, $reason);
 
             return $section->refresh();
-        });
+        }));
+    }
+
+    /**
+     * Lớp dưới sĩ số tối thiểu của học kỳ (BR-CLS-05): lớp đang Mở / Đóng đăng ký có số đăng ký < tối thiểu, kèm đề xuất
+     * gộp vào lớp khác cùng học phần còn đủ chỗ hoặc hủy. Phải xử lý hết trước khi chốt đăng ký (#113).
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function underMinSections(Term $term): array
+    {
+        $students = app(SectionStudents::class);
+        $sections = CourseSection::query()
+            ->with('subject:id,code,name')
+            ->where('term_id', $term->id)
+            ->whereIn('status', [SectionStatus::RegistrationOpen, SectionStatus::RegistrationClosed])
+            ->orderBy('code')
+            ->get();
+        $counts = $sections->mapWithKeys(fn (CourseSection $s) => [$s->id => count($students->studentIdsOf($s))]);
+        $rows = [];
+
+        foreach ($sections as $section) {
+            $enrolled = $counts[$section->id];
+
+            if ($enrolled >= $section->min_size) {
+                continue;
+            }
+
+            $targets = $sections
+                ->filter(fn (CourseSection $t) => $t->id !== $section->id && $t->subject_id === $section->subject_id
+                    && $t->max_size - $counts[$t->id] >= $enrolled)
+                ->map(fn (CourseSection $t) => ['id' => $t->id, 'code' => $t->code, 'enrolled' => $counts[$t->id], 'max_size' => $t->max_size])
+                ->values();
+
+            $rows[] = [
+                'id' => $section->id,
+                'code' => $section->code,
+                'subject' => $section->subject->only('code', 'name'),
+                'status_label' => $section->status->label(),
+                'enrolled' => $enrolled,
+                'min_size' => $section->min_size,
+                'suggestion' => $enrolled === 0 ? 'cancel' : ($targets->isNotEmpty() ? 'merge' : 'cancel_or_keep'),
+                'merge_targets' => $targets,
+            ];
+        }
+
+        return $rows;
+    }
+
+    /**
+     * Mở khóa lớp đã khóa (sau công bố điểm) theo quy trình ngoại lệ (FR-CLS-018): bắt buộc lý do, người có quyền
+     * duyệt CLS; lớp quay về Kết thúc, nhật ký ghi `unlocked` kèm lý do.
+     */
+    public function unlock(CourseSection $section, string $reason): CourseSection
+    {
+        if ($section->status !== SectionStatus::Locked) {
+            $this->fail("Lớp {$section->code} đang {$section->status->label()}, không phải Đã khóa.", 'Chỉ mở khóa lớp đã khóa.');
+        }
+
+        $old = ['status' => $section->status->value];
+        $section->update(['status' => SectionStatus::Finished]);
+        $this->audit->record(AuditEvent::Unlocked, $section, $old, ['status' => SectionStatus::Finished->value], $reason);
+
+        return $section->refresh();
     }
 
     /** Xóa lớp nhập nhầm: chỉ lớp Dự kiến chưa có dữ liệu liên quan (BR-CLS-06). */

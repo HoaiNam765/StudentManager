@@ -6,18 +6,21 @@ use App\Modules\AcademicYear\Models\Term;
 use App\Modules\Enrollment\Contracts\AcademicRecord;
 use App\Modules\Enrollment\Contracts\TuitionStatus;
 use App\Modules\Enrollment\Enums\EnrollmentStatus;
+use App\Modules\Enrollment\Listeners\CancelEnrollmentsOfSection;
 use App\Modules\Enrollment\Models\RegistrationPeriod;
 use App\Modules\Enrollment\Policies\EnrollmentPolicy;
 use App\Modules\Enrollment\Services\EmptyAcademicRecord;
 use App\Modules\Enrollment\Services\EnrollmentSectionStudents;
 use App\Modules\Enrollment\Services\NoTuitionDebt;
 use App\Modules\Faculty\Models\Major;
+use App\Modules\SchoolClass\Events\CourseSectionCancelled;
 use App\Modules\SchoolClass\Models\AdminClass;
 use App\Modules\SchoolClass\Models\Cohort;
 use App\Modules\SchoolClass\Models\CourseSection;
 use App\Modules\Student\Models\Student;
 use App\Modules\Timetable\Contracts\SectionStudents;
 use App\Support\References\ReferenceRegistry;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -37,6 +40,7 @@ class EnrollmentServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::policy(RegistrationPeriod::class, EnrollmentPolicy::class);
+        Event::listen(CourseSectionCancelled::class, CancelEnrollmentsOfSection::class);
 
         $references = app(ReferenceRegistry::class);
         $references->register(Term::class, 'registration_periods', 'term_id', 'đợt đăng ký học phần');

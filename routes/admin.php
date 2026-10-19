@@ -24,6 +24,7 @@ use App\Modules\SchoolClass\Http\Controllers\AdminClassController;
 use App\Modules\SchoolClass\Http\Controllers\AdminClassRosterController;
 use App\Modules\SchoolClass\Http\Controllers\CourseSectionController;
 use App\Modules\Student\Http\Controllers\AdmissionController;
+use App\Modules\Student\Http\Controllers\StudentChangeRequestController;
 use App\Modules\Student\Http\Controllers\StudentController;
 use App\Modules\Student\Http\Controllers\StudentCurriculumController;
 use App\Modules\Student\Http\Controllers\StudentStatusController;
@@ -242,6 +243,12 @@ Route::middleware('auth')->group(function (): void {
     Route::get('students/{student}/status', [StudentStatusController::class, 'index'])->whereNumber('student')->middleware('permission:STU.view')->name('students.status.index');
     Route::post('students/{student}/status', [StudentStatusController::class, 'store'])->whereNumber('student')->middleware('permission:STU.update')->name('students.status.store');
     Route::get('student-status-histories/{history}/attachment', [StudentStatusController::class, 'attachment'])->middleware('permission:STU.view')->name('student-status-histories.attachment');
+
+    // Yêu cầu sửa trường nhạy cảm của sinh viên (BR-STU-06): xem = STU.view theo phạm vi, duyệt / từ chối = STU.approve trên hồ sơ
+    Route::get('student-change-requests', [StudentChangeRequestController::class, 'index'])->middleware('permission:STU.view')->name('student-change-requests.index');
+    Route::get('student-change-requests/{studentChangeRequest}/evidence', [StudentChangeRequestController::class, 'evidence'])->middleware('permission:STU.view')->name('student-change-requests.evidence');
+    Route::post('student-change-requests/{studentChangeRequest}/approve', [StudentChangeRequestController::class, 'approve'])->middleware('permission:STU.approve')->name('student-change-requests.approve');
+    Route::post('student-change-requests/{studentChangeRequest}/reject', [StudentChangeRequestController::class, 'reject'])->middleware('permission:STU.approve')->name('student-change-requests.reject');
 
     // Xác nhận / hủy nhập học (STU, FR-STU-002): STU.approve (ACAD, CTSV). Cấp MSSV, email, tài khoản, CTĐT, lớp hành chính trong một giao dịch.
     Route::middleware('permission:STU.approve')->group(function (): void {

@@ -329,6 +329,12 @@ $resolver->setFor($khoa, $ngay)->code;            // bộ quy chế đang áp d�
 - Kiểm tra theo dòng / cột: định dạng, mã ngành / hệ / chuyên ngành, danh mục, trùng CCCD / email trong cùng file, và mọi quy tắc tạo hồ sơ qua `StudentService::assertCreatable()` (tuổi BR-STU-03, trùng CCCD và email trường BR-STU-02, chuyên ngành đúng ngành). Hoàn tác theo lô chỉ với hồ sơ còn Chờ nhập học, chưa MSSV, chưa phát sinh dữ liệu.
 - Đã đo trên máy dev: 100 dòng / 5 dòng lỗi → lưu đúng 95; 5.000 dòng → kiểm tra 21 giây + lưu 38 giây (job hàng đợi `database`).
 
+## Sinh viên tự cập nhật hồ sơ (STU, FR-STU-006; BR-STU-06; EV-STU-03)
+
+- `StudentSelfService`: sinh viên sửa ngay điện thoại, email cá nhân, địa chỉ thường trú / tạm trú, ảnh, người liên hệ (qua `StudentService::update`, có lịch sử trước – sau, lý do "Sinh viên tự cập nhật"). Họ tên, ngày sinh, số CCCD, ngành chỉ qua `student_change_requests` (giá trị đề nghị mã hóa, minh chứng PDF / ảnh trên disk riêng tư, tối đa một yêu cầu chờ); người gửi hủy được.
+- Cán bộ khác (STU.approve trên hồ sơ — CTSV, ACAD; không tự duyệt) duyệt → áp dụng bằng `StudentService::update` (kiểm tra trùng CCCD, tuổi, ngành; lịch sử ghi "Duyệt yêu cầu #…"), hoặc từ chối có lý do; cả hai phát `StudentChangeRequestDecided` (EV-STU-03). Nhật ký kiểm toán ẩn giá trị đề nghị; API trả CCCD đã che.
+- API: cổng sinh viên `GET|PUT /student/profile`, `POST /student/profile/photo`, `POST|PUT|DELETE /student/profile/contacts[/{id}]`, `POST /student/profile/change-requests[/{id}/cancel]`; cán bộ `GET /admin/student-change-requests[?status=]`, `GET …/{id}/evidence`, `POST …/{id}/approve|reject`.
+
 ## Trạng thái sinh viên (STU, FR-STU-009, 010; BR-STU-05, 10; BR-AUTH-07; EV-STU-02)
 
 - `StudentStatusService::change($sv, $trangThai, $quyetDinh, $tep)`: chỉ theo sơ đồ BA 6.2 (Đang học → Bảo lưu / Thôi học / Buộc thôi học / Chuyển trường / Đã tốt nghiệp; Bảo lưu → Đang học / Thôi học / Buộc thôi học). Trạng thái cuối chỉ về Đang học bằng `special` (STU.approve toàn trường — ACAD), bắt buộc lý do. Mỗi lần có số quyết định, ngày hiệu lực, lý do, tệp (PDF / ảnh, disk `studentmanager.student.decision_disk`), ghi `student_status_histories` và nhật ký kiểm toán.

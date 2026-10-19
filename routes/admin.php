@@ -21,6 +21,7 @@ use App\Modules\Faculty\Http\Controllers\UnitController;
 use App\Modules\Room\Http\Controllers\FacilityController;
 use App\Modules\Room\Http\Controllers\RoomController;
 use App\Modules\SchoolClass\Http\Controllers\AdminClassController;
+use App\Modules\SchoolClass\Http\Controllers\AdminClassRosterController;
 use App\Modules\SchoolClass\Http\Controllers\CourseSectionController;
 use App\Modules\Student\Http\Controllers\AdmissionController;
 use App\Modules\Student\Http\Controllers\StudentController;
@@ -410,6 +411,20 @@ Route::middleware('auth')->group(function (): void {
     Route::post('admin-classes', [AdminClassController::class, 'store'])->middleware('permission:CLS.create')->name('admin-classes.store');
     Route::put('admin-classes/{adminClass}', [AdminClassController::class, 'update'])->whereNumber('adminClass')->middleware('permission:CLS.update')->name('admin-classes.update');
     Route::delete('admin-classes/{adminClass}', [AdminClassController::class, 'destroy'])->whereNumber('adminClass')->middleware('permission:CLS.delete')->name('admin-classes.destroy');
+
+    // Thành viên và cố vấn lớp hành chính (FR-CLS-003, 004; BR-CLS-07, 08)
+    Route::get('admin-classes/missing-advisors', [AdminClassRosterController::class, 'missingAdvisors'])->middleware('permission:CLS.view')->name('admin-classes.missing-advisors');
+    Route::post('admin-classes/auto-placement/preview', [AdminClassRosterController::class, 'previewAutomaticPlacement'])->middleware('permission:CLS.update,ALL')->name('admin-classes.auto-placement.preview');
+    Route::post('admin-classes/auto-placement', [AdminClassRosterController::class, 'assignAutomatically'])->middleware('permission:CLS.update,ALL')->name('admin-classes.auto-placement');
+    Route::get('admin-classes/{adminClass}/members', [AdminClassRosterController::class, 'members'])->whereNumber('adminClass')->middleware('permission:CLS.view')->name('admin-classes.members.index');
+    Route::post('admin-classes/{adminClass}/members/preview', [AdminClassRosterController::class, 'previewAssignment'])->whereNumber('adminClass')->middleware('permission:CLS.update,ALL')->name('admin-classes.members.preview');
+    Route::post('admin-classes/{adminClass}/members', [AdminClassRosterController::class, 'assign'])->whereNumber('adminClass')->middleware('permission:CLS.update,ALL')->name('admin-classes.members.store');
+    Route::post('admin-classes/{adminClass}/members/remove-preview', [AdminClassRosterController::class, 'previewRemoval'])->whereNumber('adminClass')->middleware('permission:CLS.update,ALL')->name('admin-classes.members.remove-preview');
+    Route::post('admin-classes/{adminClass}/members/remove', [AdminClassRosterController::class, 'remove'])->whereNumber('adminClass')->middleware('permission:CLS.update,ALL')->name('admin-classes.members.remove');
+    Route::get('admin-classes/{adminClass}/advisors', [AdminClassRosterController::class, 'advisors'])->whereNumber('adminClass')->middleware('permission:CLS.view')->name('admin-classes.advisors.index');
+    Route::post('admin-classes/{adminClass}/advisors/preview', [AdminClassRosterController::class, 'previewAdvisor'])->whereNumber('adminClass')->middleware('permission:CLS.view')->name('admin-classes.advisors.preview');
+    Route::post('admin-classes/{adminClass}/advisors', [AdminClassRosterController::class, 'assignAdvisor'])->whereNumber('adminClass')->middleware('permission:CLS.view')->name('admin-classes.advisors.store');
+    Route::post('advisor-assignments/{advisorAssignment}/end', [AdminClassRosterController::class, 'endAdvisor'])->whereNumber('advisorAssignment')->middleware('permission:CLS.view')->name('advisor-assignments.end');
 
     // Lớp học phần (CLS, FR-CLS-009..012): xem = CLS.view (DEAN đơn vị mình, LEC lớp được phân công); mở, sửa, xóa, đổi trạng thái = CLS toàn trường (ACAD);
     // phân công giảng viên = ACAD hoặc DEAN trong đơn vị (kiểm tra trong CourseSectionController).

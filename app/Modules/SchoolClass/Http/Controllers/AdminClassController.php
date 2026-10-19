@@ -69,7 +69,14 @@ class AdminClassController extends Controller
     public function index(Request $request): JsonResponse
     {
         $list = $this->access->constrain(AdminClass::query(), $request->user(), 'CLS', PermissionAction::View)
-            ->with(['cohort:id,code,start_year', 'major:id,code,name,faculty_id', 'specialization:id,code,name', 'trainingType:id,code,name'])
+            ->with([
+                'cohort:id,code,start_year',
+                'major:id,code,name,faculty_id',
+                'specialization:id,code,name',
+                'trainingType:id,code,name',
+                'advisorAssignments' => fn (Builder $q) => $q->current()->with('lecturer:id,code,full_name'),
+            ])
+            ->withCount(['members as current_students_count' => fn (Builder $q) => $q->current()])
             ->search($request->string('q')->toString())
             ->when($request->filled('cohort_id'), fn (Builder $q) => $q->where('cohort_id', $request->integer('cohort_id')))
             ->when($request->filled('major_id'), fn (Builder $q) => $q->where('major_id', $request->integer('major_id')))
@@ -85,7 +92,13 @@ class AdminClassController extends Controller
     {
         Gate::authorize('view', $adminClass);
 
-        return response()->json($this->presentClass($adminClass->load(['cohort', 'major', 'specialization', 'trainingType'])));
+        return response()->json($this->presentClass($adminClass->load([
+            'cohort',
+            'major',
+            'specialization',
+            'trainingType',
+            'advisorAssignments' => fn (Builder $q) => $q->current()->with('lecturer:id,code,full_name'),
+        ])->loadCount(['members as current_students_count' => fn (Builder $q) => $q->current()])));
     }
 
     public function store(Request $request): JsonResponse
@@ -191,6 +204,10 @@ class AdminClassController extends Controller
     /** @return array<string, mixed> */
     private function presentClass(AdminClass $class): array
     {
+        $advisor = $class->relationLoaded('advisorAssignments')
+            ? $class->advisorAssignments->first()?->lecturer
+            : $class->advisorAssignments()->current()->with('lecturer')->first()?->lecturer;
+
         return [
             'id' => $class->id,
             'code' => $class->code,
@@ -200,6 +217,9 @@ class AdminClassController extends Controller
             'specialization' => $class->specialization?->only('id', 'code', 'name'),
             'training_type' => $class->trainingType?->only('id', 'code', 'name'),
             'max_size' => $class->max_size,
+            'current_students_count' => $class->current_students_count ?? $class->members()->current()->count(),
+            'advisor' => $advisor?->only('id', 'code', 'full_name'),
+            'advisor_warning' => $advisor === null,
             'status' => $class->status->value,
             'status_label' => $class->status_label,
         ];

@@ -53,7 +53,14 @@ class SchoolClassServiceProvider extends ServiceProvider
         $references->register(Specialization::class, 'admin_classes', 'specialization_id', 'lớp hành chính', active: $activeClass);
         $references->register(TrainingType::class, 'admin_classes', 'training_type_id', 'lớp hành chính', active: $activeClass);
         $references->register(PolicySet::class, 'cohorts', 'policy_set_id', 'khóa tuyển sinh');
-        $references->register(AdminClass::class, 'admin_class_members', 'admin_class_id', 'sinh viên trong lớp', active: fn ($q) => $q->whereNull('effective_to')->whereNull('deleted_at'));
+        $activePeriod = function ($q, ?string $on = null): void {
+            $date = $on ?? now(config('studentmanager.display_timezone'))->toDateString();
+            $q->whereNull('deleted_at')->whereDate('effective_from', '<=', $date)
+                ->where(fn ($period) => $period->whereNull('effective_to')->orWhereDate('effective_to', '>=', $date));
+        };
+        $references->register(AdminClass::class, 'admin_class_members', 'admin_class_id', 'sinh viên trong lớp', active: $activePeriod);
+        $references->register(AdminClass::class, 'advisor_assignments', 'admin_class_id', 'cố vấn lớp', active: $activePeriod);
+        $references->register(Lecturer::class, 'advisor_assignments', 'lecturer_id', 'lớp đang cố vấn', active: $activePeriod);
 
         $activeSection = fn ($q) => $q->whereIn('status', ['planned', 'registration_open', 'registration_closed', 'in_progress'])->whereNull('deleted_at');
         $references->register(Subject::class, 'course_sections', 'subject_id', 'lớp học phần', active: $activeSection);

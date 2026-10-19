@@ -6,7 +6,7 @@ use App\Models\User;
 use App\Modules\Auth\Enums\ProfileType;
 use App\Modules\Auth\Services\UserService;
 use App\Modules\SchoolClass\Models\AdminClass;
-use App\Modules\SchoolClass\Models\AdminClassMember;
+use App\Modules\SchoolClass\Services\ClassRosterService;
 use App\Modules\Student\Enums\StudentStatus;
 use App\Modules\Student\Events\StudentAdmitted;
 use App\Modules\Student\Models\Student;
@@ -28,6 +28,7 @@ class AdmissionService extends BaseService
         private readonly UserService $users,
         private readonly StudentCurriculumService $curricula,
         private readonly StudentService $students,
+        private readonly ClassRosterService $classRoster,
         private readonly AuditLogger $audit,
     ) {}
 
@@ -48,7 +49,6 @@ class AdmissionService extends BaseService
 
         $student = $this->audit->withReason('Xác nhận nhập học', fn () => $this->transaction(function () use ($student, $adminClassId, $date, $actor): Student {
             $student = Student::query()->lockForUpdate()->findOrFail($student->id);
-            $class = $this->pickClass($student, $adminClassId);
             $code = $this->nextStudentCode($student);
             $email = $this->schoolEmail($code);
 
@@ -61,12 +61,12 @@ class AdmissionService extends BaseService
 
             $this->curricula->assignDefault($student, $date);
 
-            AdminClassMember::create([
-                'admin_class_id' => $class->id,
-                'student_id' => $student->id,
-                'effective_from' => $date,
-                'reason' => 'Xếp lớp khi nhập học',
-            ]);
+            if ($adminClassId === null) {
+                $this->classRoster->assignForAdmission($student, $date);
+            } else {
+                $class = AdminClass::query()->findOrFail($adminClassId);
+                $this->classRoster->assign($class, [$student->id], $date, 'Xếp lớp khi nhập học');
+            }
 
             $user = $this->users->create([
                 'username' => $code,
@@ -131,35 +131,6 @@ class AdmissionService extends BaseService
         }
 
         return $email;
-    }
-
-    /** Lớp hành chính cùng khóa – ngành – hệ, đang hoạt động, còn chỗ (BR-STU-04, BR-CLS-01). */
-    private function pickClass(Student $student, ?int $adminClassId): AdminClass
-    {
-        $candidates = AdminClass::query()
-            ->active()
-            ->where('major_id', $student->major_id)
-            ->where('training_type_id', $student->training_type_id)
-            ->whereHas('cohort', fn ($q) => $q->where('start_year', $student->cohort))
-            ->when($adminClassId !== null, fn ($q) => $q->whereKey($adminClassId))
-            ->orderBy('code')
-            ->lockForUpdate()
-            ->get();
-
-        foreach ($candidates as $class) {
-            $members = AdminClassMember::query()->where('admin_class_id', $class->id)->current()->count();
-
-            if ($members < $class->max_size) {
-                return $class;
-            }
-        }
-
-        $this->fail(
-            $adminClassId !== null
-                ? 'Lớp hành chính đã chọn không cùng khóa – ngành – hệ với sinh viên, đã đóng hoặc đã đủ sĩ số.'
-                : "Không còn lớp hành chính khóa {$student->cohort} ngành này còn chỗ.",
-            'Mở thêm lớp hành chính cho khóa – ngành (CLS) hoặc tăng sĩ số tối đa, rồi xác nhận lại.'
-        );
     }
 
     private function today(): string

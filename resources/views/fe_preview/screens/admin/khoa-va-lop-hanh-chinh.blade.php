@@ -244,7 +244,7 @@
 <div class="flex items-center gap-2 min-w-0">
 <h1 class="text-base sm:text-lg font-bold text-slate-900 leading-tight truncate">Quản lý Khóa tuyển sinh và Lớp hành chính</h1>
 <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-blue-50 text-primary border border-blue-100">
-              Học kỳ 1 • 2026-2027
+              Dữ liệu lớp hành chính
             </span>
 </div>
 <div class="text-xs text-slate-500 hidden sm:block">Trang chủ / Quản lý Khóa tuyển sinh và Lớp hành chính</div>
@@ -292,16 +292,21 @@
 <p class="font-body-md text-body-md text-on-surface-variant mt-1">
             Quản lý các khóa tuyển sinh đào tạo chính quy, cơ cấu lớp sinh viên và phân công Cố vấn học tập (CVHT).
           </p>
+@unless($canViewClasses)
+<p role="alert" class="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+  Đăng nhập bằng tài khoản có quyền xem lớp (CLS.view) để tải dữ liệu thật trong phạm vi được cấp.
+</p>
+@endunless
 </div>
 <div class="flex items-center gap-3">
-<button class="h-10 px-4 bg-surface-container-lowest border border-outline-variant hover:bg-surface-container-low text-on-surface font-label-md text-label-md rounded-lg flex items-center gap-2 transition-colors shadow-xs">
+<button type="button" class="h-10 px-4 bg-surface-container-lowest border border-outline-variant hover:bg-surface-container-low text-on-surface font-label-md text-label-md rounded-lg flex items-center gap-2 transition-colors shadow-xs" title="Lịch sử xem trong danh sách của từng lớp">
 <span class="material-symbols-outlined text-lg">history</span>
-<span>Lịch sử điều chuyển</span>
+<span>Lịch sử lớp</span>
 </button>
-<button class="h-10 px-4 bg-primary hover:bg-[#15429b] text-white font-label-md text-label-md font-semibold rounded-lg flex items-center gap-2 transition-colors shadow-sm" onclick="document.getElementById('modal-add-class').classList.remove('hidden')">
+<a href="{{ route('admin.admin-classes.index') }}" class="h-10 px-4 bg-primary hover:bg-[#15429b] text-white font-label-md text-label-md font-semibold rounded-lg flex items-center gap-2 transition-colors shadow-sm">
 <span class="material-symbols-outlined text-lg">add_circle</span>
-<span>+ Thêm lớp hành chính</span>
-</button>
+<span>Quản lý lớp hành chính</span>
+</a>
 </div>
 </div>
 <!-- ================= Level 1 Tabs ================= -->
@@ -309,12 +314,12 @@
 <!-- Tab 1 -->
 <button class="pb-3 px-1 font-headline-sm text-headline-sm text-on-surface-variant hover:text-on-surface border-b-2 border-transparent transition-all flex items-center gap-2 font-medium">
 <span>Khóa tuyển sinh (Cohorts)</span>
-<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant text-label-sm font-label-sm">5 khóa</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant text-label-sm font-label-sm">{{ $cohorts->count() }} khóa</span>
 </button>
 <!-- Tab 2: ACTIVE -->
 <button class="pb-3 px-1 font-headline-sm text-headline-sm text-primary border-b-2 border-primary transition-all flex items-center gap-2 font-semibold">
 <span>Lớp hành chính (Classes)</span>
-<span class="px-2 py-0.5 rounded-full bg-primary-fixed text-primary text-label-sm font-label-sm font-bold">248 lớp</span>
+<span class="px-2 py-0.5 rounded-full bg-primary-fixed text-primary text-label-sm font-label-sm font-bold">{{ number_format($totalClasses) }} lớp</span>
 </button>
 </div>
 <!-- ================= 4 Summary Metric Cards ================= -->
@@ -323,10 +328,10 @@
 <div class="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant shadow-xs flex items-center justify-between">
 <div class="space-y-1">
 <span class="font-label-md text-label-md text-on-surface-variant">Tổng số lớp</span>
-<div class="font-headline-lg text-headline-lg font-bold text-on-surface">248 <span class="font-body-sm text-body-sm font-normal text-on-surface-variant">lớp hành chính</span></div>
+<div class="font-headline-lg text-headline-lg font-bold text-on-surface">{{ number_format($totalClasses) }} <span class="font-body-sm text-body-sm font-normal text-on-surface-variant">lớp hành chính</span></div>
 <div class="font-body-sm text-body-sm text-tertiary flex items-center gap-1">
 <span class="material-symbols-outlined text-sm">trending_up</span>
-<span>Tăng 12 lớp so với K23</span>
+<span>{{ number_format($activeClassCount) }} lớp đang hoạt động</span>
 </div>
 </div>
 <div class="w-12 h-12 rounded-xl bg-surface-container-low text-primary flex items-center justify-center flex-shrink-0">
@@ -337,10 +342,10 @@
 <div class="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant shadow-xs flex items-center justify-between">
 <div class="space-y-1">
 <span class="font-label-md text-label-md text-on-surface-variant">Tổng sinh viên</span>
-<div class="font-headline-lg text-headline-lg font-bold text-on-surface">14.250 <span class="font-body-sm text-body-sm font-normal text-on-surface-variant">sinh viên</span></div>
+<div class="font-headline-lg text-headline-lg font-bold text-on-surface">{{ number_format($totalStudents) }} <span class="font-body-sm text-body-sm font-normal text-on-surface-variant">sinh viên</span></div>
 <div class="font-body-sm text-body-sm text-[#15803D] flex items-center gap-1">
 <span class="material-symbols-outlined text-sm">check_circle</span>
-<span>100% Đã kích hoạt hồ sơ</span>
+<span>Số sinh viên có phân lớp hiệu lực</span>
 </div>
 </div>
 <div class="w-12 h-12 rounded-xl bg-[#DCFCE7] text-[#15803D] flex items-center justify-center flex-shrink-0">
@@ -351,9 +356,9 @@
 <div class="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant shadow-xs flex items-center justify-between">
 <div class="space-y-1">
 <span class="font-label-md text-label-md text-on-surface-variant">Sĩ số trung bình</span>
-<div class="font-headline-lg text-headline-lg font-bold text-on-surface">57.4 <span class="font-body-sm text-body-sm font-normal text-on-surface-variant">SV / lớp</span></div>
+<div class="font-headline-lg text-headline-lg font-bold text-on-surface">{{ number_format($averageStudents, 1) }} <span class="font-body-sm text-body-sm font-normal text-on-surface-variant">SV / lớp</span></div>
 <div class="font-body-sm text-body-sm text-on-surface-variant">
-<span>Định mức chuẩn: 60 SV</span>
+<span>Trung bình ở các lớp đang hoạt động</span>
 </div>
 </div>
 <div class="w-12 h-12 rounded-xl bg-surface-container-low text-primary flex items-center justify-center flex-shrink-0">
@@ -364,10 +369,10 @@
 <div class="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant shadow-xs flex items-center justify-between">
 <div class="space-y-1">
 <span class="font-label-md text-label-md text-on-surface-variant">Tỷ lệ có CVHT</span>
-<div class="font-headline-lg text-headline-lg font-bold text-[#15803D]">100%</div>
-<div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#DCFCE7] text-[#15803D] font-label-sm text-label-sm">
+<div class="font-headline-lg text-headline-lg font-bold {{ $missingAdvisorCount === 0 ? 'text-[#15803D]' : 'text-[#B45309]' }}">{{ $advisorCoverage }}%</div>
+<div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full {{ $missingAdvisorCount === 0 ? 'bg-[#DCFCE7] text-[#15803D]' : 'bg-[#FEF3C7] text-[#B45309]' }} font-label-sm text-label-sm">
 <span class="material-symbols-outlined text-xs">verified</span>
-<span>Đã phân công đầy đủ</span>
+<span>{{ $missingAdvisorCount === 0 ? 'Đã phân công đầy đủ' : $missingAdvisorCount.' lớp chưa có CVHT' }}</span>
 </div>
 </div>
 <div class="w-12 h-12 rounded-xl bg-secondary-fixed text-primary flex items-center justify-center flex-shrink-0">
@@ -380,56 +385,56 @@
 <!-- Filter Toolbar -->
 <div class="p-4 border-b border-outline-variant bg-surface-bright flex flex-col xl:flex-row gap-4 items-start xl:items-center justify-between">
 <!-- Filters Group -->
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 w-full xl:w-auto">
+<form method="GET" action="{{ url()->current() }}" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 w-full xl:w-auto">
 <!-- Search Input -->
 <div class="relative min-w-[240px]">
 <span class="material-symbols-outlined absolute left-3 top-2.5 text-lg text-outline">search</span>
-<input aria-label="Tìm mã lớp, tên lớp, CVHT..." class="w-full h-10 pl-9 pr-3 text-body-sm font-body-sm bg-surface-container-lowest border border-outline-variant rounded-lg focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-on-surface" placeholder="Tìm mã lớp, tên lớp, CVHT..." type="text"/>
+<input name="q" value="{{ request('q') }}" aria-label="Tìm mã lớp, tên lớp..." class="w-full h-10 pl-9 pr-3 text-body-sm font-body-sm bg-surface-container-lowest border border-outline-variant rounded-lg focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-on-surface" placeholder="Tìm mã lớp, tên lớp..." type="search"/>
 </div>
 <!-- Dropdown Khoa -->
 <div>
-<select aria-label="Khoa Công nghệ thông tin" class="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-body-sm font-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20">
-<option selected="">Khoa Công nghệ thông tin</option>
-<option>Khoa Thực phẩm</option>
-<option>Khoa Kinh tế</option>
-<option>Khoa Hóa học</option>
+<select name="faculty_id" aria-label="Tất cả khoa" class="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-body-sm font-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20">
+<option value="">Tất cả khoa</option>
+@foreach($faculties as $faculty)
+<option value="{{ $faculty->id }}" @selected((string) request('faculty_id') === (string) $faculty->id)>{{ $faculty->name }}</option>
+@endforeach
 </select>
 </div>
 <!-- Dropdown Khóa -->
 <div>
-<select aria-label="Khóa 21 (2021 - 2025)" class="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-body-sm font-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20">
-<option selected="">Khóa 21 (2021 - 2025)</option>
-<option>Khóa 22 (2022 - 2026)</option>
-<option>Khóa 23 (2023 - 2027)</option>
-<option>Khóa 24 (2024 - 2028)</option>
+<select name="cohort_id" aria-label="Tất cả khóa" class="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-body-sm font-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20">
+<option value="">Tất cả khóa</option>
+@foreach($cohorts as $cohort)
+<option value="{{ $cohort->id }}" @selected((string) request('cohort_id') === (string) $cohort->id)>{{ $cohort->code }} ({{ $cohort->start_year }})</option>
+@endforeach
 </select>
 </div>
 <!-- Dropdown Ngành -->
 <div>
-<select aria-label="Tất cả ngành" class="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-body-sm font-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20">
-<option selected="">Tất cả ngành</option>
-<option>Công nghệ thông tin</option>
-<option>Kỹ thuật phần mềm</option>
-<option>An toàn thông tin</option>
+<select name="major_id" aria-label="Tất cả ngành" class="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-body-sm font-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20">
+<option value="">Tất cả ngành</option>
+@foreach($majors as $major)
+<option value="{{ $major->id }}" @selected((string) request('major_id') === (string) $major->id)>{{ $major->name }}</option>
+@endforeach
 </select>
 </div>
 <!-- Dropdown Trạng thái -->
 <div>
-<select aria-label="Đang hoạt động" class="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-body-sm font-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20">
-<option selected="">Đang hoạt động</option>
-<option>Tất cả trạng thái</option>
-<option>Đã tốt nghiệp</option>
-<option>Tạm khóa</option>
+<select name="status" aria-label="Tất cả trạng thái" class="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-body-sm font-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20">
+<option value="">Tất cả trạng thái</option>
+<option value="active" @selected(request('status') === 'active')>Đang hoạt động</option>
+<option value="inactive" @selected(request('status') === 'inactive')>Đã đóng</option>
 </select>
 </div>
-</div>
+<button type="submit" class="h-10 px-3 bg-primary text-white rounded-lg font-medium">Lọc</button>
+</form>
 <!-- Action Buttons Group -->
 <div class="flex items-center gap-2 self-end xl:self-auto flex-shrink-0">
-<button class="h-10 px-3 bg-surface-container-lowest border border-outline-variant hover:bg-surface-container-low text-on-surface font-label-md text-label-md rounded-lg flex items-center gap-1.5 transition-colors">
+<button type="button" disabled title="Chức năng nhập Excel được quản lý qua Trung tâm import" class="h-10 px-3 bg-surface-container-lowest border border-outline-variant text-on-surface font-label-md text-label-md rounded-lg flex items-center gap-1.5 opacity-60 cursor-not-allowed">
 <span class="material-symbols-outlined text-base">upload_file</span>
 <span>Nhập từ Excel</span>
 </button>
-<button class="h-10 px-3 bg-surface-container-lowest border border-outline-variant hover:bg-surface-container-low text-on-surface font-label-md text-label-md rounded-lg flex items-center gap-1.5 transition-colors">
+<button type="button" disabled title="Chưa có cấu hình xuất danh sách lớp hành chính" class="h-10 px-3 bg-surface-container-lowest border border-outline-variant text-on-surface font-label-md text-label-md rounded-lg flex items-center gap-1.5 opacity-60 cursor-not-allowed">
 <span class="material-symbols-outlined text-base">file_download</span>
 <span>Xuất file</span>
 </button>
@@ -453,202 +458,52 @@
 </tr>
 </thead>
 <tbody class="divide-y divide-outline-variant font-body-sm text-body-sm">
-<!-- Dòng 1 -->
+@forelse($classes as $class)
+@php
+    $advisor = $class->advisorAssignments->first()?->lecturer;
+    $currentStudents = (int) $class->current_students_count;
+    $remainingSeats = max(0, $class->max_size - $currentStudents);
+@endphp
 <tr class="hover:bg-surface-container-low/50 transition-colors">
-<td class="py-3.5 px-4 font-label-md text-label-md text-primary font-bold sticky left-0 bg-surface-container-lowest z-10 shadow-[1px_0_0_0_#c3c6d5]">
-                  12DHTH01
-                </td>
-<td class="py-3.5 px-4 font-medium text-on-surface">ĐH Tin học 01 - K21</td>
-<td class="py-3.5 px-4 text-on-surface-variant">Công nghệ thông tin</td>
+<td class="py-3.5 px-4 font-label-md text-label-md text-primary font-bold sticky left-0 bg-surface-container-lowest z-10 shadow-[1px_0_0_0_#c3c6d5]">{{ $class->code }}</td>
+<td class="py-3.5 px-4 font-medium text-on-surface">{{ $class->name }}</td>
+<td class="py-3.5 px-4 text-on-surface-variant">{{ $class->major?->name }}</td>
+<td class="py-3.5 px-4"><span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">{{ $class->cohort?->code }}</span></td>
 <td class="py-3.5 px-4">
-<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">Khóa 21</span>
-</td>
-<td class="py-3.5 px-4">
-<div class="font-medium text-on-surface">ThS. Người dùng mẫu 10</div>
-<div class="text-[11px] text-on-surface-variant">SĐT: 0908 123 456</div>
+@if($advisor)
+<div class="font-medium text-on-surface">{{ $advisor->full_name }}</div>
+<div class="text-[11px] text-on-surface-variant">{{ $advisor->code }}</div>
+@else
+<div class="font-medium text-[#B45309]">Ch?a c? c? v?n</div>
+<div class="text-[11px] text-on-surface-variant">C?n ph?n c?ng CVHT</div>
+@endif
 </td>
 <td class="py-3.5 px-4 text-center">
-<div class="font-semibold text-on-surface">60 / 60</div>
-<span class="font-label-sm text-label-sm text-error">Đủ sĩ số</span>
+<div class="font-semibold text-on-surface">{{ $currentStudents }} / {{ $class->max_size }}</div>
+<span class="font-label-sm text-label-sm {{ $remainingSeats === 0 ? 'text-error' : 'text-on-surface-variant' }}">{{ $remainingSeats === 0 ? '?? s? s?' : 'C?n '.$remainingSeats.' ch?' }}</span>
 </td>
 <td class="py-3.5 px-4">
-<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#DCFCE7] text-[#15803D] font-label-sm text-label-sm font-semibold">
-<span class="w-1.5 h-1.5 rounded-full bg-[#15803D]"></span>
-                    Đang hoạt động
-                  </span>
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full {{ $class->isActive() ? 'bg-[#DCFCE7] text-[#15803D]' : 'bg-surface-container text-on-surface-variant' }} font-label-sm text-label-sm font-semibold">
+<span class="w-1.5 h-1.5 rounded-full {{ $class->isActive() ? 'bg-[#15803D]' : 'bg-slate-400' }}"></span>{{ $class->status_label }}
+</span>
 </td>
 <td class="py-3.5 px-4 text-right">
-<div class="inline-flex items-center gap-1.5">
-<button class="px-2.5 py-1 rounded-md bg-surface-container-low text-primary hover:bg-surface-container border border-outline-variant font-label-sm text-label-sm font-medium transition-colors">
-                      Danh sách SV
-                    </button>
-<button class="px-2.5 py-1 rounded-md bg-surface-container-lowest text-on-surface hover:bg-surface-container-low border border-outline-variant font-label-sm text-label-sm font-medium transition-colors" onclick="document.getElementById('modal-add-class').classList.remove('hidden')">
-                      Sửa
-                    </button>
-</div>
+<a class="px-2.5 py-1 rounded-md bg-surface-container-low text-primary hover:bg-surface-container border border-outline-variant font-label-sm text-label-sm font-medium transition-colors" href="{{ route('admin.admin-classes.members.index', $class->id) }}">Danh s?ch SV</a>
 </td>
 </tr>
-<!-- Dòng 2 -->
-<tr class="hover:bg-surface-container-low/50 transition-colors">
-<td class="py-3.5 px-4 font-label-md text-label-md text-primary font-bold sticky left-0 bg-surface-container-lowest z-10 shadow-[1px_0_0_0_#c3c6d5]">
-                  12DHTH02
-                </td>
-<td class="py-3.5 px-4 font-medium text-on-surface">ĐH Tin học 02 - K21</td>
-<td class="py-3.5 px-4 text-on-surface-variant">Công nghệ thông tin</td>
-<td class="py-3.5 px-4">
-<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">Khóa 21</span>
-</td>
-<td class="py-3.5 px-4">
-<div class="font-medium text-on-surface">TS. Người dùng mẫu 28</div>
-<div class="text-[11px] text-on-surface-variant">SĐT: 0913 888 999</div>
-</td>
-<td class="py-3.5 px-4 text-center">
-<div class="font-semibold text-on-surface">58 / 60</div>
-<span class="font-label-sm text-label-sm text-[#15803D]">Còn 2 chỗ</span>
-</td>
-<td class="py-3.5 px-4">
-<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#DCFCE7] text-[#15803D] font-label-sm text-label-sm font-semibold">
-<span class="w-1.5 h-1.5 rounded-full bg-[#15803D]"></span>
-                    Đang hoạt động
-                  </span>
-</td>
-<td class="py-3.5 px-4 text-right">
-<div class="inline-flex items-center gap-1.5">
-<button class="px-2.5 py-1 rounded-md bg-surface-container-low text-primary hover:bg-surface-container border border-outline-variant font-label-sm text-label-sm font-medium transition-colors">
-                      Danh sách SV
-                    </button>
-<button class="px-2.5 py-1 rounded-md bg-surface-container-lowest text-on-surface hover:bg-surface-container-low border border-outline-variant font-label-sm text-label-sm font-medium transition-colors" onclick="document.getElementById('modal-add-class').classList.remove('hidden')">
-                      Sửa
-                    </button>
-</div>
-</td>
-</tr>
-<!-- Dòng 3 -->
-<tr class="hover:bg-surface-container-low/50 transition-colors">
-<td class="py-3.5 px-4 font-label-md text-label-md text-primary font-bold sticky left-0 bg-surface-container-lowest z-10 shadow-[1px_0_0_0_#c3c6d5]">
-                  12DHPM01
-                </td>
-<td class="py-3.5 px-4 font-medium text-on-surface">ĐH Kỹ thuật phần mềm 01</td>
-<td class="py-3.5 px-4 text-on-surface-variant">Kỹ thuật phần mềm</td>
-<td class="py-3.5 px-4">
-<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">Khóa 21</span>
-</td>
-<td class="py-3.5 px-4">
-<div class="font-medium text-on-surface">TS. Người dùng mẫu 39</div>
-<div class="text-[11px] text-on-surface-variant">SĐT: 0903 555 777</div>
-</td>
-<td class="py-3.5 px-4 text-center">
-<div class="font-semibold text-on-surface">55 / 60</div>
-<span class="font-label-sm text-label-sm text-on-surface-variant">Còn 5 chỗ</span>
-</td>
-<td class="py-3.5 px-4">
-<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#DCFCE7] text-[#15803D] font-label-sm text-label-sm font-semibold">
-<span class="w-1.5 h-1.5 rounded-full bg-[#15803D]"></span>
-                    Đang hoạt động
-                  </span>
-</td>
-<td class="py-3.5 px-4 text-right">
-<div class="inline-flex items-center gap-1.5">
-<button class="px-2.5 py-1 rounded-md bg-surface-container-low text-primary hover:bg-surface-container border border-outline-variant font-label-sm text-label-sm font-medium transition-colors">
-                      Danh sách SV
-                    </button>
-<button class="px-2.5 py-1 rounded-md bg-surface-container-lowest text-on-surface hover:bg-surface-container-low border border-outline-variant font-label-sm text-label-sm font-medium transition-colors" onclick="document.getElementById('modal-add-class').classList.remove('hidden')">
-                      Sửa
-                    </button>
-</div>
-</td>
-</tr>
-<!-- Dòng 4 -->
-<tr class="hover:bg-surface-container-low/50 transition-colors bg-surface-bright/40">
-<td class="py-3.5 px-4 font-label-md text-label-md text-primary font-bold sticky left-0 bg-surface-container-lowest z-10 shadow-[1px_0_0_0_#c3c6d5]">
-                  11DHTH01
-                </td>
-<td class="py-3.5 px-4 font-medium text-on-surface">ĐH Tin học 01 - K20</td>
-<td class="py-3.5 px-4 text-on-surface-variant">Công nghệ thông tin</td>
-<td class="py-3.5 px-4">
-<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">Khóa 20</span>
-</td>
-<td class="py-3.5 px-4">
-<div class="font-medium text-on-surface">PGS.TS Người dùng mẫu 34</div>
-<div class="text-[11px] text-on-surface-variant">SĐT: 0918 333 222</div>
-</td>
-<td class="py-3.5 px-4 text-center">
-<div class="font-semibold text-on-surface">52 / 55</div>
-<span class="font-label-sm text-label-sm text-on-surface-variant">Tốt nghiệp: 50 SV</span>
-</td>
-<td class="py-3.5 px-4">
-<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#FEF3C7] text-[#B45309] font-label-sm text-label-sm font-semibold">
-<span class="w-1.5 h-1.5 rounded-full bg-[#B45309]"></span>
-                    Đã tốt nghiệp
-                  </span>
-</td>
-<td class="py-3.5 px-4 text-right">
-<div class="inline-flex items-center gap-1.5">
-<button class="px-2.5 py-1 rounded-md bg-surface-container-low text-primary hover:bg-surface-container border border-outline-variant font-label-sm text-label-sm font-medium transition-colors">
-                      Danh sách SV
-                    </button>
-<button class="px-2.5 py-1 rounded-md bg-surface-container-lowest text-on-surface hover:bg-surface-container-low border border-outline-variant font-label-sm text-label-sm font-medium transition-colors" onclick="document.getElementById('modal-add-class').classList.remove('hidden')">
-                      Sửa
-                    </button>
-</div>
-</td>
-</tr>
-<!-- Dòng 5 -->
-<tr class="hover:bg-surface-container-low/50 transition-colors">
-<td class="py-3.5 px-4 font-label-md text-label-md text-primary font-bold sticky left-0 bg-surface-container-lowest z-10 shadow-[1px_0_0_0_#c3c6d5]">
-                  13DHAT01
-                </td>
-<td class="py-3.5 px-4 font-medium text-on-surface">ĐH An toàn thông tin 01</td>
-<td class="py-3.5 px-4 text-on-surface-variant">An toàn thông tin</td>
-<td class="py-3.5 px-4">
-<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">Khóa 22</span>
-</td>
-<td class="py-3.5 px-4">
-<div class="font-medium text-on-surface">ThS. Người dùng mẫu 50</div>
-<div class="text-[11px] text-on-surface-variant">SĐT: 0977 444 111</div>
-</td>
-<td class="py-3.5 px-4 text-center">
-<div class="font-semibold text-on-surface">60 / 60</div>
-<span class="font-label-sm text-label-sm text-error">Đủ sĩ số</span>
-</td>
-<td class="py-3.5 px-4">
-<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#DCFCE7] text-[#15803D] font-label-sm text-label-sm font-semibold">
-<span class="w-1.5 h-1.5 rounded-full bg-[#15803D]"></span>
-                    Đang hoạt động
-                  </span>
-</td>
-<td class="py-3.5 px-4 text-right">
-<div class="inline-flex items-center gap-1.5">
-<button class="px-2.5 py-1 rounded-md bg-surface-container-low text-primary hover:bg-surface-container border border-outline-variant font-label-sm text-label-sm font-medium transition-colors">
-                      Danh sách SV
-                    </button>
-<button class="px-2.5 py-1 rounded-md bg-surface-container-lowest text-on-surface hover:bg-surface-container-low border border-outline-variant font-label-sm text-label-sm font-medium transition-colors" onclick="document.getElementById('modal-add-class').classList.remove('hidden')">
-                      Sửa
-                    </button>
-</div>
-</td>
-</tr>
+@empty
+<tr><td colspan="8" class="py-10 text-center text-on-surface-variant">Kh?ng c? l?p h?nh ch?nh trong ph?m vi ho?c b? l?c ?? ch?n.</td></tr>
+@endforelse
 </tbody>
 </table>
 </div>
 <!-- Pagination Footer -->
 <div class="p-4 border-t border-outline-variant flex flex-col sm:flex-row items-center justify-between gap-3 text-body-sm text-on-surface-variant">
 <div class="font-body-sm text-body-sm">
-            Hiển thị <span class="font-semibold text-on-surface">1 - 5</span> trong tổng số <span class="font-semibold text-on-surface">248</span> lớp
+            Hiển thị <span class="font-semibold text-on-surface">{{ $classes->firstItem() ?? 0 }}–{{ $classes->lastItem() ?? 0 }}</span>
+            trong tổng số <span class="font-semibold text-on-surface">{{ number_format($classes->total()) }}</span> lớp
           </div>
-<div class="flex items-center gap-1">
-<button class="p-1.5 rounded-md border border-outline-variant text-outline cursor-not-allowed" disabled="">
-<span class="material-symbols-outlined text-base">chevron_left</span>
-</button>
-<button class="w-8 h-8 rounded-md bg-primary text-white font-semibold text-label-md">1</button>
-<button class="w-8 h-8 rounded-md hover:bg-surface-container text-on-surface text-label-md">2</button>
-<button class="w-8 h-8 rounded-md hover:bg-surface-container text-on-surface text-label-md">3</button>
-<span class="px-1 text-outline">...</span>
-<button class="w-8 h-8 rounded-md hover:bg-surface-container text-on-surface text-label-md">50</button>
-<button class="p-1.5 rounded-md border border-outline-variant hover:bg-surface-container text-on-surface">
-<span class="material-symbols-outlined text-base">chevron_right</span>
-</button>
-</div>
+<div>{{ $classes->links() }}</div>
 </div>
 </div>
 </div>

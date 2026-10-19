@@ -26,7 +26,8 @@ class AdmissionController extends Controller
         ], [], ['admin_class_id' => 'lớp hành chính', 'admission_date' => 'ngày nhập học']);
 
         $student = $this->admissions->admit($student, $data['admin_class_id'] ?? null, $data['admission_date'] ?? null, $request->user());
-        $member = AdminClassMember::query()->with('adminClass:id,code,name')->where('student_id', $student->id)->current()->first();
+        $member = AdminClassMember::query()->with('adminClass:id,code,name')
+            ->where('student_id', $student->id)->whereNull('effective_to')->first();
 
         return response()->json([
             'id' => $student->id,

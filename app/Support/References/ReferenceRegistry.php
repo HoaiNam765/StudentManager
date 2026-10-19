@@ -31,9 +31,9 @@ final class ReferenceRegistry
      * @param  class-string<Model>  $model  Model bị tham chiếu
      * @param  string  $label  Tên hiển thị của dữ liệu tham chiếu, ví dụ "bộ môn", "sinh viên"
      * @param  (Closure(Builder): void)|null  $constraint  Điều kiện thêm, ví dụ chỉ tính bản ghi cùng loại
-     * @param  (Closure(Builder): void)|null  $active  Điều kiện "còn hoạt động" (ví dụ sinh viên đang học); khai báo thì
-     *                                                 tham chiếu này còn chặn việc ngừng hoạt động bản ghi bị tham chiếu
-     *                                                 cho tới khi chuyển hết (BR-FAC-05), xem `activeUsages()`
+     * @param  (Closure(Builder, ?string=): void)|null  $active  Điều kiện "còn hoạt động" (ví dụ sinh viên đang học); khai báo thì
+     *                                                           tham chiếu này còn chặn việc ngừng hoạt động bản ghi bị tham chiếu
+     *                                                           cho tới khi chuyển hết (BR-FAC-05), xem `activeUsages()`
      */
     public function register(string $model, string $table, string $column, string $label, ?Closure $constraint = null, ?Closure $active = null): void
     {
@@ -46,7 +46,7 @@ final class ReferenceRegistry
      *
      * @return array<string, int>
      */
-    public function activeUsages(Model $model): array
+    public function activeUsages(Model $model, ?string $on = null): array
     {
         $usages = [];
 
@@ -61,7 +61,7 @@ final class ReferenceRegistry
                 ($reference['constraint'])($query);
             }
 
-            ($reference['active'])($query);
+            ($reference['active'])($query, $on);
             $count = $query->count();
 
             if ($count > 0) {

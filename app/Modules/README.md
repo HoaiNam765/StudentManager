@@ -317,6 +317,12 @@ $resolver->setFor($khoa, $ngay)->code;            // bộ quy chế đang áp d�
 - Hủy nhập học: hồ sơ Chờ nhập học xóa mềm kèm lý do (đi qua `StudentService::delete`, BR-STU-07).
 - API (quyền `STU.approve`: ACAD, CTSV): `POST /admin/students/{id}/admit`, `POST /admin/students/{id}/cancel-admission` (bắt buộc `reason`).
 
+## Trạng thái sinh viên (STU, FR-STU-009, 010; BR-STU-05, 10; BR-AUTH-07; EV-STU-02)
+
+- `StudentStatusService::change($sv, $trangThai, $quyetDinh, $tep)`: chỉ theo sơ đồ BA 6.2 (Đang học → Bảo lưu / Thôi học / Buộc thôi học / Chuyển trường / Đã tốt nghiệp; Bảo lưu → Đang học / Thôi học / Buộc thôi học). Trạng thái cuối chỉ về Đang học bằng `special` (STU.approve toàn trường — ACAD), bắt buộc lý do. Mỗi lần có số quyết định, ngày hiệu lực, lý do, tệp (PDF / ảnh, disk `studentmanager.student.decision_disk`), ghi `student_status_histories` và nhật ký kiểm toán.
+- Hệ quả trong cùng giao dịch: phát `StudentStatusChanged` (EV-STU-02) → ENR hủy đăng ký **chưa chốt** của học kỳ bắt đầu sau ngày hiệu lực (BR-STU-10, nhật ký đăng ký `status_cancelled`); đăng ký mới bị chặn vì ENR chỉ nhận sinh viên Đang học. AUTH (`UserService::applyStudentStatus`): thôi học / buộc thôi học / chuyển trường → hẹn ngừng tài khoản, tốt nghiệp → chỉ đọc, khôi phục đặc biệt → hoạt động (BR-AUTH-07).
+- API: `GET|POST /admin/students/{id}/status` (lịch sử + trạng thái được chuyển tới; POST multipart có `attachment`), `GET /admin/student-status-histories/{id}/attachment`.
+
 ## Thời khóa biểu cơ bản (TTB, FR-TTB-001, 002; BR-TTB-02, 03, 04, 07)
 
 - Khung tiết `periods`: số tiết, giờ bắt đầu – kết thúc, ca (sáng / chiều / tối; giữa hai ca là giờ nghỉ). Khung chung (`campus_id` trống) hoặc riêng một cơ sở; cơ sở có khung riêng thì dùng khung riêng (`PeriodService::periodsFor($coSo)`). Số tiết không trùng, giờ không chồng và tăng dần; tiết đã có lịch không đổi số / ca, không xóa; cơ sở đã có lịch theo khung chung thì không tạo khung riêng. Seeder: 15 tiết chung.

@@ -26,6 +26,7 @@ use App\Modules\SchoolClass\Http\Controllers\CourseSectionController;
 use App\Modules\Student\Http\Controllers\AdmissionController;
 use App\Modules\Student\Http\Controllers\StudentController;
 use App\Modules\Student\Http\Controllers\StudentCurriculumController;
+use App\Modules\Student\Http\Controllers\StudentStatusController;
 use App\Modules\Subject\Http\Controllers\GradeStructureController;
 use App\Modules\Subject\Http\Controllers\SubjectController;
 use App\Modules\Subject\Http\Controllers\SubjectRelationController;
@@ -234,6 +235,12 @@ Route::middleware('auth')->group(function (): void {
     // Gán CTĐT cho sinh viên (CUR, FR-CUR-006): xem lịch sử = STU.view; gán theo ngành – khóa hoặc đổi CTĐT = STU.update (kiểm tra phạm vi trên hồ sơ)
     Route::get('students/{student}/curricula', [StudentCurriculumController::class, 'index'])->whereNumber('student')->middleware('permission:STU.view')->name('students.curricula.index');
     Route::post('students/{student}/curricula', [StudentCurriculumController::class, 'store'])->whereNumber('student')->middleware('permission:STU.update')->name('students.curricula.store');
+
+    // Trạng thái sinh viên theo quyết định (FR-STU-009, 010; BR-STU-05, 10): xem = STU.view, chuyển = STU.update trên hồ sơ,
+    // khôi phục từ trạng thái cuối (special) = STU.approve toàn trường — kiểm tra trong StudentStatusController
+    Route::get('students/{student}/status', [StudentStatusController::class, 'index'])->whereNumber('student')->middleware('permission:STU.view')->name('students.status.index');
+    Route::post('students/{student}/status', [StudentStatusController::class, 'store'])->whereNumber('student')->middleware('permission:STU.update')->name('students.status.store');
+    Route::get('student-status-histories/{history}/attachment', [StudentStatusController::class, 'attachment'])->middleware('permission:STU.view')->name('student-status-histories.attachment');
 
     // Xác nhận / hủy nhập học (STU, FR-STU-002): STU.approve (ACAD, CTSV). Cấp MSSV, email, tài khoản, CTĐT, lớp hành chính trong một giao dịch.
     Route::middleware('permission:STU.approve')->group(function (): void {

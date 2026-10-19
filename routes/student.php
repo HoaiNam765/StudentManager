@@ -5,6 +5,7 @@ use App\Http\Controllers\Pages\Student\RegistrationPageController;
 use App\Modules\Enrollment\Http\Controllers\EnrollmentController;
 use App\Modules\Enrollment\Http\Controllers\EnrollmentResultController;
 use App\Modules\Enrollment\Http\Controllers\RegistrationOptionsController;
+use App\Modules\Student\Http\Controllers\StudentSelfController;
 use App\Modules\Timetable\Http\Controllers\TimetableController;
 use Illuminate\Support\Facades\Route;
 
@@ -21,6 +22,18 @@ Route::middleware('auth')->group(function (): void {
     // Dashboard dùng dữ liệu mẫu của nhóm FE; thay bằng dữ liệu thật khi có (FR-RPT-009)
     Route::get('/', [DashboardController::class, 'student'])->name('home');
     Route::get('/mobile', [DashboardController::class, 'studentMobile'])->name('mobile');
+
+    // Hồ sơ của tôi (FR-STU-006; BR-STU-06): xem = STU.view, tự sửa / gửi yêu cầu = STU.update (OWN)
+    Route::get('/profile', [StudentSelfController::class, 'show'])->middleware('permission:STU.view')->name('profile.show');
+    Route::middleware('permission:STU.update')->group(function (): void {
+        Route::put('/profile', [StudentSelfController::class, 'update'])->name('profile.update');
+        Route::post('/profile/photo', [StudentSelfController::class, 'photo'])->name('profile.photo');
+        Route::post('/profile/contacts', [StudentSelfController::class, 'storeContact'])->name('profile.contacts.store');
+        Route::put('/profile/contacts/{studentContact}', [StudentSelfController::class, 'updateContact'])->name('profile.contacts.update');
+        Route::delete('/profile/contacts/{studentContact}', [StudentSelfController::class, 'destroyContact'])->name('profile.contacts.destroy');
+        Route::post('/profile/change-requests', [StudentSelfController::class, 'storeRequest'])->name('profile.change-requests.store');
+        Route::post('/profile/change-requests/{studentChangeRequest}/cancel', [StudentSelfController::class, 'cancelRequest'])->name('profile.change-requests.cancel');
+    });
 
     // Đăng ký học phần (ENR, FR-ENR-002): đợt đang mở của sinh viên và các lớp được chọn (JSON)
     Route::get('/registration/options', [RegistrationOptionsController::class, 'mine'])->middleware('permission:ENR.view')->name('registration.options');

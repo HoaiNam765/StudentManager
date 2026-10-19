@@ -8,6 +8,7 @@ use App\Modules\Faculty\Models\Specialization;
 use App\Modules\Faculty\Models\TrainingType;
 use App\Modules\Student\Importers\StudentImporter;
 use App\Modules\Student\Models\Student;
+use App\Modules\Student\Models\StudentChangeRequest;
 use App\Modules\Student\Models\StudentContact;
 use App\Modules\Student\Policies\StudentPolicy;
 use App\Modules\System\Models\AdministrativeUnit;
@@ -30,6 +31,7 @@ class StudentServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::policy(Student::class, StudentPolicy::class);
+        Gate::policy(StudentChangeRequest::class, StudentPolicy::class);
         Gate::policy(StudentContact::class, StudentPolicy::class);
 
         // Nhập hồ sơ sinh viên qua trung tâm import (FR-STU-007)

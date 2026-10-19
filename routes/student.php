@@ -4,6 +4,7 @@ use App\Http\Controllers\DashboardController;
 use App\Modules\Enrollment\Http\Controllers\EnrollmentController;
 use App\Modules\Enrollment\Http\Controllers\EnrollmentResultController;
 use App\Modules\Enrollment\Http\Controllers\RegistrationOptionsController;
+use App\Modules\Timetable\Http\Controllers\TimetableController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -29,6 +30,9 @@ Route::middleware('auth')->group(function (): void {
     Route::post('/registration/enrollments/{enrollment}/cancel', [EnrollmentController::class, 'cancel'])->middleware('permission:ENR.delete')->name('registration.cancel');
     Route::post('/registration/enrollments/{enrollment}/withdraw', [EnrollmentController::class, 'withdraw'])->middleware('permission:ENR.delete')->name('registration.withdraw');
     Route::post('/registration/enrollments/{enrollment}/change', [EnrollmentController::class, 'change'])->middleware('permission:ENR.create')->name('registration.change');
+
+    // Thời khóa biểu của tôi theo buổi học cụ thể (FR-TTB-004): ?view=week|month|term&date=&term_id=; chỉ khi đã công bố
+    Route::get('/timetable', [TimetableController::class, 'mineStudent'])->middleware('permission:TTB.view')->name('timetable');
 
     // Kết quả đăng ký, thời khóa biểu cá nhân, phiếu đăng ký PDF (FR-ENR-010)
     Route::get('/registration/result', [EnrollmentResultController::class, 'mine'])->middleware('permission:ENR.view')->name('registration.result');

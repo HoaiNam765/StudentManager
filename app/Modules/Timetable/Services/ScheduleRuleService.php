@@ -9,9 +9,12 @@ use App\Modules\SchoolClass\Enums\SectionStatus;
 use App\Modules\SchoolClass\Models\CourseSection;
 use App\Modules\Student\Models\Student;
 use App\Modules\Timetable\Enums\WeekParity;
+use App\Modules\Timetable\Events\ScheduleChanged;
 use App\Modules\Timetable\Models\ScheduleRule;
+use App\Support\Audit\AuditLogger;
 use App\Support\Services\BaseService;
 use Carbon\CarbonImmutable;
+use Closure;
 
 /**
  * Xếp lịch lớp học phần (FR-TTB-002).
@@ -37,9 +40,14 @@ class ScheduleRuleService extends BaseService
     public function create(CourseSection $section, array $data): array
     {
         $attributes = $this->check($section, $data);
-        $conflicts = $this->assertNoConflict($section, new ScheduleRule(['course_section_id' => $section->id, ...$attributes]));
-        $rule = ScheduleRule::create(['course_section_id' => $section->id, ...$attributes]);
-        $this->regenerateSessions($section);
+        $candidate = new ScheduleRule(['course_section_id' => $section->id, ...$attributes]);
+        $conflicts = $this->assertNoConflict($section, $candidate);
+        $rule = $this->guardPublished($section, $data, null, $candidate, function () use ($section, $attributes): ScheduleRule {
+            $rule = ScheduleRule::create(['course_section_id' => $section->id, ...$attributes]);
+            $this->regenerateSessions($section);
+
+            return $rule;
+        });
 
         return ['rule' => $rule->load('room:id,code,capacity'), 'warnings' => [...$conflicts, ...$this->summary($section)['warnings']]];
     }
@@ -59,9 +67,12 @@ class ScheduleRuleService extends BaseService
             'note' => array_key_exists('note', $data) ? $data['note'] : $rule->note,
         ], $rule->id);
 
-        $conflicts = $this->assertNoConflict($section, (clone $rule)->fill($attributes));
-        $rule->update($attributes);
-        $this->regenerateSessions($section);
+        $candidate = (clone $rule)->fill($attributes);
+        $conflicts = $this->assertNoConflict($section, $candidate);
+        $this->guardPublished($section, $data, $rule, $candidate, function () use ($rule, $attributes, $section): void {
+            $rule->update($attributes);
+            $this->regenerateSessions($section);
+        });
 
         // BR-TTB-08: sinh viên đã đăng ký bị trùng lịch với lớp khác của họ sau khi đổi
         $found = $this->conflicts->affectedStudents($section);
@@ -74,11 +85,55 @@ class ScheduleRuleService extends BaseService
         return ['rule' => $rule->refresh()->load('room:id,code,capacity'), 'warnings' => [...$conflicts, ...$affected, ...$this->summary($section)['warnings']]];
     }
 
-    public function delete(ScheduleRule $rule): void
+    /** @param array{reason?: ?string, urgent?: bool} $data */
+    public function delete(ScheduleRule $rule, array $data = []): void
     {
         $this->assertEditable($rule->section);
-        $rule->delete();
-        $this->regenerateSessions($rule->section);
+        $this->guardPublished($rule->section, $data, $rule, null, function () use ($rule): void {
+            $rule->delete();
+            $this->regenerateSessions($rule->section);
+        });
+    }
+
+    /**
+     * Sau khi công bố thời khóa biểu: bắt buộc lý do, báo trước đủ giờ hoặc khẩn cấp (BR-TTB-05), ghi lý do vào nhật ký
+     * và phát EV-TTB-02 (`ScheduleChanged`). Còn nháp thì ghi thẳng.
+     */
+    private function guardPublished(CourseSection $section, array $data, ?ScheduleRule $before, ?ScheduleRule $after, Closure $write): mixed
+    {
+        $urgent = (bool) ($data['urgent'] ?? false);
+        $dates = array_filter([$this->nextDate($section, $before), $this->nextDate($section, $after)]);
+        $reason = app(TimetablePublication::class)->assertChangeAllowed($section, $data['reason'] ?? null, $urgent, $dates);
+
+        if ($reason === null) {
+            return $write();
+        }
+
+        $result = app(AuditLogger::class)->withReason(($urgent ? '[Khẩn cấp] ' : '').$reason, $write);
+        ScheduleChanged::dispatch($section, $reason, $urgent);
+
+        return $result;
+    }
+
+    /** Ngày học sắp tới (từ hôm nay) của một dòng lịch. */
+    private function nextDate(CourseSection $section, ?ScheduleRule $rule): ?CarbonImmutable
+    {
+        if ($rule === null) {
+            return null;
+        }
+
+        $section->loadMissing('term');
+        $today = CarbonImmutable::now(config('studentmanager.display_timezone'))->startOfDay();
+
+        foreach ($rule->weeks() as $week) {
+            $date = $this->dateOf($section->term, $week, $rule->day_of_week);
+
+            if ($date->gte($today)) {
+                return $date;
+            }
+        }
+
+        return null;
     }
 
     /**

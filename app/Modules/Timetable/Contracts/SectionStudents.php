@@ -16,4 +16,10 @@ interface SectionStudents
 
     /** @return Collection<int, CourseSection> các lớp khác cùng học kỳ sinh viên đang đăng ký */
     public function otherSectionsOf(int $studentId, CourseSection $section): Collection;
+
+    /**
+     * @param  list<int>  $studentIds
+     * @return list<int> id các lớp học phần mà các sinh viên đang đăng ký trong học kỳ (xem thời khóa biểu, FR-TTB-004)
+     */
+    public function sectionIdsOfStudents(array $studentIds, int $termId): array;
 }

@@ -25,4 +25,14 @@ class EnrollmentSectionStudents implements SectionStudents
                 ->select('course_section_id'))
             ->get();
     }
+
+    public function sectionIdsOfStudents(array $studentIds, int $termId): array
+    {
+        return Enrollment::query()->active()
+            ->whereIn('student_id', $studentIds)
+            ->where('term_id', $termId)
+            ->distinct()
+            ->pluck('course_section_id')
+            ->all();
+    }
 }

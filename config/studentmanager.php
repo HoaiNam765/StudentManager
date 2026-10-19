@@ -150,6 +150,8 @@ return [
     // Thời khóa biểu (TTB): buổi học không kết thúc muộn hơn giờ này (BR-TTB-03)
     'timetable' => [
         'latest_end' => env('TIMETABLE_LATEST_END', '21:00'),
+        // Đổi lịch sau khi công bố phải báo trước tối thiểu số giờ này, trừ khi khẩn cấp (BR-TTB-05)
+        'change_notice_hours' => (int) env('TIMETABLE_CHANGE_NOTICE_HOURS', 24),
         // Loại phòng dùng cho lớp thực hành (BR-ROM-03)
         'practice_room_types' => array_filter(explode(',', env('TIMETABLE_PRACTICE_ROOM_TYPES', 'MT,TN'))),
         // Xung đột chặn (block) hay chỉ cảnh báo (warn) (FR-TTB-003)

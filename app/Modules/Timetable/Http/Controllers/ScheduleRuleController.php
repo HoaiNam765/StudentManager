@@ -73,7 +73,11 @@ class ScheduleRuleController extends Controller
     public function destroy(Request $request, ScheduleRule $scheduleRule): Response
     {
         $this->authorizeOn($request, PermissionAction::Delete, $scheduleRule->section);
-        $this->rules->delete($scheduleRule);
+        $data = $request->validate([
+            'reason' => ['sometimes', 'nullable', 'string', 'max:500'],
+            'urgent' => ['sometimes', 'boolean'],
+        ], [], ['reason' => 'lý do', 'urgent' => 'khẩn cấp']);
+        $this->rules->delete($scheduleRule, $data);
 
         return response()->noContent();
     }
@@ -100,7 +104,10 @@ class ScheduleRuleController extends Controller
             'week_to' => [$required, 'integer', 'min:1'],
             'week_parity' => ['sometimes', Rule::enum(WeekParity::class)],
             'note' => ['sometimes', 'nullable', 'string', 'max:500'],
+            'reason' => ['sometimes', 'nullable', 'string', 'max:500'],
+            'urgent' => ['sometimes', 'boolean'],
         ], [], [
+            'reason' => 'lý do thay đổi', 'urgent' => 'khẩn cấp',
             'day_of_week' => 'thứ', 'period_from' => 'tiết bắt đầu', 'period_to' => 'tiết kết thúc', 'room_id' => 'phòng',
             'week_from' => 'tuần bắt đầu', 'week_to' => 'tuần kết thúc', 'week_parity' => 'mẫu tuần', 'note' => 'ghi chú',
         ]);

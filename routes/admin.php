@@ -37,6 +37,7 @@ use App\Modules\Teacher\Http\Controllers\LecturerScheduleController;
 use App\Modules\Timetable\Http\Controllers\ClassSessionController;
 use App\Modules\Timetable\Http\Controllers\PeriodController;
 use App\Modules\Timetable\Http\Controllers\ScheduleRuleController;
+use App\Modules\Timetable\Http\Controllers\TimetableController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -444,6 +445,13 @@ Route::middleware('auth')->group(function (): void {
     Route::put('periods/{period}', [PeriodController::class, 'update'])->middleware('permission:TTB.update,ALL')->name('periods.update');
     Route::delete('periods/{period}', [PeriodController::class, 'destroy'])->middleware('permission:TTB.delete,ALL')->name('periods.destroy');
     Route::get('course-sections/{courseSection}/schedule', [ScheduleRuleController::class, 'index'])->whereNumber('courseSection')->name('course-sections.schedule.index');
+    // Xem thời khóa biểu theo đối tượng (FR-TTB-004; phạm vi kiểm tra trong controller); nháp – công bố – khóa theo học kỳ
+    // (FR-TTB-006): xem trạng thái = TTB.view, công bố / khóa = ACAD (TTB.approve toàn trường)
+    Route::get('timetable', [TimetableController::class, 'show'])->middleware('permission:TTB.view')->name('timetable.show');
+    Route::get('terms/{term}/timetable', [TimetableController::class, 'status'])->middleware('permission:TTB.view')->name('terms.timetable.status');
+    Route::post('terms/{term}/timetable/publish', [TimetableController::class, 'publish'])->middleware('permission:TTB.approve,ALL')->name('terms.timetable.publish');
+    Route::post('terms/{term}/timetable/lock', [TimetableController::class, 'lock'])->middleware('permission:TTB.approve,ALL')->name('terms.timetable.lock');
+
     // Buổi học cụ thể (FR-TTB-005, 009): xem theo phạm vi lớp; sinh lại, dạy bù, hủy buổi = ACAD
     Route::get('course-sections/{courseSection}/sessions', [ClassSessionController::class, 'index'])->whereNumber('courseSection')->middleware('permission:TTB.view')->name('course-sections.sessions.index');
     Route::post('course-sections/{courseSection}/sessions/generate', [ClassSessionController::class, 'generate'])->whereNumber('courseSection')->middleware('permission:TTB.update,ALL')->name('course-sections.sessions.generate');

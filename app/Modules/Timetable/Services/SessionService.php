@@ -8,6 +8,7 @@ use App\Modules\Room\Models\Room;
 use App\Modules\Room\Services\RoomAvailability;
 use App\Modules\SchoolClass\Models\CourseSection;
 use App\Modules\Timetable\Enums\SessionStatus;
+use App\Modules\Timetable\Enums\TimetableStatus;
 use App\Modules\Timetable\Models\ClassSession;
 use App\Modules\Timetable\Models\ScheduleRule;
 use App\Support\Services\BaseService;
@@ -127,6 +128,7 @@ class SessionService extends BaseService
         }
 
         $section = $original->section()->with('term')->first();
+        $this->assertNotLocked($section);
         $day = CarbonImmutable::parse($date);
         $term = $section->term;
 
@@ -179,9 +181,17 @@ class SessionService extends BaseService
             $this->fail("Buổi đang {$session->status->label()} nên không hủy được.", 'Chỉ hủy buổi Dự kiến hoặc Dạy bù.');
         }
 
+        $this->assertNotLocked($session->section()->with('term')->first());
         $session->update(['status' => SessionStatus::Cancelled, 'off_reason' => $reason]);
 
         return $session;
+    }
+
+    private function assertNotLocked(CourseSection $section): void
+    {
+        if (app(TimetablePublication::class)->status($section->term) === TimetableStatus::Locked) {
+            $this->fail("Thời khóa biểu {$section->term->name} đã khóa.", 'Không điều chỉnh buổi học sau khi khóa.');
+        }
     }
 
     /** @return array<string, string> ngày nghỉ áp dụng cho học kỳ => tên */

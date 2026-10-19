@@ -18,4 +18,9 @@ class NoSectionStudents implements SectionStudents
     {
         return collect();
     }
+
+    public function sectionIdsOfStudents(array $studentIds, int $termId): array
+    {
+        return [];
+    }
 }

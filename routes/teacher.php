@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Modules\Teacher\Http\Controllers\LecturerProfileController;
 use App\Modules\Teacher\Http\Controllers\LecturerScheduleController;
+use App\Modules\Timetable\Http\Controllers\TimetableController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -23,6 +24,9 @@ Route::middleware('auth')->group(function (): void {
     Route::put('profile', [LecturerProfileController::class, 'update'])->name('profile.update');
     Route::post('profile/photo', [LecturerProfileController::class, 'photo'])->name('profile.photo');
     Route::delete('profile/change-requests/{lecturerChangeRequest}', [LecturerProfileController::class, 'cancelRequest'])->name('profile.change-requests.cancel');
+
+    // Lịch dạy của tôi theo buổi học cụ thể (FR-TTB-004): ?view=week|month|term&date=&term_id=; chỉ khi đã công bố
+    Route::get('timetable', [TimetableController::class, 'mineLecturer'])->middleware('permission:TTB.view')->name('timetable');
 
     // Lịch bận, nguyện vọng học phần kỳ tới, nghỉ phép / công tác của chính giảng viên (FR-TCH-008, 012; phạm vi OWN)
     Route::get('availability', [LecturerScheduleController::class, 'myAvailability'])->name('availability.index');

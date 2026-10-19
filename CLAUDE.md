@@ -55,6 +55,7 @@ Ghi nhớ cho Claude Code khi làm việc với dự án này. Cập nhật mụ
 - Seeder: `DatabaseSeeder::MODULE_SEEDERS` theo thứ tự phụ thuộc BA 5.5, rồi `DevUserSeeder`.
 - Mỗi module mới có `app/Modules/<Module>/<Module>ServiceProvider.php` (khai báo trong `bootstrap/providers.php`): đăng ký Policy, Importer, tham chiếu (`ReferenceRegistry`). Không dồn thêm vào `AppServiceProvider`.
 - `App\Support\References\ReferenceRegistry`: module có khóa ngoại tới bảng của module khác đăng ký ở đó; dùng cho quy tắc "đã dùng thì chỉ ngừng, không xóa/không đổi mã". Importer đọc Excel/CSV kế thừa `SpreadsheetImporter`.
+- Nối giao diện vào API (`docs/fe-be-mapping.md`: màn hình mock ↔ route ↔ quyền ↔ vai trò, API còn thiếu): trang thật dùng `layouts/portal` (menu theo quyền ở `App\Http\Navigation\PortalMenu`), controller trang ở `app/Http/Controllers/Pages/<Cổng>` chỉ trả view + `$pageData` (URL API, cờ quyền), URL trang tiếng Việt không trùng URL API, cùng middleware quyền với API chính. JavaScript: `resources/js/api.js` (gọi API, lỗi 401/403/419/422/428), `resources/js/ui.js` (dựng phần tử bằng textContent, thông báo, hộp xác nhận, trạng thái tải / rỗng / lỗi), mỗi trang một tệp `resources/js/pages/<tên>.js` nạp theo `data-page`. Mock ở `__fe-preview` giữ tới khi nhóm đó nối xong.
 
 ## Quy ước kỹ thuật và bẫy đã gặp
 
@@ -68,6 +69,8 @@ Ghi nhớ cho Claude Code khi làm việc với dự án này. Cập nhật mụ
 - Môi trường chặn `rmdir /s` và `Remove-Item Env:`: dùng thư mục mới, `$env:X = $null`.
 - Khi chép khung dự án, đừng loại file theo tên trên toàn cây (từng làm mất 12 file `.gitignore` con).
 - Test dùng `travelTo()` lùi đồng hồ: vai trò gán bằng `RoleService::assign` có `valid_from` = ngày thật lúc tạo, nên sau khi lùi về quá khứ quyền chưa có hiệu lực. Gọi `travelBack()` trước khi kiểm tra quyền, đừng `travelTo` sang một ngày cố định khác (chỉ xanh đúng hôm đó). `AuditLogSearchTest` từng đỏ trên `main` ngày 06/10 vì lỗi này.
+- Preflight của Tailwind 4 xóa `margin` mặc định nên `<dialog>` không tự căn giữa: thêm `m-auto`. Mock dùng Tailwind CDN; trang thật dùng Vite + token màu trong `resources/css/app.css`.
+- Chạy thử FE trên CSDL demo: worktree có `.env` riêng `DB_DATABASE=sm_demo` (không sửa `.env` của checkout chính), hoặc `$env:DB_DATABASE='sm_demo'; php artisan serve --no-reload`. Thiếu `--no-reload` thì `serve` bỏ mọi biến môi trường ngoài danh sách `ServeCommand::$passthroughVariables` và chạy trên CSDL trong `.env` (dữ liệu dev thật). Tài khoản SV demo: MSSV của SV đã nhập học (seeder đặt mật khẩu giả); `stu.test` không gắn hồ sơ SV.
 - Khi PR của bạn trong nhóm đỏ CI: đọc log (`gh run view <id> --log-failed`) và chạy lại trên `main` trước khi kết luận lỗi do PR. Trình format của IDE đổi `fn (` thành `fn(` làm Pint đỏ; chạy `composer lint` trước khi push.
 
 ## Nhật ký công việc
@@ -116,6 +119,8 @@ Ghi nhớ cho Claude Code khi làm việc với dự án này. Cập nhật mụ
 | #112 | (chưa mở) | Xem thời khóa biểu theo đối tượng và nháp – công bố – khóa (của B): `TimetableView` (sinh viên / giảng viên / lớp học phần / lớp hành chính / phòng / khoa; tuần / tháng / học kỳ), `term_timetables` + `TimetablePublication` (EV-TTB-01; sau công bố đổi lịch cần lý do, báo trước `change_notice_hours` hoặc khẩn cấp, EV-TTB-02; khóa chặn mọi thay đổi), API quản trị + cổng sinh viên / giảng viên; `SectionStudents::sectionIdsOfStudents`. **Chưa có test tự động** — nhánh `feature/be-xem-tkb-cong-bo` |
 | #108 | (chưa mở) | Lớp thiếu sĩ số, hủy, gộp, khóa lớp (của B): `underMinSections` (đề xuất hủy / gộp, #113 chặn chốt), hủy lớp phát `CourseSectionCancelled` → ENR hủy đăng ký + EV-ENR-03, TTB hủy buổi; `SectionMergeService` (ENR) chuyển đăng ký rồi hủy lớp nguồn; xuất danh sách lớp (ExportService, ENR.export); mở khóa ngoại lệ có lý do. **Chưa có test tự động** — nhánh `feature/be-huy-khoa-lop` |
 | #113 | (chưa mở) | Đăng ký thay, ngoại lệ, chốt đăng ký (của A): cán bộ đăng ký / hủy thay (bỏ qua từng điều kiện kèm lý do, `approved_by`), `RegistrationFinalizer` (xem trước; chặn khi còn đợt mở / lớp thiếu sĩ số / SV dưới tín chỉ chưa xác nhận; chốt đăng ký, đợt, đóng lớp; `RegistrationFinalized`), sau chốt SV không tự hủy, thay đổi phát `EnrollmentAdjusted` cho FEE (BR-ENR-08). **Chưa có test tự động** — nhánh `feature/be-chot-dang-ky` |
+
+| FE #21, #22 | (chưa mở) | Nối FE vào BE, nhóm (a) phần sinh viên: `docs/fe-be-mapping.md` (88 mock ↔ 284 route), `resources/js/api.js` + `ui.js`, `layouts/portal`, trang `/student/dang-ky-hoc-phan` (gộp mock desktop + mobile; đăng ký / hủy / đổi lớp từng lớp) và `/student/ket-qua-dang-ky` (hủy / rút, phiếu PDF, bản in); BE nhỏ: `period.term_id` trong API lớp được chọn, `DevRoleUsersSeeder` đặt mật khẩu demo cho SV đã nhập học. Kiểm tra tay trên `sm_demo`, **chưa có test tự động** — nhánh `feature/fe-dang-ky-hoc-phan` |
 
 ## Việc tiếp theo của A (P1)
 

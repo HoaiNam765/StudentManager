@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {{-- resources/js/api.js đọc mã CSRF ở đây để gửi kèm các yêu cầu ghi --}}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Hệ thống Quản lý Học vụ - Trường ĐH Công Thương TP.HCM (HUIT)')</title>
     
     <!-- Google Fonts: Inter -->

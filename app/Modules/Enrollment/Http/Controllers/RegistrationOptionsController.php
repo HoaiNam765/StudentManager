@@ -60,6 +60,7 @@ class RegistrationOptionsController extends Controller
             'period' => [
                 'id' => $period->id,
                 'name' => $period->name,
+                'term_id' => $period->term_id,
                 'term' => $period->term->name,
                 'opens_at' => $period->opens_at->setTimezone($tz)->format('Y-m-d H:i'),
                 'closes_at' => $period->closes_at->setTimezone($tz)->format('Y-m-d H:i'),

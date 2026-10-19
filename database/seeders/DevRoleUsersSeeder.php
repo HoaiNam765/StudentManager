@@ -8,12 +8,15 @@ use App\Modules\Auth\Models\Role;
 use App\Modules\Faculty\Models\Faculty;
 use App\Modules\Faculty\Models\LeadershipTerm;
 use App\Modules\Faculty\Services\LeadershipService;
+use App\Modules\Student\Enums\StudentStatus;
+use App\Modules\Student\Models\Student;
 use Illuminate\Database\Seeder;
 
 /**
  * Tài khoản mẫu cho từng vai trò, chỉ dùng ở môi trường phát triển (BR-SYS-10). Mật khẩu giả: xem hằng PASSWORD.
  * Tên đăng nhập `<vai trò viết thường>.test`, ví dụ `acad.test`, `stu.test`. Tài khoản DEAN được giao nhiệm kỳ
- * trưởng khoa CNTT (nếu có dữ liệu khoa) để có phạm vi FACULTY thật. Chạy lặp lại an toàn.
+ * trưởng khoa CNTT (nếu có dữ liệu khoa) để có phạm vi FACULTY thật. Tài khoản của sinh viên đã nhập học cũng dùng
+ * mật khẩu giả này. Chạy lặp lại an toàn; không chạy ở production.
  */
 class DevRoleUsersSeeder extends Seeder
 {
@@ -68,6 +71,26 @@ class DevRoleUsersSeeder extends Seeder
                 }
             }
         }
+
+        $this->prepareAdmittedStudents();
+    }
+
+    /**
+     * Sinh viên đã nhập học (Đang học, có tài khoản) nhận mật khẩu tạm ngẫu nhiên và phải đổi ở lần đầu; để dùng thử cổng
+     * sinh viên, đặt mật khẩu giả PASSWORD (đăng nhập bằng MSSV). Chỉ áp cho tài khoản còn mật khẩu tạm, nên không ghi đè
+     * mật khẩu người dùng đã tự đổi. `stu.test` vẫn không gắn hồ sơ sinh viên để thử trường hợp đó.
+     */
+    private function prepareAdmittedStudents(): void
+    {
+        $userIds = Student::query()->where('status', StudentStatus::Studying)->whereNotNull('user_id')->pluck('user_id');
+
+        User::query()->whereIn('id', $userIds)->where('must_change_password', true)->get()
+            ->each(fn (User $user) => $user->forceFill([
+                'password' => self::PASSWORD,
+                'must_change_password' => false,
+                'temporary_password_expires_at' => null,
+                'password_changed_at' => now(),
+            ])->save());
     }
 
     /** Trưởng khoa: giao nhiệm kỳ (sinh vai trò DEAN có phạm vi khoa); chưa có khoa thì gán DEAN trực tiếp. */

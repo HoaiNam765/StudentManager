@@ -95,6 +95,9 @@ return [
     'student' => [
         'min_age' => (int) env('STUDENT_MIN_AGE', 16),
         'max_age' => (int) env('STUDENT_MAX_AGE', 60),
+        // Tệp quyết định chuyển trạng thái (FR-STU-010): disk riêng tư, dung lượng tối đa (KB)
+        'decision_disk' => env('STUDENT_DECISION_DISK', 'local'),
+        'decision_max_kb' => (int) env('STUDENT_DECISION_MAX_KB', 5120),
         // MSSV khi xác nhận nhập học (BR-STU-01): 2 số cuối khóa + N số cuối mã ngành + số thứ tự trong khóa – ngành
         'code_major_digits' => (int) env('STUDENT_CODE_MAJOR_DIGITS', 4),
         'code_sequence_digits' => (int) env('STUDENT_CODE_SEQUENCE_DIGITS', 4),

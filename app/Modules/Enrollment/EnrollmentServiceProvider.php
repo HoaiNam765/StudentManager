@@ -7,6 +7,7 @@ use App\Modules\Enrollment\Contracts\AcademicRecord;
 use App\Modules\Enrollment\Contracts\TuitionStatus;
 use App\Modules\Enrollment\Enums\EnrollmentStatus;
 use App\Modules\Enrollment\Listeners\CancelEnrollmentsOfSection;
+use App\Modules\Enrollment\Listeners\CancelEnrollmentsOnStatusChange;
 use App\Modules\Enrollment\Models\RegistrationPeriod;
 use App\Modules\Enrollment\Policies\EnrollmentPolicy;
 use App\Modules\Enrollment\Services\EmptyAcademicRecord;
@@ -17,6 +18,7 @@ use App\Modules\SchoolClass\Events\CourseSectionCancelled;
 use App\Modules\SchoolClass\Models\AdminClass;
 use App\Modules\SchoolClass\Models\Cohort;
 use App\Modules\SchoolClass\Models\CourseSection;
+use App\Modules\Student\Events\StudentStatusChanged;
 use App\Modules\Student\Models\Student;
 use App\Modules\Timetable\Contracts\SectionStudents;
 use App\Support\References\ReferenceRegistry;
@@ -41,6 +43,7 @@ class EnrollmentServiceProvider extends ServiceProvider
     {
         Gate::policy(RegistrationPeriod::class, EnrollmentPolicy::class);
         Event::listen(CourseSectionCancelled::class, CancelEnrollmentsOfSection::class);
+        Event::listen(StudentStatusChanged::class, CancelEnrollmentsOnStatusChange::class);
 
         $references = app(ReferenceRegistry::class);
         $references->register(Term::class, 'registration_periods', 'term_id', 'đợt đăng ký học phần');

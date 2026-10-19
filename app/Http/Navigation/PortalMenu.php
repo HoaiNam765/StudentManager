@@ -1,0 +1,82 @@
+<?php
+
+namespace App\Http\Navigation;
+
+use App\Models\User;
+use App\Modules\Auth\Enums\PermissionAction;
+use App\Modules\Auth\Services\AccessControl;
+use Illuminate\Support\Facades\Route;
+
+/**
+ * Menu bên của các trang đã nối API (layouts/portal), theo cổng. Một mục chỉ hiện khi route tồn tại và người dùng có
+ * đúng quyền mà middleware của route trang yêu cầu. Ẩn mục chỉ để tiện dùng, không phải bảo mật: route vẫn chặn.
+ * Trang mới nối thì thêm một dòng vào ITEMS (xem docs/fe-be-mapping.md).
+ */
+class PortalMenu
+{
+    /** Cổng => nhóm => danh sách [nhãn, biểu tượng Material Symbols, tên route, quyền "MODULE.action[,ALL]" hoặc null]. */
+    private const ITEMS = [
+        'student' => [
+            'Học tập' => [
+                ['Tổng quan', 'dashboard', 'student.home', null],
+                ['Đăng ký học phần', 'how_to_reg', 'student.pages.registration', 'ENR.view'],
+                ['Kết quả đăng ký', 'fact_check', 'student.pages.registration-result', 'ENR.view'],
+            ],
+        ],
+        'teacher' => [
+            'Giảng dạy' => [
+                ['Tổng quan', 'dashboard', 'teacher.home', null],
+            ],
+        ],
+        'admin' => [
+            'Quản lý đào tạo' => [
+                ['Tổng quan', 'dashboard', 'admin.home', null],
+            ],
+        ],
+    ];
+
+    /** Tên hiển thị của từng cổng. */
+    public const PORTALS = [
+        'student' => 'Cổng Sinh viên',
+        'teacher' => 'Cổng Giảng viên',
+        'admin' => 'Quản lý Đào tạo',
+    ];
+
+    public function __construct(private readonly AccessControl $access) {}
+
+    /**
+     * @return array<string, list<array{label: string, icon: string, url: string, active: bool}>>
+     */
+    public function for(string $portal, User $user): array
+    {
+        $menu = [];
+
+        foreach (self::ITEMS[$portal] ?? [] as $group => $items) {
+            foreach ($items as [$label, $icon, $route, $permission]) {
+                if (! Route::has($route) || ($permission !== null && ! $this->allows($user, $permission))) {
+                    continue;
+                }
+
+                $menu[$group][] = [
+                    'label' => $label,
+                    'icon' => $icon,
+                    'url' => route($route),
+                    'active' => request()->routeIs($route),
+                ];
+            }
+        }
+
+        return $menu;
+    }
+
+    private function allows(User $user, string $permission): bool
+    {
+        [$permission, $scope] = array_pad(explode(',', $permission, 2), 2, null);
+        [$module, $action] = explode('.', $permission, 2);
+        $action = PermissionAction::from($action);
+
+        return $scope === 'ALL'
+            ? $this->access->allowsGlobally($user, $module, $action)
+            : $this->access->allows($user, $module, $action);
+    }
+}

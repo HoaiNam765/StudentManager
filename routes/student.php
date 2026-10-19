@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Pages\Student\RegistrationPageController;
 use App\Modules\Enrollment\Http\Controllers\EnrollmentController;
 use App\Modules\Enrollment\Http\Controllers\EnrollmentResultController;
 use App\Modules\Enrollment\Http\Controllers\RegistrationOptionsController;
@@ -37,4 +38,8 @@ Route::middleware('auth')->group(function (): void {
     // Kết quả đăng ký, thời khóa biểu cá nhân, phiếu đăng ký PDF (FR-ENR-010)
     Route::get('/registration/result', [EnrollmentResultController::class, 'mine'])->middleware('permission:ENR.view')->name('registration.result');
     Route::get('/registration/result/slip', [EnrollmentResultController::class, 'mineSlip'])->middleware('permission:ENR.view')->name('registration.slip');
+
+    // Trang giao diện gọi các API ở trên (docs/fe-be-mapping.md, nhóm a); cùng quyền với API chính của trang
+    Route::get('/dang-ky-hoc-phan', [RegistrationPageController::class, 'index'])->middleware('permission:ENR.view')->name('pages.registration');
+    Route::get('/ket-qua-dang-ky', [RegistrationPageController::class, 'result'])->middleware('permission:ENR.view')->name('pages.registration-result');
 });

@@ -6,6 +6,7 @@ use App\Modules\Teacher\Http\Controllers\LecturerProfileController;
 use App\Modules\Teacher\Http\Controllers\LecturerScheduleController;
 use App\Modules\Timetable\Http\Controllers\TimetableController;
 use Illuminate\Support\Facades\Route;
+use App\Modules\Grade\Http\Controllers\GradebookController;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,4 +47,50 @@ Route::middleware('auth')->group(function (): void {
     Route::get('leaves', [LecturerScheduleController::class, 'myLeaves'])->name('leaves.index');
     Route::post('leaves', [LecturerScheduleController::class, 'storeLeave'])->name('leaves.store');
     Route::post('leaves/{lecturerLeave}/cancel', [LecturerScheduleController::class, 'cancelLeave'])->name('leaves.cancel');
+
+    Route::prefix('course-sections/{courseSection}')
+        ->name('gradebook.')
+        ->group(function (): void {
+            Route::get(
+                'gradebook',
+                [GradebookController::class, 'show']
+            )
+                ->middleware('permission:GRD.view')
+                ->name('show');
+
+            Route::post(
+                'grade-components/initialize',
+                [GradebookController::class, 'initialize']
+            )
+                ->middleware('permission:GRD.update')
+                ->name('initialize');
+
+            Route::put(
+                'grade-components',
+                [GradebookController::class, 'replaceStructure']
+            )
+                ->middleware('permission:GRD.update')
+                ->name('structure.update');
+
+            Route::post(
+                'grades',
+                [GradebookController::class, 'saveDraft']
+            )
+                ->middleware('permission:GRD.update')
+                ->name('draft.save');
+
+            Route::get(
+                'grades/template',
+                [GradebookController::class, 'template']
+            )
+                ->middleware('permission:GRD.view')
+                ->name('template');
+
+            Route::post(
+                'grades/import',
+                [GradebookController::class, 'import']
+            )
+                ->middleware('permission:GRD.update')
+                ->name('import');
+        });
 });

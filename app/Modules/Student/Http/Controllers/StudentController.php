@@ -11,11 +11,15 @@ use App\Modules\Student\Models\StudentChangeLog;
 use App\Modules\Student\Models\StudentContact;
 use App\Modules\Student\Services\IdentityNumber;
 use App\Modules\Student\Services\StudentService;
+use App\Support\Exports\ExportColumn;
+use App\Support\Services\ExportService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 /**
  * API hồ sơ sinh viên (FR-STU-001, 004, 005, 013). Quyền: middleware `permission:STU.*` chặn cả route; Policy kiểm tra
@@ -29,13 +33,76 @@ class StudentController extends Controller
         private readonly AccessControl $access,
     ) {}
 
+    /**
+     * Danh sách sinh viên (FR-STU-003): tìm theo MSSV, họ tên (không dấu), số CCCD đầy đủ (so bằng hash); lọc khoa, ngành,
+     * khóa, hệ, lớp hành chính hiện tại, trạng thái; sắp xếp `sort` (student_code | full_name | cohort | status) và `dir`;
+     * `per_page` tối đa 100. Kết quả lọc theo phạm vi xem của vai trò (khoa, cố vấn, lớp giảng dạy, của mình).
+     */
     public function index(Request $request): JsonResponse
     {
+        $perPage = min(100, max(1, $request->integer('per_page', 50)));
+        $list = $this->filtered($request, $this->access->constrain(Student::query(), $request->user(), 'STU', PermissionAction::View))
+            ->with(['major:id,code,name,faculty_id', 'trainingType:id,code,name'])
+            ->paginate($perPage)
+            ->withQueryString();
+
+        return response()->json($list->through(fn (Student $s) => $this->summary($s)));
+    }
+
+    /**
+     * Xuất danh sách theo bộ lọc (FR-STU-008): Excel / CSV / PDF qua ExportService (quyền STU.export, lọc theo phạm vi
+     * xuất, nhật ký `exported`). `include_sensitive=1` thêm số CCCD và địa chỉ đầy đủ — chỉ người xem STU toàn trường.
+     */
+    public function export(Request $request, ExportService $exports): SymfonyResponse
+    {
+        $request->validate([
+            'format' => ['sometimes', Rule::in(['xlsx', 'csv', 'pdf'])],
+            'include_sensitive' => ['sometimes', 'boolean'],
+        ]);
+        $sensitive = $request->boolean('include_sensitive');
+
+        $columns = [
+            new ExportColumn('student_code', 'MSSV'),
+            new ExportColumn('full_name', 'Họ và tên'),
+            new ExportColumn('date_of_birth', 'Ngày sinh'),
+            new ExportColumn('major.name', 'Ngành'),
+            new ExportColumn('cohort', 'Khóa'),
+            new ExportColumn('school_email', 'Email trường'),
+            new ExportColumn('phone', 'Điện thoại'),
+            new ExportColumn('status_label', 'Trạng thái'),
+            ...($sensitive
+                ? [new ExportColumn('national_id', 'Số CCCD', sensitive: true), new ExportColumn('permanent_address', 'Địa chỉ thường trú', sensitive: true)]
+                : [new ExportColumn('national_id_masked', 'Số CCCD (che)')]),
+        ];
+
+        $result = $exports->export(
+            $this->filtered($request, Student::query()->with('major:id,name')),
+            $columns,
+            'STU',
+            $request->user(),
+            $request->string('format', 'xlsx')->toString(),
+            'danh-sach-sinh-vien',
+        );
+
+        return $result->isQueued()
+            ? response()->json(['id' => $result->requestId, 'row_count' => $result->rowCount], 202)
+            : $result->download;
+    }
+
+    /** Bộ lọc và sắp xếp dùng chung cho danh sách và xuất. */
+    private function filtered(Request $request, Builder $query): Builder
+    {
+        $request->validate([
+            'sort' => ['sometimes', Rule::in(['student_code', 'full_name', 'cohort', 'status'])],
+            'dir' => ['sometimes', Rule::in(['asc', 'desc'])],
+            'per_page' => ['sometimes', 'integer', 'min:1', 'max:100'],
+        ]);
         $q = $request->string('q')->trim()->toString();
         $identityHash = preg_match('/^[0-9A-Za-z]{6,20}$/', $q) && preg_match('/[0-9]{6,}/', $q) ? IdentityNumber::hash($q) : null;
+        $sort = $request->string('sort', 'student_code')->toString();
+        $dir = $request->string('dir', 'asc')->toString();
 
-        $list = $this->access->constrain(Student::query(), $request->user(), 'STU', PermissionAction::View)
-            ->with(['major:id,code,name,faculty_id', 'trainingType:id,code,name'])
+        return $query
             ->when($q !== '', fn (Builder $query) => $query->where(fn (Builder $w) => $w
                 ->where(fn (Builder $s) => $s->search($q))
                 ->when($identityHash !== null, fn (Builder $s) => $s->orWhere('national_id_hash', $identityHash))))
@@ -44,12 +111,11 @@ class StudentController extends Controller
             ->when($request->filled('faculty_id'), fn (Builder $query) => $query->whereHas('major', fn (Builder $m) => $m->where('faculty_id', $request->integer('faculty_id'))))
             ->when($request->filled('cohort'), fn (Builder $query) => $query->where('cohort', $request->integer('cohort')))
             ->when($request->filled('training_type_id'), fn (Builder $query) => $query->where('training_type_id', $request->integer('training_type_id')))
-            ->orderByRaw('student_code IS NULL')
-            ->orderBy('student_code')
-            ->orderBy('full_name')
-            ->paginate(50);
-
-        return response()->json($list->through(fn (Student $s) => $this->summary($s)));
+            ->when($request->filled('admin_class_id'), fn (Builder $query) => $query->whereHas('adminClassMembers', fn (Builder $m) => $m
+                ->current()->where('admin_class_id', $request->integer('admin_class_id'))))
+            ->when($sort === 'student_code', fn (Builder $query) => $query->orderByRaw('student_code IS NULL'))
+            ->when($sort === 'full_name', fn (Builder $query) => $query->orderByRaw('full_name COLLATE utf8mb4_vietnamese_ci '.$dir), fn (Builder $query) => $query->orderBy($sort, $dir))
+            ->orderBy('id');
     }
 
     /** Hồ sơ chi tiết (FR-STU-004): thông tin cá nhân, liên hệ, học tập, người thân. Trường nhạy cảm đã che. */
@@ -151,6 +217,7 @@ class StudentController extends Controller
             'training_type' => $student->trainingType?->only('id', 'code', 'name'),
             'cohort' => $student->cohort,
             'school_email' => $student->school_email,
+            'national_id_masked' => $student->national_id_masked,
             'status' => $student->status->value,
             'status_label' => $student->status_label,
         ];

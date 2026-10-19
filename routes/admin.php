@@ -217,6 +217,7 @@ Route::middleware('auth')->group(function (): void {
     // sửa / người thân / xem đầy đủ trường nhạy cảm = STU.update, xóa hồ sơ nhập sai = STU.delete. Phạm vi kiểm tra tiếp trong StudentController.
     Route::middleware('permission:STU.view')->group(function (): void {
         Route::get('students', [StudentController::class, 'index'])->name('students.index');
+        Route::get('students/export', [StudentController::class, 'export'])->middleware('permission:STU.export')->name('students.export');
         Route::get('students/{student}', [StudentController::class, 'show'])->whereNumber('student')->name('students.show');
         Route::get('students/{student}/change-logs', [StudentController::class, 'changeLogs'])->whereNumber('student')->name('students.change-logs');
     });

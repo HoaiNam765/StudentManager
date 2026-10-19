@@ -29,6 +29,14 @@ Module của P2 trở đi (`ATT`, `EXM`, `FEE`, `DOC`, `GRA`, `REQ`, `SCH`, `EVA
 - Module chỉ phụ thuộc module khác theo chiều của ma trận phụ thuộc (BA mục 5.5); không tham chiếu vòng.
 - Migration vẫn đặt ở `database/migrations/`; view đặt ở `resources/views/<cổng>/<module>/`.
 
+### Thành viên và cố vấn lớp hành chính (CLS)
+
+`ClassRosterService` xử lý xem trước, gán/chuyển/gỡ thành viên; khi nhập học, `AdmissionService` dùng cùng dịch vụ để tự
+chọn lớp phù hợp theo khóa, ngành, hệ và sĩ số. Lịch sử giữ ngày hiệu lực và lý do kết thúc; một sinh viên chỉ có một
+phân công đang mở. `AdvisorAssignmentService` quản lý lịch sử cố vấn, chỉ nhận giảng viên đang làm việc, và lớp thiếu
+cố vấn được truy vấn qua `admin-classes/missing-advisors`. Các API quản trị nằm dưới `/admin/admin-classes`; vai trò
+`ADV` và dữ liệu sinh viên trong phạm vi cố vấn được lọc bằng `ADVISEE`.
+
 ## Lớp nền dùng chung (`app/Support`)
 
 Dùng lại thay vì tự viết trong từng module. Ví dụ đầy đủ có test nằm ở `tests/Support` và `tests/Feature/Support`.

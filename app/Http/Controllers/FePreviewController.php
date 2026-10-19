@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Modules\Auth\Enums\PermissionAction;
+use App\Modules\Auth\Services\AccessControl;
+use App\Modules\SchoolClass\Models\AdminClass;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\App;
 
@@ -15,6 +18,10 @@ class FePreviewController extends Controller
         return view('fe_preview.index', ['screens' => config('fe_preview', [])]);
     }
 
+    /**
+     * Giữ chữ ký một tham số: routes/fe-preview.php gọi trực tiếp show($key) trong closure, nên Request và
+     * AccessControl lấy từ container thay vì inject vào tham số.
+     */
     public function show(string $screen): View
     {
         abort_unless(App::environment('local'), 404);
@@ -22,6 +29,50 @@ class FePreviewController extends Controller
         $item = collect(config('fe_preview', []))->firstWhere('key', $screen);
         abort_if($item === null, 404);
 
-        return view($item['view']);
+        if ($screen !== 'admin/khoa-va-lop-hanh-chinh') {
+            return view($item['view']);
+        }
+
+        $request = request();
+        $access = app(AccessControl::class);
+
+        $query = $access->constrain(AdminClass::query(), $request->user(), 'CLS', PermissionAction::View);
+        $with = [
+            'cohort:id,code,start_year',
+            'major:id,code,name,faculty_id',
+            'major.faculty:id,name',
+            'advisorAssignments' => fn ($assignments) => $assignments->current()->with('lecturer:id,code,full_name'),
+        ];
+        $withCount = ['members as current_students_count' => fn ($members) => $members->current()];
+        $visibleClasses = (clone $query)->with($with)->withCount($withCount)->orderBy('code')->get();
+        $activeClasses = $visibleClasses->filter(fn (AdminClass $class) => $class->isActive());
+        $assignedAdvisorCount = $activeClasses->filter(fn (AdminClass $class) => $class->advisorAssignments->isNotEmpty())->count();
+        $currentStudentCount = $visibleClasses->sum('current_students_count');
+
+        $classes = (clone $query)
+            ->with($with)
+            ->withCount($withCount)
+            ->when($request->filled('q'), fn ($classes) => $classes->search($request->string('q')->toString()))
+            ->when($request->filled('cohort_id'), fn ($classes) => $classes->where('cohort_id', $request->integer('cohort_id')))
+            ->when($request->filled('major_id'), fn ($classes) => $classes->where('major_id', $request->integer('major_id')))
+            ->when($request->filled('faculty_id'), fn ($classes) => $classes->whereHas('major', fn ($major) => $major->where('faculty_id', $request->integer('faculty_id'))))
+            ->when(in_array($request->input('status'), ['active', 'inactive'], true), fn ($classes) => $classes->where('status', $request->input('status')))
+            ->orderBy('code')
+            ->paginate(25)
+            ->withQueryString();
+
+        return view($item['view'], [
+            'classes' => $classes,
+            'cohorts' => $visibleClasses->pluck('cohort')->unique('id')->sortByDesc('start_year')->values(),
+            'majors' => $visibleClasses->pluck('major')->unique('id')->sortBy('name')->values(),
+            'faculties' => $visibleClasses->pluck('major.faculty')->filter()->unique('id')->sortBy('name')->values(),
+            'totalClasses' => $visibleClasses->count(),
+            'totalStudents' => $currentStudentCount,
+            'averageStudents' => $activeClasses->count() > 0 ? $activeClasses->sum('current_students_count') / $activeClasses->count() : 0,
+            'advisorCoverage' => $activeClasses->count() > 0 ? round($assignedAdvisorCount / $activeClasses->count() * 100) : 0,
+            'missingAdvisorCount' => $activeClasses->count() - $assignedAdvisorCount,
+            'activeClassCount' => $activeClasses->count(),
+            'canViewClasses' => $access->allows($request->user(), 'CLS', PermissionAction::View),
+        ]);
     }
 }

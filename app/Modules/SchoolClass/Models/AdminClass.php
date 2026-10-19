@@ -14,13 +14,14 @@ use App\Support\Concerns\HasVietnameseSearch;
 use App\Support\Models\StandardModel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Lớp hành chính (FR-CLS-002): đúng một khóa và một ngành (BR-CLS-01), chuyên ngành tùy chọn, hệ đào tạo, sĩ số tối đa.
  * Trạng thái hoạt động / đã đóng (ngừng hoạt động).
  *
- * Phạm vi dữ liệu (BA 4.2, hàng CLS): DEAN lớp thuộc ngành của khoa mình (FACULTY). ADV (lớp mình cố vấn), STU (lớp
- * của mình) có dữ liệu khi gán cố vấn và gán sinh viên vào lớp (#99).
+ * Phạm vi dữ liệu (BA 4.2, hàng CLS): DEAN lớp thuộc ngành của khoa mình (FACULTY); ADV chỉ các lớp đang cố vấn
+ * (ADVISEE), được lọc từ `advisorAssignments`.
  */
 class AdminClass extends StandardModel implements HasDataScope
 {
@@ -56,6 +57,16 @@ class AdminClass extends StandardModel implements HasDataScope
         return $this->belongsTo(TrainingType::class);
     }
 
+    public function members(): HasMany
+    {
+        return $this->hasMany(AdminClassMember::class);
+    }
+
+    public function advisorAssignments(): HasMany
+    {
+        return $this->hasMany(AdvisorAssignment::class);
+    }
+
     public function applyDataScope(Builder $query, DataScope $scope, User $user): void
     {
         match ($scope) {
@@ -63,6 +74,9 @@ class AdminClass extends StandardModel implements HasDataScope
                 $this->qualifyColumn('major_id'),
                 Major::query()->select('id')->whereIn('faculty_id', app(FacultyAccess::class)->facultyIds($user)),
             ),
+            DataScope::Advisee => $query->whereHas('advisorAssignments', fn (Builder $assignments) => $assignments
+                ->current()
+                ->whereHas('lecturer', fn (Builder $lecturers) => $lecturers->where('user_id', $user->id))),
             default => $query->whereRaw('1 = 0'),
         };
     }

@@ -16,6 +16,7 @@ use App\Modules\Teacher\Enums\LecturerStatus;
 use App\Modules\Teacher\Models\Lecturer;
 use App\Modules\Teacher\Models\LecturerUnit;
 use App\Support\Audit\AuditLogger;
+use App\Support\References\ReferenceRegistry;
 use App\Support\Services\BaseService;
 use Carbon\CarbonImmutable;
 
@@ -35,6 +36,7 @@ class LecturerService extends BaseService
         private readonly RoleService $roles,
         private readonly AuditLogger $audit,
         private readonly TeachingAssignments $teaching,
+        private readonly ReferenceRegistry $references,
     ) {}
 
     /**
@@ -169,15 +171,15 @@ class LecturerService extends BaseService
      */
     public function changeStatus(Lecturer $lecturer, LecturerStatus $status, ?string $on = null, ?string $reason = null): Lecturer
     {
-        if ($status === $lecturer->status) {
-            $this->fail("Giảng viên {$lecturer->code} đang ở tình trạng {$status->label()}.", 'Chọn tình trạng khác với tình trạng hiện tại.');
-        }
-
         if ($status->isActive()) {
             return $this->audit->withReason($reason ?? 'Làm việc trở lại', function () use ($lecturer, $status): Lecturer {
-                $lecturer->update(['status' => $status, 'left_on' => null, 'left_reason' => null]);
+                return $this->transaction(function () use ($lecturer, $status): Lecturer {
+                    $lecturer = Lecturer::query()->whereKey($lecturer->id)->lockForUpdate()->firstOrFail();
+                    $this->assertStatusChanged($lecturer, $status);
+                    $lecturer->update(['status' => $status, 'left_on' => null, 'left_reason' => null]);
 
-                return $lecturer->refresh();
+                    return $lecturer->refresh();
+                });
             });
         }
 
@@ -186,17 +188,20 @@ class LecturerService extends BaseService
         }
 
         $on = CarbonImmutable::parse($on ?? $this->today())->toDateString();
-        $blocking = $this->workToHandOver($lecturer, $on);
-
-        if ($blocking !== []) {
-            $this->fail(
-                "Chưa ghi nhận {$status->label()} cho giảng viên {$lecturer->code} được vì còn việc phải chuyển cho người khác: ".implode('; ', $blocking).'.',
-                'Phân công giảng viên khác cho các lớp và kết thúc chức vụ quản lý trước, rồi ghi nhận lại (BR-TCH-02).'
-            );
-        }
 
         return $this->audit->withReason("{$status->label()}: {$reason}", function () use ($lecturer, $status, $on, $reason): Lecturer {
             return $this->transaction(function () use ($lecturer, $status, $on, $reason): Lecturer {
+                $lecturer = Lecturer::query()->whereKey($lecturer->id)->lockForUpdate()->firstOrFail();
+                $this->assertStatusChanged($lecturer, $status);
+                $blocking = $this->workToHandOver($lecturer, $on);
+
+                if ($blocking !== []) {
+                    $this->fail(
+                        "Chưa ghi nhận {$status->label()} cho giảng viên {$lecturer->code} được vì còn việc phải chuyển cho người khác: ".implode('; ', $blocking).'.',
+                        'Phân công giảng viên khác cho các lớp và kết thúc chức vụ quản lý trước, rồi ghi nhận lại (BR-TCH-02).'
+                    );
+                }
+
                 // Kiêm nhiệm kết thúc vào ngày nghỉ; lịch sử giữ nguyên
                 $lecturer->units()->overlapping($on, null)->get()->each(function (LecturerUnit $unit) use ($on): void {
                     $unit->starts_on->toDateString() > $on
@@ -211,6 +216,13 @@ class LecturerService extends BaseService
         });
     }
 
+    private function assertStatusChanged(Lecturer $lecturer, LecturerStatus $status): void
+    {
+        if ($status === $lecturer->status) {
+            $this->fail("Giảng viên {$lecturer->code} đang ở tình trạng {$status->label()}.", 'Chọn một tình trạng khác với tình trạng hiện tại.');
+        }
+    }
+
     /**
      * Việc phải chuyển trước khi giảng viên nghỉ: lớp đang dạy (CLS) và chức vụ quản lý còn hiệu lực sau ngày nghỉ.
      *
@@ -223,6 +235,11 @@ class LecturerService extends BaseService
 
         if ($sections !== []) {
             $items[] = count($sections).' lớp đang dạy ('.implode(', ', $sections).')';
+        }
+
+        $advisorClasses = $this->references->activeUsages($lecturer, $on)['lớp đang cố vấn'] ?? 0;
+        if ($advisorClasses > 0) {
+            $items[] = "{$advisorClasses} lớp đang cố vấn";
         }
 
         if ($lecturer->user_id !== null) {

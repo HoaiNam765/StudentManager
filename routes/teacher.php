@@ -7,6 +7,7 @@ use App\Modules\Teacher\Http\Controllers\LecturerProfileController;
 use App\Modules\Teacher\Http\Controllers\LecturerScheduleController;
 use App\Modules\Timetable\Http\Controllers\TimetableController;
 use Illuminate\Support\Facades\Route;
+use App\Modules\Grade\Http\Controllers\GradeResultController;
 
 /*
 |--------------------------------------------------------------------------
@@ -93,4 +94,11 @@ Route::middleware('auth')->group(function (): void {
                 ->middleware('permission:GRD.update')
                 ->name('import');
         });
+
+    Route::get(
+        'enrollments/{enrollment}/grade-result',
+        [GradeResultController::class, 'show']
+    )
+        ->middleware('permission:GRD.view')
+        ->name('grade-result.show');
 });

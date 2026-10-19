@@ -4,14 +4,17 @@ namespace App\Modules\Timetable;
 
 use App\Modules\Room\Models\Campus;
 use App\Modules\Room\Models\Room;
+use App\Modules\SchoolClass\Events\CourseSectionCancelled;
 use App\Modules\SchoolClass\Models\CourseSection;
 use App\Modules\Timetable\Contracts\SectionStudents;
+use App\Modules\Timetable\Listeners\CancelSessionsOfSection;
 use App\Modules\Timetable\Models\ClassSession;
 use App\Modules\Timetable\Models\Period;
 use App\Modules\Timetable\Models\ScheduleRule;
 use App\Modules\Timetable\Policies\TimetablePolicy;
 use App\Modules\Timetable\Services\NoSectionStudents;
 use App\Support\References\ReferenceRegistry;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -29,6 +32,7 @@ class TimetableServiceProvider extends ServiceProvider
         Gate::policy(Period::class, TimetablePolicy::class);
         Gate::policy(ScheduleRule::class, TimetablePolicy::class);
         Gate::policy(ClassSession::class, TimetablePolicy::class);
+        Event::listen(CourseSectionCancelled::class, CancelSessionsOfSection::class);
 
         $references = app(ReferenceRegistry::class);
         // Dòng lịch / tiết đã xóa không còn ý nghĩa nghiệp vụ nên không tính

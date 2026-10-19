@@ -59,6 +59,11 @@ class Enrollment extends StandardModel implements HasDataScope
         return $this->belongsTo(RegistrationPeriod::class, 'registration_period_id');
     }
 
+    public function getTypeLabelAttribute(): string
+    {
+        return self::TYPES[$this->type] ?? $this->type;
+    }
+
     public function scopeActive(Builder $query): Builder
     {
         return $query->whereIn($this->qualifyColumn('status'), EnrollmentStatus::activeValues());

@@ -88,6 +88,14 @@ class CourseSectionController extends Controller
         return response()->json($this->present($section->load(['subject', 'term.academicYear', 'instructors.lecturer', 'room'])));
     }
 
+    /** Mở khóa lớp đã khóa theo quy trình ngoại lệ (FR-CLS-018): CLS.approve toàn trường, bắt buộc lý do. */
+    public function unlock(Request $request, CourseSection $courseSection): JsonResponse
+    {
+        $reason = $request->validate(['reason' => ['required', 'string', 'max:500']], [], ['reason' => 'lý do mở khóa'])['reason'];
+
+        return response()->json($this->present($this->sections->unlock($courseSection, $reason)->load(['subject', 'term.academicYear', 'instructors.lecturer', 'room'])));
+    }
+
     // ---------------------------------------------------------------------
     // Phân công giảng viên (FR-CLS-011)
     // ---------------------------------------------------------------------

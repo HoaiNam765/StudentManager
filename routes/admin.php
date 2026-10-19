@@ -14,6 +14,7 @@ use App\Modules\Enrollment\Http\Controllers\EnrollmentController;
 use App\Modules\Enrollment\Http\Controllers\EnrollmentResultController;
 use App\Modules\Enrollment\Http\Controllers\RegistrationOptionsController;
 use App\Modules\Enrollment\Http\Controllers\RegistrationPeriodController;
+use App\Modules\Enrollment\Http\Controllers\SectionEnrollmentController;
 use App\Modules\Faculty\Http\Controllers\LeadershipController;
 use App\Modules\Faculty\Http\Controllers\UnitController;
 use App\Modules\Room\Http\Controllers\FacilityController;
@@ -421,6 +422,11 @@ Route::middleware('auth')->group(function (): void {
     Route::post('course-sections', [CourseSectionController::class, 'store'])->middleware('permission:CLS.create,ALL')->name('course-sections.store');
     Route::put('course-sections/{courseSection}', [CourseSectionController::class, 'update'])->whereNumber('courseSection')->middleware('permission:CLS.update,ALL')->name('course-sections.update');
     Route::delete('course-sections/{courseSection}', [CourseSectionController::class, 'destroy'])->whereNumber('courseSection')->middleware('permission:CLS.delete,ALL')->name('course-sections.destroy');
+    // Lớp sau đăng ký (BR-CLS-05, 09; FR-CLS-014, 018): lớp thiếu sĩ số, gộp lớp, xuất danh sách, mở khóa ngoại lệ
+    Route::get('terms/{term}/under-min-sections', [SectionEnrollmentController::class, 'underMin'])->middleware('permission:CLS.view')->name('terms.under-min-sections');
+    Route::post('course-sections/{courseSection}/merge', [SectionEnrollmentController::class, 'merge'])->whereNumber('courseSection')->middleware('permission:CLS.update,ALL')->name('course-sections.merge');
+    Route::get('course-sections/{courseSection}/enrollments/export', [SectionEnrollmentController::class, 'export'])->whereNumber('courseSection')->middleware('permission:ENR.export')->name('course-sections.enrollments.export');
+    Route::post('course-sections/{courseSection}/unlock', [CourseSectionController::class, 'unlock'])->whereNumber('courseSection')->middleware('permission:CLS.approve,ALL')->name('course-sections.unlock');
     Route::post('course-sections/{courseSection}/status/{status}', [CourseSectionController::class, 'transition'])
         ->whereNumber('courseSection')->middleware('permission:CLS.update,ALL')->name('course-sections.status');
 

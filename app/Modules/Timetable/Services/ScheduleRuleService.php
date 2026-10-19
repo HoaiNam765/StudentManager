@@ -39,6 +39,7 @@ class ScheduleRuleService extends BaseService
         $attributes = $this->check($section, $data);
         $conflicts = $this->assertNoConflict($section, new ScheduleRule(['course_section_id' => $section->id, ...$attributes]));
         $rule = ScheduleRule::create(['course_section_id' => $section->id, ...$attributes]);
+        $this->regenerateSessions($section);
 
         return ['rule' => $rule->load('room:id,code,capacity'), 'warnings' => [...$conflicts, ...$this->summary($section)['warnings']]];
     }
@@ -60,6 +61,7 @@ class ScheduleRuleService extends BaseService
 
         $conflicts = $this->assertNoConflict($section, (clone $rule)->fill($attributes));
         $rule->update($attributes);
+        $this->regenerateSessions($section);
 
         // BR-TTB-08: sinh viên đã đăng ký bị trùng lịch với lớp khác của họ sau khi đổi
         $found = $this->conflicts->affectedStudents($section);
@@ -76,6 +78,7 @@ class ScheduleRuleService extends BaseService
     {
         $this->assertEditable($rule->section);
         $rule->delete();
+        $this->regenerateSessions($rule->section);
     }
 
     /**
@@ -241,6 +244,12 @@ class ScheduleRuleService extends BaseService
         }
 
         return $found['warn'];
+    }
+
+    /** Lịch đổi thì sinh lại buổi học cụ thể (FR-TTB-005); lấy qua container để tránh phụ thuộc vòng với SessionService. */
+    private function regenerateSessions(CourseSection $section): void
+    {
+        app(SessionService::class)->generate($section);
     }
 
     private function assertEditable(CourseSection $section): void

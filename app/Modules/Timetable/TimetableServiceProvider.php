@@ -6,6 +6,7 @@ use App\Modules\Room\Models\Campus;
 use App\Modules\Room\Models\Room;
 use App\Modules\SchoolClass\Models\CourseSection;
 use App\Modules\Timetable\Contracts\SectionStudents;
+use App\Modules\Timetable\Models\ClassSession;
 use App\Modules\Timetable\Models\Period;
 use App\Modules\Timetable\Models\ScheduleRule;
 use App\Modules\Timetable\Policies\TimetablePolicy;
@@ -27,6 +28,7 @@ class TimetableServiceProvider extends ServiceProvider
     {
         Gate::policy(Period::class, TimetablePolicy::class);
         Gate::policy(ScheduleRule::class, TimetablePolicy::class);
+        Gate::policy(ClassSession::class, TimetablePolicy::class);
 
         $references = app(ReferenceRegistry::class);
         // Dòng lịch / tiết đã xóa không còn ý nghĩa nghiệp vụ nên không tính
@@ -35,5 +37,6 @@ class TimetableServiceProvider extends ServiceProvider
         $references->register(Campus::class, 'periods', 'campus_id', 'khung tiết học riêng của cơ sở', constraint: $notDeleted);
         $references->register(Room::class, 'schedule_rules', 'room_id', 'lịch học', constraint: $notDeleted);
         $references->register(CourseSection::class, 'schedule_rules', 'course_section_id', 'dòng lịch học', constraint: $notDeleted);
+        $references->register(Room::class, 'class_sessions', 'room_id', 'buổi học', constraint: $notDeleted);
     }
 }

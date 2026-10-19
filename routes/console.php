@@ -15,4 +15,7 @@ Schedule::command('exports:prune')->dailyAt('02:00')->withoutOverlapping();
 Schedule::command('users:apply-deactivations')->dailyAt('00:15')->withoutOverlapping();
 
 // Vai trò DEAN theo nhiệm kỳ lãnh đạo đơn vị: sửa dòng vai trò lệch, ghi nhật ký nhiệm kỳ bắt đầu / kết thúc (BR-FAC-06)
+// Ngày nghỉ khai báo sau khi đã sinh buổi học: chuyển buổi trùng ngày nghỉ sang Nghỉ (FR-TTB-009)
+Schedule::command('timetable:apply-holidays')->dailyAt('00:30')->withoutOverlapping();
+
 Schedule::command('faculty:sync-leadership')->dailyAt('00:05')->withoutOverlapping();

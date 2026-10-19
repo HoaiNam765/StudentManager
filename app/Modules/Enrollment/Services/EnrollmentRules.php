@@ -63,7 +63,7 @@ class EnrollmentRules
             $reasons = [...$reasons, ...$this->access->problems($period, $student)];
         }
 
-        $reasons = [...$reasons, ...$this->sectionReasons($section, $period, ! in_array('capacity', $skip, true))];
+        $reasons = [...$reasons, ...$this->sectionReasons($section, $period, ! in_array('capacity', $skip, true), in_array('period', $skip, true))];
 
         $current = $this->currentSections($student, $section, $replacing);
         $passed = $this->record->passedSubjectIds($student);
@@ -122,8 +122,11 @@ class EnrollmentRules
         return array_values(array_unique($reasons));
     }
 
-    /** Lý do thuộc về lớp (không phụ thuộc sinh viên): trạng thái, học kỳ, sĩ số (BR-ENR-05). */
-    public function sectionReasons(CourseSection $section, RegistrationPeriod $period, bool $checkCapacity = true): array
+    /**
+     * Lý do thuộc về lớp (không phụ thuộc sinh viên): trạng thái, học kỳ, sĩ số (BR-ENR-05). `$outsidePeriod` = cán bộ
+     * đăng ký thay ngoài đợt (bỏ qua "period", FR-ENR-009): nhận cả lớp Đóng đăng ký / Đang học.
+     */
+    public function sectionReasons(CourseSection $section, RegistrationPeriod $period, bool $checkCapacity = true, bool $outsidePeriod = false): array
     {
         $reasons = [];
 
@@ -131,7 +134,11 @@ class EnrollmentRules
             $reasons[] = "Lớp {$section->code} không thuộc học kỳ của đợt {$period->name}.";
         }
 
-        if ($section->status !== SectionStatus::RegistrationOpen) {
+        $accepted = $outsidePeriod
+            ? [SectionStatus::RegistrationOpen, SectionStatus::RegistrationClosed, SectionStatus::InProgress]
+            : [SectionStatus::RegistrationOpen];
+
+        if (! in_array($section->status, $accepted, true)) {
             $reasons[] = "Lớp {$section->code} đang ở trạng thái {$section->status->label()}, chưa / không còn mở đăng ký. Chọn lớp khác của học phần.";
         }
 

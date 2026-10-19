@@ -6,10 +6,13 @@ use App\Models\User;
 use App\Modules\AcademicYear\Models\MilestoneType;
 use App\Modules\AcademicYear\Services\MilestoneService;
 use App\Modules\Enrollment\Enums\EnrollmentStatus;
+use App\Modules\Enrollment\Enums\PeriodStatus;
+use App\Modules\Enrollment\Events\EnrollmentAdjusted;
 use App\Modules\Enrollment\Models\Enrollment;
 use App\Modules\Enrollment\Models\RegistrationPeriod;
 use App\Modules\SchoolClass\Models\CourseSection;
 use App\Modules\Student\Models\Student;
+use App\Support\Audit\AuditLogger;
 use App\Support\Exceptions\BusinessRuleException;
 use App\Support\Services\BaseService;
 use Carbon\CarbonImmutable;
@@ -34,6 +37,7 @@ class EnrollmentService extends BaseService
         private readonly EnrollmentRules $rules,
         private readonly RegistrationAccess $access,
         private readonly MilestoneService $milestones,
+        private readonly AuditLogger $audit,
     ) {}
 
     public function register(
@@ -53,18 +57,51 @@ class EnrollmentService extends BaseService
                 $period ??= $this->periodFor($student, $section);
 
                 $this->assertAllowed($this->rules->check($student, $section, $period, $type, null, $skip));
+                $enrollment = $this->create($student, $section, $period, $type, $actor, $skip !== [] ? $overrideReason : null);
 
-                return $this->create($student, $section, $period, $type, $actor, $skip !== [] ? $overrideReason : null);
+                // Sau khi chốt, cán bộ đăng ký thay: đồng bộ sang FEE (BR-ENR-08)
+                if ($enrollment->status === EnrollmentStatus::Confirmed) {
+                    EnrollmentAdjusted::dispatch($enrollment, 'register', (string) $overrideReason);
+                }
+
+                return $enrollment;
             });
         });
     }
 
-    /** Hủy trong thời hạn đăng ký: giải phóng chỗ (FR-ENR-005). */
-    public function cancel(Enrollment $enrollment, ?User $actor = null, ?string $ip = null, bool $staff = false): Enrollment
+    /**
+     * Hủy trong thời hạn đăng ký: giải phóng chỗ (FR-ENR-005). Sau khi chốt, sinh viên không tự hủy được; cán bộ
+     * (`$staff`) hủy cả đăng ký Đã chốt, bắt buộc lý do, ghi nhật ký và đồng bộ FEE (BR-ENR-08, FR-ENR-009).
+     */
+    public function cancel(Enrollment $enrollment, ?User $actor = null, ?string $ip = null, bool $staff = false, ?string $reason = null): Enrollment
     {
-        return $this->attempt('cancel', $enrollment->student, $enrollment->section, $actor, $ip, function () use ($enrollment, $staff): Enrollment {
-            return $this->transaction(function () use ($enrollment, $staff): Enrollment {
+        return $this->attempt('cancel', $enrollment->student, $enrollment->section, $actor, $ip, function () use ($enrollment, $staff, $reason): Enrollment {
+            return $this->transaction(function () use ($enrollment, $staff, $reason): Enrollment {
                 $enrollment = Enrollment::query()->lockForUpdate()->findOrFail($enrollment->id);
+
+                if ($enrollment->status === EnrollmentStatus::Confirmed && ! $staff) {
+                    $this->fail('Đăng ký học kỳ này đã chốt nên bạn không tự hủy được (BR-ENR-08).', 'Rút học phần trong hạn rút, hoặc liên hệ Phòng Đào tạo để xử lý kèm lý do.');
+                }
+
+                if ($staff) {
+                    if (trim((string) $reason) === '') {
+                        $this->fail('Cán bộ hủy đăng ký thay phải ghi lý do.', 'Nhập lý do hủy (FR-ENR-009, BR-ENR-08).');
+                    }
+
+                    if (! in_array($enrollment->status, [EnrollmentStatus::Registered, EnrollmentStatus::Confirmed], true)) {
+                        $this->assertTransition($enrollment, EnrollmentStatus::Cancelled);
+                    }
+
+                    $wasConfirmed = $enrollment->status === EnrollmentStatus::Confirmed;
+                    $this->audit->withReason("Hủy đăng ký thay: {$reason}", fn () => $enrollment->update(['status' => EnrollmentStatus::Cancelled, 'cancelled_at' => $this->access->now()]));
+
+                    if ($wasConfirmed) {
+                        EnrollmentAdjusted::dispatch($enrollment, 'cancel', $reason);
+                    }
+
+                    return $enrollment;
+                }
+
                 $this->assertTransition($enrollment, EnrollmentStatus::Cancelled);
 
                 if (! $staff && ! $this->canCancelNow($enrollment)) {
@@ -176,7 +213,7 @@ class EnrollmentService extends BaseService
                 'subject_id' => $section->subject_id,
                 'registration_period_id' => $period->id,
                 'type' => $type,
-                'status' => EnrollmentStatus::Registered,
+                'status' => $this->isFinalized($section->term_id) ? EnrollmentStatus::Confirmed : EnrollmentStatus::Registered,
                 'source' => $actor !== null && $actor->id !== $student->user_id ? 'staff' : 'student',
                 'registered_at' => $this->access->now(),
                 'override_reason' => $overrideReason,
@@ -189,6 +226,12 @@ class EnrollmentService extends BaseService
 
             throw $e;
         }
+    }
+
+    /** Học kỳ đã chốt đăng ký (#113): có đợt ở trạng thái Đã chốt. */
+    public function isFinalized(int $termId): bool
+    {
+        return RegistrationPeriod::query()->where('term_id', $termId)->where('status', PeriodStatus::Finalized)->exists();
     }
 
     /** Đợt đang mở cho sinh viên ở học kỳ của lớp; cán bộ đăng ký thay ngoài đợt dùng đợt gần nhất của học kỳ. */

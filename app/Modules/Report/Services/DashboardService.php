@@ -95,8 +95,7 @@ class DashboardService
                 $range['from'],
                 $range['to']
             ),
-            fn (array $session): bool =>
-                $session['date'] === $today
+            fn (array $session): bool => $session['date'] === $today
         ));
     }
 }

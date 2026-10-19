@@ -5,10 +5,10 @@ use App\Http\Controllers\Pages\Student\RegistrationPageController;
 use App\Modules\Enrollment\Http\Controllers\EnrollmentController;
 use App\Modules\Enrollment\Http\Controllers\EnrollmentResultController;
 use App\Modules\Enrollment\Http\Controllers\RegistrationOptionsController;
+use App\Modules\Report\Http\Controllers\DashboardDataController;
 use App\Modules\Student\Http\Controllers\StudentSelfController;
 use App\Modules\Timetable\Http\Controllers\TimetableController;
 use Illuminate\Support\Facades\Route;
-use App\Modules\Report\Http\Controllers\DashboardDataController;
 
 /*
 |--------------------------------------------------------------------------

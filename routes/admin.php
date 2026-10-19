@@ -416,6 +416,7 @@ Route::middleware('auth')->group(function (): void {
     Route::get('admin-classes/missing-advisors', [AdminClassRosterController::class, 'missingAdvisors'])->middleware('permission:CLS.view')->name('admin-classes.missing-advisors');
     Route::post('admin-classes/auto-placement/preview', [AdminClassRosterController::class, 'previewAutomaticPlacement'])->middleware('permission:CLS.update,ALL')->name('admin-classes.auto-placement.preview');
     Route::post('admin-classes/auto-placement', [AdminClassRosterController::class, 'assignAutomatically'])->middleware('permission:CLS.update,ALL')->name('admin-classes.auto-placement');
+    Route::get('admin-classes/{adminClass}/members/export', [AdminClassRosterController::class, 'exportMembers'])->whereNumber('adminClass')->middleware('permission:CLS.export')->name('admin-classes.members.export');
     Route::get('admin-classes/{adminClass}/members', [AdminClassRosterController::class, 'members'])->whereNumber('adminClass')->middleware('permission:CLS.view')->name('admin-classes.members.index');
     Route::post('admin-classes/{adminClass}/members/preview', [AdminClassRosterController::class, 'previewAssignment'])->whereNumber('adminClass')->middleware('permission:CLS.update,ALL')->name('admin-classes.members.preview');
     Route::post('admin-classes/{adminClass}/members', [AdminClassRosterController::class, 'assign'])->whereNumber('adminClass')->middleware('permission:CLS.update,ALL')->name('admin-classes.members.store');

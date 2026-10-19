@@ -6,6 +6,7 @@ use App\Modules\Teacher\Http\Controllers\LecturerProfileController;
 use App\Modules\Teacher\Http\Controllers\LecturerScheduleController;
 use App\Modules\Timetable\Http\Controllers\TimetableController;
 use Illuminate\Support\Facades\Route;
+use App\Modules\Report\Http\Controllers\DashboardDataController;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,4 +47,9 @@ Route::middleware('auth')->group(function (): void {
     Route::get('leaves', [LecturerScheduleController::class, 'myLeaves'])->name('leaves.index');
     Route::post('leaves', [LecturerScheduleController::class, 'storeLeave'])->name('leaves.store');
     Route::post('leaves/{lecturerLeave}/cancel', [LecturerScheduleController::class, 'cancelLeave'])->name('leaves.cancel');
+
+    Route::get(
+        '/dashboard/data',
+        [DashboardDataController::class, 'teacher']
+    )->name('dashboard.data');
 });

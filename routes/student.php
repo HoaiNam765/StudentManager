@@ -8,6 +8,7 @@ use App\Modules\Enrollment\Http\Controllers\RegistrationOptionsController;
 use App\Modules\Student\Http\Controllers\StudentSelfController;
 use App\Modules\Timetable\Http\Controllers\TimetableController;
 use Illuminate\Support\Facades\Route;
+use App\Modules\Report\Http\Controllers\DashboardDataController;
 
 /*
 |--------------------------------------------------------------------------
@@ -55,4 +56,9 @@ Route::middleware('auth')->group(function (): void {
     // Trang giao diện gọi các API ở trên (docs/fe-be-mapping.md, nhóm a); cùng quyền với API chính của trang
     Route::get('/dang-ky-hoc-phan', [RegistrationPageController::class, 'index'])->middleware('permission:ENR.view')->name('pages.registration');
     Route::get('/ket-qua-dang-ky', [RegistrationPageController::class, 'result'])->middleware('permission:ENR.view')->name('pages.registration-result');
+
+    Route::get(
+        '/dashboard/data',
+        [DashboardDataController::class, 'student']
+    )->name('dashboard.data');
 });

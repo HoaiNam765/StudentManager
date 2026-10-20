@@ -17,7 +17,16 @@ use App\Modules\Subject\Services\GradeStructureService;
 use App\Support\Services\BaseService;
 use Illuminate\Support\Collection;
 
-/** FR-GRD-001/002; BR-GRD-05/10. Mọi kiểm tra nhạy cảm ở máy chủ, ghi trong transaction. */
+/**
+ * Cơ cấu điểm lớp học phần và nhập điểm thành phần (FR-GRD-001, 002; BR-GRD-05, 10).
+ *
+ * - Lớp kế thừa cơ cấu điểm của học phần (`initialize`); được điều chỉnh trong giới hạn của GradeStructureService
+ *   (`replaceStructure`, phiên bản cũ xóa mềm) khi lớp chưa khóa / hủy và **chưa có điểm**.
+ * - Chỉ giảng viên được phân công lớp nhập điểm, chỉ cho đăng ký còn hiệu lực; lớp đang học hoặc đã kết thúc.
+ * - Điểm trong khoảng `config('grades.min_score')`–`max_score`, theo bước `score_step` (mặc định 0,1); để trống = chưa có
+ *   điểm (không tự cho 0). Thiếu điểm thành phần bắt buộc → "chưa đủ dữ liệu".
+ * Mọi kiểm tra ở máy chủ, ghi trong giao dịch; từng điểm lưu qua Eloquent nên có nhật ký kiểm toán.
+ */
 class GradebookService extends BaseService
 {
     public function __construct(
@@ -39,7 +48,8 @@ class GradebookService extends BaseService
 
     public function authorizeGrading(CourseSection $section, User $user): void
     {
-        $this->authorizeStructure($section, $user);
+        abort_unless($this->access->allowsOn($user, 'GRD', PermissionAction::Update, $section), 403,
+            'Bạn không có quyền nhập điểm lớp này. Chỉ giảng viên được phân công lớp mới nhập điểm (BR-GRD-05).');
         // Quyền GRD.update phạm vi ALL KHÔNG thay thế điều kiện giảng viên thực sự được phân công.
         abort_unless(SectionInstructor::query()
             ->where('course_section_id', $section->id)

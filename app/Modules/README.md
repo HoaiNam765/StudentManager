@@ -353,6 +353,12 @@ $resolver->setFor($khoa, $ngay)->code;            // bộ quy chế đang áp d�
 - Chưa làm (issue sau): lịch bận giảng viên khi xếp lịch (FR-TTB-010).
 - API: `GET /admin/periods[?campus_id=]` (TTB.view), `POST|PUT|DELETE /admin/periods` (ACAD); `GET /admin/course-sections/{id}/schedule` (TTB.view theo phạm vi lớp: DEAN khoa mình, LEC lớp mình dạy), `POST /admin/course-sections/{id}/schedule`, `PUT|DELETE /admin/schedule-rules/{id}` (TTB toàn trường — ACAD; chữ C của DEAN, LEC ở ma trận TTB là đề xuất, không tự xếp lịch).
 
+## Điểm — cơ cấu lớp và điểm thành phần (GRD, FR-GRD-001, 002; BR-GRD-05, 10)
+
+- `section_grade_components` (kế thừa `grade_component_templates` của học phần, có `version`; sửa cơ cấu = phiên bản mới, bản cũ xóa mềm; khóa khi lớp đã có điểm), `grade_entries` (đăng ký – thành phần – điểm, `draft` / `missing`, CHECK 0–10).
+- `GradebookService`: `initialize`, `replaceStructure` (GRD.update trên lớp), `saveDraft` (chỉ giảng viên được phân công, lớp Đang học / Kết thúc, đăng ký còn hiệu lực, khoảng và bước điểm theo `config/grades.php`), `gradebook` (lưới điểm, "chưa đủ dữ liệu" khi thiếu thành phần bắt buộc).
+- API cổng giảng viên: `/teacher/course-sections/{id}/gradebook`, `grade-components/initialize`, `PUT grade-components`, `POST grades`, `GET grades/template` (mẫu Excel), `POST grades/import`.
+
 ## Đăng ký học phần (ENR, FR-ENR-001, 002; BR-ENR-01, 11)
 
 - Đợt đăng ký `registration_periods`: học kỳ, vòng (vòng 1 / vòng 2 / bổ sung), mở – đóng (nhập giờ Việt Nam, lưu UTC; không nhập thì lấy mốc "Mở đăng ký" 00:00 và "Đóng đăng ký" 23:59 trong lịch học vụ ACY), khung tín chỉ riêng (trống = theo quy chế, #104), trạng thái nháp → công bố → đã chốt (#113). Đối tượng `registration_period_targets`: mỗi dòng một tổ hợp khóa / ngành / lớp hành chính, không có dòng nào = mọi sinh viên.

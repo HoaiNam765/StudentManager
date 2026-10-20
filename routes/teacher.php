@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Modules\Grade\Http\Controllers\GradebookController;
+use App\Modules\Grade\Http\Controllers\GradeResultController;
 use App\Modules\SchoolClass\Http\Controllers\TeacherClassRosterController;
 use App\Modules\Teacher\Http\Controllers\LecturerProfileController;
 use App\Modules\Teacher\Http\Controllers\LecturerScheduleController;
@@ -93,4 +94,11 @@ Route::middleware('auth')->group(function (): void {
                 ->middleware('permission:GRD.update')
                 ->name('import');
         });
+
+    Route::get(
+        'enrollments/{enrollment}/grade-result',
+        [GradeResultController::class, 'show']
+    )
+        ->middleware('permission:GRD.view')
+        ->name('grade-result.show');
 });

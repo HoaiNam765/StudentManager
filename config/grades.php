@@ -8,15 +8,8 @@ return [
     'import_max_rows' => (int) env('GRD_IMPORT_MAX_ROWS', 5000),
     'import_max_kb' => (int) env('GRD_IMPORT_MAX_KB', 10240),
 
+    // BR-GRD-02: số chữ số thập phân khi làm tròn điểm học phần. Thang quy đổi chữ / hệ 4 và điểm đạt nằm trong bộ quy chế
+    // theo khóa (grading.scale, grading.pass_score — PolicyResolver), không đặt ở đây.
     'round_digits' => (int) env('GRD_ROUND_DIGITS', 1),
-    'pass_score' => (float) env('GRD_PASS_SCORE', 4.0),
-
-    'default_scale' => [
-        ['min' => 8.5, 'letter' => 'A', 'point4' => 4.0],
-        ['min' => 7.0, 'letter' => 'B', 'point4' => 3.0],
-        ['min' => 5.5, 'letter' => 'C', 'point4' => 2.0],
-        ['min' => 4.0, 'letter' => 'D', 'point4' => 1.0],
-        ['min' => 0.0, 'letter' => 'F', 'point4' => 0.0],
-    ],
 
 ];

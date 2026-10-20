@@ -5,13 +5,21 @@ namespace App\Modules\Grade\Services;
 use App\Modules\Enrollment\Models\Enrollment;
 use App\Modules\Grade\Models\CourseResult;
 use App\Modules\Grade\Models\GradeEntry;
-use App\Modules\Grade\Models\GradeScale;
 use App\Modules\Grade\Models\SectionGradeComponent;
+use App\Modules\System\Services\PolicyResolver;
 use App\Support\Services\BaseService;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Tính điểm học phần (BR-GRD-01..03, 11; UAT-07): tổng (điểm thành phần × trọng số), làm tròn `grades.round_digits`
+ * (mặc định 1 chữ số, nửa lên); quy đổi chữ / hệ 4 theo `grading.scale` và đạt khi ≥ `grading.pass_score` của bộ quy
+ * chế áp dụng cho khóa sinh viên, đồng thời đạt điểm sàn các thành phần bắt buộc (trượt sàn → F). Thiếu thành phần bắt
+ * buộc → `incomplete`. Học phần Đạt / Không đạt chỉ trả đạt hay không, không có điểm số.
+ */
 class CourseGradeService extends BaseService
 {
+    public function __construct(private readonly PolicyResolver $policies) {}
+
     public function calculate(Enrollment $enrollment): array
     {
         $enrollment->loadMissing('student', 'section.subject');
@@ -85,7 +93,8 @@ class CourseGradeService extends BaseService
         $digits = (int) config('grades.round_digits', 1);
         $score10 = round($total, $digits, PHP_ROUND_HALF_UP);
 
-        $passScore = (float) config('grades.pass_score', 4.0);
+        $cohort = (int) $enrollment->student->cohort;
+        $passScore = (float) $this->policies->value('grading.pass_score', $cohort);
         $passed = $score10 >= $passScore && $floorPassed;
 
         // Học phần đánh giá Đạt/Không đạt không có
@@ -100,31 +109,16 @@ class CourseGradeService extends BaseService
             ];
         }
 
-        $cohort = (int) $enrollment->student->cohort;
-
-        $scale = GradeScale::query()
-            ->where('cohort', $cohort)
-            ->orderByDesc('min_score')
-            ->get();
-
-        // Nếu khóa chưa có thang riêng, dùng thang mặc định.
-        if ($scale->isEmpty()) {
-            $scale = collect(config('grades.default_scale'))
-                ->map(fn ($row) => (object) [
-                    'min_score' => $row['min'],
-                    'letter' => $row['letter'],
-                    'point4' => $row['point4'],
-                ]);
-        }
-
-        $grade = $scale->first(
-            fn ($row) => $score10 >= (float) $row->min_score
-        );
+        // Thang quy đổi của bộ quy chế áp dụng cho khóa (mặc định phụ lục C: A 8,5 / B 7,0 / C 5,5 / D 4,0 / F)
+        $grade = collect((array) $this->policies->value('grading.scale', $cohort))
+            ->sortByDesc(fn (array $band) => (float) $band['min'])
+            ->map(fn (array $band) => (object) ['min_score' => (float) $band['min'], 'letter' => $band['letter'], 'point4' => (float) $band['gpa']])
+            ->first(fn (object $band) => $score10 >= $band->min_score);
 
         if (! $grade) {
             $this->fail(
-                'Không có mức quy đổi phù hợp.',
-                'Kiểm tra bảng GradeScale của khóa học.'
+                "Không có mức quy đổi cho điểm {$score10}.",
+                'Kiểm tra thang quy đổi (grading.scale) trong bộ quy chế áp dụng cho khóa '.$cohort.'.'
             );
         }
 

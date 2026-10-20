@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Modules\Grade\Http\Controllers\GradebookController;
 use App\Modules\Grade\Http\Controllers\GradeResultController;
+use App\Modules\Report\Http\Controllers\DashboardDataController;
 use App\Modules\SchoolClass\Http\Controllers\TeacherClassRosterController;
 use App\Modules\Teacher\Http\Controllers\LecturerProfileController;
 use App\Modules\Teacher\Http\Controllers\LecturerScheduleController;
@@ -101,4 +102,9 @@ Route::middleware('auth')->group(function (): void {
     )
         ->middleware('permission:GRD.view')
         ->name('grade-result.show');
+
+    Route::get(
+        '/dashboard/data',
+        [DashboardDataController::class, 'teacher']
+    )->name('dashboard.data');
 });

@@ -139,6 +139,11 @@ return [
         'max_periods_per_term' => (int) env('SECTION_MAX_PERIODS_PER_TERM', 400),
     ],
 
+    // Dashboard sinh viên / giảng viên (FR-RPT-009, 010): hiện các hạn chót trong số ngày tới
+    'dashboard' => [
+        'deadline_days' => (int) env('DASHBOARD_DEADLINE_DAYS', 30),
+    ],
+
     // Đăng ký học phần (ENR): khung tín chỉ riêng (BR-ENR-02; khung thường tính từ quy chế registration.load_*_ratio),
     // cùng học phần hai lớp (BR-ENR-04), chặn khi nợ quá hạn (BR-ENR-09)
     'enrollment' => [

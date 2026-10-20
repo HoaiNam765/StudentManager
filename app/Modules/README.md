@@ -359,6 +359,11 @@ $resolver->setFor($khoa, $ngay)->code;            // bộ quy chế đang áp d�
 - `GradebookService`: `initialize`, `replaceStructure` (GRD.update trên lớp), `saveDraft` (chỉ giảng viên được phân công, lớp Đang học / Kết thúc, đăng ký còn hiệu lực, khoảng và bước điểm theo `config/grades.php`), `gradebook` (lưới điểm, "chưa đủ dữ liệu" khi thiếu thành phần bắt buộc).
 - API cổng giảng viên: `/teacher/course-sections/{id}/gradebook`, `grade-components/initialize`, `PUT grade-components`, `POST grades`, `GET grades/template` (mẫu Excel), `POST grades/import`.
 
+## Dashboard sinh viên, giảng viên (RPT, FR-RPT-009, 010; FR-TCH-009)
+
+- `DashboardService` (chỉ dữ liệu của chính mình): lịch hôm nay từ buổi học cụ thể khi thời khóa biểu đã công bố; hạn chót = mốc lịch học vụ sắp tới trong `studentmanager.dashboard.deadline_days` ngày (sinh viên: đăng ký, hủy, rút, học phí, thi, công bố điểm + hạn đóng đợt đăng ký đang mở; giảng viên: bắt đầu / kết thúc giảng dạy, thi, hạn nhập điểm, công bố điểm); giảng viên có danh sách lớp đang trong giai đoạn nhập điểm. GPA / tín chỉ (GRD #125) và thông báo (NOT) trả `null` / rỗng tới khi có.
+- API `GET /student/dashboard/data`, `GET /teacher/dashboard/data`.
+
 ## Đăng ký học phần (ENR, FR-ENR-001, 002; BR-ENR-01, 11)
 
 - Đợt đăng ký `registration_periods`: học kỳ, vòng (vòng 1 / vòng 2 / bổ sung), mở – đóng (nhập giờ Việt Nam, lưu UTC; không nhập thì lấy mốc "Mở đăng ký" 00:00 và "Đóng đăng ký" 23:59 trong lịch học vụ ACY), khung tín chỉ riêng (trống = theo quy chế, #104), trạng thái nháp → công bố → đã chốt (#113). Đối tượng `registration_period_targets`: mỗi dòng một tổ hợp khóa / ngành / lớp hành chính, không có dòng nào = mọi sinh viên.

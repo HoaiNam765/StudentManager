@@ -5,10 +5,12 @@ namespace App\Modules\Grade\Services;
 use App\Models\User;
 use App\Modules\Auth\Enums\PermissionAction;
 use App\Modules\Auth\Services\AccessControl;
+use App\Modules\Enrollment\Models\Enrollment;
 use App\Modules\Grade\Enums\GradePublicationStatus as Status;
 use App\Modules\Grade\Events\GradesPublished;
 use App\Modules\Grade\Models\SectionGradeWorkflow;
 use App\Modules\SchoolClass\Models\CourseSection;
+use App\Modules\Student\Models\Student;
 use App\Support\Services\BaseService;
 use Illuminate\Validation\ValidationException;
 
@@ -24,6 +26,7 @@ class GradeWorkflowService extends BaseService
     public function change(CourseSection $section, User $actor, Status $next, ?string $reason = null, ?string $schedule = null): SectionGradeWorkflow
     {
         $this->authorizeStep($section, $actor, $next);
+
         return $this->transaction(function () use ($section, $actor, $next, $reason, $schedule) {
             $workflow = $this->current($section);
             $workflow = SectionGradeWorkflow::query()->lockForUpdate()->findOrFail($workflow->id);
@@ -41,6 +44,7 @@ class GradeWorkflowService extends BaseService
                 $workflow->actor_id = $actor->id;
                 $workflow->return_reason = null;
                 $workflow->save();
+
                 return $workflow;
             }
             $workflow->status = $next;
@@ -55,6 +59,7 @@ class GradeWorkflowService extends BaseService
                 GradesPublished::dispatch($section->id, $actor->id);
                 $this->recalculateGpaForSection($section->id);
             }
+
             return $workflow;
         });
     }
@@ -80,12 +85,13 @@ class GradeWorkflowService extends BaseService
                     });
                 }
             });
+
         return $count;
     }
 
     private function recalculateGpaForSection(int $sectionId): void
     {
-        $studentIds = \App\Modules\Enrollment\Models\Enrollment::query()
+        $studentIds = Enrollment::query()
             ->where('course_section_id', $sectionId)
             ->active()
             ->pluck('student_id')
@@ -93,7 +99,7 @@ class GradeWorkflowService extends BaseService
 
         if ($studentIds->isNotEmpty()) {
             $gpaService = app(GpaService::class);
-            foreach (\App\Modules\Student\Models\Student::whereIn('id', $studentIds)->cursor() as $student) {
+            foreach (Student::whereIn('id', $studentIds)->cursor() as $student) {
                 $gpaService->recalculate($student);
             }
         }
@@ -104,16 +110,19 @@ class GradeWorkflowService extends BaseService
         $lecturer = in_array($next, [Status::Submitted, Status::Draft], true);
         if ($lecturer) {
             $this->gradebook->authorizeGrading($section, $actor);
+
             return;
         }
         if ($next === Status::FacultyApproved) {
             abort_unless($actor->hasRole('DEAN') && $this->access->allowsOn($actor, 'GRD', PermissionAction::Approve, $section), 403, 'Chỉ người có vai trò DEAN và quyền duyệt đúng phạm vi khoa mới được thực hiện.');
+
             return;
         }
         if ($next === Status::Returned) {
             $isDean = $actor->hasRole('DEAN') && $this->access->allowsOn($actor, 'GRD', PermissionAction::Approve, $section);
             $isAcadExam = ($actor->hasRole('ACAD') || $actor->hasRole('EXAM')) && $this->access->allowsGlobally($actor, 'GRD', PermissionAction::Approve);
             abort_unless($isDean || $isAcadExam, 403, 'Chỉ lãnh đạo Khoa hoặc phòng Đào tạo/Khảo thí mới có quyền trả lại điểm.');
+
             return;
         }
         abort_unless(($actor->hasRole('ACAD') || $actor->hasRole('EXAM')) && $this->access->allowsGlobally($actor, 'GRD', PermissionAction::Approve), 403, 'Chỉ phòng Đào tạo hoặc Khảo thí có quyền GRD.approve toàn trường được thực hiện.');

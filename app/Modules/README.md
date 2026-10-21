@@ -395,6 +395,12 @@ $resolver->setFor($khoa, $ngay)->code;            // bộ quy chế đang áp d�
 - Mọi chỉ số đọc thẳng từ bảng nghiệp vụ và lọc theo phạm vi **RPT.view** (`AccessControl::constrain`): lãnh đạo khoa chỉ thấy dữ liệu khoa mình. Mỗi widget có `definition` công bố (BR-RPT-07); trang tự làm mới sau `studentmanager.dashboard.refresh_seconds` (mặc định 300). Học kỳ hiện hành: học kỳ ACAD đặt, không có thì theo ngày.
 - API `GET /admin/dashboard/data` (RPT.view), trang `admin.home` (`admin/dashboard.blade.php`; mẫu FE cũ giữ ở `admin/admin-dashboard.blade.php`). Dashboard sinh viên / giảng viên (#121) nay có GPA từng kỳ, GPA / tín chỉ tích lũy, tín chỉ còn thiếu theo CTĐT và thông báo chưa đọc.
 
+## Dữ liệu demo (SYS, FR-SYS-016; BR-SYS-10; NFR-DAT-02)
+
+- `php artisan migrate:fresh --seed` (dữ liệu mẫu của các module) rồi `php artisan demo:seed` (`DemoDataSeeder`, khoảng 4 phút). Cả hai **không chạy ở production**: `demo:seed` từ chối; `DatabaseSeeder` bỏ qua tài khoản dùng thử (`DevUserSeeder`, `DevRoleUsersSeeder`). Chạy `demo:seed` lần hai thì bỏ qua (đã có năm học 2025-2026); cả lần chạy trong một giao dịch nên lỗi giữa chừng không để lại dữ liệu dở dang.
+- Kết quả: 300 sinh viên (khóa 2025 và 2026, mỗi ngành 25 / khóa; `Student::factory()` dùng Faker vi_VN, CCCD giả `0993…`, email `example.test`), nhập học qua `AdmissionService` (MSSV, tài khoản, CTĐT, lớp hành chính). Năm học 2025–2026 hai học kỳ **đã khóa** (lớp theo CTĐT, chia lớp khi quá 80 sinh viên, điểm công bố + khóa, GPA đã tính); học kỳ 1 2026–2027 **đang diễn ra** (đăng ký đã chốt, đang nhập điểm, hai lớp đã nộp). Tình huống đặc biệt: học lại, học lực yếu (bị cảnh báo), vắng thi không lý do, bảo lưu. Nợ học phí, vắng quá ngưỡng chờ FEE, ATT.
+- Chỉ trong dữ liệu demo: CTĐT mẫu đổi `cohort_from` từ 2026 về 2025 để khóa 2025 nhập học được. Mật khẩu sinh viên demo = `DevRoleUsersSeeder::PASSWORD`, đăng nhập bằng MSSV.
+
 ## Đăng ký học phần (ENR, FR-ENR-001, 002; BR-ENR-01, 11)
 
 - Đợt đăng ký `registration_periods`: học kỳ, vòng (vòng 1 / vòng 2 / bổ sung), mở – đóng (nhập giờ Việt Nam, lưu UTC; không nhập thì lấy mốc "Mở đăng ký" 00:00 và "Đóng đăng ký" 23:59 trong lịch học vụ ACY), khung tín chỉ riêng (trống = theo quy chế, #104), trạng thái nháp → công bố → đã chốt (#113). Đối tượng `registration_period_targets`: mỗi dòng một tổ hợp khóa / ngành / lớp hành chính, không có dòng nào = mọi sinh viên.

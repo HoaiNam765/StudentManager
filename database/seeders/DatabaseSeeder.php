@@ -40,6 +40,13 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(self::MODULE_SEEDERS);
 
+        // Tài khoản dùng thử có mật khẩu biết trước: chỉ ở môi trường không phải production (BR-SYS-10)
+        if (app()->isProduction()) {
+            $this->command?->warn('Môi trường production: bỏ qua tài khoản dùng thử (DevUserSeeder, DevRoleUsersSeeder).');
+
+            return;
+        }
+
         // Chạy sau seeder của module để tài khoản dùng thử được gán vai trò ADMIN
         $this->call(DevUserSeeder::class);
 

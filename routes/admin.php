@@ -18,6 +18,7 @@ use App\Modules\Enrollment\Http\Controllers\SectionEnrollmentController;
 use App\Modules\Enrollment\Http\Controllers\StaffEnrollmentController;
 use App\Modules\Faculty\Http\Controllers\LeadershipController;
 use App\Modules\Faculty\Http\Controllers\UnitController;
+use App\Modules\Grade\Http\Controllers\GradeWorkflowController;
 use App\Modules\Room\Http\Controllers\FacilityController;
 use App\Modules\Room\Http\Controllers\RoomController;
 use App\Modules\SchoolClass\Http\Controllers\AdminClassController;
@@ -480,6 +481,12 @@ Route::middleware('auth')->group(function (): void {
     Route::get('terms/{term}/registration/finalize', [StaffEnrollmentController::class, 'preview'])->middleware('permission:ENR.approve,ALL')->name('terms.registration.finalize-preview');
     Route::post('terms/{term}/registration/finalize', [StaffEnrollmentController::class, 'finalize'])->middleware('permission:ENR.approve,ALL')->name('terms.registration.finalize');
     Route::get('students/{student}/registration-options', [RegistrationOptionsController::class, 'forStudent'])->whereNumber('student')->middleware('permission:ENR.view')->name('students.registration-options');
+
+    // Duyệt và công bố điểm (GRD, FR-GRD-004, 005): xem theo phạm vi GRD.view; duyệt khoa = DEAN, xác nhận / công bố /
+    // khóa = ACAD, EXAM (GRD.approve toàn trường); trả lại = khoa hoặc phòng — kiểm tra từng bước trong GradeWorkflowService
+    Route::get('grade-workflows', [GradeWorkflowController::class, 'index'])->middleware('permission:GRD.view')->name('grade-workflows.index');
+    Route::get('course-sections/{courseSection}/grade-workflow', [GradeWorkflowController::class, 'show'])->whereNumber('courseSection')->middleware('permission:GRD.view')->name('course-sections.grade-workflow.show');
+    Route::post('course-sections/{courseSection}/grade-workflow', [GradeWorkflowController::class, 'change'])->whereNumber('courseSection')->middleware('permission:GRD.approve')->name('course-sections.grade-workflow.change');
 
     // Thời khóa biểu (TTB, FR-TTB-001, 002): khung tiết xem = TTB.view, sửa = ACAD (TTB toàn trường);
     // mẫu lịch lớp học phần: xem theo phạm vi lớp (DEAN, LEC), thêm / sửa / xóa chỉ ACAD — kiểm tra trong ScheduleRuleController.

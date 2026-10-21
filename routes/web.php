@@ -1,11 +1,13 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\Pages\NotificationPageController;
 use App\Modules\Auth\Http\Controllers\LoginController;
 use App\Modules\Auth\Http\Controllers\PasswordController;
 use App\Modules\Auth\Http\Controllers\PasswordResetController;
 use App\Modules\Auth\Http\Controllers\SessionController;
 use App\Modules\Auth\Services\PortalResolver;
+use App\Modules\Notification\Http\Controllers\NotificationController;
 use App\Modules\System\Http\Controllers\LookupOptionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -61,3 +63,12 @@ Route::middleware(['auth', 'password.changed'])->prefix('danh-muc')->name('looku
 if (app()->environment('local')) {
     require __DIR__.'/fe-preview.php';
 }
+
+// Trung tâm thông báo dùng chung cho mọi cổng (NOT, FR-NOT-001): chỉ thông báo của chính người dùng (BR-NOT-01)
+Route::middleware(['auth', 'password.changed', 'permission:NOT.view'])->group(function (): void {
+    Route::get('/thong-bao', [NotificationPageController::class, 'index'])->name('notifications.page');
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unread-count');
+    Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
+    Route::post('/notifications/{notification}/read', [NotificationController::class, 'read'])->whereNumber('notification')->name('notifications.read');
+});

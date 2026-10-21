@@ -9,6 +9,7 @@ use App\Modules\Enrollment\Enums\EnrollmentStatus;
 use App\Modules\Enrollment\Models\Enrollment;
 use App\Modules\Grade\Models\GradeEntry;
 use App\Modules\Grade\Models\SectionGradeComponent;
+use App\Modules\Grade\Models\SectionGradeWorkflow;
 use App\Modules\SchoolClass\Enums\SectionStatus;
 use App\Modules\SchoolClass\Models\CourseSection;
 use App\Modules\SchoolClass\Models\SectionInstructor;
@@ -147,6 +148,13 @@ class GradebookService extends BaseService
         return $this->transaction(function () use ($section, $items): int {
             $locked = CourseSection::query()->lockForUpdate()->findOrFail($section->id);
             $this->assertGradingOpen($locked);
+            $workflow = SectionGradeWorkflow::where('course_section_id', $locked->id)->first();
+            if ($workflow) {
+                $statusVal = $workflow->status instanceof \BackedEnum ? $workflow->status->value : (string) $workflow->status;
+                if (! in_array($statusVal, ['draft', 'returned'], true)) {
+                    $this->fail('Điểm đã được nộp hoặc công bố, không thể sửa trực tiếp.', 'Yêu cầu trả lại trước công bố hoặc sử dụng quy trình điều chỉnh điểm sau công bố.');
+                }
+            }
             $components = $this->components($locked)->keyBy('id');
             if ($components->isEmpty()) {
                 $this->fail('Lớp chưa có cơ cấu điểm.', 'Khởi tạo cơ cấu điểm lớp học phần trước khi nhập.');

@@ -67,6 +67,7 @@ class NotificationController extends Controller
             'sent_at' => $n->sent_at?->toIso8601String(),
             'expires_at' => $n->expires_at?->toIso8601String(),
             'read_at' => $row->read_at?->toIso8601String(),
+            'attachment' => $n->attachment_name ? ['name' => $n->attachment_name, 'url' => route('notifications.attachment', $n->id)] : null,
         ];
     }
 }

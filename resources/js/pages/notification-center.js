@@ -97,6 +97,7 @@ export default function notificationCenter(root) {
                 el('p', { class: 'text-sm text-on-surface-variant whitespace-pre-line' }, n.body),
                 el('p', { class: 'text-[11px] text-outline' }, [n.category_label, n.sender ? `Người gửi: ${n.sender}` : null, time].filter(Boolean).join(' · ')),
                 el('div', { class: 'flex flex-wrap gap-2 pt-1' },
+                    n.attachment ? el('a', { href: n.attachment.url, class: 'px-3 py-1.5 rounded-lg border border-outline-variant text-label-md font-semibold hover:bg-surface-container-low inline-flex items-center gap-1' }, icon('attach_file', 'text-[16px]'), n.attachment.name) : null,
                     n.link ? el('button', { type: 'button', class: 'px-3 py-1.5 rounded-lg bg-primary hover:bg-primary-container text-white text-label-md font-semibold inline-flex items-center gap-1', onclick: (e) => open(e.currentTarget, n) }, icon('open_in_new', 'text-[16px]'), 'Xem chi tiết') : null,
                     unread ? el('button', { type: 'button', class: 'px-3 py-1.5 rounded-lg border border-outline-variant text-label-md font-semibold hover:bg-surface-container-low', onclick: (e) => markRead(e.currentTarget, n) }, 'Đánh dấu đã đọc') : null),
             ),

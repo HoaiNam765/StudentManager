@@ -1,11 +1,13 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Pages\AnnouncementPageController;
 use App\Modules\Grade\Http\Controllers\GradebookController;
 use App\Modules\Grade\Http\Controllers\GradeChangeController;
 use App\Modules\Grade\Http\Controllers\GradeResultController;
 use App\Modules\Grade\Http\Controllers\GradeWorkflowController;
 use App\Modules\Grade\Http\Controllers\TranscriptController;
+use App\Modules\Notification\Http\Controllers\AnnouncementController;
 use App\Modules\Report\Http\Controllers\DashboardDataController;
 use App\Modules\SchoolClass\Http\Controllers\TeacherClassRosterController;
 use App\Modules\Teacher\Http\Controllers\LecturerProfileController;
@@ -118,6 +120,16 @@ Route::middleware('auth')->group(function (): void {
     Route::post('enrollments/{enrollment}/grade-change-requests', [GradeChangeController::class, 'store'])->middleware('permission:GRD.update')->name('grade-change-requests.store');
     Route::get('grade-change-requests/{gradeChangeRequest}/evidence', [GradeChangeController::class, 'evidence'])->middleware('permission:GRD.view')->name('grade-change-requests.evidence');
     Route::get('enrollments/{enrollment}/grade-history', [GradeChangeController::class, 'history'])->middleware('permission:GRD.view')->name('grade-history');
+
+    // Thông báo thủ công (NOT, FR-NOT-006, 015): đối tượng trong phạm vi người gửi (BR-NOT-05), kiểm tra trong AudienceResolver
+    Route::get('announcements/options', [AnnouncementController::class, 'options'])->middleware('permission:NOT.create')->name('announcements.options');
+    Route::post('announcements/preview', [AnnouncementController::class, 'preview'])->middleware('permission:NOT.create')->name('announcements.preview');
+    Route::get('announcements', [AnnouncementController::class, 'index'])->middleware('permission:NOT.create')->name('announcements.index');
+    Route::post('announcements', [AnnouncementController::class, 'store'])->middleware('permission:NOT.create')->name('announcements.store');
+    Route::post('recipient-groups', [AnnouncementController::class, 'saveGroup'])->middleware('permission:NOT.create')->name('recipient-groups.store');
+    Route::put('recipient-groups/{recipientGroup}', [AnnouncementController::class, 'saveGroup'])->whereNumber('recipientGroup')->middleware('permission:NOT.create')->name('recipient-groups.update');
+    Route::delete('recipient-groups/{recipientGroup}', [AnnouncementController::class, 'deleteGroup'])->whereNumber('recipientGroup')->middleware('permission:NOT.create')->name('recipient-groups.destroy');
+    Route::get('gui-thong-bao', [AnnouncementPageController::class, 'index'])->middleware('permission:NOT.create')->name('pages.announcements');
 
     Route::get(
         '/dashboard/data',

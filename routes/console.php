@@ -18,4 +18,7 @@ Schedule::command('users:apply-deactivations')->dailyAt('00:15')->withoutOverlap
 // Ngày nghỉ khai báo sau khi đã sinh buổi học: chuyển buổi trùng ngày nghỉ sang Nghỉ (FR-TTB-009)
 Schedule::command('timetable:apply-holidays')->dailyAt('00:30')->withoutOverlapping();
 
+// Công bố bảng điểm đã hẹn giờ (FR-GRD-005)
+Schedule::command('grades:publish-scheduled')->everyFiveMinutes()->withoutOverlapping();
+
 Schedule::command('faculty:sync-leadership')->dailyAt('00:05')->withoutOverlapping();

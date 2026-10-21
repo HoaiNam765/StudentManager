@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Modules\Grade\Http\Controllers\GradebookController;
+use App\Modules\Grade\Http\Controllers\GradeResultController;
+use App\Modules\Grade\Http\Controllers\GradeWorkflowController;
 use App\Modules\Report\Http\Controllers\DashboardDataController;
 use App\Modules\SchoolClass\Http\Controllers\TeacherClassRosterController;
 use App\Modules\Teacher\Http\Controllers\LecturerProfileController;
@@ -94,6 +96,18 @@ Route::middleware('auth')->group(function (): void {
                 ->middleware('permission:GRD.update')
                 ->name('import');
         });
+
+    // Bảng điểm của lớp (FR-GRD-004): xem trạng thái, nộp / nộp lại (giảng viên được phân công)
+    Route::get('course-sections/{courseSection}/grade-workflow', [GradeWorkflowController::class, 'show'])->middleware('permission:GRD.view')->name('grade-workflow.show');
+    Route::post('course-sections/{courseSection}/grade-workflow', [GradeWorkflowController::class, 'change'])->middleware('permission:GRD.update')->name('grade-workflow.change');
+
+    Route::get(
+        'enrollments/{enrollment}/grade-result',
+        [GradeResultController::class, 'show']
+    )
+        ->middleware('permission:GRD.view')
+        ->name('grade-result.show');
+
     Route::get(
         '/dashboard/data',
         [DashboardDataController::class, 'teacher']

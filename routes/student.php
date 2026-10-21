@@ -1,11 +1,14 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Pages\Student\GradePageController;
 use App\Http\Controllers\Pages\Student\RegistrationPageController;
 use App\Modules\Enrollment\Http\Controllers\EnrollmentController;
 use App\Modules\Enrollment\Http\Controllers\EnrollmentResultController;
 use App\Modules\Enrollment\Http\Controllers\RegistrationOptionsController;
+use App\Modules\Grade\Http\Controllers\StudentGpaController;
 use App\Modules\Grade\Http\Controllers\StudentGradesController;
+use App\Modules\Grade\Http\Controllers\TranscriptController;
 use App\Modules\Report\Http\Controllers\DashboardDataController;
 use App\Modules\Student\Http\Controllers\StudentSelfController;
 use App\Modules\Timetable\Http\Controllers\TimetableController;
@@ -65,4 +68,8 @@ Route::middleware('auth')->group(function (): void {
 
     // Điểm của tôi (FR-GRD-005; BR-GRD-08): chỉ lớp đã công bố, kể cả điểm thành phần
     Route::get('/grades', [StudentGradesController::class, 'mine'])->middleware('permission:GRD.view')->name('grades');
+    // GPA học kỳ / tích lũy, xếp loại (FR-GRD-008, 009) và bảng điểm cá nhân JSON / PDF tiếng Việt – Anh (FR-GRD-010)
+    Route::get('/gpa', [StudentGpaController::class, 'mine'])->middleware('permission:GRD.view')->name('gpa');
+    Route::get('/transcript', [TranscriptController::class, 'mine'])->middleware('permission:GRD.view')->name('transcript');
+    Route::get('/ket-qua-hoc-tap', [GradePageController::class, 'index'])->middleware('permission:GRD.view')->name('pages.grades');
 });

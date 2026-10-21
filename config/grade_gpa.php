@@ -1,10 +1,8 @@
 <?php
 
+// GPA (BR-GRD-04; FR-GRD-009). Xếp loại học lực lấy từ bộ quy chế theo khóa (classification.bands — PolicyResolver),
+// không đặt ở đây.
 return [
-    'retake_policy' => env('GRD_RETAKE_POLICY', 'highest'), // highest | latest
-    'classification' => [
-        ['min' => 3.6, 'name' => 'Xuất sắc'], ['min' => 3.2, 'name' => 'Giỏi'],
-        ['min' => 2.5, 'name' => 'Khá'], ['min' => 2.0, 'name' => 'Trung bình'],
-        ['min' => 1.0, 'name' => 'Yếu'], ['min' => 0.0, 'name' => 'Kém'],
-    ],
+    // GPA tích lũy lấy kết quả cao nhất của mỗi học phần (highest, mặc định) hay lần học gần nhất (latest) — Q-12
+    'retake_policy' => env('GRD_RETAKE_POLICY', 'highest'),
 ];

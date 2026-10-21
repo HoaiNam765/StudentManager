@@ -14,7 +14,8 @@ use Illuminate\Support\Facades\DB;
  * Tính điểm học phần (BR-GRD-01..03, 11; UAT-07): tổng (điểm thành phần × trọng số), làm tròn `grades.round_digits`
  * (mặc định 1 chữ số, nửa lên); quy đổi chữ / hệ 4 theo `grading.scale` và đạt khi ≥ `grading.pass_score` của bộ quy
  * chế áp dụng cho khóa sinh viên, đồng thời đạt điểm sàn các thành phần bắt buộc (trượt sàn → F). Thiếu thành phần bắt
- * buộc → `incomplete`. Học phần Đạt / Không đạt chỉ trả đạt hay không, không có điểm số.
+ * buộc → `incomplete`. Học phần Đạt / Không đạt chỉ trả đạt hay không, không có điểm số. Khi lưu, lần học mang trạng
+ * thái đặc biệt loại trừ (`config/grade_special_statuses.php`) có `status` = `special`, không có điểm số.
  */
 class CourseGradeService extends BaseService
 {
@@ -142,11 +143,15 @@ class CourseGradeService extends BaseService
     public function save(Enrollment $enrollment): array
     {
         return DB::transaction(function () use ($enrollment) {
-            $result = $this->calculate($enrollment);
-
             $record = CourseResult::query()->firstOrNew([
                 'enrollment_id' => $enrollment->id,
             ]);
+
+            // Trạng thái đặc biệt không tính điểm (miễn, công nhận, hoãn thi…; FR-GRD-012) => không có điểm số
+            $special = $record->special_status !== null ? config("grade_special_statuses.{$record->special_status}") : null;
+            $result = ($special['gpa'] ?? null) === 'exclude'
+                ? ['score10' => null, 'letter' => null, 'point4' => null, 'is_passed' => null, 'status' => 'special']
+                : $this->calculate($enrollment);
 
             $record->fill($result);
             $record->save();

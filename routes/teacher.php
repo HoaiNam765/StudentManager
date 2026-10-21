@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Modules\Grade\Http\Controllers\GradebookController;
+use App\Modules\Grade\Http\Controllers\GradeChangeController;
 use App\Modules\Grade\Http\Controllers\GradeResultController;
 use App\Modules\Grade\Http\Controllers\GradeWorkflowController;
+use App\Modules\Grade\Http\Controllers\TranscriptController;
 use App\Modules\Report\Http\Controllers\DashboardDataController;
 use App\Modules\SchoolClass\Http\Controllers\TeacherClassRosterController;
 use App\Modules\Teacher\Http\Controllers\LecturerProfileController;
@@ -107,6 +109,15 @@ Route::middleware('auth')->group(function (): void {
     )
         ->middleware('permission:GRD.view')
         ->name('grade-result.show');
+
+    // Sổ điểm lớp JSON / PDF / Excel (FR-GRD-011); trạng thái điểm đặc biệt trước khi nộp (FR-GRD-012); yêu cầu điều
+    // chỉnh điểm sau công bố và lịch sử phiên bản (FR-GRD-006) — chỉ giảng viên được phân công (kiểm tra trong Service)
+    Route::get('course-sections/{courseSection}/grade-report', [TranscriptController::class, 'gradebook'])->middleware('permission:GRD.view')->name('grade-report');
+    Route::post('enrollments/{enrollment}/special-status', [GradeChangeController::class, 'special'])->middleware('permission:GRD.update')->name('special-status');
+    Route::get('grade-change-requests', [GradeChangeController::class, 'index'])->middleware('permission:GRD.view')->name('grade-change-requests.index');
+    Route::post('enrollments/{enrollment}/grade-change-requests', [GradeChangeController::class, 'store'])->middleware('permission:GRD.update')->name('grade-change-requests.store');
+    Route::get('grade-change-requests/{gradeChangeRequest}/evidence', [GradeChangeController::class, 'evidence'])->middleware('permission:GRD.view')->name('grade-change-requests.evidence');
+    Route::get('enrollments/{enrollment}/grade-history', [GradeChangeController::class, 'history'])->middleware('permission:GRD.view')->name('grade-history');
 
     Route::get(
         '/dashboard/data',

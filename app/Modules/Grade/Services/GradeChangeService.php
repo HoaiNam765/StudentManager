@@ -11,113 +11,199 @@ use App\Modules\Grade\Models\CourseResult;
 use App\Modules\Grade\Models\GradeChangeRequest;
 use App\Modules\Grade\Models\GradeEntry;
 use App\Modules\Grade\Models\GradeVersion;
-use App\Modules\Grade\Models\SectionGradeWorkflow;
+use App\Modules\Grade\Models\SectionGradeComponent;
 use App\Modules\SchoolClass\Models\CourseSection;
-use App\Modules\SchoolClass\Models\SectionInstructor;
-use App\Modules\Student\Models\Student;
 use App\Support\Services\BaseService;
-use Illuminate\Validation\ValidationException;
 
+/**
+ * Điều chỉnh điểm sau công bố (FR-GRD-006; BR-GRD-06): giảng viên được phân công gửi yêu cầu (lý do, minh chứng, điểm
+ * mới từng thành phần) → lãnh đạo khoa duyệt (nếu bật `grade_lifecycle.faculty_approval_required`) → Phòng Đào tạo /
+ * Khảo thí xác nhận thì mới áp dụng: ghi điểm, tính lại kết quả (`CourseGradeService`), lưu phiên bản trước – sau
+ * (`grade_versions`, bất biến), phát `GradeAdjusted` (EV-GRD-02) để tính lại GPA và báo sinh viên. Từ chối phải có lý do.
+ */
 class GradeChangeService extends BaseService
 {
-    public function __construct(private readonly AccessControl $access, private readonly CourseResultService $calculator) {}
+    public const PENDING = ['pending_faculty', 'pending_confirmation'];
 
+    public function __construct(
+        private readonly AccessControl $access,
+        private readonly GradebookService $gradebook,
+        private readonly GradeWorkflowService $workflows,
+        private readonly CourseGradeService $calculator,
+    ) {}
+
+    /** @param list<array{component_id: int, score: float|int|string}> $items */
     public function request(Enrollment $enrollment, User $actor, array $items, string $reason, ?string $evidence): GradeChangeRequest
     {
-        $section = CourseSection::findOrFail($enrollment->course_section_id);
-        $this->assertLecturer($section, $actor);
+        $section = CourseSection::query()->findOrFail($enrollment->course_section_id);
+        $this->gradebook->authorizeGrading($section, $actor);
         $this->assertPublished($section);
-        if (GradeChangeRequest::where('enrollment_id', $enrollment->id)->whereIn('status', ['pending_faculty', 'pending_confirmation'])->exists()) {
-            throw ValidationException::withMessages(['grades' => 'Đã có yêu cầu điều chỉnh đang chờ duyệt cho lần học này.']);
-        }
-        $ids = array_column($items, 'component_id');
-        if (count($ids) !== count(array_unique($ids))) {
-            throw ValidationException::withMessages(['scores' => 'Một thành phần điểm chỉ được điều chỉnh một lần trong yêu cầu.']);
-        }
-        $actual = GradeEntry::query()->where('enrollment_id', $enrollment->id)->whereIn('section_grade_component_id', $ids)->count();
-        if ($actual !== count($items)) {
-            throw ValidationException::withMessages(['scores' => 'Có thành phần điểm không thuộc đăng ký này.']);
-        }
-        $initialStatus = config('grade_lifecycle.faculty_approval_required', true) ? 'pending_faculty' : 'pending_confirmation';
 
-        return GradeChangeRequest::create([
-            'enrollment_id' => $enrollment->id, 'requested_by' => $actor->id,
-            'proposed_scores' => $items, 'reason' => $reason, 'evidence_path' => $evidence,
-            'status' => $initialStatus,
-        ]);
+        return $this->transaction(function () use ($enrollment, $section, $actor, $items, $reason, $evidence): GradeChangeRequest {
+            Enrollment::query()->lockForUpdate()->findOrFail($enrollment->id);
+
+            if (GradeChangeRequest::query()->where('enrollment_id', $enrollment->id)->whereIn('status', self::PENDING)->exists()) {
+                $this->fail('Lần học này đã có yêu cầu điều chỉnh đang chờ duyệt.', 'Chờ yêu cầu trước được duyệt / từ chối rồi gửi yêu cầu mới.');
+            }
+
+            $components = SectionGradeComponent::query()->where('course_section_id', $section->id)->get()->keyBy('id');
+            $current = GradeEntry::query()->where('enrollment_id', $enrollment->id)->get()->keyBy('section_grade_component_id');
+            $seen = [];
+            $proposed = [];
+
+            foreach ($items as $item) {
+                $componentId = (int) $item['component_id'];
+                $component = $components->get($componentId);
+
+                if ($component === null) {
+                    $this->fail("Thành phần điểm #{$componentId} không thuộc lớp này.", 'Tải lại sổ điểm để lấy đúng mã thành phần.');
+                }
+
+                if (isset($seen[$componentId])) {
+                    $this->fail("Thành phần \"{$component->name}\" xuất hiện hai lần.", 'Mỗi thành phần điểm chỉ điều chỉnh một lần trong yêu cầu.');
+                }
+
+                $seen[$componentId] = true;
+                $score = $this->normalizeScore($item['score']);
+                $old = $current->get($componentId)?->score;
+
+                if ($old !== null && abs((float) $old - $score) < 0.00001) {
+                    $this->fail("Điểm mới của \"{$component->name}\" trùng điểm hiện tại.", 'Bỏ thành phần không đổi khỏi yêu cầu.');
+                }
+
+                $proposed[] = ['component_id' => $componentId, 'name' => $component->name, 'old' => $old === null ? null : (float) $old, 'score' => $score];
+            }
+
+            return GradeChangeRequest::query()->create([
+                'enrollment_id' => $enrollment->id,
+                'requested_by' => $actor->id,
+                'proposed_scores' => $proposed,
+                'reason' => $reason,
+                'evidence_path' => $evidence,
+                'status' => config('grade_lifecycle.faculty_approval_required', true) ? 'pending_faculty' : 'pending_confirmation',
+            ]);
+        });
     }
 
     public function decide(GradeChangeRequest $request, User $actor, bool $approve, ?string $reason = null): GradeChangeRequest
     {
-        return $this->transaction(function () use ($request, $actor, $approve, $reason) {
+        if (! $approve && blank($reason)) {
+            $this->fail('Từ chối yêu cầu điều chỉnh phải nhập lý do.', 'Ghi rõ lý do để giảng viên biết cần bổ sung gì.');
+        }
+
+        return $this->transaction(function () use ($request, $actor, $approve, $reason): GradeChangeRequest {
             $request = GradeChangeRequest::query()->lockForUpdate()->findOrFail($request->id);
-            $enrollment = Enrollment::findOrFail($request->enrollment_id);
-            $section = CourseSection::findOrFail($enrollment->course_section_id);
-            $this->assertPublished($section);
+            $enrollment = Enrollment::query()->findOrFail($request->enrollment_id);
+            $section = CourseSection::query()->findOrFail($enrollment->course_section_id);
+
+            if ($request->requested_by === $actor->id) {
+                $this->fail('Không tự duyệt yêu cầu điều chỉnh của chính mình.', 'Yêu cầu phải do lãnh đạo khoa / Phòng Đào tạo khác duyệt.');
+            }
+
             if ($request->status === 'pending_faculty') {
-                abort_unless($actor->hasRole('DEAN') && $this->access->allowsOn($actor, 'GRD', PermissionAction::Approve, $section), 403, 'Khoa không có quyền duyệt yêu cầu này.');
+                abort_unless($actor->hasRole('DEAN') && $this->access->allowsOn($actor, 'GRD', PermissionAction::Approve, $section), 403,
+                    'Chỉ lãnh đạo khoa phụ trách lớp mới duyệt cấp khoa.');
                 $request->faculty_approved_by = $actor->id;
                 $request->status = $approve ? 'pending_confirmation' : 'rejected';
             } elseif ($request->status === 'pending_confirmation') {
-                abort_unless(($actor->hasRole('ACAD') || $actor->hasRole('EXAM')) && $this->access->allowsGlobally($actor, 'GRD', PermissionAction::Approve), 403, 'Chỉ Đào tạo/Khảo thí được xác nhận điều chỉnh.');
+                abort_unless($this->isOffice($actor), 403, 'Chỉ Phòng Đào tạo / Khảo thí (GRD.approve toàn trường) mới xác nhận điều chỉnh điểm.');
                 $request->confirmed_by = $actor->id;
                 $request->status = $approve ? 'approved' : 'rejected';
-                if ($approve) {
-                    $this->apply($request, $enrollment, $section, $actor);
-                }
             } else {
-                throw ValidationException::withMessages(['status' => 'Yêu cầu này không còn ở trạng thái chờ duyệt.']);
+                $this->fail('Yêu cầu này đã được xử lý.', 'Tải lại danh sách yêu cầu chờ duyệt.');
             }
-            if (! $approve && blank($reason)) {
-                throw ValidationException::withMessages(['reason' => 'Từ chối yêu cầu phải nhập lý do.']);
-            }
-            if (! $approve) {
-                $request->rejection_reason = $reason;
-            }
+
+            $request->rejection_reason = $approve ? null : $reason;
             $request->save();
 
-            return $request;
+            if ($request->status === 'approved') {
+                $this->apply($request, $enrollment, $actor);
+            }
+
+            return $request->refresh();
         });
     }
 
-    private function apply(GradeChangeRequest $request, Enrollment $enrollment, CourseSection $section, User $actor): void
+    /** Lãnh đạo khoa thấy yêu cầu chờ khoa trong phạm vi; Phòng Đào tạo / Khảo thí thấy mọi yêu cầu. */
+    public function canReview(User $actor, GradeChangeRequest $request): bool
     {
-        $previous = GradeEntry::where('enrollment_id', $enrollment->id)->get();
-        $previousResult = CourseResult::where('enrollment_id', $enrollment->id)->first();
-        $version = (int) GradeVersion::where('enrollment_id', $enrollment->id)->max('version') + 1;
+        $section = $request->enrollment?->section;
+
+        return $this->isOffice($actor)
+            || ($section !== null && $actor->hasRole('DEAN') && $this->access->allowsOn($actor, 'GRD', PermissionAction::Approve, $section));
+    }
+
+    /** Người này có được duyệt bước hiện tại của yêu cầu không (khoa: chờ khoa; Phòng Đào tạo / Khảo thí: chờ xác nhận). */
+    public function canAct(User $actor, GradeChangeRequest $request): bool
+    {
+        $section = $request->enrollment?->section;
+
+        return $request->requested_by !== $actor->id && match ($request->status) {
+            'pending_faculty' => $section !== null && $actor->hasRole('DEAN') && $this->access->allowsOn($actor, 'GRD', PermissionAction::Approve, $section),
+            'pending_confirmation' => $this->isOffice($actor),
+            default => false,
+        };
+    }
+
+    private function apply(GradeChangeRequest $request, Enrollment $enrollment, User $actor): void
+    {
+        $before = $this->snapshot($enrollment);
+
         foreach ($request->proposed_scores as $item) {
-            $entry = GradeEntry::where('enrollment_id', $enrollment->id)
-                ->where('section_grade_component_id', $item['component_id'])->firstOrFail();
-            $entry->update(['score' => $item['score'], 'status' => 'draft']);
+            $entry = GradeEntry::query()->firstOrNew([
+                'enrollment_id' => $enrollment->id,
+                'section_grade_component_id' => $item['component_id'],
+            ]);
+            $entry->fill(['score' => $item['score'], 'status' => 'draft'])->save();
         }
-        $this->calculator->calculate($section);
-        $updatedResult = CourseResult::where('enrollment_id', $enrollment->id)->first();
-        GradeVersion::create([
-            'enrollment_id' => $enrollment->id, 'grade_change_request_id' => $request->id,
-            'version' => $version, 'created_by' => $actor->id, 'reason' => $request->reason,
-            'snapshot' => ['before' => ['result' => $previousResult?->only('score_10', 'score_4', 'letter', 'passed', 'special_status'),
-                'entries' => $previous->map(fn ($entry) => $entry->only('section_grade_component_id', 'score', 'status'))->all()],
-                'after' => ['result' => $updatedResult?->only('score_10', 'score_4', 'letter', 'passed', 'special_status'), 'entries' => GradeEntry::where('enrollment_id', $enrollment->id)->get()->map(fn ($entry) => $entry->only('section_grade_component_id', 'score', 'status'))->all()],
-                'proposed_scores' => $request->proposed_scores],
+
+        $this->calculator->save($enrollment);
+
+        GradeVersion::query()->create([
+            'enrollment_id' => $enrollment->id,
+            'grade_change_request_id' => $request->id,
+            'version' => (int) GradeVersion::query()->where('enrollment_id', $enrollment->id)->max('version') + 1,
+            'reason' => $request->reason,
+            'snapshot' => ['before' => $before, 'after' => $this->snapshot($enrollment), 'confirmed_by' => $actor->id],
         ]);
+
         GradeAdjusted::dispatch($enrollment->id, $request->id);
-        $student = $enrollment->student ?? Student::find($enrollment->student_id);
-        if ($student) {
-            app(GpaService::class)->recalculate($student);
-        }
+    }
+
+    /** @return array{result: array<string, mixed>|null, entries: list<array<string, mixed>>} */
+    private function snapshot(Enrollment $enrollment): array
+    {
+        return [
+            'result' => CourseResult::query()->where('enrollment_id', $enrollment->id)->first()
+                ?->only('score10', 'letter', 'point4', 'is_passed', 'status', 'special_status'),
+            'entries' => GradeEntry::query()->where('enrollment_id', $enrollment->id)->orderBy('section_grade_component_id')->get()
+                ->map(fn (GradeEntry $e) => ['component_id' => $e->section_grade_component_id, 'score' => $e->score])->all(),
+        ];
     }
 
     private function assertPublished(CourseSection $section): void
     {
-        $workflow = SectionGradeWorkflow::where('course_section_id', $section->id)->first();
-        $statusVal = $workflow?->status instanceof \BackedEnum ? $workflow->status->value : (string) $workflow?->status;
-        abort_unless(in_array($statusVal, ['published', 'locked'], true), 422, 'Chỉ điều chỉnh điểm sau công bố hoặc khóa.');
+        if (! $this->workflows->isPublished($section->id)) {
+            $this->fail('Bảng điểm lớp chưa công bố nên không cần yêu cầu điều chỉnh.',
+                'Trước công bố, đề nghị trả lại bảng điểm rồi sửa trực tiếp trong sổ điểm (BR-GRD-06).');
+        }
     }
 
-    private function assertLecturer(CourseSection $section, User $actor): void
+    private function isOffice(User $actor): bool
     {
-        abort_unless($this->access->allowsOn($actor, 'GRD', PermissionAction::Update, $section)
-            && SectionInstructor::where('course_section_id', $section->id)->whereHas('lecturer', fn ($q) => $q->where('user_id', $actor->id))->exists(),
-            403, 'Chỉ giảng viên được phân công mới được yêu cầu điều chỉnh điểm.');
+        return ($actor->hasRole('ACAD') || $actor->hasRole('EXAM')) && $this->access->allowsGlobally($actor, 'GRD', PermissionAction::Approve);
+    }
+
+    private function normalizeScore(mixed $score): float
+    {
+        $min = (float) config('grades.min_score', 0);
+        $max = (float) config('grades.max_score', 10);
+        $step = (float) config('grades.score_step', 0.1);
+
+        if (! is_numeric($score) || (float) $score < $min || (float) $score > $max || abs((float) $score / $step - round((float) $score / $step)) > 0.00001) {
+            $this->fail("Điểm {$score} không hợp lệ.", "Điểm phải từ {$min} đến {$max}, theo bước {$step}.");
+        }
+
+        return (float) $score;
     }
 }

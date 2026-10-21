@@ -23,6 +23,7 @@ use App\Modules\Grade\Http\Controllers\GradeChangeController;
 use App\Modules\Grade\Http\Controllers\GradeWorkflowController;
 use App\Modules\Grade\Http\Controllers\StudentGpaController;
 use App\Modules\Grade\Http\Controllers\TranscriptController;
+use App\Modules\Notification\Http\Controllers\EventSubscriptionController;
 use App\Modules\Room\Http\Controllers\FacilityController;
 use App\Modules\Room\Http\Controllers\RoomController;
 use App\Modules\SchoolClass\Http\Controllers\AdminClassController;
@@ -491,6 +492,10 @@ Route::middleware('auth')->group(function (): void {
     Route::get('grade-workflows', [GradeWorkflowController::class, 'index'])->middleware('permission:GRD.view')->name('grade-workflows.index');
     Route::get('course-sections/{courseSection}/grade-workflow', [GradeWorkflowController::class, 'show'])->whereNumber('courseSection')->middleware('permission:GRD.view')->name('course-sections.grade-workflow.show');
     Route::post('course-sections/{courseSection}/grade-workflow', [GradeWorkflowController::class, 'change'])->whereNumber('courseSection')->middleware('permission:GRD.approve')->name('course-sections.grade-workflow.change');
+
+    // Cấu hình thông báo theo sự kiện (NOT, FR-NOT-004; phụ lục A): chỉ ADMIN (NOT.update toàn trường)
+    Route::get('notification-events', [EventSubscriptionController::class, 'index'])->middleware('permission:NOT.update,ALL')->name('notification-events.index');
+    Route::put('notification-events/{code}', [EventSubscriptionController::class, 'update'])->where('code', 'EV-[A-Z]+-[0-9]{2}')->middleware('permission:NOT.update,ALL')->name('notification-events.update');
 
     // Điều chỉnh điểm sau công bố (FR-GRD-006): khoa duyệt (DEAN, phạm vi) → ACAD / EXAM xác nhận; từ chối có lý do
     Route::get('grade-change-requests', [GradeChangeController::class, 'index'])->middleware('permission:GRD.approve')->name('grade-change-requests.index');

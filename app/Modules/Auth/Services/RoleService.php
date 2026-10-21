@@ -4,6 +4,7 @@ namespace App\Modules\Auth\Services;
 
 use App\Models\User;
 use App\Modules\Auth\Enums\DataScope;
+use App\Modules\Auth\Events\UserRolesChanged;
 use App\Modules\Auth\Models\Permission;
 use App\Modules\Auth\Models\Role;
 use App\Support\Audit\AuditEvent;
@@ -19,7 +20,7 @@ use Illuminate\Support\Str;
  * Quản lý vai trò, ma trận phân quyền và vai trò của người dùng (FR-AUTH-010, 011, 012).
  * Mọi thay đổi có hiệu lực ngay và được ghi nhật ký kiểm toán (BR-AUTH-08).
  *
- * Thông báo cho người bị ảnh hưởng (sự kiện EV-AUTH-03) sẽ nối khi có module NOT.
+ * Gán / gỡ vai trò phát `UserRolesChanged` (EV-AUTH-03), NOT báo cho người bị ảnh hưởng.
  */
 class RoleService extends BaseService
 {
@@ -192,6 +193,7 @@ class RoleService extends BaseService
         });
 
         $this->access->flush();
+        UserRolesChanged::dispatch($user, 'assigned', $role->name);
     }
 
     /** Gỡ vai trò từ hôm nay. Không xóa dòng gán: đặt ngày kết thúc để giữ lịch sử (GC-06). */
@@ -237,6 +239,7 @@ class RoleService extends BaseService
         });
 
         $this->access->flush();
+        UserRolesChanged::dispatch($user, 'revoked', $role->name);
     }
 
     /**

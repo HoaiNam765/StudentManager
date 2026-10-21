@@ -4,6 +4,7 @@ namespace App\Modules\Grade\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Modules\Enrollment\Models\Enrollment;
+use App\Modules\Grade\Models\CourseResult;
 use App\Modules\Grade\Models\GradeEntry;
 use App\Modules\Student\Models\Student;
 use Illuminate\Http\JsonResponse;
@@ -21,10 +22,11 @@ class StudentGradesController extends Controller
                 $query->select('course_section_id')->from('section_grade_workflows')
                     ->whereIn('status', ['published', 'locked'])->whereNull('deleted_at');
             })->get();
-        $results = \App\Modules\Grade\Models\CourseResult::query()
+        $results = CourseResult::query()
             ->whereIn('enrollment_id', $enrollments->pluck('id'))->get()->keyBy('enrollment_id');
         $entries = GradeEntry::query()->whereIn('enrollment_id', $enrollments->pluck('id'))
             ->with('component:id,name,weight')->get()->groupBy('enrollment_id');
+
         return response()->json(['grades' => $enrollments->map(fn ($e) => [
             'enrollment_id' => $e->id, 'subject' => $e->subject, 'section' => $e->section,
             'result' => $results->get($e->id),

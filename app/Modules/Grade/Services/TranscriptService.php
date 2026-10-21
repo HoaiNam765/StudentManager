@@ -20,6 +20,7 @@ class TranscriptService
             ->when($termId, fn ($q) => $q->where('term_id', $termId))
             ->with('subject:id,code,name,name_en,credits')->orderBy('term_id')->orderBy('id')->get();
         $results = CourseResult::whereIn('enrollment_id', $attempts->pluck('id'))->get()->keyBy('enrollment_id');
+
         return [
             'student' => $student->only('id', 'student_code', 'full_name'),
             'term_id' => $termId,
@@ -45,6 +46,7 @@ class TranscriptService
             'score_4' => $results->get($e->id)?->score_4, 'passed' => $results->get($e->id)?->passed,
         ]);
         $graded = $rows->filter(fn ($row) => $row['score_10'] !== null);
+
         return [
             'section' => $section->only('id', 'code', 'subject_id', 'term_id'),
             'rows' => $rows->all(),

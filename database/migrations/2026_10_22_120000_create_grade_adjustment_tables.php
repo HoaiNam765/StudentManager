@@ -33,6 +33,7 @@ return new class extends Migration
             $table->unique(['enrollment_id', 'version']);
         });
     }
+
     public function down(): void
     {
         Schema::dropIfExists('grade_versions');

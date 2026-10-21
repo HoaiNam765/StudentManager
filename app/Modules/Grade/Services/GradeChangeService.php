@@ -14,6 +14,7 @@ use App\Modules\Grade\Models\GradeVersion;
 use App\Modules\Grade\Models\SectionGradeWorkflow;
 use App\Modules\SchoolClass\Models\CourseSection;
 use App\Modules\SchoolClass\Models\SectionInstructor;
+use App\Modules\Student\Models\Student;
 use App\Support\Services\BaseService;
 use Illuminate\Validation\ValidationException;
 
@@ -38,6 +39,7 @@ class GradeChangeService extends BaseService
             throw ValidationException::withMessages(['scores' => 'Có thành phần điểm không thuộc đăng ký này.']);
         }
         $initialStatus = config('grade_lifecycle.faculty_approval_required', true) ? 'pending_faculty' : 'pending_confirmation';
+
         return GradeChangeRequest::create([
             'enrollment_id' => $enrollment->id, 'requested_by' => $actor->id,
             'proposed_scores' => $items, 'reason' => $reason, 'evidence_path' => $evidence,
@@ -73,6 +75,7 @@ class GradeChangeService extends BaseService
                 $request->rejection_reason = $reason;
             }
             $request->save();
+
             return $request;
         });
     }
@@ -98,7 +101,7 @@ class GradeChangeService extends BaseService
                 'proposed_scores' => $request->proposed_scores],
         ]);
         GradeAdjusted::dispatch($enrollment->id, $request->id);
-        $student = $enrollment->student ?? \App\Modules\Student\Models\Student::find($enrollment->student_id);
+        $student = $enrollment->student ?? Student::find($enrollment->student_id);
         if ($student) {
             app(GpaService::class)->recalculate($student);
         }

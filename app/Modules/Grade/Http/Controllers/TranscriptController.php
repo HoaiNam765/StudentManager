@@ -3,7 +3,6 @@
 namespace App\Modules\Grade\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use App\Modules\Auth\Enums\PermissionAction;
 use App\Modules\Auth\Services\AccessControl;
 use App\Modules\Grade\Services\TranscriptService;
@@ -12,10 +11,8 @@ use App\Modules\SchoolClass\Models\SectionInstructor;
 use App\Modules\Student\Models\Student;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
-use OpenSpout\Common\Entity\Cell;
 use OpenSpout\Common\Entity\Row;
 use OpenSpout\Writer\XLSX\Writer;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class TranscriptController extends Controller
 {
@@ -25,6 +22,7 @@ class TranscriptController extends Controller
     {
         $student = Student::where('user_id', $request->user()->id)->firstOrFail();
         $data = $request->validate(['term_id' => ['nullable', 'integer', 'exists:terms,id'], 'lang' => ['nullable', 'in:vi,en']]);
+
         return Pdf::loadView('pdf.grade-transcript', ['report' => $this->transcript->personal($student, $data['term_id'] ?? null), 'lang' => $data['lang'] ?? 'vi'])
             ->download('bang-diem-'.$student->student_code.'.pdf');
     }
@@ -60,6 +58,7 @@ class TranscriptController extends Controller
         } finally {
             $writer->close();
         }
+
         return response()->download($file, 'so-diem-'.$courseSection->code.'.xlsx')->deleteFileAfterSend(true);
     }
 }

@@ -35,6 +35,7 @@ class GpaService
                         return false;
                     }
                 }
+
                 return $res->score_4 !== null || ($res->special_status !== null && ($specialStatuses[$res->special_status]['gpa'] ?? '') === 'zero');
             });
             $termRows = [];
@@ -56,6 +57,7 @@ class GpaService
                 if ($policy === 'latest') {
                     return $group->sortByDesc(fn ($e) => sprintf('%012d%012d', (int) $e->term_id, (int) $e->id))->first();
                 }
+
                 return $group->sortByDesc(fn ($e) => sprintf('%06.2f%012d', (float) ($results->get($e->id)->score_4 ?? 0), (int) $e->id))->first();
             });
             $cumulative = $this->weighted($selected, $results, $specialStatuses);
@@ -65,6 +67,7 @@ class GpaService
                 'credits_earned' => $selected->sum(fn ($e) => $results->get($e->id)->passed ? $e->subject->credits : 0),
                 'classification' => $this->classification($cumulative),
             ]);
+
             return ['terms' => $termRows, 'cumulative' => $cgpa];
         });
     }
@@ -81,6 +84,7 @@ class GpaService
             if ($res->special_status !== null && ($specialStatuses[$res->special_status]['gpa'] ?? '') === 'zero') {
                 $score4 = 0.0;
             }
+
             return (float) $e->subject->credits * $score4;
         });
 
@@ -97,6 +101,7 @@ class GpaService
                 return $level['name'];
             }
         }
+
         return null;
     }
 }

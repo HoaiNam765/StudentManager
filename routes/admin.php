@@ -26,6 +26,7 @@ use App\Modules\Grade\Http\Controllers\StudentGpaController;
 use App\Modules\Grade\Http\Controllers\TranscriptController;
 use App\Modules\Notification\Http\Controllers\AnnouncementController;
 use App\Modules\Notification\Http\Controllers\EventSubscriptionController;
+use App\Modules\Report\Http\Controllers\DashboardDataController;
 use App\Modules\Room\Http\Controllers\FacilityController;
 use App\Modules\Room\Http\Controllers\RoomController;
 use App\Modules\SchoolClass\Http\Controllers\AdminClassController;
@@ -65,6 +66,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth')->group(function (): void {
     // Dashboard dùng dữ liệu mẫu của nhóm FE; thay bằng dữ liệu thật khi có (FR-RPT-001)
     Route::get('/', [DashboardController::class, 'admin'])->name('home');
+    // Dữ liệu dashboard quản trị theo vai trò và phạm vi (RPT, FR-RPT-001, 002, 008)
+    Route::get('/dashboard/data', [DashboardDataController::class, 'admin'])->middleware('permission:RPT.view')->name('dashboard.data');
 
     // Phân quyền (AUTH): chỉ người có quyền trên toàn trường, mặc định là ADMIN
     Route::middleware('permission:AUTH.view,ALL')->group(function (): void {

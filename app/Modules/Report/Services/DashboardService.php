@@ -8,9 +8,13 @@ use App\Modules\AcademicYear\Models\Term;
 use App\Modules\AcademicYear\Models\TermMilestone;
 use App\Modules\Enrollment\Models\RegistrationPeriod;
 use App\Modules\Enrollment\Services\RegistrationAccess;
+use App\Modules\Grade\Models\CumulativeGpa;
+use App\Modules\Grade\Models\TermGpa;
+use App\Modules\Notification\Services\NotificationCenter;
 use App\Modules\SchoolClass\Enums\SectionStatus;
 use App\Modules\SchoolClass\Models\CourseSection;
 use App\Modules\Student\Models\Student;
+use App\Modules\Student\Services\StudentCurriculumService;
 use App\Modules\Teacher\Models\Lecturer;
 use App\Modules\Timetable\Services\TimetablePublication;
 use App\Modules\Timetable\Services\TimetableView;
@@ -23,7 +27,8 @@ use Carbon\CarbonImmutable;
  * - Hạn chót: các mốc lịch học vụ (ACY) sắp tới trong `studentmanager.dashboard.deadline_days` ngày, theo vai trò; sinh
  *   viên thêm hạn đóng của đợt đăng ký đang mở cho mình.
  * - Giảng viên: lớp được phân công đang trong giai đoạn nhập điểm (Đang học / Kết thúc).
- * - GPA, tín chỉ tích lũy (GRD #125), thông báo (NOT #115) trả `null` / rỗng cho tới khi các module đó có.
+ * - GPA từng học kỳ và tích lũy, tín chỉ tích lũy / còn thiếu theo CTĐT hiện hành (GRD #125, đã lưu khi công bố điểm).
+ * - Thông báo chưa đọc mới nhất (NOT #115, tối đa 5) và số chưa đọc.
  */
 class DashboardService
 {
@@ -55,15 +60,13 @@ class DashboardService
                 'code' => $student->student_code,
                 'name' => $student->full_name,
             ],
-            'gpa_by_term' => null,
-            'credits_earned' => null,
-            'credits_remaining' => null,
+            ...$this->academic($student),
             'today_schedule' => $this->schedule(
                 'student',
                 $student->id
             ),
             'deadlines' => $this->studentDeadlines($student),
-            'notifications' => [],
+            'notifications' => $this->notifications($user),
         ];
     }
 
@@ -85,7 +88,40 @@ class DashboardService
             ),
             'pending_grade_sections' => $this->gradingSections($lecturer),
             'deadlines' => $this->milestones(self::TEACHER_MILESTONES),
-            'notifications' => [],
+            'notifications' => $this->notifications($user),
+        ];
+    }
+
+    /** GPA theo học kỳ, GPA / tín chỉ tích lũy và tín chỉ còn thiếu so với CTĐT hiện hành. */
+    private function academic(Student $student): array
+    {
+        $terms = TermGpa::query()->with('term:id,name,start_date')->where('student_id', $student->id)->get()
+            ->sortBy(fn (TermGpa $t) => $t->term?->start_date?->format('Y-m-d'))
+            ->map(fn (TermGpa $t) => ['term' => $t->term?->name, 'gpa' => $t->gpa === null ? null : (float) $t->gpa, 'classification' => $t->classification])
+            ->values()->all();
+        $cumulative = CumulativeGpa::query()->where('student_id', $student->id)->first();
+        $required = app(StudentCurriculumService::class)->current($student)?->total_credits;
+        $earned = $cumulative?->credits_earned;
+
+        return [
+            'gpa_by_term' => $terms,
+            'cumulative_gpa' => $cumulative?->gpa === null ? null : (float) $cumulative->gpa,
+            'classification' => $cumulative?->classification,
+            'credits_earned' => $earned,
+            'credits_remaining' => $required === null ? null : max(0, (int) $required - (int) $earned),
+        ];
+    }
+
+    /** @return array{unread: int, latest: list<array<string, mixed>>} */
+    private function notifications(User $user): array
+    {
+        $center = app(NotificationCenter::class);
+
+        return [
+            'unread' => $center->unreadCount($user),
+            'latest' => collect($center->list($user, ['status' => 'unread'])->items())->take(5)
+                ->map(fn ($row) => ['id' => $row->notification->id, 'title' => $row->notification->title, 'link' => $row->notification->link, 'sent_at' => $row->notification->sent_at?->toIso8601String()])
+                ->values()->all(),
         ];
     }
 

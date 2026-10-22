@@ -57,16 +57,6 @@
                     </div>
                 </div>
 
-                {{-- Grade #124–#127: add navigation without replacing the original Admin dashboard. --}}
-                @if (\Illuminate\Support\Facades\Route::has('admin.pages.grades') && app(\App\Modules\Auth\Services\AccessControl::class)->allows(auth()->user(), 'GRD', \App\Modules\Auth\Enums\PermissionAction::View))
-                    <a href="{{ route('admin.pages.grades') }}"
-                       @if (request()->routeIs('admin.pages.grades')) aria-current="page" @endif
-                       class="{{ request()->routeIs('admin.pages.grades') ? 'bg-[#EEF2FD] text-primary border-l-4 border-l-primary font-semibold' : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low font-normal' }} rounded-lg px-3 py-2.5 flex items-center gap-3 transition-colors">
-                        <span class="material-symbols-outlined text-[20px]">verified</span>
-                        <span class="text-sm">Quản lý &amp; Duyệt điểm</span>
-                    </a>
-                @endif
-
                 <!-- Collapsible: Danh mục -->
                 <div class="pt-1">
                     <button type="button" onclick="document.getElementById('sub-danh-muc').classList.toggle('hidden'); document.getElementById('icon-danh-muc').classList.toggle('rotate-180')" class="w-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low font-normal rounded-lg px-3 py-2 flex items-center justify-between transition-colors">

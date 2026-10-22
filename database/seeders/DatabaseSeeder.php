@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
     public const MODULE_SEEDERS = [
         SystemSeeder::class,          // SYS: cấu hình, bộ quy chế, danh mục dùng chung
         AuthSeeder::class,            // AUTH: vai trò, quyền, ma trận phân quyền mặc định
+        NotificationEventSeeder::class, // NOT: danh mục sự kiện thông báo (phụ lục A)
         FacultySeeder::class,         // FAC: khoa, bộ môn, ngành
         AcademicYearSeeder::class,    // ACY: năm học, học kỳ, lịch học vụ
         RoomSeeder::class,            // ROM: phòng học
@@ -38,6 +39,13 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(self::MODULE_SEEDERS);
+
+        // Tài khoản dùng thử có mật khẩu biết trước: chỉ ở môi trường không phải production (BR-SYS-10)
+        if (app()->isProduction()) {
+            $this->command?->warn('Môi trường production: bỏ qua tài khoản dùng thử (DevUserSeeder, DevRoleUsersSeeder).');
+
+            return;
+        }
 
         // Chạy sau seeder của module để tài khoản dùng thử được gán vai trò ADMIN
         $this->call(DevUserSeeder::class);

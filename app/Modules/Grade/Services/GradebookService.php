@@ -148,13 +148,7 @@ class GradebookService extends BaseService
         return $this->transaction(function () use ($section, $items): int {
             $locked = CourseSection::query()->lockForUpdate()->findOrFail($section->id);
             $this->assertGradingOpen($locked);
-            $workflow = SectionGradeWorkflow::where('course_section_id', $locked->id)->first();
-            if ($workflow) {
-                $statusVal = $workflow->status instanceof \BackedEnum ? $workflow->status->value : (string) $workflow->status;
-                if (! in_array($statusVal, ['draft', 'returned'], true)) {
-                    $this->fail('Điểm đã được nộp hoặc công bố, không thể sửa trực tiếp.', 'Yêu cầu trả lại trước công bố hoặc sử dụng quy trình điều chỉnh điểm sau công bố.');
-                }
-            }
+            $this->assertWorkflowEditable($locked);
             $components = $this->components($locked)->keyBy('id');
             if ($components->isEmpty()) {
                 $this->fail('Lớp chưa có cơ cấu điểm.', 'Khởi tạo cơ cấu điểm lớp học phần trước khi nhập.');
@@ -253,6 +247,21 @@ class GradebookService extends BaseService
         if ($hasScores) {
             $this->fail('Không thể sửa cơ cấu điểm vì lớp đã có điểm.',
                 'Giữ cơ cấu đã chốt; việc điều chỉnh điểm sau này phải qua quy trình duyệt.');
+        }
+    }
+
+    /** Bảng điểm đã nộp / duyệt / công bố thì không sửa trực tiếp (BR-GRD-06); bị trả lại thì sửa được. */
+    private function assertWorkflowEditable(CourseSection $section): void
+    {
+        $status = SectionGradeWorkflow::query()->where('course_section_id', $section->id)->first()?->status;
+
+        if ($status !== null && ! $status->editable()) {
+            $this->fail(
+                "Bảng điểm lớp đang ở trạng thái \"{$status->label()}\", không sửa điểm trực tiếp được.",
+                $status->public()
+                    ? 'Sau công bố, gửi yêu cầu điều chỉnh điểm kèm lý do và minh chứng (BR-GRD-06).'
+                    : 'Đề nghị khoa / Phòng Đào tạo trả lại bảng điểm rồi sửa và nộp lại.'
+            );
         }
     }
 

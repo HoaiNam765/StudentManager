@@ -8,6 +8,7 @@ use App\Modules\AcademicYear\Services\MilestoneService;
 use App\Modules\Enrollment\Enums\EnrollmentStatus;
 use App\Modules\Enrollment\Enums\PeriodStatus;
 use App\Modules\Enrollment\Events\EnrollmentAdjusted;
+use App\Modules\Enrollment\Events\EnrollmentChanged;
 use App\Modules\Enrollment\Models\Enrollment;
 use App\Modules\Enrollment\Models\RegistrationPeriod;
 use App\Modules\SchoolClass\Models\CourseSection;
@@ -275,6 +276,10 @@ class EnrollmentService extends BaseService
         try {
             $result = $callback();
             $this->log($action, $student, $section, true, null, $actor, $ip);
+
+            if ($result instanceof Enrollment) {
+                EnrollmentChanged::dispatch($result, $action); // EV-ENR-02
+            }
 
             return $result;
         } catch (BusinessRuleException $e) {

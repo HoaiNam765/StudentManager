@@ -57,18 +57,19 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/registration/result', [EnrollmentResultController::class, 'mine'])->middleware('permission:ENR.view')->name('registration.result');
     Route::get('/registration/result/slip', [EnrollmentResultController::class, 'mineSlip'])->middleware('permission:ENR.view')->name('registration.slip');
 
-    // Kết quả điểm, GPA, và bảng điểm cá nhân (GRD, FR-GRD-005, 008, 010)
-    Route::get('/grades', [StudentGradesController::class, 'mine'])->middleware('permission:GRD.view')->name('grades.mine');
-    Route::get('/gpa', [StudentGpaController::class, 'mine'])->middleware('permission:GRD.view')->name('gpa.mine');
-    Route::get('/transcript', [TranscriptController::class, 'mine'])->middleware('permission:GRD.view')->name('transcript.mine');
-
     // Trang giao diện gọi các API ở trên (docs/fe-be-mapping.md, nhóm a); cùng quyền với API chính của trang
     Route::get('/dang-ky-hoc-phan', [RegistrationPageController::class, 'index'])->middleware('permission:ENR.view')->name('pages.registration');
     Route::get('/ket-qua-dang-ky', [RegistrationPageController::class, 'result'])->middleware('permission:ENR.view')->name('pages.registration-result');
-    Route::get('/ket-qua-hoc-tap', [GradePageController::class, 'index'])->middleware('permission:GRD.view')->name('pages.grades');
 
     Route::get(
         '/dashboard/data',
         [DashboardDataController::class, 'student']
     )->name('dashboard.data');
+
+    // Điểm của tôi (FR-GRD-005; BR-GRD-08): chỉ lớp đã công bố, kể cả điểm thành phần
+    Route::get('/grades', [StudentGradesController::class, 'mine'])->middleware('permission:GRD.view')->name('grades');
+    // GPA học kỳ / tích lũy, xếp loại (FR-GRD-008, 009) và bảng điểm cá nhân JSON / PDF tiếng Việt – Anh (FR-GRD-010)
+    Route::get('/gpa', [StudentGpaController::class, 'mine'])->middleware('permission:GRD.view')->name('gpa');
+    Route::get('/transcript', [TranscriptController::class, 'mine'])->middleware('permission:GRD.view')->name('transcript');
+    Route::get('/ket-qua-hoc-tap', [GradePageController::class, 'index'])->middleware('permission:GRD.view')->name('pages.grades');
 });

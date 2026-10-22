@@ -1,9 +1,8 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\Pages\Admin\GradeAdminActionController;
-use App\Http\Controllers\Pages\Admin\GradeAdminDetailController;
-use App\Http\Controllers\Pages\Admin\GradeAdminPageController;
+use App\Http\Controllers\Pages\Admin\GradeChangePageController;
+use App\Http\Controllers\Pages\AnnouncementPageController;
 use App\Modules\AcademicYear\Http\Controllers\AcademicCalendarController;
 use App\Modules\AcademicYear\Http\Controllers\AcademicYearController;
 use App\Modules\Auth\Http\Controllers\LoginHistoryController;
@@ -23,7 +22,11 @@ use App\Modules\Faculty\Http\Controllers\LeadershipController;
 use App\Modules\Faculty\Http\Controllers\UnitController;
 use App\Modules\Grade\Http\Controllers\GradeChangeController;
 use App\Modules\Grade\Http\Controllers\GradeWorkflowController;
+use App\Modules\Grade\Http\Controllers\StudentGpaController;
 use App\Modules\Grade\Http\Controllers\TranscriptController;
+use App\Modules\Notification\Http\Controllers\AnnouncementController;
+use App\Modules\Notification\Http\Controllers\EventSubscriptionController;
+use App\Modules\Report\Http\Controllers\DashboardDataController;
 use App\Modules\Room\Http\Controllers\FacilityController;
 use App\Modules\Room\Http\Controllers\RoomController;
 use App\Modules\SchoolClass\Http\Controllers\AdminClassController;
@@ -63,6 +66,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth')->group(function (): void {
     // Dashboard dùng dữ liệu mẫu của nhóm FE; thay bằng dữ liệu thật khi có (FR-RPT-001)
     Route::get('/', [DashboardController::class, 'admin'])->name('home');
+    // Dữ liệu dashboard quản trị theo vai trò và phạm vi (RPT, FR-RPT-001, 002, 008)
+    Route::get('/dashboard/data', [DashboardDataController::class, 'admin'])->middleware('permission:RPT.view')->name('dashboard.data');
 
     // Phân quyền (AUTH): chỉ người có quyền trên toàn trường, mặc định là ADMIN
     Route::middleware('permission:AUTH.view,ALL')->group(function (): void {
@@ -487,6 +492,39 @@ Route::middleware('auth')->group(function (): void {
     Route::post('terms/{term}/registration/finalize', [StaffEnrollmentController::class, 'finalize'])->middleware('permission:ENR.approve,ALL')->name('terms.registration.finalize');
     Route::get('students/{student}/registration-options', [RegistrationOptionsController::class, 'forStudent'])->whereNumber('student')->middleware('permission:ENR.view')->name('students.registration-options');
 
+    // Duyệt và công bố điểm (GRD, FR-GRD-004, 005): xem theo phạm vi GRD.view; duyệt khoa = DEAN, xác nhận / công bố /
+    // khóa = ACAD, EXAM (GRD.approve toàn trường); trả lại = khoa hoặc phòng — kiểm tra từng bước trong GradeWorkflowService
+    Route::get('grade-workflows', [GradeWorkflowController::class, 'index'])->middleware('permission:GRD.view')->name('grade-workflows.index');
+    Route::get('course-sections/{courseSection}/grade-workflow', [GradeWorkflowController::class, 'show'])->whereNumber('courseSection')->middleware('permission:GRD.view')->name('course-sections.grade-workflow.show');
+    Route::post('course-sections/{courseSection}/grade-workflow', [GradeWorkflowController::class, 'change'])->whereNumber('courseSection')->middleware('permission:GRD.approve')->name('course-sections.grade-workflow.change');
+
+    // Thông báo thủ công (NOT, FR-NOT-006, 015): đối tượng trong phạm vi người gửi (BR-NOT-05), kiểm tra trong AudienceResolver
+    Route::get('announcements/options', [AnnouncementController::class, 'options'])->middleware('permission:NOT.create')->name('announcements.options');
+    Route::post('announcements/preview', [AnnouncementController::class, 'preview'])->middleware('permission:NOT.create')->name('announcements.preview');
+    Route::get('announcements', [AnnouncementController::class, 'index'])->middleware('permission:NOT.create')->name('announcements.index');
+    Route::post('announcements', [AnnouncementController::class, 'store'])->middleware('permission:NOT.create')->name('announcements.store');
+    Route::post('announcements/{notification}/revoke', [AnnouncementController::class, 'revoke'])->whereNumber('notification')->middleware('permission:NOT.delete,ALL')->name('announcements.revoke');
+    Route::post('recipient-groups', [AnnouncementController::class, 'saveGroup'])->middleware('permission:NOT.create')->name('recipient-groups.store');
+    Route::put('recipient-groups/{recipientGroup}', [AnnouncementController::class, 'saveGroup'])->whereNumber('recipientGroup')->middleware('permission:NOT.create')->name('recipient-groups.update');
+    Route::delete('recipient-groups/{recipientGroup}', [AnnouncementController::class, 'deleteGroup'])->whereNumber('recipientGroup')->middleware('permission:NOT.create')->name('recipient-groups.destroy');
+    Route::get('soan-thong-bao', [AnnouncementPageController::class, 'index'])->middleware('permission:NOT.create')->name('pages.announcements');
+
+    // Cấu hình thông báo theo sự kiện (NOT, FR-NOT-004; phụ lục A): chỉ ADMIN (NOT.update toàn trường)
+    Route::get('notification-events', [EventSubscriptionController::class, 'index'])->middleware('permission:NOT.update,ALL')->name('notification-events.index');
+    Route::put('notification-events/{code}', [EventSubscriptionController::class, 'update'])->where('code', 'EV-[A-Z]+-[0-9]{2}')->middleware('permission:NOT.update,ALL')->name('notification-events.update');
+
+    // Điều chỉnh điểm sau công bố (FR-GRD-006): khoa duyệt (DEAN, phạm vi) → ACAD / EXAM xác nhận; từ chối có lý do
+    Route::get('grade-change-requests', [GradeChangeController::class, 'index'])->middleware('permission:GRD.approve')->name('grade-change-requests.index');
+    Route::post('grade-change-requests/{gradeChangeRequest}/approve', [GradeChangeController::class, 'approve'])->whereNumber('gradeChangeRequest')->middleware('permission:GRD.approve')->name('grade-change-requests.approve');
+    Route::post('grade-change-requests/{gradeChangeRequest}/reject', [GradeChangeController::class, 'reject'])->whereNumber('gradeChangeRequest')->middleware('permission:GRD.approve')->name('grade-change-requests.reject');
+    Route::get('grade-change-requests/{gradeChangeRequest}/evidence', [GradeChangeController::class, 'evidence'])->whereNumber('gradeChangeRequest')->middleware('permission:GRD.approve')->name('grade-change-requests.evidence');
+    Route::get('enrollments/{enrollment}/grade-history', [GradeChangeController::class, 'history'])->whereNumber('enrollment')->middleware('permission:GRD.view')->name('enrollments.grade-history');
+    // Sổ điểm lớp (FR-GRD-011), GPA và bảng điểm của một sinh viên trong phạm vi (FR-GRD-009, 010)
+    Route::get('course-sections/{courseSection}/grade-report', [TranscriptController::class, 'gradebook'])->whereNumber('courseSection')->middleware('permission:GRD.view')->name('course-sections.grade-report');
+    Route::get('students/{student}/gpa', [StudentGpaController::class, 'show'])->whereNumber('student')->middleware('permission:GRD.view')->name('students.gpa');
+    Route::get('students/{student}/transcript', [TranscriptController::class, 'student'])->whereNumber('student')->middleware('permission:GRD.view')->name('students.transcript');
+    Route::get('duyet-dieu-chinh-diem', [GradeChangePageController::class, 'index'])->middleware('permission:GRD.approve')->name('pages.grade-changes');
+
     // Thời khóa biểu (TTB, FR-TTB-001, 002): khung tiết xem = TTB.view, sửa = ACAD (TTB toàn trường);
     // mẫu lịch lớp học phần: xem theo phạm vi lớp (DEAN, LEC), thêm / sửa / xóa chỉ ACAD — kiểm tra trong ScheduleRuleController.
     Route::get('periods', [PeriodController::class, 'index'])->middleware('permission:TTB.view')->name('periods.index');
@@ -567,43 +605,4 @@ Route::middleware('auth')->group(function (): void {
         ->whereIn('unitType', $unitTypes)->whereNumber('id')->middleware('permission:FAC.update')->name('units.update');
     Route::delete('{unitType}/{id}', [UnitController::class, 'destroy'])
         ->whereIn('unitType', $unitTypes)->whereNumber('id')->middleware('permission:FAC.delete')->name('units.destroy');
-
-    // Quản lý quy trình duyệt và công bố điểm (GRD, FR-GRD-004, FR-GRD-011)
-    Route::get('course-sections/{courseSection}/grade-workflow', [GradeWorkflowController::class, 'show'])
-        ->whereNumber('courseSection')->middleware('permission:GRD.view')->name('course-sections.grade-workflow.show');
-    Route::post('course-sections/{courseSection}/grade-workflow', [GradeWorkflowController::class, 'change'])
-        ->whereNumber('courseSection')->middleware('permission:GRD.approve')->name('course-sections.grade-workflow.change');
-    Route::get('course-sections/{courseSection}/gradebook/export', [TranscriptController::class, 'gradebook'])
-        ->whereNumber('courseSection')->middleware('permission:GRD.view')->name('course-sections.gradebook.export');
-
-    // Điều chỉnh điểm sau công bố (GRD, FR-GRD-006)
-    Route::post('enrollments/{enrollment}/grade-changes', [GradeChangeController::class, 'store'])
-        ->whereNumber('enrollment')->middleware('permission:GRD.update')->name('enrollments.grade-changes.store');
-    Route::post('grade-change-requests/{gradeChangeRequest}/approve', [GradeChangeController::class, 'approve'])
-        ->whereNumber('gradeChangeRequest')->middleware('permission:GRD.approve')->name('grade-change-requests.approve');
-    Route::post('grade-change-requests/{gradeChangeRequest}/reject', [GradeChangeController::class, 'reject'])
-        ->whereNumber('gradeChangeRequest')->middleware('permission:GRD.approve')->name('grade-change-requests.reject');
-    Route::get('enrollments/{enrollment}/grade-history', [GradeChangeController::class, 'history'])
-        ->whereNumber('enrollment')->middleware('permission:GRD.view')->name('enrollments.grade-history');
-
-    // Các trang và thao tác WEB (Blade) - giữ API JSON nguyên vẹn.
-    Route::get('quan-ly-diem/lop/{courseSection}', [GradeAdminDetailController::class, 'section'])
-        ->whereNumber('courseSection')->middleware('permission:GRD.view')->name('pages.grade-section');
-    Route::get('quan-ly-diem/lich-su/{enrollment}', [GradeAdminDetailController::class, 'history'])
-        ->whereNumber('enrollment')->middleware('permission:GRD.view')->name('pages.grade-history');
-    Route::get('quan-ly-diem/gpa', [GradeAdminDetailController::class, 'gpa'])
-        ->middleware('permission:GRD.view')->name('pages.grade-gpa');
-    Route::get('quan-ly-diem/minh-chung/{gradeChangeRequest}', [GradeAdminDetailController::class, 'evidence'])
-        ->whereNumber('gradeChangeRequest')->middleware('permission:GRD.view')->name('pages.grade-evidence');
-    Route::post('quan-ly-diem/lop/{courseSection}/chuyen-trang-thai', [GradeAdminActionController::class, 'workflow'])
-        ->whereNumber('courseSection')->middleware('permission:GRD.approve')->name('pages.grade-workflow.change');
-    Route::post('quan-ly-diem/yeu-cau/{gradeChangeRequest}/duyet', [GradeAdminActionController::class, 'approve'])
-        ->whereNumber('gradeChangeRequest')->middleware('permission:GRD.approve')->name('pages.grade-changes.approve');
-    Route::post('quan-ly-diem/yeu-cau/{gradeChangeRequest}/tu-choi', [GradeAdminActionController::class, 'reject'])
-        ->whereNumber('gradeChangeRequest')->middleware('permission:GRD.approve')->name('pages.grade-changes.reject');
-
-    // Trang giao diện quản lý duyệt điểm & điều chỉnh điểm
-    Route::get('quan-ly-diem', [GradeAdminPageController::class, 'index'])
-        ->middleware('permission:GRD.view')
-        ->name('pages.grades');
 });

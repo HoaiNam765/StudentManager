@@ -3,6 +3,7 @@
 namespace App\Modules\Auth\Services;
 
 use App\Models\User;
+use App\Modules\Auth\Events\AccountSecurityAlert;
 use App\Modules\Auth\Models\LoginHistory;
 use App\Modules\Auth\Notifications\UnusualLoginAlert;
 use Illuminate\Http\Request;
@@ -38,6 +39,7 @@ class LoginHistoryService
 
         if ($unusual) {
             $user->notify(new UnusualLoginAlert($entry));
+            AccountSecurityAlert::dispatch($user, 'unusual_login', 'login:'.$entry->id);
         }
 
         return $this->lastSuccess = $entry;

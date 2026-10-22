@@ -4,6 +4,7 @@ namespace App\Modules\Auth\Services;
 
 use App\Models\User;
 use App\Modules\Auth\Enums\AccountStatus;
+use App\Modules\Auth\Events\AccountSecurityAlert;
 use App\Support\Audit\AuditEvent;
 use App\Support\Audit\AuditLogger;
 use Illuminate\Support\Facades\Auth;
@@ -21,7 +22,7 @@ use Illuminate\Validation\ValidationException;
  * - Mọi lần đăng nhập thành công/thất bại và lần khóa đều ghi nhật ký kiểm toán và lịch sử đăng nhập (FR-AUTH-016).
  * - "Ghi nhớ đăng nhập" có hiệu lực tối đa `studentmanager.auth.remember_days` ngày; 0 = tắt (FR-AUTH-007).
  *
- * Cảnh báo cho chủ tài khoản khi bị khóa (sự kiện EV-AUTH-02) sẽ nối khi có module NOT.
+ * Bị khóa tạm thì phát `AccountSecurityAlert` (EV-AUTH-02), NOT báo cho chủ tài khoản và ADMIN.
  * Tài khoản bị khóa hẳn, ngừng hoạt động hoặc đã tới ngày hẹn ngừng (User::canSignIn) bị chặn sau khi đúng mật khẩu.
  */
 class LoginService
@@ -156,6 +157,8 @@ class LoginService
                     $fresh,
                     reason: "Nhập sai mật khẩu {$config['lockout_max_attempts']} lần liên tiếp; khóa tạm {$config['lockout_minutes']} phút",
                 );
+
+                AccountSecurityAlert::dispatch($fresh, 'locked', 'locked:'.$fresh->locked_until->timestamp);
             }
         });
     }

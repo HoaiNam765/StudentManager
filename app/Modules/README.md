@@ -401,6 +401,10 @@ $resolver->setFor($khoa, $ngay)->code;            // bộ quy chế đang áp d�
 - Kết quả: 300 sinh viên (khóa 2025 và 2026, mỗi ngành 25 / khóa; `Student::factory()` dùng Faker vi_VN, CCCD giả `0993…`, email `example.test`), nhập học qua `AdmissionService` (MSSV, tài khoản, CTĐT, lớp hành chính). Năm học 2025–2026 hai học kỳ **đã khóa** (lớp theo CTĐT, chia lớp khi quá 80 sinh viên, điểm công bố + khóa, GPA đã tính); học kỳ 1 2026–2027 **đang diễn ra** (đăng ký đã chốt, đang nhập điểm, hai lớp đã nộp). Tình huống đặc biệt: học lại, học lực yếu (bị cảnh báo), vắng thi không lý do, bảo lưu. Nợ học phí, vắng quá ngưỡng chờ FEE, ATT.
 - Chỉ trong dữ liệu demo: CTĐT mẫu đổi `cohort_from` từ 2026 về 2025 để khóa 2025 nhập học được. Mật khẩu sinh viên demo = `DevRoleUsersSeeder::PASSWORD`, đăng nhập bằng MSSV.
 
+## Nghiệm thu P1 (QA, BA 11.2 UAT-01 → UAT-08)
+
+- `php artisan uat:p1` chạy các kịch bản UAT qua dịch vụ thật trên CSDL hiện tại (nên là CSDL demo), **trong một giao dịch rồi hoàn tác**; in từng kiểm tra ĐẠT / LỖI / BỎ QUA và ghi báo cáo `storage/logs/uat-p1-*.md`; kết quả và cách chạy ở `docs/nghiem-thu-p1.md`. Không chạy ở production. Phần 100 yêu cầu đồng thời của UAT-06 cần nhiều tiến trình nên bỏ qua trong lệnh này.
+
 ## Đăng ký học phần (ENR, FR-ENR-001, 002; BR-ENR-01, 11)
 
 - Đợt đăng ký `registration_periods`: học kỳ, vòng (vòng 1 / vòng 2 / bổ sung), mở – đóng (nhập giờ Việt Nam, lưu UTC; không nhập thì lấy mốc "Mở đăng ký" 00:00 và "Đóng đăng ký" 23:59 trong lịch học vụ ACY), khung tín chỉ riêng (trống = theo quy chế, #104), trạng thái nháp → công bố → đã chốt (#113). Đối tượng `registration_period_targets`: mỗi dòng một tổ hợp khóa / ngành / lớp hành chính, không có dòng nào = mọi sinh viên.

@@ -3,6 +3,7 @@
 use App\Modules\Auth\Http\Middleware\EnsureAccountWritable;
 use App\Modules\Auth\Http\Middleware\EnsurePasswordIsChanged;
 use App\Modules\Auth\Http\Middleware\EnsurePermission;
+use App\Modules\Auth\Http\Middleware\EnsurePortal;
 use App\Support\Audit\AuditEvent;
 use App\Support\Audit\AuditLogger;
 use App\Support\Exceptions\BusinessRuleException;
@@ -22,11 +23,11 @@ return Application::configure(basePath: dirname(__DIR__))
         then: function (): void {
             // Ba cổng giao diện theo docs/BA.md mục 8.1; trang công khai nằm ở routes/web.php.
             // password.changed: chưa đổi mật khẩu tạm / mật khẩu quá hạn thì chưa dùng được các cổng.
-            Route::middleware(['web', 'password.changed'])->prefix('student')->name('student.')
+            Route::middleware(['web', 'password.changed', 'portal:student'])->prefix('student')->name('student.')
                 ->group(base_path('routes/student.php'));
-            Route::middleware(['web', 'password.changed'])->prefix('teacher')->name('teacher.')
+            Route::middleware(['web', 'password.changed', 'portal:teacher'])->prefix('teacher')->name('teacher.')
                 ->group(base_path('routes/teacher.php'));
-            Route::middleware(['web', 'password.changed'])->prefix('admin')->name('admin.')
+            Route::middleware(['web', 'password.changed', 'portal:admin'])->prefix('admin')->name('admin.')
                 ->group(base_path('routes/admin.php'));
         },
     )
@@ -34,6 +35,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'permission' => EnsurePermission::class,
             'password.changed' => EnsurePasswordIsChanged::class,
+            'portal' => EnsurePortal::class,
         ]);
 
         // Tài khoản chỉ đọc (sinh viên đã tốt nghiệp, BR-AUTH-07) không thao tác ghi ở bất kỳ trang nào

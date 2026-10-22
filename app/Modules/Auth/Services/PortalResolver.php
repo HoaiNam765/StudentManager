@@ -27,4 +27,21 @@ class PortalResolver
             default => null,
         };
     }
+
+    /**
+     * Cổng người dùng được vào: `student` khi có vai trò sinh viên, `teacher` khi có vai trò giảng viên, `admin` khi có
+     * vai trò khác (cán bộ văn phòng). Nhiều vai trò thì vào được nhiều cổng.
+     *
+     * @return list<string>
+     */
+    public function portalsFor(User $user): array
+    {
+        $codes = $user->activeRoles()->pluck('roles.code')->unique()->all();
+
+        return array_keys(array_filter([
+            'admin' => array_diff($codes, self::TEACHER_ROLES, self::STUDENT_ROLES) !== [],
+            'teacher' => array_intersect($codes, self::TEACHER_ROLES) !== [],
+            'student' => array_intersect($codes, self::STUDENT_ROLES) !== [],
+        ]));
+    }
 }

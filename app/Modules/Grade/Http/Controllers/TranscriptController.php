@@ -32,6 +32,14 @@ class TranscriptController extends Controller
         return $this->personal($request, $student);
     }
 
+    /** Sinh viên: tải bảng điểm PDF (liên kết "Tải bảng điểm" của giao diện FE student/grade/grades). */
+    public function minePdf(Request $request): Response
+    {
+        $request->merge(['format' => 'pdf']);
+
+        return $this->mine($request);
+    }
+
     /** Cán bộ có GRD.view: bảng điểm của một sinh viên trong phạm vi dữ liệu sinh viên của mình (STU.view). */
     public function student(Request $request, Student $student): JsonResponse|Response
     {

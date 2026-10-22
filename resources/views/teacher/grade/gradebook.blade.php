@@ -4,7 +4,7 @@
 @section('page-title', 'Nhập điểm lớp học phần')
 
 @section('page')
-<div class="space-y-6 pb-16" @if ($selectedSection) data-page="teacher-gradebook" @endif>
+<div class="space-y-6 pb-16">
     {{-- Thanh chọn Lớp học phần & Trạng thái --}}
     <div class="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/60 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -18,7 +18,7 @@
                     <select name="course_section_id" onchange="this.form.submit()" aria-label="Chọn lớp học phần" class="h-10 pl-3.5 pr-9 bg-surface-container-low border border-outline-variant rounded-xl font-label-md text-on-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none appearance-none cursor-pointer max-w-xs sm:max-w-sm truncate">
                         @forelse ($sections as $sec)
                             <option value="{{ $sec->id }}" @selected($selectedSection?->id == $sec->id)>
-                                {{ $sec->code }} — {{ $sec->subject?->name }} ({{ $sec->term?->name }} {{ $sec->term?->academicYear?->name }})
+                                {{ $sec->code }} — {{ $sec->subject?->name }} ({{ $sec->term?->name }})
                             </option>
                         @empty
                             <option value="">(Chưa có lớp học phần được phân công)</option>
@@ -30,7 +30,19 @@
         </div>
     </div>
 
-    <div data-region="alert" hidden></div>
+    @if (session('success'))
+        <div class="rounded-xl p-4 bg-emerald-50 border border-emerald-200 text-emerald-900 text-sm flex items-center gap-2.5 shadow-xs">
+            <span class="material-symbols-outlined text-emerald-600 text-[20px]" aria-hidden="true">check_circle</span>
+            <span>{{ session('success') }}</span>
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="rounded-xl p-4 bg-red-50 border border-red-200 text-red-900 text-sm flex items-center gap-2.5 shadow-xs">
+            <span class="material-symbols-outlined text-red-600 text-[20px]" aria-hidden="true">error</span>
+            <span>{{ session('error') }}</span>
+        </div>
+    @endif
 
     @if (! $selectedSection)
         <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-12 text-center text-on-surface-variant shadow-xs">
@@ -69,7 +81,7 @@
                             {{ $selectedSection->subject?->name }}
                         </h2>
                         <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface-variant border border-outline-variant/60">
-                            {{ $selectedSection->subject?->credits }} Tín chỉ
+                            {{ $selectedSection->subject?->credits ?? 3 }} Tín chỉ
                         </span>
 
                         {{-- Huy hiệu trạng thái sổ điểm --}}
@@ -82,7 +94,7 @@
                     <div class="flex flex-wrap items-center gap-x-6 gap-y-1.5 text-xs text-on-surface-variant pt-1">
                         <span class="flex items-center gap-1.5">
                             <span class="material-symbols-outlined text-[16px]" aria-hidden="true">calendar_today</span>
-                            Học kỳ: <strong class="text-on-surface">{{ $selectedSection->term?->name }} {{ $selectedSection->term?->academicYear?->name }}</strong>
+                            Học kỳ: <strong class="text-on-surface">{{ $selectedSection->term?->name }}</strong>
                         </span>
                         <span class="flex items-center gap-1.5">
                             <span class="material-symbols-outlined text-[16px]" aria-hidden="true">groups</span>
@@ -125,11 +137,11 @@
                             <span class="material-symbols-outlined text-[16px]" aria-hidden="true">arrow_drop_down</span>
                         </button>
                         <div id="export-menu" class="hidden absolute right-0 mt-2 w-44 rounded-xl bg-surface-container-lowest border border-outline-variant shadow-md z-20 py-1">
-                            <a href="{{ route('teacher.grade-report', ['courseSection' => $selectedSection->id, 'format' => 'xlsx']) }}" class="flex items-center gap-2 px-3.5 py-2 text-xs text-on-surface hover:bg-surface-container-low">
+                            <a href="{{ route('teacher.gradebook.export', ['courseSection' => $selectedSection->id, 'format' => 'xlsx']) }}" class="flex items-center gap-2 px-3.5 py-2 text-xs text-on-surface hover:bg-surface-container-low">
                                 <span class="material-symbols-outlined text-[18px] text-emerald-600" aria-hidden="true">table_view</span>
                                 <span>Xuất Excel (.xlsx)</span>
                             </a>
-                            <a href="{{ route('teacher.grade-report', ['courseSection' => $selectedSection->id, 'format' => 'pdf']) }}" class="flex items-center gap-2 px-3.5 py-2 text-xs text-on-surface hover:bg-surface-container-low">
+                            <a href="{{ route('teacher.gradebook.export', ['courseSection' => $selectedSection->id, 'format' => 'pdf']) }}" target="_blank" class="flex items-center gap-2 px-3.5 py-2 text-xs text-on-surface hover:bg-surface-container-low">
                                 <span class="material-symbols-outlined text-[18px] text-red-600" aria-hidden="true">picture_as_pdf</span>
                                 <span>Xuất PDF</span>
                             </a>
@@ -138,10 +150,14 @@
 
                     {{-- Nộp điểm --}}
                     @if ($canEdit)
-                        <button type="button" data-action="submit" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-white bg-primary hover:bg-primary-container transition-colors shadow-xs">
-                            <span class="material-symbols-outlined text-[18px]" aria-hidden="true">send</span>
-                            <span>Nộp điểm</span>
-                        </button>
+                        <form method="POST" action="{{ route('teacher.gradebook.workflow.change', ['courseSection' => $selectedSection->id]) }}" onsubmit="return confirm('Bạn có chắc chắn muốn nộp bảng điểm lớp này lên cấp trên không? Sau khi nộp bạn sẽ không thể chỉnh sửa trực tiếp.')">
+                            @csrf
+                            <input type="hidden" name="status" value="submitted">
+                            <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-white bg-primary hover:bg-primary-container transition-colors shadow-xs">
+                                <span class="material-symbols-outlined text-[18px]" aria-hidden="true">send</span>
+                                <span>Nộp điểm</span>
+                            </button>
+                        </form>
                     @endif
                 </div>
             </div>
@@ -162,16 +178,14 @@
                     @if (! $loop->last) <span class="text-outline">+</span> @endif
                 @empty
                     <span class="text-outline">Chưa thiết lập cơ cấu điểm cho lớp này.</span>
-                    @if ($canEdit)
-                        <button type="button" data-action="initialize" class="ml-2 px-3 py-1 rounded-lg bg-primary text-white font-semibold hover:bg-primary-container">Khởi tạo theo cơ cấu của học phần</button>
-                    @endif
                 @endforelse
             </div>
         </section>
 
         {{-- Bảng Nhập điểm Sổ lớp --}}
         <section class="bg-surface-container-lowest rounded-2xl border border-outline-variant/60 shadow-xs overflow-hidden">
-            <form id="draft-form" data-form="draft" novalidate>
+            <form id="draft-form" method="POST" action="{{ route('teacher.gradebook.draft.save', ['courseSection' => $selectedSection->id]) }}">
+                @csrf
                 <div class="p-4 sm:p-5 border-b border-outline-variant/40 flex flex-wrap items-center justify-between gap-3">
                     <div class="flex items-center gap-2.5">
                         <span class="material-symbols-outlined text-primary text-[22px]" aria-hidden="true">table_chart</span>
@@ -215,20 +229,19 @@
                                     <th scope="col" class="py-3 px-3 text-center min-w-[60px]">Điểm chữ</th>
                                     <th scope="col" class="py-3 px-3 text-center min-w-[70px]">Hệ 4</th>
                                     <th scope="col" class="py-3 px-3 text-center min-w-[90px]">Kết quả</th>
-                                    <th scope="col" class="py-3 px-3 text-center min-w-[150px]">Trạng thái đặc biệt</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-outline-variant/30 text-on-surface">
+                                @php $inputIndex = 0; @endphp
                                 @foreach ($gradebookData['students'] as $idx => $st)
                                     @php
                                         $scoresByComp = collect($st['scores'] ?? [])->keyBy('component_id');
-                                        $final = $results->get($st['enrollment_id']);
-                                        $special = $final?->special_status;
+                                        $final = $st['final_result'] ?? null;
                                     @endphp
                                     <tr class="hover:bg-surface-container-low/40 transition-colors">
                                         <td class="py-3 px-3 text-center font-mono text-outline">{{ $idx + 1 }}</td>
                                         <td class="py-3 px-3 font-mono font-medium text-primary">{{ $st['student']['student_code'] ?? '—' }}</td>
-                                        <td class="py-3 px-4 font-medium">{{ $st['student']['full_name'] ?? '—' }}</td>
+                                        <td class="py-3 px-4 font-medium">{{ $st['student']['name'] ?? '—' }}</td>
 
                                         @foreach ($gradebookData['components'] ?? [] as $comp)
                                             @php
@@ -237,12 +250,13 @@
                                             @endphp
                                             <td class="py-2 px-2 text-center">
                                                 @if ($canEdit)
-                                                    <input type="number" step="{{ config('grades.score_step') }}" min="{{ config('grades.min_score') }}" max="{{ config('grades.max_score') }}"
-                                                           data-enrollment="{{ $st['enrollment_id'] }}" data-component="{{ $comp['id'] }}"
-                                                           data-original="{{ $scoreVal !== null ? (float) $scoreVal : '' }}"
-                                                           aria-label="{{ $comp['name'] }} {{ $st['student']['student_code'] ?? '' }}"
+                                                    <input type="hidden" name="items[{{ $inputIndex }}][enrollment_id]" value="{{ $st['enrollment_id'] }}">
+                                                    <input type="hidden" name="items[{{ $inputIndex }}][component_id]" value="{{ $comp['id'] }}">
+                                                    <input type="number" step="0.1" min="0" max="10"
+                                                           name="items[{{ $inputIndex }}][score]"
                                                            value="{{ $scoreVal !== null ? (float) $scoreVal : '' }}"
                                                            class="w-16 h-8 text-center bg-surface-container-lowest border border-outline-variant rounded-lg font-mono text-xs focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-colors">
+                                                    @php $inputIndex++; @endphp
                                                 @else
                                                     <span class="font-mono font-semibold {{ $scoreVal !== null ? 'text-on-surface' : 'text-outline' }}">
                                                         {{ $scoreVal !== null ? number_format((float) $scoreVal, 1) : '—' }}
@@ -252,46 +266,31 @@
                                         @endforeach
 
                                         <td class="py-3 px-3 text-center font-bold text-sm">
-                                            {{ $final?->score10 !== null ? number_format((float) $final->score10, 1, ',', '') : '—' }}
+                                            {{ $final && $final['score_10'] !== null ? number_format((float) $final['score_10'], 1) : '—' }}
                                         </td>
                                         <td class="py-3 px-3 text-center">
-                                            @if (! empty($final?->letter))
-                                                <span class="inline-block px-1.5 py-0.5 rounded font-bold text-[11px] {{ $final->letter === 'F' ? 'bg-red-50 text-red-700' : 'bg-primary/10 text-primary' }}">
-                                                    {{ $final->letter }}
+                                            @if ($final && ! empty($final['letter']))
+                                                <span class="inline-block px-1.5 py-0.5 rounded font-bold text-[11px] {{ $final['letter'] === 'F' ? 'bg-red-50 text-red-700' : 'bg-primary/10 text-primary' }}">
+                                                    {{ $final['letter'] }}
                                                 </span>
                                             @else
                                                 <span class="text-outline">—</span>
                                             @endif
                                         </td>
                                         <td class="py-3 px-3 text-center font-mono font-semibold">
-                                            {{ $final?->point4 !== null ? number_format((float) $final->point4, 1, ',', '') : '—' }}
+                                            {{ $final && $final['score_4'] !== null ? number_format((float) $final['score_4'], 2) : '—' }}
                                         </td>
                                         <td class="py-3 px-3 text-center">
-                                            @if ($final?->is_passed === true)
+                                            @if ($final && $final['passed'] === true)
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                                     Đạt
                                                 </span>
-                                            @elseif ($final?->is_passed === false)
+                                            @elseif ($final && $final['passed'] === false)
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-red-50 text-red-700 border border-red-200">
                                                     Không đạt
                                                 </span>
-                                            @elseif ($final?->status === 'incomplete')
-                                                <span class="text-[11px] text-amber-800">Chưa đủ dữ liệu</span>
                                             @else
                                                 <span class="text-outline">—</span>
-                                            @endif
-                                        </td>
-                                        <td class="py-2 px-2 text-center">
-                                            @if ($canEdit)
-                                                <select data-special="{{ $st['enrollment_id'] }}" data-original="{{ $special }}" aria-label="Trạng thái đặc biệt {{ $st['student']['student_code'] ?? '' }}"
-                                                        class="h-8 max-w-[150px] px-2 bg-surface-container-lowest border border-outline-variant rounded-lg text-[11px]">
-                                                    <option value="">—</option>
-                                                    @foreach ($specialStatuses as $code => $label)
-                                                        <option value="{{ $code }}" @selected($special === $code)>{{ $label }}</option>
-                                                    @endforeach
-                                                </select>
-                                            @else
-                                                <span class="text-[11px] text-on-surface-variant">{{ $special ? ($specialStatuses[$special] ?? $special) : '—' }}</span>
                                             @endif
                                         </td>
                                     </tr>
@@ -316,7 +315,8 @@
                     </button>
                 </div>
 
-                <form data-form="import" class="space-y-4" novalidate>
+                <form method="POST" action="{{ route('teacher.gradebook.import', ['courseSection' => $selectedSection->id]) }}" enctype="multipart/form-data" class="space-y-4">
+                    @csrf
                     <p class="text-xs text-on-surface-variant">
                         Chọn file <strong>.xlsx</strong> đúng định dạng tải từ nút <em>Mẫu Excel</em>. Điểm sau khi nhập sẽ được lưu tự động vào bản nháp.
                     </p>

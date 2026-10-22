@@ -175,7 +175,7 @@ class GradeChangeService extends BaseService
     {
         return [
             'result' => CourseResult::query()->where('enrollment_id', $enrollment->id)->first()
-                ?->only('score10', 'letter', 'point4', 'is_passed', 'status', 'special_status'),
+                ?->only('score10', 'letter', 'point4', 'is_passed', 'status', 'special_status', 'score_10', 'score_4'), // score_10, score_4: tên khóa view FE admin/grade/history
             'entries' => GradeEntry::query()->where('enrollment_id', $enrollment->id)->orderBy('section_grade_component_id')->get()
                 ->map(fn (GradeEntry $e) => ['component_id' => $e->section_grade_component_id, 'score' => $e->score])->all(),
         ];

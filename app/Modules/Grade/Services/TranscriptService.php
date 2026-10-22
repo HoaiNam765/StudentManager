@@ -126,6 +126,10 @@ class TranscriptService
             'status' => $result?->status,
             'special_status' => $result?->special_status,
             'special_label' => $special['label'] ?? null,
+            // Tên khóa view FE pdf/grade-section đang dùng
+            'score_10' => $result?->score10,
+            'score_4' => $result?->point4,
+            'passed' => $result?->is_passed,
         ];
     }
 

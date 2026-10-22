@@ -73,6 +73,7 @@ class PortalOverview
             'current' => ['courses' => $current->count(), 'credits' => $inProgress],
             'blocks' => $curriculum === null ? [] : $this->blocks($curriculum->id, $this->record->passedSubjectIds($student)),
             'recent_results' => $this->recentResults($student),
+            'gpa10' => $this->gpa10($student),
         ];
     }
 
@@ -172,6 +173,22 @@ class PortalOverview
                 'letter' => $r->letter ?? (config("grade_special_statuses.{$r->special_status}.symbol")),
                 'passed' => $r->is_passed,
             ])->all();
+    }
+
+    /** Điểm trung bình tích lũy hệ 10: trung bình theo tín chỉ của điểm hệ 10 các học phần tính GPA đã công bố / khóa. */
+    private function gpa10(Student $student): ?float
+    {
+        $row = CourseResult::query()
+            ->join('enrollments', 'enrollments.id', '=', 'course_results.enrollment_id')
+            ->join('section_grade_workflows as w', 'w.course_section_id', '=', 'enrollments.course_section_id')
+            ->join('subjects', 'subjects.id', '=', 'enrollments.subject_id')
+            ->where('enrollments.student_id', $student->id)->where('subjects.counts_toward_gpa', true)
+            ->whereNotNull('course_results.score10')
+            ->whereIn('w.status', [GradePublicationStatus::Published->value, GradePublicationStatus::Locked->value])
+            ->selectRaw('sum(course_results.score10 * subjects.credits) as total, sum(subjects.credits) as credits')
+            ->toBase()->first();
+
+        return $row && $row->credits > 0 ? round($row->total / $row->credits, 2) : null;
     }
 
     /** Học kỳ đang diễn ra theo ngày; giữa hai học kỳ thì học kỳ gần nhất đã bắt đầu. */

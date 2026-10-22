@@ -61,7 +61,7 @@ class FrontendPagesTest extends TestCase
     public function test_dashboard_hien_thi_theo_cong(): void
     {
         $this->actingAs($this->userWithRole('ADMIN'))->get('/admin')->assertOk()->assertSee('Tổng quan Quản lý Đào tạo');
-        $this->actingAs($this->userWithRole('STU'))->get('/student')->assertOk()->assertSee('Cổng thông tin Sinh viên');
+        $this->actingAs($this->userWithRole('STU'))->get('/student')->assertOk()->assertSee('Cổng Sinh viên');
         $this->actingAs($this->userWithRole('STU'))->get('/student/mobile')->assertOk()->assertSee('Lịch học hôm nay');
         $this->actingAs($this->userWithRole('LEC'))->get('/teacher')->assertOk()->assertSee('Cổng Giảng viên');
     }

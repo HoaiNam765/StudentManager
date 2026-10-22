@@ -27,12 +27,14 @@ class PortalMenu
         'teacher' => [
             'Giảng dạy' => [
                 ['Tổng quan', 'dashboard', 'teacher.home', null],
+                ['Nhập điểm', 'edit_note', 'teacher.pages.gradebook', 'GRD.update'],
                 ['Gửi thông báo', 'campaign', 'teacher.pages.announcements', 'NOT.create'],
             ],
         ],
         'admin' => [
             'Quản lý đào tạo' => [
                 ['Tổng quan', 'dashboard', 'admin.home', null],
+                ['Duyệt & công bố điểm', 'verified', 'admin.pages.grades', 'GRD.approve'],
                 ['Duyệt điều chỉnh điểm', 'rule', 'admin.pages.grade-changes', 'GRD.approve'],
                 ['Gửi thông báo', 'campaign', 'admin.pages.announcements', 'NOT.create'],
             ],

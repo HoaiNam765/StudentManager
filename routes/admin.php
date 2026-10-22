@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Pages\Admin\GradeAdminPageController;
 use App\Http\Controllers\Pages\Admin\GradeChangePageController;
 use App\Http\Controllers\Pages\AnnouncementPageController;
 use App\Modules\AcademicYear\Http\Controllers\AcademicCalendarController;
@@ -523,6 +524,8 @@ Route::middleware('auth')->group(function (): void {
     Route::get('course-sections/{courseSection}/grade-report', [TranscriptController::class, 'gradebook'])->whereNumber('courseSection')->middleware('permission:GRD.view')->name('course-sections.grade-report');
     Route::get('students/{student}/gpa', [StudentGpaController::class, 'show'])->whereNumber('student')->middleware('permission:GRD.view')->name('students.gpa');
     Route::get('students/{student}/transcript', [TranscriptController::class, 'student'])->whereNumber('student')->middleware('permission:GRD.view')->name('students.transcript');
+    // Trang duyệt và công bố điểm theo lớp (FR-GRD-004, 005); nút bước tiếp theo theo vai trò
+    Route::get('quan-ly-diem', [GradeAdminPageController::class, 'index'])->middleware('permission:GRD.view')->name('pages.grades');
     Route::get('duyet-dieu-chinh-diem', [GradeChangePageController::class, 'index'])->middleware('permission:GRD.approve')->name('pages.grade-changes');
 
     // Thời khóa biểu (TTB, FR-TTB-001, 002): khung tiết xem = TTB.view, sửa = ACAD (TTB toàn trường);

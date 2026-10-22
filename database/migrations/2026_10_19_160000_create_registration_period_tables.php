@@ -21,8 +21,8 @@ return new class extends Migration
             $table->foreignId('term_id')->constrained()->restrictOnDelete();
             $table->string('name');
             $table->string('round', 20)->comment('round_1 | round_2 | supplementary');
-            $table->timestamp('opens_at')->comment('UTC');
-            $table->timestamp('closes_at')->comment('UTC');
+            $table->dateTime('opens_at')->comment('UTC');
+            $table->dateTime('closes_at')->comment('UTC');
             $table->unsignedTinyInteger('min_credits')->nullable()->comment('Trống = theo quy chế (BR-ENR-02)');
             $table->unsignedTinyInteger('max_credits')->nullable()->comment('Trống = theo quy chế (BR-ENR-02)');
             $table->string('status', 20)->default('draft')->index()->comment('draft | published | finalized');

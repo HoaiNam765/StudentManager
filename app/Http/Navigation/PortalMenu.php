@@ -21,16 +21,19 @@ class PortalMenu
                 ['Tổng quan', 'dashboard', 'student.home', null],
                 ['Đăng ký học phần', 'how_to_reg', 'student.pages.registration', 'ENR.view'],
                 ['Kết quả đăng ký', 'fact_check', 'student.pages.registration-result', 'ENR.view'],
+                ['Kết quả học tập & Điểm', 'grade', 'student.pages.grades', 'GRD.view'],
             ],
         ],
         'teacher' => [
             'Giảng dạy' => [
                 ['Tổng quan', 'dashboard', 'teacher.home', null],
+                ['Quản lý & Nhập điểm', 'fact_check', 'teacher.pages.gradebook', 'GRD.view'],
             ],
         ],
         'admin' => [
             'Quản lý đào tạo' => [
                 ['Tổng quan', 'dashboard', 'admin.home', null],
+                ['Quản lý & Duyệt điểm', 'verified', 'admin.pages.grades', 'GRD.view'],
             ],
         ],
     ];

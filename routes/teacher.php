@@ -1,7 +1,11 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Pages\Teacher\GradebookPageController;
 use App\Modules\Grade\Http\Controllers\GradebookController;
+use App\Modules\Grade\Http\Controllers\GradeChangeController;
+use App\Modules\Grade\Http\Controllers\GradeWorkflowController;
+use App\Modules\Grade\Http\Controllers\TranscriptController;
 use App\Modules\Report\Http\Controllers\DashboardDataController;
 use App\Modules\SchoolClass\Http\Controllers\TeacherClassRosterController;
 use App\Modules\Teacher\Http\Controllers\LecturerProfileController;
@@ -93,7 +97,42 @@ Route::middleware('auth')->group(function (): void {
             )
                 ->middleware('permission:GRD.update')
                 ->name('import');
+
+            Route::get(
+                'workflow',
+                [GradeWorkflowController::class, 'show']
+            )
+                ->middleware('permission:GRD.view')
+                ->name('workflow.show');
+
+            Route::post(
+                'workflow',
+                [GradeWorkflowController::class, 'change']
+            )
+                ->middleware('permission:GRD.update')
+                ->name('workflow.change');
+
+            Route::get(
+                'export',
+                [TranscriptController::class, 'gradebook']
+            )
+                ->middleware('permission:GRD.view')
+                ->name('export');
         });
+
+    Route::post('enrollments/{enrollment}/grade-changes', [GradeChangeController::class, 'store'])
+        ->middleware('permission:GRD.update')
+        ->name('grade-changes.store');
+
+    Route::get('enrollments/{enrollment}/grade-history', [GradeChangeController::class, 'history'])
+        ->middleware('permission:GRD.view')
+        ->name('grade-changes.history');
+
+    // Trang giao diện nhập điểm / sổ điểm lớp học phần
+    Route::get('/nhap-diem', [GradebookPageController::class, 'index'])
+        ->middleware('permission:GRD.view')
+        ->name('pages.gradebook');
+
     Route::get(
         '/dashboard/data',
         [DashboardDataController::class, 'teacher']

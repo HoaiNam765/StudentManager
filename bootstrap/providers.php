@@ -5,6 +5,7 @@ use App\Modules\Curriculum\CurriculumServiceProvider;
 use App\Modules\Enrollment\EnrollmentServiceProvider;
 use App\Modules\Faculty\FacultyServiceProvider;
 use App\Modules\Grade\GradeServiceProvider;
+use App\Modules\Notification\NotificationServiceProvider;
 use App\Modules\Room\RoomServiceProvider;
 use App\Modules\SchoolClass\SchoolClassServiceProvider;
 use App\Modules\Student\StudentServiceProvider;
@@ -28,4 +29,5 @@ return [
     TimetableServiceProvider::class,
     EnrollmentServiceProvider::class,
     GradeServiceProvider::class,
+    NotificationServiceProvider::class,
 ];

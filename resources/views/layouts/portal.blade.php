@@ -10,14 +10,19 @@
 @php
     $currentUser = auth()->user();
     $portal = \Illuminate\Support\Str::before(request()->route()?->getName() ?? '', '.');
+    $homeRoute = app(\App\Modules\Auth\Services\PortalResolver::class)->homeRouteFor($currentUser);
+    // Trang dùng chung (trung tâm thông báo…) không thuộc cổng nào: lấy cổng theo vai trò của người dùng
+    if (! isset(\App\Http\Navigation\PortalMenu::PORTALS[$portal]) && $homeRoute !== null) {
+        $portal = \Illuminate\Support\Str::before($homeRoute, '.');
+    }
     $menu = app(\App\Http\Navigation\PortalMenu::class)->for($portal, $currentUser);
     $portalName = \App\Http\Navigation\PortalMenu::PORTALS[$portal] ?? 'Hệ thống Quản lý Học vụ';
-    $homeRoute = app(\App\Modules\Auth\Services\PortalResolver::class)->homeRouteFor($currentUser);
     $homeUrl = $homeRoute !== null ? route($homeRoute) : url('/');
     $initials = \Illuminate\Support\Str::of($currentUser->name)->trim()->explode(' ')->filter()->take(-2)
         ->map(fn ($word) => mb_strtoupper(mb_substr($word, 0, 1)))->implode('');
 
     $accountLinks = [
+        ['route' => 'notifications.page', 'icon' => 'notifications', 'label' => 'Thông báo'],
         ['route' => 'account.settings', 'icon' => 'manage_accounts', 'label' => 'Thông tin tài khoản'],
         ['route' => 'password.change', 'icon' => 'lock_reset', 'label' => 'Đổi mật khẩu'],
         ['route' => 'account.sessions', 'icon' => 'devices', 'label' => 'Phiên đăng nhập'],
@@ -94,6 +99,14 @@
                 </nav>
             </div>
             <div class="flex items-center gap-2 shrink-0">
+                @if (Route::has('notifications.page') && app(\App\Modules\Auth\Services\AccessControl::class)->allows($currentUser, 'NOT', \App\Modules\Auth\Enums\PermissionAction::View))
+                    {{-- Chuông thông báo (FR-NOT-001): số chưa đọc do resources/js/notification-bell.js hỏi định kỳ --}}
+                    <a href="{{ route('notifications.page') }}" class="relative p-2 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-low"
+                       data-notification-bell data-count-url="{{ route('notifications.unread-count') }}" data-poll="{{ (int) config('notifications.poll_seconds', 60) }}" aria-label="Thông báo">
+                        <span class="material-symbols-outlined text-[22px]" aria-hidden="true">notifications</span>
+                        <span data-bell-count hidden class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-error text-white text-[10px] font-bold leading-[18px] text-center"></span>
+                    </a>
+                @endif
                 <div class="w-8 h-8 rounded-full bg-primary-container text-on-primary text-xs flex items-center justify-center font-bold" aria-hidden="true">{{ $initials }}</div>
                 <span class="hidden md:inline text-xs font-semibold text-on-surface">{{ $currentUser->name }}</span>
             </div>

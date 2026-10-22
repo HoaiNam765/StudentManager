@@ -369,6 +369,13 @@ $resolver->setFor($khoa, $ngay)->code;            // bộ quy chế đang áp d�
 - `DashboardService` (chỉ dữ liệu của chính mình): lịch hôm nay từ buổi học cụ thể khi thời khóa biểu đã công bố; hạn chót = mốc lịch học vụ sắp tới trong `studentmanager.dashboard.deadline_days` ngày (sinh viên: đăng ký, hủy, rút, học phí, thi, công bố điểm + hạn đóng đợt đăng ký đang mở; giảng viên: bắt đầu / kết thúc giảng dạy, thi, hạn nhập điểm, công bố điểm); giảng viên có danh sách lớp đang trong giai đoạn nhập điểm. GPA / tín chỉ (đã có ở GRD #125, dashboard chưa đọc) và thông báo (NOT) trả `null` / rỗng tới khi có.
 - API `GET /student/dashboard/data`, `GET /teacher/dashboard/data`.
 
+## Thông báo trong ứng dụng (NOT, FR-NOT-001; BR-NOT-01, 06, 09)
+
+- Bảng `notifications` (nội dung một lần gửi: nguồn sự kiện / thủ công / hệ thống, mã `EV-…`, `event_key` duy nhất, nhóm, liên kết tương đối, khẩn, bắt buộc, ghim, hạn hiển thị, thu hồi) và `notification_recipients` (mỗi người nhận một dòng, `read_at`).
+- **Module khác gửi thông báo qua một cổng duy nhất:** `app(NotificationDispatcher::class)->send(['title' => …, 'body' => …, 'link' => '/student/…', 'category' => 'grade', 'event_code' => 'EV-GRD-01', 'event_key' => 'EV-GRD-01:section:12:…'], $userIds)`. Cùng `event_key` gửi lại thì trả `null`, không tạo trùng (BR-NOT-09). Ghi người nhận theo lô `notifications.chunk_size`; bỏ tài khoản đã ngừng; liên kết phải là đường dẫn trong hệ thống. **Không đưa điểm, số nợ, CCCD vào nội dung** (BR-NOT-03).
+- `NotificationCenter`: số chưa đọc, danh sách (lọc chưa đọc / nhóm / từ khóa; hết hạn thì ẩn, xem ở kho `archived=1` — BR-NOT-06), đánh dấu đã đọc / đọc tất cả. Mọi truy vấn đi từ dòng người nhận của chính người dùng; thông báo người khác trả 404.
+- API (mọi cổng, `NOT.view`): `GET /notifications`, `GET /notifications/unread-count`, `POST /notifications/{id}/read`, `POST /notifications/read-all`; trang `/thong-bao`; chuông trên thanh trên cùng của `layouts/portal` hỏi số chưa đọc mỗi `notifications.poll_seconds` giây. Lệnh `notifications:prune` (hằng ngày) xóa thông báo hết hạn quá `notifications.retention_days` ngày.
+
 ## Đăng ký học phần (ENR, FR-ENR-001, 002; BR-ENR-01, 11)
 
 - Đợt đăng ký `registration_periods`: học kỳ, vòng (vòng 1 / vòng 2 / bổ sung), mở – đóng (nhập giờ Việt Nam, lưu UTC; không nhập thì lấy mốc "Mở đăng ký" 00:00 và "Đóng đăng ký" 23:59 trong lịch học vụ ACY), khung tín chỉ riêng (trống = theo quy chế, #104), trạng thái nháp → công bố → đã chốt (#113). Đối tượng `registration_period_targets`: mỗi dòng một tổ hợp khóa / ngành / lớp hành chính, không có dòng nào = mọi sinh viên.

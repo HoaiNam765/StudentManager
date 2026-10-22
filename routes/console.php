@@ -19,6 +19,9 @@ Schedule::command('users:apply-deactivations')->dailyAt('00:15')->withoutOverlap
 Schedule::command('timetable:apply-holidays')->dailyAt('00:30')->withoutOverlapping();
 
 // Công bố bảng điểm đã hẹn giờ (FR-GRD-005)
+// Xóa thông báo hết hạn quá thời gian lưu (NOT, BR-NOT-06)
+Schedule::command('notifications:prune')->dailyAt('02:30')->withoutOverlapping();
+
 Schedule::command('grades:publish-scheduled')->everyFiveMinutes()->withoutOverlapping();
 
 Schedule::command('faculty:sync-leadership')->dailyAt('00:05')->withoutOverlapping();

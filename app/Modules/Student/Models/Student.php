@@ -18,7 +18,9 @@ use App\Modules\System\Models\AdministrativeUnit;
 use App\Modules\System\Models\LookupValue;
 use App\Support\Concerns\HasVietnameseSearch;
 use App\Support\Models\StandardModel;
+use Database\Factories\StudentFactory;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
@@ -32,7 +34,12 @@ use Illuminate\Support\Facades\DB;
  */
 class Student extends StandardModel implements HasDataScope
 {
-    use HasVietnameseSearch;
+    use HasFactory, HasVietnameseSearch;
+
+    protected static function newFactory(): StudentFactory
+    {
+        return StudentFactory::new();
+    }
 
     protected $guarded = [];
 

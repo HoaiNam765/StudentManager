@@ -72,14 +72,15 @@ export default function adminDashboard(root) {
     function summary(w) {
         const d = w.data;
         const big = (value, label) => el('div', {}, el('p', { class: 'text-headline-lg font-bold text-on-surface' }, value.toLocaleString('vi-VN')), el('p', { class: 'text-[11px] text-secondary uppercase tracking-wider' }, label));
-        const parts = {
-            students_by_status: [big(d.total, 'Tổng hồ sơ')],
-            new_admissions: [big(d.total, `Từ ${d.since}`)],
-            section_fill: [big(d.total, 'Lớp học phần'), big(d.under_min, 'Dưới sĩ số tối thiểu'), big(d.full, 'Đã đầy')],
-            grading_progress: [big(d.total, 'Lớp cần điểm'), big(d.published, 'Đã công bố / khóa')],
-            admin_class_sizes: [big(d.total, 'Lớp hành chính'), big(d.students, 'Sinh viên')],
-            pending_grade_changes: [big(d.total, 'Đang chờ')],
-        }[w.code] ?? [];
+        // Hàm theo từng widget: chỉ đọc trường của widget đó
+        const parts = ({
+            students_by_status: () => [big(d.total, 'Tổng hồ sơ')],
+            new_admissions: () => [big(d.total, `Từ ${d.since}`)],
+            section_fill: () => [big(d.total, 'Lớp học phần'), big(d.under_min, 'Dưới sĩ số tối thiểu'), big(d.full, 'Đã đầy')],
+            grading_progress: () => [big(d.total, 'Lớp cần điểm'), big(d.published, 'Đã công bố / khóa')],
+            admin_class_sizes: () => [big(d.total, 'Lớp hành chính'), big(d.students, 'Sinh viên')],
+            pending_grade_changes: () => [big(d.total, 'Đang chờ')],
+        }[w.code] ?? (() => []))();
 
         if (w.code === 'pending_grade_changes' && page.links?.gradeChanges) {
             parts.push(el('a', { href: page.links.gradeChanges, class: 'self-center text-label-md font-semibold text-primary hover:underline' }, 'Xem và duyệt'));

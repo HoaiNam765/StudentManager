@@ -7,4 +7,9 @@ return [
     'score_step' => (float) env('GRD_SCORE_STEP', 0.1),
     'import_max_rows' => (int) env('GRD_IMPORT_MAX_ROWS', 5000),
     'import_max_kb' => (int) env('GRD_IMPORT_MAX_KB', 10240),
+
+    // BR-GRD-02: số chữ số thập phân khi làm tròn điểm học phần. Thang quy đổi chữ / hệ 4 và điểm đạt nằm trong bộ quy chế
+    // theo khóa (grading.scale, grading.pass_score — PolicyResolver), không đặt ở đây.
+    'round_digits' => (int) env('GRD_ROUND_DIGITS', 1),
+
 ];

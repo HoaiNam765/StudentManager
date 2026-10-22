@@ -357,6 +357,7 @@ $resolver->setFor($khoa, $ngay)->code;            // bộ quy chế đang áp d�
 
 - `section_grade_components` (kế thừa `grade_component_templates` của học phần, có `version`; sửa cơ cấu = phiên bản mới, bản cũ xóa mềm; khóa khi lớp đã có điểm), `grade_entries` (đăng ký – thành phần – điểm, `draft` / `missing`, CHECK 0–10).
 - `GradebookService`: `initialize`, `replaceStructure` (GRD.update trên lớp), `saveDraft` (chỉ giảng viên được phân công, lớp Đang học / Kết thúc, đăng ký còn hiệu lực, khoảng và bước điểm theo `config/grades.php`), `gradebook` (lưới điểm, "chưa đủ dữ liệu" khi thiếu thành phần bắt buộc).
+- `CourseGradeService::calculate($dangKy)` (#120; BR-GRD-01..03, 11): điểm thang 10 làm tròn `grades.round_digits`, chữ / hệ 4 theo `grading.scale` và đạt theo `grading.pass_score` của **bộ quy chế áp dụng cho khóa** (PolicyResolver), trượt điểm sàn thành phần bắt buộc → F, thiếu thành phần bắt buộc → `incomplete`, học phần Đạt / Không đạt không có điểm số; `save()` ghi `course_results`. Ví dụ UAT-07: 9,0 / 7,0 / 6,5 × 10 / 30 / 60 → 6,9, C, 2,0, Đạt. `GET /teacher/enrollments/{id}/grade-result` (GRD.view trên lớp).
 - API cổng giảng viên: `/teacher/course-sections/{id}/gradebook`, `grade-components/initialize`, `PUT grade-components`, `POST grades`, `GET grades/template` (mẫu Excel), `POST grades/import`.
 
 ## Dashboard sinh viên, giảng viên (RPT, FR-RPT-009, 010; FR-TCH-009)

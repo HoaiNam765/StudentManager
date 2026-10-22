@@ -5,6 +5,7 @@ use App\Http\Controllers\Pages\Student\RegistrationPageController;
 use App\Modules\Enrollment\Http\Controllers\EnrollmentController;
 use App\Modules\Enrollment\Http\Controllers\EnrollmentResultController;
 use App\Modules\Enrollment\Http\Controllers\RegistrationOptionsController;
+use App\Modules\Grade\Http\Controllers\StudentGradesController;
 use App\Modules\Report\Http\Controllers\DashboardDataController;
 use App\Modules\Student\Http\Controllers\StudentSelfController;
 use App\Modules\Timetable\Http\Controllers\TimetableController;
@@ -61,4 +62,7 @@ Route::middleware('auth')->group(function (): void {
         '/dashboard/data',
         [DashboardDataController::class, 'student']
     )->name('dashboard.data');
+
+    // Điểm của tôi (FR-GRD-005; BR-GRD-08): chỉ lớp đã công bố, kể cả điểm thành phần
+    Route::get('/grades', [StudentGradesController::class, 'mine'])->middleware('permission:GRD.view')->name('grades');
 });

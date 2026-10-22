@@ -3,6 +3,7 @@
 namespace App\Modules\Notification;
 
 use App\Modules\Notification\Console\PruneNotifications;
+use App\Modules\Notification\Console\SendScheduledNotifications;
 use App\Modules\Notification\Listeners\EventNotificationSubscriber;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
@@ -18,7 +19,7 @@ class NotificationServiceProvider extends ServiceProvider
         Event::subscribe(EventNotificationSubscriber::class);
 
         if ($this->app->runningInConsole()) {
-            $this->commands([PruneNotifications::class]);
+            $this->commands([PruneNotifications::class, SendScheduledNotifications::class]);
         }
     }
 }

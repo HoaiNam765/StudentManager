@@ -7,6 +7,7 @@ use App\Modules\Auth\Http\Controllers\PasswordController;
 use App\Modules\Auth\Http\Controllers\PasswordResetController;
 use App\Modules\Auth\Http\Controllers\SessionController;
 use App\Modules\Auth\Services\PortalResolver;
+use App\Modules\Notification\Http\Controllers\AnnouncementController;
 use App\Modules\Notification\Http\Controllers\EventSubscriptionController;
 use App\Modules\Notification\Http\Controllers\NotificationController;
 use App\Modules\System\Http\Controllers\LookupOptionController;
@@ -73,5 +74,6 @@ Route::middleware(['auth', 'password.changed', 'permission:NOT.view'])->group(fu
     Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
     Route::get('/notifications/preferences', [EventSubscriptionController::class, 'preferences'])->name('notifications.preferences');
     Route::put('/notifications/preferences', [EventSubscriptionController::class, 'savePreferences'])->name('notifications.preferences.save');
+    Route::get('/notifications/{notification}/attachment', [AnnouncementController::class, 'attachment'])->whereNumber('notification')->name('notifications.attachment');
     Route::post('/notifications/{notification}/read', [NotificationController::class, 'read'])->whereNumber('notification')->name('notifications.read');
 });

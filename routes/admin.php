@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Pages\Admin\GradeChangePageController;
+use App\Http\Controllers\Pages\AnnouncementPageController;
 use App\Modules\AcademicYear\Http\Controllers\AcademicCalendarController;
 use App\Modules\AcademicYear\Http\Controllers\AcademicYearController;
 use App\Modules\Auth\Http\Controllers\LoginHistoryController;
@@ -23,6 +24,7 @@ use App\Modules\Grade\Http\Controllers\GradeChangeController;
 use App\Modules\Grade\Http\Controllers\GradeWorkflowController;
 use App\Modules\Grade\Http\Controllers\StudentGpaController;
 use App\Modules\Grade\Http\Controllers\TranscriptController;
+use App\Modules\Notification\Http\Controllers\AnnouncementController;
 use App\Modules\Notification\Http\Controllers\EventSubscriptionController;
 use App\Modules\Room\Http\Controllers\FacilityController;
 use App\Modules\Room\Http\Controllers\RoomController;
@@ -492,6 +494,17 @@ Route::middleware('auth')->group(function (): void {
     Route::get('grade-workflows', [GradeWorkflowController::class, 'index'])->middleware('permission:GRD.view')->name('grade-workflows.index');
     Route::get('course-sections/{courseSection}/grade-workflow', [GradeWorkflowController::class, 'show'])->whereNumber('courseSection')->middleware('permission:GRD.view')->name('course-sections.grade-workflow.show');
     Route::post('course-sections/{courseSection}/grade-workflow', [GradeWorkflowController::class, 'change'])->whereNumber('courseSection')->middleware('permission:GRD.approve')->name('course-sections.grade-workflow.change');
+
+    // Thông báo thủ công (NOT, FR-NOT-006, 015): đối tượng trong phạm vi người gửi (BR-NOT-05), kiểm tra trong AudienceResolver
+    Route::get('announcements/options', [AnnouncementController::class, 'options'])->middleware('permission:NOT.create')->name('announcements.options');
+    Route::post('announcements/preview', [AnnouncementController::class, 'preview'])->middleware('permission:NOT.create')->name('announcements.preview');
+    Route::get('announcements', [AnnouncementController::class, 'index'])->middleware('permission:NOT.create')->name('announcements.index');
+    Route::post('announcements', [AnnouncementController::class, 'store'])->middleware('permission:NOT.create')->name('announcements.store');
+    Route::post('announcements/{notification}/revoke', [AnnouncementController::class, 'revoke'])->whereNumber('notification')->middleware('permission:NOT.delete,ALL')->name('announcements.revoke');
+    Route::post('recipient-groups', [AnnouncementController::class, 'saveGroup'])->middleware('permission:NOT.create')->name('recipient-groups.store');
+    Route::put('recipient-groups/{recipientGroup}', [AnnouncementController::class, 'saveGroup'])->whereNumber('recipientGroup')->middleware('permission:NOT.create')->name('recipient-groups.update');
+    Route::delete('recipient-groups/{recipientGroup}', [AnnouncementController::class, 'deleteGroup'])->whereNumber('recipientGroup')->middleware('permission:NOT.create')->name('recipient-groups.destroy');
+    Route::get('soan-thong-bao', [AnnouncementPageController::class, 'index'])->middleware('permission:NOT.create')->name('pages.announcements');
 
     // Cấu hình thông báo theo sự kiện (NOT, FR-NOT-004; phụ lục A): chỉ ADMIN (NOT.update toàn trường)
     Route::get('notification-events', [EventSubscriptionController::class, 'index'])->middleware('permission:NOT.update,ALL')->name('notification-events.index');

@@ -35,7 +35,7 @@ class NotificationCenter extends BaseService
             ->orderByDesc('notifications.sent_at')
             ->orderByDesc('notification_recipients.id')
             ->select('notification_recipients.*')
-            ->with('notification:id,source,event_code,category,title,body,link,priority,mandatory,pinned,sent_at,expires_at,sender_id', 'notification.sender:id,name')
+            ->with('notification:id,source,event_code,category,title,body,link,attachment_name,priority,mandatory,pinned,sent_at,expires_at,sender_id', 'notification.sender:id,name')
             ->paginate((int) config('notifications.per_page', 20));
     }
 

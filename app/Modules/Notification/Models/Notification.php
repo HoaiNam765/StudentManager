@@ -21,6 +21,8 @@ class Notification extends StandardModel
             'sent_at' => 'datetime',
             'expires_at' => 'datetime',
             'revoked_at' => 'datetime',
+            'scheduled_at' => 'datetime',
+            'audience' => 'array',
             'recipient_count' => 'integer',
         ];
     }

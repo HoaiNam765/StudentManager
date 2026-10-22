@@ -100,10 +100,6 @@ Route::middleware('auth')->group(function (): void {
             )
                 ->middleware('permission:GRD.update')
                 ->name('import');
-
-            // Form HTML của giao diện FE: nộp bảng điểm (redirect kèm thông báo) và xuất sổ điểm PDF / Excel
-            Route::post('grade-workflow/form', [GradebookPageController::class, 'workflow'])->middleware('permission:GRD.update')->name('workflow.change');
-            Route::get('gradebook/export', [TranscriptController::class, 'gradebook'])->middleware('permission:GRD.view')->name('export');
         });
 
     // Bảng điểm của lớp (FR-GRD-004): xem trạng thái, nộp / nộp lại (giảng viên được phân công)

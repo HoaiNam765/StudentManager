@@ -25,72 +25,13 @@ class DashboardController extends Controller
     }
 
     /**
-     * Tổng quan cổng sinh viên (FR-RPT-009) theo các biến view FE student/student-dashboard đang đọc (`$student`,
-     * `$todayClasses`, `$recentGrades`), dữ liệu thật của chính sinh viên (PortalOverview). Tài khoản chưa gắn hồ sơ
-     * sinh viên thì không truyền biến (view tự hiện giá trị mặc định của FE).
+     * Tổng quan cổng sinh viên (FR-RPT-009): hồ sơ, tín chỉ theo CTĐT, GPA, học phần học kỳ này, lịch hôm nay, kết quả mới
+     * công bố, hạn chót, thông báo — dữ liệu thật của chính sinh viên (PortalOverview). Tài khoản chưa gắn hồ sơ thì
+     * view báo rõ thay vì hiện số giả.
      */
     public function student(Request $request, PortalOverview $overview): View
     {
-        $o = $overview->student($request->user());
-
-        if ($o === null) {
-            return view('student.student-dashboard');
-        }
-
-        $student = [
-            'name' => $o['profile']['name'],
-            'student_id' => $o['profile']['code'],
-            'major' => $o['profile']['major'] ?? '—',
-            'cohort' => $o['profile']['cohort'] === null ? '—' : 'K'.$o['profile']['cohort'],
-            'class' => $o['profile']['class'] ?? '—',
-            'credits_earned' => $o['credits']['earned'],
-            'credits_total' => $o['credits']['total'],
-            'credits_pct' => $o['credits']['pct'],
-            'credits_remaining' => max(0, $o['credits']['total'] - $o['credits']['earned']),
-            'gpa_4' => (float) ($o['cumulative_gpa'] ?? 0),
-            'gpa_10' => (float) ($o['gpa10'] ?? 0),
-            'classification' => $o['classification'] ?? 'Chưa xếp loại',
-            'current_courses_count' => $o['current']['courses'],
-            'current_credits' => $o['current']['credits'],
-            // Học phí (FEE) chưa làm: không hiện số nợ giả
-            'tuition_status' => 'Chưa có dữ liệu học phí',
-            'tuition_debt' => 0,
-        ];
-
-        $todayClasses = array_map(fn (array $s) => $this->classCard($s), $o['today_schedule']);
-
-        $recentGrades = array_map(fn (array $r) => [
-            'course_name' => $r['subject'],
-            'credits' => $r['credits'],
-            'semester' => $r['term'],
-            'score' => $r['score'] ?? '—',
-            'letter' => $r['letter'] ?? '—',
-        ], $o['recent_results']);
-
-        return view('student.student-dashboard', compact('student', 'todayClasses', 'recentGrades'));
-    }
-
-    /** Một buổi học hôm nay theo khóa view FE: `status` ongoing / upcoming / done tính theo giờ hiện tại (UTC+7). */
-    private function classCard(array $session): array
-    {
-        [$from, $to] = array_pad(explode('–', $session['time']), 2, null);
-        $now = now(config('studentmanager.display_timezone'))->format('H:i');
-        $off = ! in_array($session['status'], ['planned', 'makeup', 'taught'], true);
-        $status = match (true) {
-            $off => 'done',
-            $from !== null && $to !== null && $now >= $from && $now <= $to => 'ongoing',
-            $from !== null && $now < $from => 'upcoming',
-            default => 'done',
-        };
-
-        return [
-            'time' => str_replace('–', ' - ', $session['time']),
-            'status' => $status,
-            'status_label' => $off ? $session['status_label'] : ['ongoing' => 'Đang diễn ra', 'upcoming' => 'Sắp diễn ra', 'done' => 'Đã kết thúc'][$status],
-            'course_name' => $session['subject'],
-            'room' => $session['room'] ?? '—',
-            'lecturer' => $session['lecturer'] ?? '—',
-        ];
+        return view('student.student-dashboard', ['overview' => $overview->student($request->user())]);
     }
 
     /** Dữ liệu mẫu cho dashboard sinh viên trên điện thoại (chưa nối dữ liệu thật) */

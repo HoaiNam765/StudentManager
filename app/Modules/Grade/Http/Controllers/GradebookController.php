@@ -8,7 +8,6 @@ use App\Modules\SchoolClass\Models\CourseSection;
 use App\Modules\Subject\Enums\ComponentKind;
 use App\Support\Exceptions\BusinessRuleException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Validation\Rule;
@@ -55,7 +54,7 @@ class GradebookController extends Controller
         return response()->json(['message' => 'Đã cập nhật cơ cấu điểm của lớp.', 'components' => $components]);
     }
 
-    public function saveDraft(Request $request, CourseSection $courseSection): JsonResponse|RedirectResponse
+    public function saveDraft(Request $request, CourseSection $courseSection): JsonResponse
     {
         $data = $request->validate([
             'items' => ['required', 'array', 'min:1', 'max:5000'],
@@ -63,33 +62,10 @@ class GradebookController extends Controller
             'items.*.component_id' => ['required', 'integer', 'min:1'],
             'items.*.score' => ['present', 'nullable', 'numeric'],
         ]);
-
-        return $this->respond($request, $courseSection, fn () => $this->gradebook->saveDraft($courseSection, $request->user(), $data['items']),
-            'Đã lưu nháp điểm thành phần thành công.');
-    }
-
-    /**
-     * API JSON trả kết quả; form HTML của giao diện FE (teacher/grade/gradebook) được chuyển về trang kèm thông báo
-     * `success` / `error` trong session.
-     */
-    private function respond(Request $request, CourseSection $courseSection, callable $save, string $message): JsonResponse|RedirectResponse
-    {
-        try {
-            $count = $save();
-        } catch (BusinessRuleException $e) {
-            if ($request->expectsJson()) {
-                throw $e;
-            }
-
-            return back()->with('error', $e->getMessage());
-        }
-
-        if (! $request->expectsJson()) {
-            return back()->with('success', "{$message} ({$count} điểm).");
-        }
+        $count = $this->gradebook->saveDraft($courseSection, $request->user(), $data['items']);
 
         return response()->json([
-            'message' => $message,
+            'message' => 'Đã lưu nháp điểm thành phần thành công.',
             'saved_count' => $count,
             'gradebook' => $this->gradebook->gradebook($courseSection, $request->user()),
         ]);
@@ -125,18 +101,10 @@ class GradebookController extends Controller
             ->deleteFileAfterSend(true);
     }
 
-    public function import(Request $request, CourseSection $courseSection): JsonResponse|RedirectResponse
+    public function import(Request $request, CourseSection $courseSection): JsonResponse
     {
         $this->gradebook->authorizeGrading($courseSection, $request->user());
         $request->validate(['file' => ['required', 'file', 'mimes:xlsx', 'max:'.config('grades.import_max_kb')]]);
-
-        return $this->respond($request, $courseSection, fn () => $this->gradebook->saveDraft($courseSection, $request->user(), $this->importRows($request)),
-            'Đã nhập Excel và lưu nháp điểm thành công.');
-    }
-
-    /** @return list<array{enrollment_id: int, component_id: int, score: mixed}> các dòng điểm đọc từ tệp mẫu */
-    private function importRows(Request $request): array
-    {
         $file = $request->file('file');
         $reader = new Reader;
         $rows = [];
@@ -189,8 +157,13 @@ class GradebookController extends Controller
         if ($line === 0) {
             throw new BusinessRuleException('File Excel trống.', 'Tải file mẫu và điền điểm vào cột score.');
         }
+        $count = $this->gradebook->saveDraft($courseSection, $request->user(), $rows);
 
-        return $rows;
+        return response()->json([
+            'message' => 'Đã nhập Excel và lưu nháp điểm thành công.',
+            'saved_count' => $count,
+            'gradebook' => $this->gradebook->gradebook($courseSection, $request->user()),
+        ]);
     }
 
     private function row(array $values): Row

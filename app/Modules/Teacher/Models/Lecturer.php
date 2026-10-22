@@ -52,12 +52,6 @@ class Lecturer extends StandardModel implements HasDataScope
         return $this->belongsTo(User::class);
     }
 
-    /** `name` = họ tên, cho view của nhóm FE (`$lecturer->name`). */
-    public function getNameAttribute(): ?string
-    {
-        return $this->full_name;
-    }
-
     public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class);

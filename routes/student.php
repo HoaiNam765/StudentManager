@@ -71,6 +71,5 @@ Route::middleware('auth')->group(function (): void {
     // GPA học kỳ / tích lũy, xếp loại (FR-GRD-008, 009) và bảng điểm cá nhân JSON / PDF tiếng Việt – Anh (FR-GRD-010)
     Route::get('/gpa', [StudentGpaController::class, 'mine'])->middleware('permission:GRD.view')->name('gpa');
     Route::get('/transcript', [TranscriptController::class, 'mine'])->middleware('permission:GRD.view')->name('transcript');
-    Route::get('/transcript/pdf', [TranscriptController::class, 'minePdf'])->middleware('permission:GRD.view')->name('transcript.mine');
     Route::get('/ket-qua-hoc-tap', [GradePageController::class, 'index'])->middleware('permission:GRD.view')->name('pages.grades');
 });

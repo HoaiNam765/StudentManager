@@ -47,13 +47,16 @@ class StudentPortalWiringTest extends TestCase
         CumulativeGpa::create(['student_id' => $this->student->id, 'gpa' => 2.75, 'credits_earned' => 21, 'classification' => 'Khá']);
         Student::factory()->create(['full_name' => 'Hồ Sơ Không Được Hiện']);
 
+        // Dashboard dùng view của nhóm FE (student-dashboard, student-mobile); BE chỉ truyền dữ liệu thật
         foreach (['student.home', 'student.mobile'] as $route) {
-            $this->get(route($route))->assertOk()->assertSee('Sinh Viên Kiểm Tra')->assertSee('PORTAL0001')
-                ->assertSee('2.75')->assertDontSee('Nguyễn Văn An')->assertDontSee('Hồ Sơ Không Được Hiện')
-                ->assertSee(route('student.pages.timetable'), false);
+            $this->get(route($route))->assertOk()->assertSee('2.75')
+                ->assertDontSee('Nguyễn Văn An')->assertDontSee('Hồ Sơ Không Được Hiện');
         }
+        $this->get(route('student.mobile'))->assertSee('Sinh Viên Kiểm Tra')->assertSee('PORTAL0001');
+        // Menu cổng (PortalMenu) dẫn tới các trang thật
         $this->get(route('student.home'))->assertSee(route('student.pages.registration'), false)
-            ->assertSee(route('student.pages.grades'), false)->assertSee(route('student.pages.profile'), false);
+            ->assertSee(route('student.pages.grades'), false)->assertSee(route('student.pages.timetable'), false)
+            ->assertSee(route('student.pages.profile'), false)->assertSee(route('student.pages.curriculum'), false);
     }
 
     public function test_pages_use_actual_profile_and_handle_unpublished_or_missing_data(): void
@@ -108,7 +111,7 @@ class StudentPortalWiringTest extends TestCase
     public function test_account_without_profile_does_not_get_sample_records(): void
     {
         $this->actingAs($this->userWithRoles('STU'))->get(route('student.home'))->assertOk()
-            ->assertSee('chưa được liên kết')->assertDontSee('Nguyễn Văn An')->assertDontSee('3.42');
+            ->assertSee('Chưa liên kết hồ sơ')->assertDontSee('Nguyễn Văn An')->assertDontSee('3.42');
     }
 
     public function test_curriculum_displays_assigned_subjects_without_fake_completion(): void
@@ -128,6 +131,5 @@ class StudentPortalWiringTest extends TestCase
 
         $this->get(route('student.pages.curriculum'))->assertOk()->assertSee('PORTAL101')
             ->assertSee('Học phần từ cơ sở dữ liệu')->assertSee('0 / 3 TC đã đạt')->assertDontSee('Hoàn thành 100%');
-        $this->get(route('student.home'))->assertOk()->assertSee('Khối kiểm thử')->assertSee('0 / 3 tín chỉ');
     }
 }

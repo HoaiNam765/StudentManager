@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Pages\AnnouncementPageController;
+use App\Http\Controllers\Pages\Teacher\GradebookPageController;
 use App\Modules\Grade\Http\Controllers\GradebookController;
 use App\Modules\Grade\Http\Controllers\GradeChangeController;
 use App\Modules\Grade\Http\Controllers\GradeResultController;
@@ -99,6 +100,10 @@ Route::middleware('auth')->group(function (): void {
             )
                 ->middleware('permission:GRD.update')
                 ->name('import');
+
+            // Form HTML của giao diện FE: nộp bảng điểm (redirect kèm thông báo) và xuất sổ điểm PDF / Excel
+            Route::post('grade-workflow/form', [GradebookPageController::class, 'workflow'])->middleware('permission:GRD.update')->name('workflow.change');
+            Route::get('gradebook/export', [TranscriptController::class, 'gradebook'])->middleware('permission:GRD.view')->name('export');
         });
 
     // Bảng điểm của lớp (FR-GRD-004): xem trạng thái, nộp / nộp lại (giảng viên được phân công)
@@ -111,6 +116,9 @@ Route::middleware('auth')->group(function (): void {
     )
         ->middleware('permission:GRD.view')
         ->name('grade-result.show');
+
+    // Trang sổ điểm: chọn lớp, nhập / lưu nháp điểm, nhập Excel, nộp bảng điểm, xuất sổ điểm (FR-GRD-001, 002, 004, 011)
+    Route::get('nhap-diem', [GradebookPageController::class, 'index'])->middleware('permission:GRD.view')->name('pages.gradebook');
 
     // Sổ điểm lớp JSON / PDF / Excel (FR-GRD-011); trạng thái điểm đặc biệt trước khi nộp (FR-GRD-012); yêu cầu điều
     // chỉnh điểm sau công bố và lịch sử phiên bản (FR-GRD-006) — chỉ giảng viên được phân công (kiểm tra trong Service)

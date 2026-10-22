@@ -194,12 +194,6 @@
 </div>
 <!-- Header Right: Role Switcher & Student Profile -->
 <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-<!-- Role quick switch -->
-<div class="hidden md:flex items-center p-1 bg-slate-100 rounded-lg text-xs font-medium">
-<span class="px-2.5 py-1 rounded-md bg-white text-primary font-semibold shadow-xs">Sinh viên</span>
-<a class="px-2.5 py-1 text-slate-600 hover:text-slate-900" href="{{ route('teacher.home') }}">Giảng viên</a>
-<a class="px-2.5 py-1 text-slate-600 hover:text-slate-900" href="{{ route('admin.home') }}">Phòng ĐT</a>
-</div>
 <!-- Notification Bell -->
 <a class="relative p-2 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors" href="{{ route('notifications.page') }}" title="Thông báo">
 <span class="material-symbols-outlined text-[21px]">notifications</span>

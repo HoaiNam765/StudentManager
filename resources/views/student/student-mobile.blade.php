@@ -30,12 +30,12 @@
             <section class="grid grid-cols-2 gap-3" aria-label="Tóm tắt học tập">
                 <div class="bg-white border border-[#E2E8F0] rounded-xl p-4 shadow-xs">
                     <div class="text-[11px] text-on-surface-variant font-medium">GPA (thang 4)</div>
-                    <div class="text-2xl font-bold text-primary mt-1">{{ $student['gpa_4'] === null ? '—' : number_format($student['gpa_4'], 2) }}</div>
+                    <div class="text-2xl font-bold text-primary mt-1">{{ number_format($student['gpa_4'], 2) }}</div>
                     <div class="text-[11px] text-on-surface-variant mt-0.5">Xếp loại {{ $student['classification'] }}</div>
                 </div>
                 <div class="bg-white border border-[#E2E8F0] rounded-xl p-4 shadow-xs">
                     <div class="text-[11px] text-on-surface-variant font-medium">Tín chỉ tích lũy</div>
-                    <div class="text-2xl font-bold text-on-surface mt-1">{{ $student['credits_earned'] ?? '—' }}<span class="text-sm font-medium text-on-surface-variant">/{{ $student['credits_total'] ?? '—' }}</span></div>
+                    <div class="text-2xl font-bold text-on-surface mt-1">{{ $student['credits_earned'] }}<span class="text-sm font-medium text-on-surface-variant">/{{ $student['credits_total'] }}</span></div>
                     <div class="h-1.5 mt-2 rounded-full bg-surface-container overflow-hidden" role="progressbar" aria-valuenow="{{ $student['credits_pct'] }}" aria-valuemin="0" aria-valuemax="100" aria-label="Tiến độ tín chỉ">
                         <div class="h-full bg-primary rounded-full" style="width: {{ $student['credits_pct'] }}%"></div>
                     </div>
@@ -70,7 +70,7 @@
                                 <div class="text-[11px] text-on-surface-variant">{{ $grade['credits'] }} tín chỉ • {{ $grade['semester'] }}</div>
                             </div>
                             <div class="text-right shrink-0">
-                                <div class="text-sm font-bold text-primary">{{ $grade['score'] === null ? '—' : number_format($grade['score'], 1) }}</div>
+                                <div class="text-sm font-bold text-primary">{{ number_format($grade['score'], 1) }}</div>
                                 <div class="text-[11px] text-on-surface-variant">{{ $grade['letter'] }}</div>
                             </div>
                         </li>
@@ -86,11 +86,11 @@
                     <span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">dashboard</span>
                     <span class="text-[11px] font-semibold">Tổng quan</span>
                 </a>
-                <a href="{{ route('student.pages.timetable') }}" class="flex flex-col items-center gap-0.5 py-2 text-on-surface-variant">
+                <a href="#" class="flex flex-col items-center gap-0.5 py-2 text-on-surface-variant">
                     <span class="material-symbols-outlined text-[22px]" aria-hidden="true">calendar_month</span>
                     <span class="text-[11px]">Lịch học</span>
                 </a>
-                <a href="{{ route('student.pages.grades') }}" class="flex flex-col items-center gap-0.5 py-2 text-on-surface-variant">
+                <a href="#" class="flex flex-col items-center gap-0.5 py-2 text-on-surface-variant">
                     <span class="material-symbols-outlined text-[22px]" aria-hidden="true">grade</span>
                     <span class="text-[11px]">Điểm</span>
                 </a>

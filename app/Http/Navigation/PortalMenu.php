@@ -21,6 +21,7 @@ class PortalMenu
                 ['Tổng quan', 'dashboard', 'student.home', null],
                 ['Đăng ký học phần', 'how_to_reg', 'student.pages.registration', 'ENR.view'],
                 ['Kết quả đăng ký', 'fact_check', 'student.pages.registration-result', 'ENR.view'],
+                ['Kết quả học tập', 'school', 'student.pages.grades', 'GRD.view'],
             ],
         ],
         'teacher' => [
@@ -31,6 +32,7 @@ class PortalMenu
         'admin' => [
             'Quản lý đào tạo' => [
                 ['Tổng quan', 'dashboard', 'admin.home', null],
+                ['Duyệt điều chỉnh điểm', 'rule', 'admin.pages.grade-changes', 'GRD.approve'],
             ],
         ],
     ];

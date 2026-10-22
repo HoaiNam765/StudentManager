@@ -366,7 +366,7 @@ $resolver->setFor($khoa, $ngay)->code;            // bộ quy chế đang áp d�
 
 ## Dashboard sinh viên, giảng viên (RPT, FR-RPT-009, 010; FR-TCH-009)
 
-- `DashboardService` (chỉ dữ liệu của chính mình): lịch hôm nay từ buổi học cụ thể khi thời khóa biểu đã công bố; hạn chót = mốc lịch học vụ sắp tới trong `studentmanager.dashboard.deadline_days` ngày (sinh viên: đăng ký, hủy, rút, học phí, thi, công bố điểm + hạn đóng đợt đăng ký đang mở; giảng viên: bắt đầu / kết thúc giảng dạy, thi, hạn nhập điểm, công bố điểm); giảng viên có danh sách lớp đang trong giai đoạn nhập điểm. GPA / tín chỉ (đã có ở GRD #125, dashboard chưa đọc) và thông báo (NOT) trả `null` / rỗng tới khi có.
+- `DashboardService` (chỉ dữ liệu của chính mình): lịch hôm nay từ buổi học cụ thể khi thời khóa biểu đã công bố; hạn chót = mốc lịch học vụ sắp tới trong `studentmanager.dashboard.deadline_days` ngày (sinh viên: đăng ký, hủy, rút, học phí, thi, công bố điểm + hạn đóng đợt đăng ký đang mở; giảng viên: bắt đầu / kết thúc giảng dạy, thi, hạn nhập điểm, công bố điểm); giảng viên có danh sách lớp đang trong giai đoạn nhập điểm. GPA / tín chỉ tích lũy / tín chỉ còn thiếu (GRD #125) và thông báo chưa đọc (NOT #115) — nối ở #118.
 - API `GET /student/dashboard/data`, `GET /teacher/dashboard/data`.
 
 ## Thông báo trong ứng dụng (NOT, FR-NOT-001; BR-NOT-01, 06, 09)
@@ -388,6 +388,12 @@ $resolver->setFor($khoa, $ngay)->code;            // bộ quy chế đang áp d�
 - `AudienceResolver`: bộ chọn `{"targets": [{"type": "all|faculty|major|cohort|admin_class|course_section", "id": …}], "student_codes": […], "group_id": …}` → tài khoản sinh viên đang học / bảo lưu. **Phạm vi (BR-NOT-05):** toàn trường / khóa cần NOT.create toàn trường; khoa / ngành thì toàn trường hoặc lãnh đạo khoa đó; lớp hành chính, lớp học phần, MSSV phải nằm trong phạm vi NOT.create (khoa / lớp mình dạy / lớp mình cố vấn). Một mục ngoài phạm vi là từ chối cả lần gửi (422 kèm cách khắc phục); cuối cùng vẫn lọc lại theo phạm vi. `options()` chỉ liệt kê đối tượng người gửi được chọn.
 - `AnnouncementService`: `preview` (số người nhận), `create` (gửi ngay hoặc hẹn giờ — `status` = scheduled, lệnh `notifications:send-scheduled` chạy mỗi phút, tính lại người nhận theo phạm vi lúc gửi; ghim, khẩn, hạn hiển thị, tệp đính kèm disk riêng tư; lưu người gửi và đối tượng), `revoke` (chỉ ADMIN, chỉ thông báo thủ công; người nhận không còn thấy), `history` (tỷ lệ đã đọc; ADMIN thấy tất cả), nhóm người nhận `recipient_groups` (lưu bộ chọn của chính người gửi, kiểm tra phạm vi khi lưu và khi gửi).
 - API (NOT.create): `/admin|teacher/announcements` (`options`, `preview`, danh sách, gửi — form có `audience` dạng JSON), `/admin/announcements/{id}/revoke` (NOT.delete toàn trường + vai trò ADMIN), `/admin|teacher/recipient-groups`; tệp đính kèm `GET /notifications/{id}/attachment` (người nhận, người gửi, ADMIN). Trang `/admin/soan-thong-bao`, `/teacher/gui-thong-bao`.
+
+## Dashboard quản trị (RPT, FR-RPT-001, 002, 008; BR-RPT-03, 07)
+
+- `AdminDashboardService::data($user)`: bộ widget theo vai trò ở `studentmanager.dashboard.widgets` (người nhiều vai trò thấy hợp các bộ): sinh viên theo trạng thái, nhập học mới (theo ngành, từ đầu năm học hiện hành), sĩ số lớp học phần của học kỳ hiện hành (dưới tối thiểu / đầy), tiến độ nhập điểm (theo trạng thái bảng điểm), sĩ số lớp hành chính, yêu cầu điều chỉnh điểm chờ duyệt.
+- Mọi chỉ số đọc thẳng từ bảng nghiệp vụ và lọc theo phạm vi **RPT.view** (`AccessControl::constrain`): lãnh đạo khoa chỉ thấy dữ liệu khoa mình. Mỗi widget có `definition` công bố (BR-RPT-07); trang tự làm mới sau `studentmanager.dashboard.refresh_seconds` (mặc định 300). Học kỳ hiện hành: học kỳ ACAD đặt, không có thì theo ngày.
+- API `GET /admin/dashboard/data` (RPT.view), trang `admin.home` (`admin/dashboard.blade.php`; mẫu FE cũ giữ ở `admin/admin-dashboard.blade.php`). Dashboard sinh viên / giảng viên (#121) nay có GPA từng kỳ, GPA / tín chỉ tích lũy, tín chỉ còn thiếu theo CTĐT và thông báo chưa đọc.
 
 ## Đăng ký học phần (ENR, FR-ENR-001, 002; BR-ENR-01, 11)
 

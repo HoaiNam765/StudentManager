@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Modules\Auth\Enums\DataScope;
 use App\Modules\Auth\Enums\PermissionAction;
 use App\Modules\Auth\Services\AccessControl;
+use App\Modules\Report\Services\AdminDashboardService;
 use App\Modules\Report\Services\DashboardService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -57,5 +58,11 @@ class DashboardDataController extends Controller
         return response()->json(
             $this->dashboard->teacher($request->user())
         );
+    }
+
+    /** Dashboard quản trị theo vai trò, trong phạm vi RPT.view (#118). */
+    public function admin(Request $request, AdminDashboardService $dashboard): JsonResponse
+    {
+        return response()->json($dashboard->data($request->user()));
     }
 }

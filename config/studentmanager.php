@@ -142,6 +142,19 @@ return [
     // Dashboard sinh viên / giảng viên (FR-RPT-009, 010): hiện các hạn chót trong số ngày tới
     'dashboard' => [
         'deadline_days' => (int) env('DASHBOARD_DEADLINE_DAYS', 30),
+
+        // Dashboard quản trị (RPT, FR-RPT-001, 002; BR-RPT-03): trang tự làm mới sau … giây (mặc định 5 phút)
+        'refresh_seconds' => (int) env('DASHBOARD_REFRESH_SECONDS', 300),
+
+        // Bộ widget theo vai trò (FR-RPT-001); người có nhiều vai trò thấy hợp các bộ. Mã widget: AdminDashboardService::WIDGETS
+        'widgets' => [
+            'ADMIN' => ['students_by_status', 'new_admissions', 'section_fill', 'grading_progress', 'admin_class_sizes', 'pending_grade_changes'],
+            'ACAD' => ['students_by_status', 'new_admissions', 'section_fill', 'grading_progress', 'admin_class_sizes', 'pending_grade_changes'],
+            'EXAM' => ['grading_progress', 'pending_grade_changes', 'section_fill'],
+            'CTSV' => ['students_by_status', 'new_admissions', 'admin_class_sizes'],
+            'FIN' => ['students_by_status', 'section_fill'],
+            'DEAN' => ['students_by_status', 'new_admissions', 'section_fill', 'grading_progress', 'admin_class_sizes', 'pending_grade_changes'],
+        ],
     ],
 
     // Đăng ký học phần (ENR): khung tín chỉ riêng (BR-ENR-02; khung thường tính từ quy chế registration.load_*_ratio),

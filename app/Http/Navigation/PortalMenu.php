@@ -19,6 +19,9 @@ class PortalMenu
         'student' => [
             'Học tập' => [
                 ['Tổng quan', 'dashboard', 'student.home', null],
+                ['Chương trình đào tạo', 'school', 'student.pages.curriculum', 'CUR.view'],
+                ['Thời khóa biểu', 'calendar_month', 'student.pages.timetable', 'TTB.view'],
+                ['Hồ sơ cá nhân', 'person', 'student.pages.profile', 'STU.view'],
                 ['Đăng ký học phần', 'how_to_reg', 'student.pages.registration', 'ENR.view'],
                 ['Kết quả đăng ký', 'fact_check', 'student.pages.registration-result', 'ENR.view'],
                 ['Kết quả học tập', 'school', 'student.pages.grades', 'GRD.view'],

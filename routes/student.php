@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Pages\Student\GradePageController;
+use App\Http\Controllers\Pages\Student\PortalPageController;
 use App\Http\Controllers\Pages\Student\RegistrationPageController;
 use App\Modules\Enrollment\Http\Controllers\EnrollmentController;
 use App\Modules\Enrollment\Http\Controllers\EnrollmentResultController;
@@ -24,6 +25,18 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('auth')->group(function (): void {
+    Route::get('/chuong-trinh-dao-tao', [PortalPageController::class, 'curriculum'])->middleware('permission:CUR.view')->name('pages.curriculum');
+    Route::get('/thoi-khoa-bieu', [PortalPageController::class, 'timetable'])->middleware('permission:TTB.view')->name('pages.timetable');
+    Route::get('/ho-so-ca-nhan', [PortalPageController::class, 'profile'])->middleware('permission:STU.view')->name('pages.profile');
+    Route::middleware('permission:STU.update')->prefix('ho-so-ca-nhan')->name('pages.profile.')->group(function (): void {
+        Route::put('/', [PortalPageController::class, 'updateProfile'])->name('update');
+        Route::post('/anh', [PortalPageController::class, 'photo'])->name('photo');
+        Route::post('/yeu-cau', [PortalPageController::class, 'requestChange'])->name('request');
+        Route::post('/yeu-cau/{studentChangeRequest}/huy', [PortalPageController::class, 'cancelChange'])->name('cancel');
+        Route::post('/nguoi-than', [PortalPageController::class, 'storeContact'])->name('contacts.store');
+        Route::put('/nguoi-than/{studentContact}', [PortalPageController::class, 'updateContact'])->name('contacts.update');
+        Route::delete('/nguoi-than/{studentContact}', [PortalPageController::class, 'destroyContact'])->name('contacts.destroy');
+    });
     // Dashboard dùng dữ liệu mẫu của nhóm FE; thay bằng dữ liệu thật khi có (FR-RPT-009)
     Route::get('/', [DashboardController::class, 'student'])->name('home');
     Route::get('/mobile', [DashboardController::class, 'studentMobile'])->name('mobile');

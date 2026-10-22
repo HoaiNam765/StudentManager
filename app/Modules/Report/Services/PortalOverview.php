@@ -170,6 +170,7 @@ class PortalOverview
                 'credits' => (int) $r->credits,
                 'term' => $r->term,
                 'score' => $r->score10 === null ? null : number_format((float) $r->score10, 1, ',', ''),
+                'score10' => $r->score10 === null ? null : (float) $r->score10,
                 'letter' => $r->letter ?? (config("grade_special_statuses.{$r->special_status}.symbol")),
                 'passed' => $r->is_passed,
             ])->all();

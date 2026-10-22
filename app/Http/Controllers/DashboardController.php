@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Modules\Report\Services\PortalOverview;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -26,15 +27,47 @@ class DashboardController extends Controller
 
     /**
      * Tổng quan cổng sinh viên (FR-RPT-009) theo các biến view FE student/student-dashboard đang đọc (`$student`,
-     * `$todayClasses`, `$recentGrades`), dữ liệu thật của chính sinh viên (PortalOverview). Tài khoản chưa gắn hồ sơ
-     * sinh viên thì không truyền biến (view tự hiện giá trị mặc định của FE).
+     * `$todayClasses`, `$recentGrades`), dữ liệu thật của chính sinh viên (PortalOverview).
      */
     public function student(Request $request, PortalOverview $overview): View
     {
-        $o = $overview->student($request->user());
+        return view('student.student-dashboard', $this->studentView($request->user(), $overview));
+    }
+
+    /** Cổng Sinh viên trên điện thoại (view FE student/student-mobile), cùng dữ liệu thật với trang máy tính. */
+    public function studentMobile(Request $request, PortalOverview $overview): View
+    {
+        $data = $this->studentView($request->user(), $overview);
+        // View điện thoại định dạng điểm bằng number_format: chỉ lấy học phần có điểm số, truyền dạng số
+        $data['recentGrades'] = array_values(array_map(
+            fn (array $g) => ['score' => (float) $g['score10']] + $g,
+            array_filter($data['recentGrades'], fn (array $g) => $g['score10'] !== null),
+        ));
+
+        return view('student.student-mobile', $data);
+    }
+
+    /**
+     * Tài khoản chưa gắn hồ sơ sinh viên: truyền giá trị rỗng / 0 thay vì để view hiện số mẫu của FE.
+     *
+     * @return array{student: array<string, mixed>, todayClasses: list<array<string, mixed>>, recentGrades: list<array<string, mixed>>}
+     */
+    private function studentView(User $user, PortalOverview $overview): array
+    {
+        $o = $overview->student($user);
 
         if ($o === null) {
-            return view('student.student-dashboard');
+            return [
+                'student' => [
+                    'name' => $user->name, 'student_id' => '—', 'major' => '—', 'cohort' => '—', 'class' => 'Chưa liên kết hồ sơ',
+                    'credits_earned' => 0, 'credits_total' => 0, 'credits_pct' => 0, 'credits_remaining' => 0,
+                    'gpa_4' => 0.0, 'gpa_10' => 0.0, 'classification' => 'Chưa có kết quả',
+                    'current_courses_count' => 0, 'current_credits' => 0,
+                    'tuition_status' => 'Chưa có dữ liệu học phí', 'tuition_debt' => 0,
+                ],
+                'todayClasses' => [],
+                'recentGrades' => [],
+            ];
         }
 
         $student = [
@@ -64,10 +97,11 @@ class DashboardController extends Controller
             'credits' => $r['credits'],
             'semester' => $r['term'],
             'score' => $r['score'] ?? '—',
+            'score10' => $r['score10'],
             'letter' => $r['letter'] ?? '—',
         ], $o['recent_results']);
 
-        return view('student.student-dashboard', compact('student', 'todayClasses', 'recentGrades'));
+        return compact('student', 'todayClasses', 'recentGrades');
     }
 
     /** Một buổi học hôm nay theo khóa view FE: `status` ongoing / upcoming / done tính theo giờ hiện tại (UTC+7). */
@@ -93,65 +127,6 @@ class DashboardController extends Controller
         ];
     }
 
-    /** Dữ liệu mẫu cho dashboard sinh viên trên điện thoại (chưa nối dữ liệu thật) */
-    private function studentData(): array
-    {
-        $student = [
-            'name' => 'Nguyễn Văn An',
-            'student_id' => '2001210123',
-            'major' => 'Công nghệ Thông tin',
-            'cohort' => '12 (2021–2025)',
-            'class' => '12DHTT01',
-            'credits_earned' => 84,
-            'credits_total' => 132,
-            'credits_pct' => 63.6,
-            'credits_remaining' => 48,
-            'gpa_4' => 3.42,
-            'gpa_10' => 8.35,
-            'classification' => 'Giỏi',
-            'current_courses_count' => 6,
-            'current_credits' => 18,
-            'tuition_debt' => 0,
-            'tuition_status' => 'Đã hoàn tất',
-        ];
-
-        $todayClasses = [
-            [
-                'time' => '07:30 - 09:10',
-                'status' => 'ongoing',
-                'status_label' => 'Đang diễn ra',
-                'course_name' => 'Lập trình Web nâng cao',
-                'room' => 'A3.04',
-                'lecturer' => 'TS. Trần Hoàng Nam',
-            ],
-            [
-                'time' => '09:30 - 11:10',
-                'status' => 'upcoming',
-                'status_label' => 'Sắp bắt đầu',
-                'course_name' => 'Cơ sở dữ liệu phân tán',
-                'room' => 'B1.02',
-                'lecturer' => 'ThS. Lê Thị Bình',
-            ],
-            [
-                'time' => '13:00 - 15:35',
-                'status' => 'afternoon',
-                'status_label' => 'Chiều nay • 3 Tiết',
-                'course_name' => 'Thực hành Lập trình Web',
-                'room' => 'PM04 (Phòng máy)',
-                'lecturer' => 'TS. Trần Hoàng Nam',
-            ],
-        ];
-
-        $recentGrades = [
-            ['course_name' => 'Lập trình Web API', 'credits' => 3, 'semester' => 'HK trước', 'score' => 9.5, 'letter' => 'A+'],
-            ['course_name' => 'Hệ quản trị CSDL SQL', 'credits' => 3, 'semester' => 'HK trước', 'score' => 8.8, 'letter' => 'A'],
-            ['course_name' => 'Hệ điều hành máy tính', 'credits' => 3, 'semester' => 'HK trước', 'score' => 7.8, 'letter' => 'B+'],
-            ['course_name' => 'Kiến trúc máy tính', 'credits' => 3, 'semester' => 'HK trước', 'score' => 8.5, 'letter' => 'A'],
-        ];
-
-        return compact('student', 'todayClasses', 'recentGrades');
-    }
-
     /**
      * Tổng quan cổng giảng viên (FR-RPT-010; FR-TCH-009): lịch dạy hôm nay, lớp học kỳ này và trạng thái bảng điểm, việc
      * cần xử lý, yêu cầu điều chỉnh điểm, hạn chót, thông báo — dữ liệu thật (PortalOverview).
@@ -159,13 +134,5 @@ class DashboardController extends Controller
     public function lecturer(Request $request, PortalOverview $overview): View
     {
         return view('teacher.lecturer-dashboard', ['overview' => $overview->lecturer($request->user())]);
-    }
-
-    /**
-     * Cổng Sinh viên (Mobile Web)
-     */
-    public function studentMobile(): View
-    {
-        return view('student.student-mobile', $this->studentData());
     }
 }

@@ -3,109 +3,126 @@
 namespace App\Http\Controllers\Pages\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Modules\AcademicYear\Models\Term;
 use App\Modules\Auth\Enums\PermissionAction;
 use App\Modules\Auth\Services\AccessControl;
 use App\Modules\Faculty\Models\Faculty;
+use App\Modules\Faculty\Services\FacultyAccess;
+use App\Modules\Grade\Enums\GradePublicationStatus as Status;
 use App\Modules\Grade\Models\GradeChangeRequest;
 use App\Modules\Grade\Models\SectionGradeWorkflow;
-use App\Modules\Grade\Services\GradeWorkflowService;
+use App\Modules\Grade\Services\GradeChangeService;
+use App\Modules\SchoolClass\Enums\SectionStatus;
 use App\Modules\SchoolClass\Models\CourseSection;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
- * Trang quản lý quy trình duyệt, công bố điểm và điều chỉnh điểm của Quản trị / Phòng ĐT (#124, #126, #127).
- * Hỗ trợ duyệt khoa (DEAN), xác nhận & công bố (ACAD/EXAM), trả về kèm lý do, và duyệt yêu cầu sửa điểm.
+ * Trang duyệt và công bố điểm cho cán bộ (FR-GRD-004, 005, 011; mock admin/quan-ly-diem): lớp học phần đang học / kết
+ * thúc / đã khóa của học kỳ trong phạm vi GRD.view (lãnh đạo khoa chỉ thấy lớp của khoa mình), lọc theo khoa và trạng thái
+ * bảng điểm, thẻ số liệu, nút bước tiếp theo theo vai trò. Các nút gọi API `admin.course-sections.grade-workflow.change`
+ * (resources/js/pages/admin-grade-workflows.js); máy chủ kiểm tra lại quyền từng bước trong GradeWorkflowService.
  */
 class GradeAdminPageController extends Controller
 {
+    private const STATUSES = [SectionStatus::InProgress, SectionStatus::Finished, SectionStatus::Locked];
+
     public function __construct(
-        private readonly GradeWorkflowService $workflowService,
-        private readonly AccessControl $access
+        private readonly AccessControl $access,
+        private readonly FacultyAccess $faculties,
+        private readonly GradeChangeService $changes,
     ) {}
 
     public function index(Request $request): View
     {
         $user = $request->user();
-        $terms = Term::query()->orderByDesc('id')->get();
-        $faculties = Faculty::query()->orderBy('name')->get();
+        $terms = Term::query()->with('academicYear:id,name')->orderByDesc('start_date')->get();
+        $termId = $request->integer('term_id') ?: $this->defaultTerm($terms);
+        $global = $this->access->allowsGlobally($user, 'GRD', PermissionAction::View);
+        $faculties = Faculty::query()->when(! $global, fn ($q) => $q->whereIn('id', $this->faculties->facultyIds($user)))->orderBy('name')->get(['id', 'name']);
+        $facultyId = $request->integer('faculty_id') ?: null;
+        $status = $request->string('status')->toString();
 
-        $selectedTermId = $request->integer('term_id') ?: ($terms->first()?->id ?? null);
-        $selectedFacultyId = $request->integer('faculty_id') ?: null;
-        $selectedStatus = $request->string('status')->toString();
-        $activeTab = $request->string('tab', 'workflow')->toString();
+        $base = fn (): Builder => $this->access->constrain(CourseSection::query(), $user, 'GRD', PermissionAction::View)
+            ->where('course_sections.term_id', $termId)
+            ->whereIn('course_sections.status', array_map(fn ($s) => $s->value, self::STATUSES));
 
-        // 1. Lọc danh sách Lớp học phần
-        $sectionsQuery = CourseSection::query()
-            ->with(['subject.department.faculty', 'term', 'instructors.lecturer'])
-            ->when($selectedTermId, fn ($q) => $q->where('term_id', $selectedTermId))
-            ->when($selectedFacultyId, fn ($q) => $q->whereHas('subject.department', fn ($dq) => $dq->where('faculty_id', $selectedFacultyId)));
+        $sections = $base()
+            ->with('subject:id,code,name,credits,department_id', 'subject.department:id,faculty_id', 'instructors.lecturer:id,code,full_name')
+            ->when($facultyId, fn ($q) => $q->whereHas('subject.department', fn ($d) => $d->where('faculty_id', $facultyId)))
+            ->when($status !== '', fn ($q) => $status === Status::Draft->value
+                ? $q->whereNotIn('id', SectionGradeWorkflow::query()->select('course_section_id')->where('status', '!=', Status::Draft->value))
+                : $q->whereIn('id', SectionGradeWorkflow::query()->select('course_section_id')->where('status', $status)))
+            ->withCount(['instructors'])
+            ->orderBy('code')
+            ->paginate(20)
+            ->withQueryString();
 
-        if ($selectedStatus && $selectedStatus !== 'all') {
-            $sectionsQuery->whereIn('id', function ($sub) use ($selectedStatus) {
-                $sub->select('course_section_id')->from('section_grade_workflows')
-                    ->where('status', $selectedStatus)
-                    ->whereNull('deleted_at');
-            });
-        }
+        $workflows = SectionGradeWorkflow::query()->whereIn('course_section_id', $base()->select('course_sections.id'))->get()->keyBy('course_section_id');
+        $counts = $workflows->countBy(fn (SectionGradeWorkflow $w) => $w->status->value);
+        $pendingChanges = GradeChangeRequest::query()->whereIn('status', GradeChangeService::PENDING)->with('enrollment.section')->get()
+            ->filter(fn (GradeChangeRequest $r) => $this->changes->canAct($user, $r))->count();
 
-        $sections = $sectionsQuery->orderByDesc('id')->paginate(15)->withQueryString();
-
-        // Lấy workflows tương ứng
-        $workflows = SectionGradeWorkflow::query()
-            ->whereIn('course_section_id', $sections->pluck('id'))
-            ->get()
-            ->keyBy('course_section_id');
-
-        // 2. Danh sách yêu cầu điều chỉnh điểm sau công bố (#126)
-        $changeRequests = GradeChangeRequest::query()
-            ->with(['enrollment.student', 'enrollment.section.subject', 'creator'])
-            ->latest('id')
-            ->paginate(10, ['*'], 'changes_page');
-
-        // 3. Thống kê KPI
-        $totalSectionsCount = CourseSection::query()->when($selectedTermId, fn ($q) => $q->where('term_id', $selectedTermId))->count();
-        $pendingApprovalCount = SectionGradeWorkflow::query()
-            ->whereIn('status', ['submitted', 'faculty_approved'])
-            ->whereNull('deleted_at')
-            ->count();
-        $publishedCount = SectionGradeWorkflow::query()
-            ->whereIn('status', ['published', 'locked'])
-            ->whereNull('deleted_at')
-            ->count();
-        $pendingChangesCount = GradeChangeRequest::query()
-            ->whereIn('status', ['pending_faculty', 'pending_acad'])
-            ->count();
-
-        $canApprove = $this->access->allows($user, 'GRD', PermissionAction::Approve);
-
-        $pageData = [
-            'api' => [
-                'workflowChange' => route('admin.course-sections.grade-workflow.change', ['courseSection' => '__ID__']),
-                'export' => route('admin.course-sections.gradebook.export', ['courseSection' => '__ID__']),
-                'approveChange' => route('admin.grade-change-requests.approve', ['gradeChangeRequest' => '__ID__']),
-                'rejectChange' => route('admin.grade-change-requests.reject', ['gradeChangeRequest' => '__ID__']),
+        return view('admin.grade.index', [
+            'terms' => $terms,
+            'faculties' => $faculties,
+            'selectedTermId' => $termId,
+            'selectedFacultyId' => $facultyId,
+            'selectedStatus' => $status,
+            'statuses' => collect(Status::cases())->mapWithKeys(fn (Status $s) => [$s->value => $s->label()]),
+            'sections' => $sections,
+            'workflows' => $workflows,
+            'actions' => $sections->getCollection()->mapWithKeys(fn (CourseSection $s) => [$s->id => $this->actions($user, $s, $workflows->get($s->id)?->status ?? Status::Draft)]),
+            'kpi' => [
+                'total' => $base()->count(),
+                'pending' => ($counts['submitted'] ?? 0) + ($counts['faculty_approved'] ?? 0) + ($counts['confirmed'] ?? 0),
+                'published' => ($counts['published'] ?? 0) + ($counts['locked'] ?? 0),
+                'changes' => $pendingChanges,
             ],
-            'canApprove' => $canApprove,
+            'pageData' => [
+                'api' => ['change' => route('admin.course-sections.grade-workflow.change', ['courseSection' => '__ID__'])],
+            ],
+        ]);
+    }
+
+    /**
+     * Bước người xem được bấm từ trạng thái hiện tại (giống quy tắc trong GradeWorkflowService::authorizeStep):
+     * khoa duyệt = DEAN trong phạm vi; trả lại = DEAN hoặc ACAD / EXAM; các bước còn lại = ACAD / EXAM toàn trường.
+     *
+     * @return list<array{status: string, label: string}>
+     */
+    private function actions(User $user, CourseSection $section, Status $current): array
+    {
+        $isDean = $user->hasRole('DEAN') && $this->access->allowsOn($user, 'GRD', PermissionAction::Approve, $section);
+        $isOffice = ($user->hasRole('ACAD') || $user->hasRole('EXAM')) && $this->access->allowsGlobally($user, 'GRD', PermissionAction::Approve);
+        $facultyRequired = (bool) config('grade_lifecycle.faculty_approval_required', true);
+        $labels = [
+            Status::FacultyApproved->value => 'Khoa duyệt',
+            Status::Confirmed->value => 'Xác nhận',
+            Status::Published->value => 'Công bố',
+            Status::Locked->value => 'Khóa sổ',
+            Status::Returned->value => 'Trả lại',
         ];
 
-        return view('admin.grade.index', compact(
-            'terms',
-            'faculties',
-            'selectedTermId',
-            'selectedFacultyId',
-            'selectedStatus',
-            'activeTab',
-            'sections',
-            'workflows',
-            'changeRequests',
-            'totalSectionsCount',
-            'pendingApprovalCount',
-            'publishedCount',
-            'pendingChangesCount',
-            'canApprove',
-            'pageData'
-        ));
+        return collect([Status::FacultyApproved, Status::Confirmed, Status::Published, Status::Locked, Status::Returned])
+            ->filter(fn (Status $next) => $current->allows($next, $facultyRequired) && match ($next) {
+                Status::FacultyApproved => $isDean,
+                Status::Returned => $isDean || $isOffice,
+                default => $isOffice,
+            })
+            ->map(fn (Status $next) => ['status' => $next->value, 'label' => $labels[$next->value]])
+            ->values()->all();
+    }
+
+    /** Học kỳ đang diễn ra theo ngày, không có thì học kỳ gần nhất đã bắt đầu. */
+    private function defaultTerm($terms): ?int
+    {
+        $today = now(config('studentmanager.display_timezone'))->toDateString();
+
+        return ($terms->first(fn (Term $t) => $t->start_date->toDateString() <= $today && $t->end_date->toDateString() >= $today)
+            ?? $terms->first(fn (Term $t) => $t->start_date->toDateString() <= $today)
+            ?? $terms->first())?->id;
     }
 }

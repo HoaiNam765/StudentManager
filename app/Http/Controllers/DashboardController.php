@@ -1,9 +1,9 @@
 <?php
 
-// Mẫu test Giao diện
-
 namespace App\Http\Controllers;
 
+use App\Modules\Report\Services\PortalOverview;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\View\View;
 
@@ -25,14 +25,16 @@ class DashboardController extends Controller
     }
 
     /**
-     * Cổng thông tin Sinh viên (Desktop)
+     * Tổng quan cổng sinh viên (FR-RPT-009): hồ sơ, tín chỉ theo CTĐT, GPA, học phần học kỳ này, lịch hôm nay, kết quả mới
+     * công bố, hạn chót, thông báo — dữ liệu thật của chính sinh viên (PortalOverview). Tài khoản chưa gắn hồ sơ thì
+     * view báo rõ thay vì hiện số giả.
      */
-    public function student(): View
+    public function student(Request $request, PortalOverview $overview): View
     {
-        return view('student.student-dashboard', $this->studentData());
+        return view('student.student-dashboard', ['overview' => $overview->student($request->user())]);
     }
 
-    /** Dữ liệu mẫu dùng chung cho dashboard sinh viên (máy tính và điện thoại) */
+    /** Dữ liệu mẫu cho dashboard sinh viên trên điện thoại (chưa nối dữ liệu thật) */
     private function studentData(): array
     {
         $student = [
@@ -92,25 +94,12 @@ class DashboardController extends Controller
     }
 
     /**
-     * Cổng Giảng viên
+     * Tổng quan cổng giảng viên (FR-RPT-010; FR-TCH-009): lịch dạy hôm nay, lớp học kỳ này và trạng thái bảng điểm, việc
+     * cần xử lý, yêu cầu điều chỉnh điểm, hạn chót, thông báo — dữ liệu thật (PortalOverview).
      */
-    public function lecturer(): View
+    public function lecturer(Request $request, PortalOverview $overview): View
     {
-        $lecturer = [
-            'name' => 'TS. Trần Hoàng Nam',
-            'faculty' => 'Khoa Công nghệ Thông tin',
-            'role' => 'Giảng viên',
-            'pending_tasks_count' => 3,
-            'today_classes_count' => 3,
-        ];
-
-        $urgentTasks = [
-            ['title' => 'Nộp điểm cuối kỳ HP Lập trình Java', 'deadline' => 'Hôm nay 15/10/2026', 'tag' => 'Khẩn cấp'],
-            ['title' => 'Phê duyệt đơn xin nghỉ học của SV', 'deadline' => '3 đơn đang chờ duyệt', 'tag' => 'Cần xử lý'],
-            ['title' => 'Cập nhật đề cương Công nghệ phần mềm', 'deadline' => 'Thời hạn: 20/10/2026', 'tag' => 'Cần xử lý'],
-        ];
-
-        return view('teacher.lecturer-dashboard', compact('lecturer', 'urgentTasks'));
+        return view('teacher.lecturer-dashboard', ['overview' => $overview->lecturer($request->user())]);
     }
 
     /**

@@ -19,7 +19,6 @@ class PortalMenu
         'student' => [
             'Học tập' => [
                 ['Tổng quan', 'dashboard', 'student.home', null],
-                ['Năm học & Lịch học vụ', 'calendar_month', 'admin.pages.academic-years', 'ACY.view,ALL'],
                 ['Chương trình đào tạo', 'school', 'student.pages.curriculum', 'CUR.view'],
                 ['Thời khóa biểu', 'calendar_month', 'student.pages.timetable', 'TTB.view'],
                 ['Hồ sơ cá nhân', 'person', 'student.pages.profile', 'STU.view'],
@@ -38,6 +37,12 @@ class PortalMenu
         'admin' => [
             'Quản lý đào tạo' => [
                 ['Tổng quan', 'dashboard', 'admin.home', null],
+                ['Vận hành & Khóa sổ', 'settings_backup_restore', 'admin.pages.system-operations', 'SYS.view'],
+                ['Dạy bù & Phòng học', 'meeting_room', 'admin.pages.makeup', 'TTB.view'],
+                ['Đăng ký học phần', 'how_to_reg', 'admin.pages.enrollment', 'ENR.view'],
+                ['Xếp thời khóa biểu', 'calendar_month', 'admin.pages.timetable', 'TTB.view'],
+                ['Năm học & Lịch học vụ', 'calendar_month', 'admin.pages.academic-years', 'ACY.view,ALL'],
+                ['Lớp học phần', 'groups', 'admin.pages.course-sections', 'CLS.view'],
                 ['Quản lý & Duyệt điểm', 'verified', 'admin.pages.grades', 'GRD.view'],
                 ['Duyệt điều chỉnh điểm', 'rule', 'admin.pages.grade-changes', 'GRD.approve'],
                 ['Gửi thông báo', 'campaign', 'admin.pages.announcements', 'NOT.create'],

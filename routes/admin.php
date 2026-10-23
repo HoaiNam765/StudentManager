@@ -6,6 +6,11 @@ use App\Http\Controllers\Pages\Admin\GradeAdminDetailController;
 use App\Http\Controllers\Pages\Admin\GradeAdminPageController;
 use App\Http\Controllers\Pages\Admin\AcademicYearPageController;
 use App\Http\Controllers\Pages\Admin\GradeChangePageController;
+use App\Http\Controllers\Pages\Admin\SystemOperationPageController;
+use App\Http\Controllers\Pages\Admin\MakeupPageController;
+use App\Http\Controllers\Pages\Admin\EnrollmentAdminPageController;
+use App\Http\Controllers\Pages\Admin\TimetablePageController;
+use App\Http\Controllers\Pages\Admin\CourseSectionPageController;
 use App\Http\Controllers\Pages\AnnouncementPageController;
 use App\Modules\AcademicYear\Http\Controllers\AcademicCalendarController;
 use App\Modules\AcademicYear\Http\Controllers\AcademicYearController;
@@ -73,6 +78,11 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/', [DashboardController::class, 'admin'])->name('home');
     // Dữ liệu dashboard quản trị theo vai trò và phạm vi (RPT, FR-RPT-001, 002, 008)
     Route::get('/dashboard/data', [DashboardDataController::class, 'admin'])->middleware('permission:RPT.view')->name('dashboard.data');
+    Route::get('van-hanh-he-thong', [SystemOperationPageController::class, 'index'])->middleware('permission:SYS.view')->name('pages.system-operations');
+    Route::get('thoi-khoa-bieu/day-bu', [MakeupPageController::class, 'index'])->middleware('permission:TTB.view')->name('pages.makeup');
+    Route::get('dang-ky-hoc-phan', [EnrollmentAdminPageController::class, 'index'])->middleware('permission:ENR.view')->name('pages.enrollment');
+    Route::get('thoi-khoa-bieu', [TimetablePageController::class, 'index'])->middleware('permission:TTB.view')->name('pages.timetable');
+    Route::get('lop-hoc-phan', [CourseSectionPageController::class, 'index'])->middleware('permission:CLS.view')->name('pages.course-sections');
 
     // Phân quyền (AUTH): chỉ người có quyền trên toàn trường, mặc định là ADMIN
     Route::middleware('permission:AUTH.view,ALL')->group(function (): void {
@@ -628,4 +638,3 @@ Route::middleware('auth')->group(function (): void {
     ->middleware('permission:ACY.view,ALL')
     ->name('pages.academic-years');
 });
-

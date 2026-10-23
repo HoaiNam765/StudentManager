@@ -322,7 +322,7 @@ export default function adminAcademicYear(root) {
                         dataset: { milestone: item.type },
                         disabled: !page.can?.update,
                         class: 'mt-1 w-full rounded-lg border border-outline-variant px-3 py-2 text-sm disabled:bg-surface-container-low disabled:text-on-surface-variant',
-                    }))));
+                    })))));
             refreshCopyOptions(termId);
         } catch (error) {
             region('milestones').replaceChildren(errorBlock(error, () => loadMilestones()));

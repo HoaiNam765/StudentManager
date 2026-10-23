@@ -4,6 +4,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Pages\Admin\GradeAdminActionController;
 use App\Http\Controllers\Pages\Admin\GradeAdminDetailController;
 use App\Http\Controllers\Pages\Admin\GradeAdminPageController;
+use App\Http\Controllers\Pages\Admin\AcademicYearPageController;
 use App\Http\Controllers\Pages\Admin\GradeChangePageController;
 use App\Http\Controllers\Pages\AnnouncementPageController;
 use App\Modules\AcademicYear\Http\Controllers\AcademicCalendarController;
@@ -56,6 +57,7 @@ use App\Modules\Timetable\Http\Controllers\PeriodController;
 use App\Modules\Timetable\Http\Controllers\ScheduleRuleController;
 use App\Modules\Timetable\Http\Controllers\TimetableController;
 use Illuminate\Support\Facades\Route;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -620,4 +622,10 @@ Route::middleware('auth')->group(function (): void {
         ->whereIn('unitType', $unitTypes)->whereNumber('id')->middleware('permission:FAC.update')->name('units.update');
     Route::delete('{unitType}/{id}', [UnitController::class, 'destroy'])
         ->whereIn('unitType', $unitTypes)->whereNumber('id')->middleware('permission:FAC.delete')->name('units.destroy');
+
+    // FE #9: Năm học, học kỳ, lịch học vụ và ngày nghỉ.
+    Route::get('nam-hoc', [AcademicYearPageController::class, 'index'])
+    ->middleware('permission:ACY.view,ALL')
+    ->name('pages.academic-years');
 });
+

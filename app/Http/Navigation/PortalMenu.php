@@ -19,6 +19,7 @@ class PortalMenu
         'student' => [
             'Học tập' => [
                 ['Tổng quan', 'dashboard', 'student.home', null],
+                ['Năm học & Lịch học vụ', 'calendar_month', 'admin.pages.academic-years', 'ACY.view,ALL'],
                 ['Chương trình đào tạo', 'school', 'student.pages.curriculum', 'CUR.view'],
                 ['Thời khóa biểu', 'calendar_month', 'student.pages.timetable', 'TTB.view'],
                 ['Hồ sơ cá nhân', 'person', 'student.pages.profile', 'STU.view'],

@@ -127,7 +127,8 @@ export default function adminCourseSections(root) {
                 el('div', { class: 'flex items-start justify-between gap-2' },
                     el('div', {}, el('h3', { class: 'text-lg font-bold' }, item.code), el('p', { class: 'text-sm text-on-surface-variant' }, `${item.subject?.code ?? ''} · ${item.subject?.name ?? ''}`)),
                     el('span', { class: `rounded-full px-2 py-1 text-xs font-semibold ${BADGE[item.status] ?? ''}` }, item.status_label)),
-                el('p', { class: 'mt-2 text-xs text-on-surface-variant' }, `${item.term?.name ?? '—'} · ${item.term?.academic_year ?? ''} · ${item.section_type} · ${item.delivery_mode}`)),
+                el('p', { class: 'mt-2 text-xs text-on-surface-variant' }, `${item.term?.name ?? '—'} · ${item.term?.academic_year ?? ''} · ${item.section_type} · ${item.delivery_mode}`),
+                page.links?.detail ? el('a', { href: page.links.detail.replace('__ID__', encodeURIComponent(item.id)), class: 'mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline' }, icon('open_in_new', 'text-[16px]'), 'Xem chi tiết lớp và danh sách sinh viên') : null),
         );
 
         if (page.can.update && ['planned', 'registration_open'].includes(item.status)) box.append(editForm(item));

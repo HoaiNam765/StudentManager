@@ -9,6 +9,7 @@ use App\Modules\Enrollment\Models\Enrollment;
 use App\Modules\Enrollment\Services\EnrollmentRules;
 use App\Modules\Enrollment\Services\EnrollmentService;
 use App\Modules\Enrollment\Services\RegistrationAccess;
+use App\Modules\SchoolClass\Models\AdminClassMember;
 use App\Modules\SchoolClass\Models\CourseSection;
 use App\Modules\Timetable\Models\ScheduleRule;
 use Illuminate\Http\JsonResponse;
@@ -92,19 +93,24 @@ class EnrollmentController extends Controller
         abort_unless($this->acl->allowsOn($request->user(), 'ENR', PermissionAction::View, $courseSection), 403, 'Bạn không có quyền thực hiện thao tác này.');
 
         $list = Enrollment::query()
-            ->with('student:id,student_code,full_name,school_email')
+            ->with('student:id,student_code,full_name,school_email,major_id,cohort,status', 'student.major:id,name')
             ->where('course_section_id', $courseSection->id)
             ->when(! $request->boolean('all'), fn ($q) => $q->active())
             ->get()
             ->sortBy(fn (Enrollment $e) => $e->student->student_code)
             ->values();
+        $classes = AdminClassMember::query()->current()->whereIn('student_id', $list->pluck('student_id'))
+            ->with('adminClass:id,code')->get()->keyBy('student_id');
 
         return response()->json([
             'section' => $courseSection->only('id', 'code', 'max_size'),
             'count' => $list->filter(fn (Enrollment $e) => $e->status->isActive())->count(),
             'data' => $list->map(fn (Enrollment $e) => [
                 'id' => $e->id,
-                'student' => $e->student->only('id', 'student_code', 'full_name', 'school_email'),
+                'student' => $e->student->only('id', 'student_code', 'full_name', 'school_email', 'cohort') + [
+                    'major' => $e->student->major?->name,
+                    'admin_class' => $classes->get($e->student_id)?->adminClass?->code,
+                ],
                 'type' => $e->type,
                 'status' => $e->status->value,
                 'status_label' => $e->status->label(),

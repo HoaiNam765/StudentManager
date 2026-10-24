@@ -24,7 +24,7 @@ class ClassDirectoryService
     {
         return $this->access->constrain(
             CourseSection::query()
-                ->with(['subject:id,code,name', 'term:id,name,academic_year_id', 'term.academicYear:id,name'])
+                ->with(['subject:id,code,name,credits', 'term:id,name,academic_year_id', 'term.academicYear:id,name'])
                 ->whereIn('status', SectionStatus::activeValues())
                 ->orderBy('code'),
             $user,
@@ -54,7 +54,7 @@ class ClassDirectoryService
         return $this->access->constrain(
             Enrollment::query()
                 ->with([
-                    'student:id,student_code,full_name,photo_path,school_email,status',
+                    'student:id,student_code,full_name,photo_path,school_email,status,date_of_birth',
                     'student.adminClassMembers' => fn (Relation $query) => $query->current()->with('adminClass:id,code,name'),
                 ])
                 ->where('course_section_id', $section->id)
@@ -79,7 +79,7 @@ class ClassDirectoryService
             ->select('students.id');
 
         return AdminClassMember::query()
-            ->with('student:id,student_code,full_name,photo_path,school_email,status')
+            ->with('student:id,student_code,full_name,photo_path,school_email,status,date_of_birth')
             ->where('admin_class_id', $class->id)
             ->whereIn('admin_class_id', $visibleClasses)
             ->whereIn('student_id', $visibleStudents)
@@ -120,6 +120,7 @@ class ClassDirectoryService
             'photo_url' => $student->photo_path === null ? null : asset('storage/'.$student->photo_path),
             'admin_class' => $class?->only('id', 'code', 'name'),
             'school_email' => $student->school_email,
+            'date_of_birth' => $student->date_of_birth?->toDateString(),
             'status' => $student->status?->value,
         ];
     }

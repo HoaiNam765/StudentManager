@@ -61,4 +61,20 @@ class PortalAccessTest extends TestCase
         $this->actingAs($dean)->get('/teacher')->assertOk();
         $this->actingAs($dean)->get('/student')->assertRedirect(route('admin.home'));
     }
+
+    /**
+     * API dữ liệu dùng chung được kiểm tra bởi quyền module / policy; không mở cổng
+     * quản trị HTML hay các API quản trị nhạy cảm cho vai trò sinh viên.
+     */
+    public function test_sinh_vien_duoc_doc_api_dung_chung_nhung_khong_vao_duoc_admin_html(): void
+    {
+        $student = $this->userWithRoles('STU');
+        $this->actingAs($student);
+
+        $this->getJson('/admin/subjects')->assertOk();
+        $this->get('/admin/subjects')->assertRedirect(route('student.home'));
+        $this->getJson('/admin/users')->assertForbidden();
+        $this->postJson('/admin/subjects', [])->assertForbidden();
+        $this->get('/admin/subjects/export')->assertForbidden();
+    }
 }

@@ -30,6 +30,9 @@ class PortalMenu
         'teacher' => [
             'Giảng dạy' => [
                 ['Tổng quan', 'dashboard', 'teacher.home', null],
+                ['Lịch giảng dạy', 'calendar_month', 'teacher.pages.schedule', 'TTB.view'],
+                ['Lớp học phần', 'groups', 'teacher.pages.sections', 'CLS.view'],
+                ['Lớp cố vấn học tập', 'supervisor_account', 'teacher.pages.advisees', 'CLS.view'],
                 ['Quản lý & Nhập điểm', 'fact_check', 'teacher.pages.gradebook', 'GRD.view'],
                 ['Gửi thông báo', 'campaign', 'teacher.pages.announcements', 'NOT.create'],
             ],

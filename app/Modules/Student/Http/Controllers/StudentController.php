@@ -5,6 +5,7 @@ namespace App\Modules\Student\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Modules\Auth\Enums\PermissionAction;
 use App\Modules\Auth\Services\AccessControl;
+use App\Modules\SchoolClass\Models\AdminClassMember;
 use App\Modules\Student\Http\Requests\StudentRequest;
 use App\Modules\Student\Models\Student;
 use App\Modules\Student\Models\StudentChangeLog;
@@ -17,6 +18,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -45,8 +47,19 @@ class StudentController extends Controller
             ->with(['major:id,code,name,faculty_id', 'trainingType:id,code,name'])
             ->paginate($perPage)
             ->withQueryString();
+        $ids = $list->getCollection()->pluck('id');
+        // Lớp hành chính hiện tại và GPA tích lũy cho cột "Lớp hành chính", "ĐTB tích lũy / TC" của trang danh sách
+        $classes = AdminClassMember::query()->current()->whereIn('student_id', $ids)->with('adminClass:id,code,name')->get()->keyBy('student_id');
+        $gpas = DB::table('cumulative_gpas')->whereIn('student_id', $ids)->get(['student_id', 'gpa', 'credits_earned', 'classification'])->keyBy('student_id');
 
-        return response()->json($list->through(fn (Student $s) => $this->summary($s)));
+        return response()->json($list->through(fn (Student $s) => $this->summary($s) + [
+            'admin_class' => $classes->get($s->id)?->adminClass?->only('id', 'code', 'name'),
+            'gpa' => ($g = $gpas->get($s->id)) === null ? null : [
+                'gpa' => $g->gpa === null ? null : (float) $g->gpa,
+                'credits_earned' => (int) $g->credits_earned,
+                'classification' => $g->classification,
+            ],
+        ]));
     }
 
     /**
@@ -259,6 +272,7 @@ class StudentController extends Controller
             ],
             'contacts' => $student->contacts->map(fn (StudentContact $c) => $this->presentContact($c))->values(),
             'note' => $student->note,
+            'photo_url' => $student->photo_path === null ? null : asset('storage/'.$student->photo_path),
         ];
     }
 

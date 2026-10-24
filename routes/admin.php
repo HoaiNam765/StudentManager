@@ -9,6 +9,7 @@ use App\Http\Controllers\Pages\Admin\GradeAdminDetailController;
 use App\Http\Controllers\Pages\Admin\GradeAdminPageController;
 use App\Http\Controllers\Pages\Admin\GradeChangePageController;
 use App\Http\Controllers\Pages\Admin\MakeupPageController;
+use App\Http\Controllers\Pages\Admin\StudentPageController;
 use App\Http\Controllers\Pages\Admin\SystemOperationPageController;
 use App\Http\Controllers\Pages\Admin\TimetablePageController;
 use App\Http\Controllers\Pages\AnnouncementPageController;
@@ -82,6 +83,13 @@ Route::middleware('auth')->group(function (): void {
     Route::get('dang-ky-hoc-phan', [EnrollmentAdminPageController::class, 'index'])->middleware('permission:ENR.view')->name('pages.enrollment');
     Route::get('thoi-khoa-bieu', [TimetablePageController::class, 'index'])->middleware('permission:TTB.view')->name('pages.timetable');
     Route::get('lop-hoc-phan', [CourseSectionPageController::class, 'index'])->middleware('permission:CLS.view')->name('pages.course-sections');
+    // Quản lý sinh viên (FE #16) và khóa – lớp hành chính (FE #15): trang HTML, dữ liệu do JavaScript gọi API STU / CLS / SYS
+    Route::get('sinh-vien', [StudentPageController::class, 'index'])->middleware('permission:STU.view')->name('pages.students');
+    Route::get('sinh-vien/them', [StudentPageController::class, 'create'])->middleware('permission:STU.create')->name('pages.students.create');
+    Route::get('sinh-vien/nhap-file', [StudentPageController::class, 'import'])->middleware('permission:SYS.view')->name('pages.students.import');
+    Route::get('sinh-vien/{student}', [StudentPageController::class, 'show'])->whereNumber('student')->middleware('permission:STU.view')->name('pages.students.show');
+    Route::get('sinh-vien/{student}/sua', [StudentPageController::class, 'edit'])->whereNumber('student')->middleware('permission:STU.update')->name('pages.students.edit');
+    Route::get('lop-hanh-chinh', [StudentPageController::class, 'classes'])->middleware('permission:CLS.view')->name('pages.admin-classes');
 
     // Phân quyền (AUTH): chỉ người có quyền trên toàn trường, mặc định là ADMIN
     Route::middleware('permission:AUTH.view,ALL')->group(function (): void {

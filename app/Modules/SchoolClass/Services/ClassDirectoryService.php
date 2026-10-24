@@ -12,6 +12,7 @@ use App\Modules\SchoolClass\Models\AdminClassMember;
 use App\Modules\SchoolClass\Models\CourseSection;
 use App\Modules\Student\Models\Student;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 /** Các truy vấn danh sách lớp và sinh viên, luôn giới hạn theo quyền CLS/STU của người gọi. */
 class ClassDirectoryService
@@ -54,7 +55,7 @@ class ClassDirectoryService
             Enrollment::query()
                 ->with([
                     'student:id,student_code,full_name,photo_path,school_email,status',
-                    'student.adminClassMembers' => fn (Builder $query) => $query->current()->with('adminClass:id,code,name'),
+                    'student.adminClassMembers' => fn (Relation $query) => $query->current()->with('adminClass:id,code,name'),
                 ])
                 ->where('course_section_id', $section->id)
                 ->active()

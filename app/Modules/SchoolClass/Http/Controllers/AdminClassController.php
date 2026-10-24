@@ -9,6 +9,7 @@ use App\Modules\SchoolClass\Models\AdminClass;
 use App\Modules\SchoolClass\Models\Cohort;
 use App\Modules\SchoolClass\Services\AdminClassService;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -74,7 +75,7 @@ class AdminClassController extends Controller
                 'major:id,code,name,faculty_id',
                 'specialization:id,code,name',
                 'trainingType:id,code,name',
-                'advisorAssignments' => fn (Builder $q) => $q->current()->with('lecturer:id,code,full_name'),
+                'advisorAssignments' => fn (Relation $q) => $q->current()->with('lecturer:id,code,full_name'),
             ])
             ->withCount(['members as current_students_count' => fn (Builder $q) => $q->current()])
             ->search($request->string('q')->toString())
@@ -97,7 +98,7 @@ class AdminClassController extends Controller
             'major',
             'specialization',
             'trainingType',
-            'advisorAssignments' => fn (Builder $q) => $q->current()->with('lecturer:id,code,full_name'),
+            'advisorAssignments' => fn (Relation $q) => $q->current()->with('lecturer:id,code,full_name'),
         ])->loadCount(['members as current_students_count' => fn (Builder $q) => $q->current()])));
     }
 

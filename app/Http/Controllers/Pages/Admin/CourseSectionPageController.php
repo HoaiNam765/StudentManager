@@ -38,6 +38,7 @@ class CourseSectionPageController extends Controller
                 'lecturers' => route('admin.lecturers.index'),
                 'rooms' => route('admin.rooms.index'),
             ],
+            'links' => ['detail' => route('admin.pages.course-sections.show', ['courseSection' => '__ID__'])],
             'can' => [
                 'create' => $this->access->allowsGlobally($user, 'CLS', PermissionAction::Create),
                 'update' => $this->access->allowsGlobally($user, 'CLS', PermissionAction::Update),

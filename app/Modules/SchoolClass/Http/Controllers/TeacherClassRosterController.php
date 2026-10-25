@@ -5,12 +5,16 @@ namespace App\Modules\SchoolClass\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Modules\Auth\Enums\PermissionAction;
 use App\Modules\Auth\Services\AccessControl;
+use App\Modules\Enrollment\Enums\EnrollmentStatus;
+use App\Modules\Grade\Enums\GradePublicationStatus;
 use App\Modules\SchoolClass\Models\AdminClass;
 use App\Modules\SchoolClass\Models\AdminClassMember;
 use App\Modules\SchoolClass\Models\CourseSection;
 use App\Modules\SchoolClass\Services\ClassDirectoryService;
+use App\Modules\Timetable\Models\ScheduleRule;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 /** Danh sách lớp được giảng viên phụ trách và sinh viên thuộc lớp (FR-TCH-011, BR-TCH-04). */
 class TeacherClassRosterController extends Controller
@@ -23,14 +27,41 @@ class TeacherClassRosterController extends Controller
     public function sections(Request $request): JsonResponse
     {
         $sections = $this->directory->taughtSections($request->user())->paginate(50);
+        $ids = $sections->getCollection()->pluck('id');
+        // Sĩ số, lịch học, trạng thái bảng điểm cho thẻ lớp của trang giảng viên (mock teacher/lop-hoc-phan)
+        $sizes = DB::table('enrollments')->whereIn('course_section_id', $ids)->whereIn('status', EnrollmentStatus::activeValues())
+            ->whereNull('deleted_at')->groupBy('course_section_id')->selectRaw('course_section_id, count(*) as n')->pluck('n', 'course_section_id');
+        $rules = DB::table('schedule_rules')->leftJoin('rooms', 'rooms.id', '=', 'schedule_rules.room_id')
+            ->whereIn('schedule_rules.course_section_id', $ids)->whereNull('schedule_rules.deleted_at')
+            ->orderBy('schedule_rules.day_of_week')->orderBy('schedule_rules.period_from')
+            ->get(['schedule_rules.course_section_id', 'day_of_week', 'period_from', 'period_to', 'week_from', 'week_to', 'rooms.code as room'])
+            ->groupBy('course_section_id');
+        $workflows = DB::table('section_grade_workflows')->whereIn('course_section_id', $ids)->whereNull('deleted_at')->pluck('status', 'course_section_id');
 
         return response()->json($sections->through(fn (CourseSection $section) => [
             'id' => $section->id,
             'code' => $section->code,
             'status' => $section->status->value,
-            'subject' => $section->subject?->only('id', 'code', 'name'),
+            'status_label' => $section->status->label(),
+            'subject' => $section->subject?->only('id', 'code', 'name', 'credits'),
             'term' => $section->term?->only('id', 'name'),
             'academic_year' => $section->term?->academicYear?->only('id', 'name'),
+            'max_size' => $section->max_size,
+            'students_count' => (int) ($sizes[$section->id] ?? 0),
+            'schedule' => ($rules->get($section->id) ?? collect())->map(fn ($r) => [
+                'day_of_week' => (int) $r->day_of_week,
+                'day_label' => ScheduleRule::DAYS[(int) $r->day_of_week] ?? '',
+                'period_from' => (int) $r->period_from,
+                'period_to' => (int) $r->period_to,
+                'week_from' => (int) $r->week_from,
+                'week_to' => (int) $r->week_to,
+                'room' => $r->room,
+            ])->values(),
+            'grade_status' => ($status = GradePublicationStatus::tryFrom($workflows[$section->id] ?? 'draft')) === null ? null : [
+                'value' => $status->value,
+                'label' => $status->label(),
+                'editable' => $status->editable(),
+            ],
         ]));
     }
 
@@ -73,10 +104,18 @@ class TeacherClassRosterController extends Controller
         $members = $this->directory
             ->studentsInAdminClass($request->user(), $adminClass)
             ->paginate(50);
+        // GPA, tín chỉ tích lũy cho cột của mock teacher/lop-co-van-hoc-tap
+        $gpas = DB::table('cumulative_gpas')->whereIn('student_id', $members->getCollection()->pluck('student_id'))->whereNull('deleted_at')
+            ->get(['student_id', 'gpa', 'credits_earned', 'classification'])->keyBy('student_id');
 
         return response()->json($members->through(fn (AdminClassMember $member) => [
             'id' => $member->student?->id,
             'student' => $this->directory->presentStudent($member->student, $adminClass),
+            'gpa' => ($g = $gpas->get($member->student_id)) === null ? null : [
+                'gpa' => $g->gpa === null ? null : (float) $g->gpa,
+                'credits_earned' => (int) $g->credits_earned,
+                'classification' => $g->classification,
+            ],
         ]));
     }
 }

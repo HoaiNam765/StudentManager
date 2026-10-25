@@ -223,4 +223,19 @@ return [
         'retention_days' => (int) env('EXPORT_RETENTION_DAYS', 7),
     ],
 
+    // Điểm danh (ATT, BA 6.8). Ngưỡng cảnh báo / cấm thi theo bộ quy chế khóa: attendance.warning_percent, ban_percent
+    'attendance' => [
+        // Phiên điểm danh mở từ N ngày trước ngày học (BR-ATT-01); 0 = chỉ từ ngày học
+        'open_days_before' => (int) env('ATT_OPEN_DAYS_BEFORE', 0),
+        // Giảng viên tự sửa trong N ngày kể từ ngày học, sau đó gửi yêu cầu cho Phòng Đào tạo duyệt (FR-ATT-005)
+        'edit_days' => (int) env('ATT_EDIT_DAYS', 7),
+        // Hệ số vắng có phép khi tính tỷ lệ vắng: 1 = tính như vắng, 0 = không tính (BR-ATT-02)
+        'excused_weight' => (float) env('ATT_EXCUSED_WEIGHT', 1),
+        // Đi muộn quá N phút tính là vắng; N lần đi muộn quy đổi 1 buổi vắng (BR-ATT-04)
+        'late_minutes_as_absent' => (int) env('ATT_LATE_MINUTES_AS_ABSENT', 15),
+        'lates_per_absence' => (int) env('ATT_LATES_PER_ABSENCE', 3),
+        // Điểm chuyên cần hệ 10 = max(0, 10 − số buổi vắng quy đổi × điểm trừ mỗi buổi); bị cấm thi thì 0 (FR-ATT-008)
+        'score_deduction_per_absence' => (float) env('ATT_SCORE_DEDUCTION', 2),
+    ],
+
 ];

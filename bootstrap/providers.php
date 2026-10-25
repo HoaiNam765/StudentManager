@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Attendance\AttendanceServiceProvider;
 use App\Modules\Auth\AuthServiceProvider;
 use App\Modules\Curriculum\CurriculumServiceProvider;
 use App\Modules\Enrollment\EnrollmentServiceProvider;
@@ -29,5 +30,6 @@ return [
     TimetableServiceProvider::class,
     EnrollmentServiceProvider::class,
     GradeServiceProvider::class,
+    AttendanceServiceProvider::class,
     NotificationServiceProvider::class,
 ];

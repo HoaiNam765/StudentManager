@@ -171,7 +171,9 @@ class DemoDataSeeder extends Seeder
 
     private function demoPasswords(Collection $students): void
     {
-        User::query()->whereIn('id', $students->pluck('user_id'))->where('must_change_password', true)->get()
+        // Sinh viên và giảng viên demo (tài khoản giảng viên tạo bởi TeacherSeeder còn mật khẩu tạm ngẫu nhiên)
+        $lecturers = Lecturer::query()->whereNotNull('user_id')->pluck('user_id');
+        User::query()->whereIn('id', $students->pluck('user_id')->merge($lecturers))->where('must_change_password', true)->get()
             ->each(fn (User $u) => $u->forceFill([
                 'password' => DevRoleUsersSeeder::PASSWORD,
                 'must_change_password' => false,

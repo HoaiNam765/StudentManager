@@ -11,6 +11,7 @@ use App\Http\Controllers\Pages\Admin\GradeAdminPageController;
 use App\Http\Controllers\Pages\Admin\GradeChangePageController;
 use App\Http\Controllers\Pages\Admin\MakeupPageController;
 use App\Http\Controllers\Pages\Admin\StudentPageController;
+use App\Http\Controllers\Pages\Admin\SubjectPageController;
 use App\Http\Controllers\Pages\Admin\SystemOperationPageController;
 use App\Http\Controllers\Pages\Admin\TimetablePageController;
 use App\Http\Controllers\Pages\AnnouncementPageController;
@@ -83,6 +84,7 @@ Route::middleware('auth')->group(function (): void {
     Route::get('thoi-khoa-bieu/day-bu', [MakeupPageController::class, 'index'])->middleware('permission:TTB.view')->name('pages.makeup');
     Route::get('dang-ky-hoc-phan', [EnrollmentAdminPageController::class, 'index'])->middleware('permission:ENR.view')->name('pages.enrollment');
     Route::get('thoi-khoa-bieu', [TimetablePageController::class, 'index'])->middleware('permission:TTB.view')->name('pages.timetable');
+    Route::get('hoc-phan', [SubjectPageController::class, 'index'])->middleware('permission:SUB.view')->name('pages.subjects');
     Route::get('lop-hoc-phan', [CourseSectionPageController::class, 'index'])->middleware('permission:CLS.view')->name('pages.course-sections');
     Route::get('lop-hoc-phan/{courseSection}', [CourseSectionDetailPageController::class, 'show'])->whereNumber('courseSection')->middleware('permission:CLS.view')->name('pages.course-sections.show');
     // Quản lý sinh viên (FE #16) và khóa – lớp hành chính (FE #15): trang HTML, dữ liệu do JavaScript gọi API STU / CLS / SYS

@@ -139,6 +139,7 @@ class StudentPageController extends Controller
             'api' => $this->lookupApis() + [
                 'cohortStore' => route('admin.cohorts.store'),
                 'cohortUpdate' => route('admin.cohorts.update', ['cohort' => '__ID__']),
+                'cohortDestroy' => route('admin.cohorts.destroy', ['cohort' => '__ID__']),
                 'classStore' => route('admin.admin-classes.store'),
                 'classUpdate' => route('admin.admin-classes.update', ['adminClass' => '__ID__']),
                 'classDestroy' => route('admin.admin-classes.destroy', ['adminClass' => '__ID__']),

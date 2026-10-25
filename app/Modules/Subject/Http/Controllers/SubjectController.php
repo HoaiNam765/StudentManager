@@ -7,8 +7,10 @@ use App\Models\User;
 use App\Modules\Auth\Enums\PermissionAction;
 use App\Modules\Auth\Services\AccessControl;
 use App\Modules\Faculty\Services\FacultyAccess;
+use App\Modules\Subject\Enums\RelationType;
 use App\Modules\Subject\Http\Requests\SubjectRequest;
 use App\Modules\Subject\Models\Subject;
+use App\Modules\Subject\Models\SubjectRelation;
 use App\Modules\Subject\Services\SubjectService;
 use App\Support\Exports\ExportColumn;
 use App\Support\Services\ExportService;
@@ -33,9 +35,23 @@ class SubjectController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $list = $this->access->constrain($this->listQuery($request), $request->user(), 'SUB', PermissionAction::View)->paginate(50);
+        $list = $this->access->constrain($this->listQuery($request), $request->user(), 'SUB', PermissionAction::View)
+            ->paginate(min(100, max(1, $request->integer('per_page', 50))))->withQueryString();
+        // Học phần tiên quyết / học trước đang hiệu lực cho cột "Học phần tiên quyết" của trang danh sách (mock admin/hoc-phan)
+        $requires = SubjectRelation::query()->with('relatedSubject:id,code,name')
+            ->whereIn('subject_id', $list->getCollection()->pluck('id'))
+            ->whereIn('type', [RelationType::Prerequisite->value, RelationType::Prior->value])
+            ->effectiveOn(now(config('studentmanager.display_timezone'))->toDateString())
+            ->get()->groupBy('subject_id');
 
-        return response()->json($list->through(fn (Subject $subject) => $this->present($subject)));
+        return response()->json($list->through(fn (Subject $subject) => $this->present($subject) + [
+            'prerequisites' => ($requires->get($subject->id) ?? collect())->map(fn (SubjectRelation $r) => [
+                'type' => $r->type->value,
+                'type_label' => $r->type->label(),
+                'code' => $r->relatedSubject?->code,
+                'name' => $r->relatedSubject?->name,
+            ])->values(),
+        ]));
     }
 
     public function show(Subject $subject): JsonResponse

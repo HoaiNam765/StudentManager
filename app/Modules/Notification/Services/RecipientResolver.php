@@ -87,11 +87,17 @@ class RecipientResolver
     /** @return list<int> tài khoản đang có vai trò ADMIN */
     public function admins(): array
     {
+        return $this->withRole(Role::ADMIN);
+    }
+
+    /** @return list<int> người dùng đang giữ vai trò `$code` (ví dụ ACAD nhận EV-ATT-02) */
+    public function withRole(string $code): array
+    {
         $today = now(config('studentmanager.display_timezone'))->toDateString();
 
         return $this->ids(DB::table('user_roles')
             ->join('roles', 'roles.id', '=', 'user_roles.role_id')
-            ->where('roles.code', Role::ADMIN)
+            ->where('roles.code', $code)
             ->where(fn ($q) => $q->whereNull('user_roles.valid_from')->orWhere('user_roles.valid_from', '<=', $today))
             ->where(fn ($q) => $q->whereNull('user_roles.valid_to')->orWhere('user_roles.valid_to', '>=', $today))
             ->pluck('user_roles.user_id'));

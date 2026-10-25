@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Pages\AnnouncementPageController;
+use App\Http\Controllers\Pages\AttendancePageController;
 use App\Http\Controllers\Pages\Teacher\GradebookPageController;
 use App\Http\Controllers\Pages\Teacher\TeachingPageController;
+use App\Modules\Attendance\Http\Controllers\AttendanceController;
 use App\Modules\Grade\Http\Controllers\GradebookController;
 use App\Modules\Grade\Http\Controllers\GradeChangeController;
 use App\Modules\Grade\Http\Controllers\GradeResultController;
@@ -148,4 +150,17 @@ Route::middleware('auth')->group(function (): void {
         '/dashboard/data',
         [DashboardDataController::class, 'teacher']
     )->name('dashboard.data');
+
+    // Điểm danh (ATT, #142, #144): buổi học của lớp, phiếu điểm danh, ghi / sửa, yêu cầu sửa quá hạn, sổ đầu bài,
+    // tổng hợp chuyên cần lớp, chuyển điểm chuyên cần sang sổ điểm. Chỉ giảng viên được phân công (kiểm tra ở Service).
+    Route::get('course-sections/{courseSection}/attendance/sessions', [AttendanceController::class, 'sessions'])->whereNumber('courseSection')->middleware('permission:ATT.view')->name('attendance.sessions');
+    Route::get('course-sections/{courseSection}/attendance/summary', [AttendanceController::class, 'summary'])->whereNumber('courseSection')->middleware('permission:ATT.view')->name('attendance.summary');
+    Route::post('course-sections/{courseSection}/attendance/push-grades', [AttendanceController::class, 'pushScores'])->whereNumber('courseSection')->middleware('permission:ATT.update')->name('attendance.push-grades');
+    Route::get('class-sessions/{classSession}/attendance', [AttendanceController::class, 'sheet'])->whereNumber('classSession')->middleware('permission:ATT.view')->name('attendance.sheet');
+    Route::put('class-sessions/{classSession}/attendance', [AttendanceController::class, 'record'])->whereNumber('classSession')->middleware('permission:ATT.create')->name('attendance.record');
+    Route::put('class-sessions/{classSession}/teaching-log', [AttendanceController::class, 'teachingLog'])->whereNumber('classSession')->middleware('permission:ATT.update')->name('attendance.teaching-log');
+    Route::post('attendance-records/{attendanceRecord}/change-requests', [AttendanceController::class, 'requestChange'])->whereNumber('attendanceRecord')->middleware('permission:ATT.update')->name('attendance.change-requests.store');
+
+    // Trang điểm danh / chuyên cần (FE #38, #42, #43)
+    Route::get('diem-danh', [AttendancePageController::class, 'teacher'])->middleware('permission:ATT.view')->name('pages.attendance');
 });

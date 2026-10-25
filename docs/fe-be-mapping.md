@@ -137,7 +137,6 @@ Cột "Trang thật" là đề xuất; cột "Quyền trang" là middleware củ
 |---|---|
 | Dashboard / KPI (RPT) | `admin/tong-quan`, `admin/bao-cao`, `student/tong-quan`, `student/tong-quan-mobile`, `teacher/tong-quan` (trang chủ thật `admin.home`, `student.home`, `teacher.home` vẫn dùng số liệu giả trong `DashboardController`) |
 | Điểm, GPA (GRD) | `admin/quan-ly-diem`, `student/ket-qua-hoc-tap`, `teacher/nhap-diem` |
-| Điểm danh (ATT) | `admin/diem-danh-chuyen-can`, `student/chuyen-can`, `teacher/diem-danh` |
 | Học phí (FEE) | `admin/hoc-phi`, `student/hoc-phi`, `student/thanh-toan-online` |
 | Thi, khảo thí (EXM) | `admin/ky-thi`, `student/lich-thi`, `teacher/lich-coi-thi` |
 | Thông báo (NOT) | `admin/thong-bao`, `admin/mau-thong-bao`, `student/thong-bao`, `student/tuy-chon-thong-bao` (trang tài khoản `/tai-khoan/thong-bao` hiện là trang tĩnh), `teacher/thong-bao-lop`, `public/bang-tin` |
@@ -151,6 +150,14 @@ Cột "Trang thật" là đề xuất; cột "Quyền trang" là middleware củ
 | Đăng nhập SSO | `public/dang-nhap-sso` |
 
 Tổng: 38 màn hình (đếm cả hai trang tổng quan sinh viên).
+
+### Đã nối sau khi có BE
+
+| Màn hình mock | Trang thật | API | Quyền trang |
+|---|---|---|---|
+| `teacher/diem-danh` | `/teacher/diem-danh` | `GET /teacher/course-sections/{id}/attendance/sessions`, `…/summary`; `GET/PUT /teacher/class-sessions/{id}/attendance`; `PUT …/teaching-log`; `POST /teacher/attendance-records/{id}/change-requests`; `POST /teacher/course-sections/{id}/attendance/push-grades` | `ATT.view` |
+| `student/chuyen-can` | `/student/chuyen-can` | `GET /student/attendance?term_id=` | `ATT.view` |
+| `admin/diem-danh-chuyen-can` | `/admin/diem-danh` | `GET /admin/attendance/summaries` (+ `/export`), `POST /admin/attendance-summaries/{id}/exempt`, `GET/POST /admin/attendance-change-requests…`, `POST /admin/course-sections/{id}/attendance/lock\|unlock`, `PUT /admin/class-sessions/{id}/attendance` | `ATT.view` |
 
 ## 5. Thiếu API (ghi nhận, chưa sửa BE)
 

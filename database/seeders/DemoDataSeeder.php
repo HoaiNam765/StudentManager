@@ -71,6 +71,8 @@ class DemoDataSeeder extends Seeder
 
         // Một giao dịch: lỗi giữa chừng thì không để lại dữ liệu demo dở dang
         DB::transaction(fn () => $this->seed());
+        // Điểm danh các buổi đã qua của học kỳ đang diễn ra (ATT)
+        $this->call(AttendanceDemoSeeder::class);
 
         $this->command?->info(sprintf('Dữ liệu demo: %d sinh viên, %d lớp học phần, %d lượt đăng ký.',
             Student::query()->whereNotNull('student_code')->count(), CourseSection::query()->count(), Enrollment::query()->count()));

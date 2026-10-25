@@ -14,8 +14,11 @@ use App\Http\Controllers\Pages\Admin\StudentPageController;
 use App\Http\Controllers\Pages\Admin\SystemOperationPageController;
 use App\Http\Controllers\Pages\Admin\TimetablePageController;
 use App\Http\Controllers\Pages\AnnouncementPageController;
+use App\Http\Controllers\Pages\AttendancePageController;
 use App\Modules\AcademicYear\Http\Controllers\AcademicCalendarController;
 use App\Modules\AcademicYear\Http\Controllers\AcademicYearController;
+use App\Modules\Attendance\Http\Controllers\AttendanceAdminController;
+use App\Modules\Attendance\Http\Controllers\AttendanceController;
 use App\Modules\Auth\Http\Controllers\LoginHistoryController;
 use App\Modules\Auth\Http\Controllers\RoleController;
 use App\Modules\Auth\Http\Controllers\RolePermissionController;
@@ -646,4 +649,22 @@ Route::middleware('auth')->group(function (): void {
     Route::get('nam-hoc', [AcademicYearPageController::class, 'index'])
         ->middleware('permission:ACY.view,ALL')
         ->name('pages.academic-years');
+
+    // Điểm danh và chuyên cần (ATT, #142–#144): tổng hợp theo phạm vi, xuất, yêu cầu sửa quá hạn, khóa sổ, miễn cấm thi.
+    // Phòng Đào tạo điều chỉnh phiếu điểm danh qua cùng API với giảng viên (AttendanceService kiểm tra ATT.approve).
+    Route::get('attendance/summaries', [AttendanceAdminController::class, 'summaries'])->middleware('permission:ATT.view')->name('attendance.summaries');
+    Route::get('attendance/summaries/export', [AttendanceAdminController::class, 'export'])->middleware('permission:ATT.export')->name('attendance.summaries.export');
+    Route::post('attendance-summaries/{attendanceSummary}/exempt', [AttendanceAdminController::class, 'exempt'])->whereNumber('attendanceSummary')->middleware('permission:ATT.approve,ALL')->name('attendance.exempt');
+    Route::get('attendance-change-requests', [AttendanceAdminController::class, 'changeRequests'])->middleware('permission:ATT.view')->name('attendance.change-requests');
+    Route::post('attendance-change-requests/{attendanceChangeRequest}/approve', [AttendanceAdminController::class, 'approve'])->whereNumber('attendanceChangeRequest')->middleware('permission:ATT.approve,ALL')->name('attendance.change-requests.approve');
+    Route::post('attendance-change-requests/{attendanceChangeRequest}/reject', [AttendanceAdminController::class, 'reject'])->whereNumber('attendanceChangeRequest')->middleware('permission:ATT.approve,ALL')->name('attendance.change-requests.reject');
+    Route::post('course-sections/{courseSection}/attendance/lock', [AttendanceAdminController::class, 'lock'])->whereNumber('courseSection')->middleware('permission:ATT.approve,ALL')->name('attendance.lock');
+    Route::post('course-sections/{courseSection}/attendance/unlock', [AttendanceAdminController::class, 'unlock'])->whereNumber('courseSection')->middleware('permission:ATT.approve,ALL')->name('attendance.unlock');
+    Route::get('course-sections/{courseSection}/attendance/sessions', [AttendanceController::class, 'sessions'])->whereNumber('courseSection')->middleware('permission:ATT.view')->name('attendance.sessions');
+    Route::get('course-sections/{courseSection}/attendance/summary', [AttendanceController::class, 'summary'])->whereNumber('courseSection')->middleware('permission:ATT.view')->name('attendance.summary');
+    Route::get('class-sessions/{classSession}/attendance', [AttendanceController::class, 'sheet'])->whereNumber('classSession')->middleware('permission:ATT.view')->name('attendance.sheet');
+    Route::put('class-sessions/{classSession}/attendance', [AttendanceController::class, 'record'])->whereNumber('classSession')->middleware('permission:ATT.approve,ALL')->name('attendance.record');
+
+    // Trang điểm danh / chuyên cần (FE #38, #42, #43)
+    Route::get('diem-danh', [AttendancePageController::class, 'admin'])->middleware('permission:ATT.view')->name('pages.attendance');
 });

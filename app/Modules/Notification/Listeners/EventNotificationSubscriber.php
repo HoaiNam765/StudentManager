@@ -2,6 +2,7 @@
 
 namespace App\Modules\Notification\Listeners;
 
+use App\Modules\Attendance\Events\AttendanceThresholdReached;
 use App\Modules\Auth\Events\AccountSecurityAlert;
 use App\Modules\Auth\Events\UserRolesChanged;
 use App\Modules\Enrollment\Events\EnrollmentChanged;
@@ -48,6 +49,7 @@ class EventNotificationSubscriber
             ScheduleChanged::class => 'scheduleChanged',
             GradesPublished::class => 'gradesPublished',
             GradeAdjusted::class => 'gradeAdjusted',
+            AttendanceThresholdReached::class => 'attendanceThreshold',
         ];
     }
 
@@ -182,5 +184,24 @@ class EventNotificationSubscriber
 
         $this->notifier->notify('EV-GRD-02', "request:{$event->changeRequestId}", $this->recipients->students([$enrollment->student_id]), $vars);
         $this->notifier->notify('EV-GRD-02', "request:{$event->changeRequestId}:lecturer", $this->recipients->sectionLecturers($enrollment->course_section_id), $vars, '/teacher');
+    }
+
+    /** EV-ATT-01 (cảnh báo vắng): sinh viên, cố vấn; EV-ATT-02 (cấm thi): thêm Phòng Đào tạo. Không kèm tỷ lệ vắng trong nội dung gửi email. */
+    public function attendanceThreshold(AttendanceThresholdReached $event): void
+    {
+        $summary = $event->summary->loadMissing('student:id,student_code,full_name', 'section:id,code,subject_id', 'section.subject:id,name');
+        $banned = $event->level === AttendanceThresholdReached::BANNED;
+        $code = $banned ? 'EV-ATT-02' : 'EV-ATT-01';
+        $text = $banned
+            ? "Sinh viên {$summary->student?->student_code} vắng vượt ngưỡng cấm thi học phần {$summary->section?->subject?->name} (lớp {$summary->section?->code}), không đủ điều kiện dự thi."
+            : "Sinh viên {$summary->student?->student_code} vắng chạm ngưỡng cảnh báo học phần {$summary->section?->subject?->name} (lớp {$summary->section?->code}).";
+        $key = "attendance:{$summary->id}:{$event->level}";
+
+        $this->notifier->notify($code, $key, $this->recipients->students([$summary->student_id]), ['noi_dung' => $text], '/student/chuyen-can');
+        $this->notifier->notify($code, "{$key}:advisor", $this->recipients->advisorsOf($summary->student_id), ['noi_dung' => $text], '/teacher/lop-co-van');
+
+        if ($banned) {
+            $this->notifier->notify($code, "{$key}:office", $this->recipients->withRole('ACAD'), ['noi_dung' => $text], '/admin/diem-danh');
+        }
     }
 }

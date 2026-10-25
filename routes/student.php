@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Pages\AttendancePageController;
 use App\Http\Controllers\Pages\Student\GradePageController;
 use App\Http\Controllers\Pages\Student\PortalPageController;
 use App\Http\Controllers\Pages\Student\RegistrationPageController;
+use App\Modules\Attendance\Http\Controllers\StudentAttendanceController;
 use App\Modules\Enrollment\Http\Controllers\EnrollmentController;
 use App\Modules\Enrollment\Http\Controllers\EnrollmentResultController;
 use App\Modules\Enrollment\Http\Controllers\RegistrationOptionsController;
@@ -86,4 +88,10 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/transcript', [TranscriptController::class, 'mine'])->middleware('permission:GRD.view')->name('transcript');
     Route::get('/transcript/pdf', [TranscriptController::class, 'minePdf'])->middleware('permission:GRD.view')->name('transcript.mine');
     Route::get('/ket-qua-hoc-tap', [GradePageController::class, 'index'])->middleware('permission:GRD.view')->name('pages.grades');
+
+    // Chuyên cần của chính sinh viên (ATT, #144; FR-ATT-007)
+    Route::get('/attendance', [StudentAttendanceController::class, 'mine'])->middleware('permission:ATT.view')->name('attendance');
+
+    // Trang điểm danh / chuyên cần (FE #38, #42, #43)
+    Route::get('/chuyen-can', [AttendancePageController::class, 'student'])->middleware('permission:ATT.view')->name('pages.attendance');
 });

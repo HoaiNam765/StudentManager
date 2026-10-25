@@ -364,8 +364,28 @@ export default function adminClasses(root) {
                     el('td', { class: 'py-3 px-4 text-xs' }, x.effective_policy_set ? `${x.effective_policy_set.code} v${x.effective_policy_set.version}${x.policy_set ? '' : ' (tự chọn theo năm)'}` : 'Chưa có'),
                     el('td', { class: 'py-3 px-4 text-center' }, x.active_classes_count ?? 0),
                     el('td', { class: 'py-3 px-4 text-center' }, el('span', { class: `inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold ${x.status === 'active' ? 'bg-[#DCFCE7] text-[#15803D]' : 'bg-surface-container text-on-surface-variant'}` }, x.status_label)),
-                    el('td', { class: 'py-3 px-4 text-right' }, page.can.update ? el('button', { type: 'button', class: 'text-xs font-semibold text-primary hover:underline', onclick: () => editCohort(x) }, 'Sửa') : null)))))
+                    el('td', { class: 'py-3 px-4 text-right whitespace-nowrap' },
+                        page.can.update ? el('button', { type: 'button', class: 'text-xs font-semibold text-primary hover:underline', onclick: () => editCohort(x) }, 'Sửa') : null,
+                        page.can.delete ? el('button', { type: 'button', class: 'ml-3 text-xs font-semibold text-red-700 hover:underline', onclick: (e) => removeCohort(e.currentTarget, x) }, 'Xóa') : null)))))
             : emptyBlock('Chưa có khóa tuyển sinh', '', 'event_note'));
+    }
+
+    async function removeCohort(button, x) {
+        const ok = await confirmDialog({ title: `Xóa khóa ${x.code}?`, message: 'Chỉ xóa được khóa chưa có lớp hành chính / sinh viên; khóa đã dùng thì chuyển sang "Ngừng".', confirmText: 'Xóa', danger: true });
+
+        if (!ok) {
+            return;
+        }
+
+        try {
+            await withBusy(button, () => api.del(tpl(page.api.cohortDestroy, x.id)));
+            toast(`Đã xóa khóa ${x.code}.`, 'success');
+            state.cohorts = rows(await api.get(page.api.cohorts));
+            fillSelect(form.elements.cohort_id, state.cohorts, (c) => `${c.code} (${c.start_year})`);
+            renderCohorts();
+        } catch (error) {
+            showAlert(region('alert'), error);
+        }
     }
 
     async function editCohort(x) {

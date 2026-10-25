@@ -47,6 +47,7 @@ class PortalMenu
                 ['Đăng ký học phần', 'how_to_reg', 'admin.pages.enrollment', 'ENR.view'],
                 ['Xếp thời khóa biểu', 'calendar_month', 'admin.pages.timetable', 'TTB.view'],
                 ['Năm học & Lịch học vụ', 'calendar_month', 'admin.pages.academic-years', 'ACY.view,ALL'],
+                ['Học phần', 'menu_book', 'admin.pages.subjects', 'SUB.view'],
                 ['Sinh viên', 'school', 'admin.pages.students', 'STU.view'],
                 ['Khóa & Lớp hành chính', 'diversity_3', 'admin.pages.admin-classes', 'CLS.view'],
                 ['Lớp học phần', 'groups', 'admin.pages.course-sections', 'CLS.view'],

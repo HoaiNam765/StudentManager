@@ -117,6 +117,26 @@ Tài khoản dùng thử (chỉ có ở môi trường phát triển, tạo bở
 
 Đăng nhập sai 5 lần liên tiếp trong 15 phút thì tài khoản tạm khóa 15 phút (cấu hình trong `config/studentmanager.php`, mục `auth`).
 
+### Dữ liệu demo đầy đủ (tùy chọn)
+
+Để xem hệ thống với dữ liệu gần thực tế (300 sinh viên khóa 2025 / 2026, năm học 2025–2026 đã có điểm, học kỳ hiện tại đang học, đăng ký học phần, điểm danh), chạy sau bước 3, **trên CSDL dùng thử, không phải dữ liệu thật** (lệnh từ chối chạy ở môi trường production, khoảng 4–5 phút):
+
+```bash
+php artisan demo:seed
+```
+
+Tài khoản demo (mật khẩu đều là `password`):
+
+| Vai trò | Tên đăng nhập | Dùng để thử |
+|---|---|---|
+| Quản trị hệ thống | `admin` | người dùng, phân quyền, nhập dữ liệu từ Excel |
+| Phòng Đào tạo | `acad.test` | năm học, lớp học phần, thời khóa biểu, đợt đăng ký, sinh viên, duyệt và công bố điểm, điểm danh |
+| Trưởng khoa CNTT | `dean.test` | duyệt điểm cấp khoa các lớp của khoa |
+| Giảng viên | `GV0001` … `GV0020` | lịch giảng dạy, lớp học phần, điểm danh, nhập điểm |
+| Sinh viên | MSSV, ví dụ `2501010001` | đăng ký học phần, thời khóa biểu, kết quả học tập, chuyên cần |
+
+CSDL đã có dữ liệu demo từ trước thì chỉ cần thêm phần điểm danh: `php artisan db:seed --class=AttendanceDemoSeeder`.
+
 **Sau mỗi lần `git pull`:** chạy `composer install` (nếu `composer.lock` đổi), `npm install` (nếu `package-lock.json` đổi) và `php artisan migrate` (nếu có migration mới). So `.env` của bạn với `.env.example` xem có biến mới không.
 
 ### Kiểm thử và chuẩn mã

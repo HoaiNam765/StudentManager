@@ -49,7 +49,14 @@ export default function adminStudents(root) {
             showAlert(region('alert'), error);
         }
 
-        await Promise.all([reload(1), loadStats(), loadRequests()]);
+        // Khôi phục bộ lọc và trang từ URL (?q=&faculty_id=&…&page=): tải lại / quay lại không mất từ khóa
+        const query = new URLSearchParams(window.location.search);
+        ['q', 'faculty_id', 'cohort', 'admin_class_id', 'status'].forEach((name) => { form.elements[name].value = query.get(name) ?? ''; });
+        fillMajors();
+        form.elements.major_id.value = query.get('major_id') ?? '';
+        perPage.value = query.get('per_page') ?? perPage.value;
+
+        await Promise.all([reload(Number(query.get('page') ?? 1) || 1), loadStats(), loadRequests()]);
     }
 
     function fillMajors() {
@@ -66,6 +73,8 @@ export default function adminStudents(root) {
 
     async function reload(target = 1) {
         state.page = target;
+        const url = new URLSearchParams({ ...filters(), ...(target > 1 ? { page: target } : {}), ...(perPage.value !== '50' ? { per_page: perPage.value } : {}) });
+        window.history.replaceState(null, '', `${window.location.pathname}${url.toString() ? `?${url}` : ''}`);
         renderTags();
         region('table').replaceChildren(loadingBlock(5));
 

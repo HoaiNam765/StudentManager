@@ -51,7 +51,9 @@ class TimetableController extends Controller
     {
         $student = Student::query()->where('user_id', $request->user()->id)->firstOrFail();
 
-        return $this->respond($request, 'student', $student->id, false);
+        // Sinh viên luôn thấy buổi học của các lớp mình đang đăng ký (đăng ký xong là có lịch, hủy là mất), kể cả khi thời
+        // khóa biểu học kỳ chưa công bố; `timetable_status` = draft cho biết lịch còn có thể thay đổi.
+        return $this->respond($request, 'student', $student->id, true, true);
     }
 
     public function mineLecturer(Request $request): JsonResponse
@@ -90,7 +92,7 @@ class TimetableController extends Controller
         return $this->status($term);
     }
 
-    private function respond(Request $request, string $target, int $id, bool $seesDraft): JsonResponse
+    private function respond(Request $request, string $target, int $id, bool $seesDraft, bool $ownDraftNotice = false): JsonResponse
     {
         $request->validate([
             'view' => ['sometimes', Rule::in(['week', 'month', 'term'])],
@@ -104,7 +106,13 @@ class TimetableController extends Controller
         $view = $request->input('view', 'week');
         $range = $this->view->range($view, $request->input('date'), $term);
         $status = $this->publication->status($term);
-        $visible = $seesDraft || $this->publication->isVisible($term);
+        $published = $this->publication->isVisible($term);
+        $visible = $seesDraft || $published;
+        $message = match (true) {
+            ! $visible => "Thời khóa biểu {$term->name} chưa công bố.",
+            ! $published && $ownDraftNotice => "Thời khóa biểu {$term->name} chưa công bố: đây là lịch dự kiến của các lớp bạn đã đăng ký, có thể còn thay đổi.",
+            default => null,
+        };
 
         return response()->json([
             'target' => $target,
@@ -114,7 +122,7 @@ class TimetableController extends Controller
             'view' => $view,
             'from' => $range['from']->toDateString(),
             'to' => $range['to']->toDateString(),
-            'message' => $visible ? null : "Thời khóa biểu {$term->name} chưa công bố.",
+            'message' => $message,
             'sessions' => $visible ? $this->view->sessions($target, $id, $term, $range['from'], $range['to']) : [],
         ]);
     }

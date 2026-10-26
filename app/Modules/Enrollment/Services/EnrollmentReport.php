@@ -14,6 +14,7 @@ use App\Modules\Student\Enums\StudentStatus;
 use App\Modules\Student\Models\Student;
 use App\Modules\Timetable\Models\ScheduleRule;
 use App\Modules\Timetable\Services\PeriodService;
+use App\Modules\Timetable\Services\SectionStartDates;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Collection;
 
@@ -25,6 +26,7 @@ class EnrollmentReport
     public function __construct(
         private readonly PeriodService $periods,
         private readonly CreditLimits $limits,
+        private readonly SectionStartDates $startDates,
     ) {}
 
     /** Học kỳ mặc định: học kỳ có đợt đăng ký mới nhất (đã công bố), không có thì học kỳ mới nhất. */
@@ -58,6 +60,7 @@ class EnrollmentReport
         $rules = ScheduleRule::query()->with('room.building')
             ->whereIn('course_section_id', $active->pluck('course_section_id'))->get()->groupBy('course_section_id');
         $period = RegistrationPeriod::query()->where('term_id', $term->id)->where('status', '!=', PeriodStatus::Draft)->orderByDesc('opens_at')->first();
+        $starts = $this->startDates->for($enrollments->pluck('course_section_id'));
 
         return [
             'student' => [
@@ -67,7 +70,13 @@ class EnrollmentReport
                 'major' => $student->major?->name,
                 'cohort' => $student->cohort,
             ],
-            'term' => ['id' => $term->id, 'name' => $term->name, 'academic_year' => $term->academicYear?->name],
+            'term' => [
+                'id' => $term->id,
+                'name' => $term->name,
+                'academic_year' => $term->academicYear?->name,
+                'start_date' => $term->start_date->toDateString(),
+                'end_date' => $term->end_date->toDateString(),
+            ],
             'total_credits' => $active->sum(fn (Enrollment $e) => (int) $e->subject->credits),
             'credit_limits' => $period ? $this->limits->for($student, $period) : null,
             'items' => $enrollments->map(fn (Enrollment $e) => [
@@ -80,6 +89,7 @@ class EnrollmentReport
                 'counts_for_gpa' => $e->status !== EnrollmentStatus::Withdrawn,
                 'instructors' => ($instructors->get($e->course_section_id) ?? collect())->map(fn (SectionInstructor $i) => $i->lecturer->full_name)->values(),
                 'schedule' => ($rules->get($e->course_section_id) ?? collect())->map(fn (ScheduleRule $r) => $r->describe().($r->room ? " – phòng {$r->room->code}" : ''))->values(),
+                'starts_on' => ($starts[$e->course_section_id] ?? null)?->toDateString(),
                 'registered_at' => $e->registered_at->setTimezone(config('studentmanager.display_timezone'))->format('d/m/Y H:i'),
             ])->all(),
             'timetable' => $this->timetable($active, $rules),

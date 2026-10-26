@@ -267,6 +267,9 @@ export default function studentRegistration(root) {
                         section.schedule.length
                             ? section.schedule.map((rule) => el('p', { class: 'flex items-center gap-1 text-on-surface' }, icon('schedule', 'text-[16px] text-primary'), rule.description, rule.room ? el('span', { class: 'text-secondary' }, ` · phòng ${rule.room}`) : null))
                             : el('p', { class: 'flex items-center gap-1' }, icon('schedule', 'text-[16px]'), 'Chưa có lịch học'),
+                        section.starts_on
+                            ? el('p', { class: 'flex items-center gap-1 text-on-surface font-semibold' }, icon('event', 'text-[16px] text-primary'), `Bắt đầu học: ${section.starts_on.split('-').reverse().join('/')}`)
+                            : null,
                     ),
                 ),
                 actionArea(section, mine, otherClass, alertBox),

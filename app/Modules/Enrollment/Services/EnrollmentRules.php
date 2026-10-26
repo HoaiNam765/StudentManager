@@ -12,6 +12,7 @@ use App\Modules\Subject\Models\Subject;
 use App\Modules\Subject\Services\SubjectRelationService;
 use App\Modules\Timetable\Contracts\SectionStudents;
 use App\Modules\Timetable\Services\ScheduleConflictService;
+use App\Modules\Timetable\Services\SectionStartDates;
 use Illuminate\Support\Collection;
 
 /**
@@ -41,6 +42,7 @@ class EnrollmentRules
         private readonly SubjectRelationService $relations,
         private readonly ScheduleConflictService $conflicts,
         private readonly CreditLimits $limits,
+        private readonly SectionStartDates $startDates,
     ) {}
 
     /**
@@ -144,6 +146,17 @@ class EnrollmentRules
 
         if ($checkCapacity && $this->remaining($section) <= 0) {
             $reasons[] = "Lớp {$section->code} đã đủ {$section->max_size} sinh viên. Chọn lớp khác của học phần.";
+        }
+
+        // Ngày bắt đầu học phải sau ngày đóng đăng ký của đợt (cán bộ đăng ký thay ngoài đợt thì bỏ qua)
+        if (! $outsidePeriod) {
+            $starts = $this->startDates->of($section->id);
+            $closes = $period->closes_at->setTimezone(config('studentmanager.display_timezone'))->startOfDay();
+
+            if ($starts !== null && $starts->toDateString() <= $closes->toDateString()) {
+                $reasons[] = "Lớp {$section->code} bắt đầu học ngày {$starts->format('d/m/Y')}, không sau ngày đóng đăng ký ({$closes->format('d/m/Y')}). "
+                    .'Chọn lớp khác của học phần, hoặc liên hệ Phòng Đào tạo để dời lịch học / thời gian đăng ký.';
+            }
         }
 
         return $reasons;

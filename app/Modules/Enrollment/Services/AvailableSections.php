@@ -10,6 +10,7 @@ use App\Modules\SchoolClass\Models\SectionInstructor;
 use App\Modules\Student\Models\Student;
 use App\Modules\Student\Services\StudentCurriculumService;
 use App\Modules\Timetable\Models\ScheduleRule;
+use App\Modules\Timetable\Services\SectionStartDates;
 
 /**
  * Danh sách lớp học phần sinh viên được chọn trong đợt (FR-ENR-002): lớp của học kỳ thuộc học phần trong CTĐT hiện hành
@@ -22,6 +23,7 @@ class AvailableSections
     public function __construct(
         private readonly StudentCurriculumService $curricula,
         private readonly EnrollmentRules $rules,
+        private readonly SectionStartDates $startDates,
     ) {}
 
     /** @return list<array<string, mixed>> */
@@ -44,8 +46,9 @@ class AvailableSections
             ->get();
 
         $rules = ScheduleRule::query()->with('room:id,code')->whereIn('course_section_id', $sections->pluck('id'))->get()->groupBy('course_section_id');
+        $starts = $this->startDates->for($sections->pluck('id'));
 
-        return $sections->map(function (CourseSection $section) use ($items, $rules, $student, $period): array {
+        return $sections->map(function (CourseSection $section) use ($items, $rules, $starts, $student, $period): array {
             $item = $items->get($section->subject_id);
             $remaining = $this->rules->remaining($section);
             $reasons = $this->rules->check($student, $section, $period);
@@ -69,6 +72,7 @@ class AvailableSections
                     'description' => $r->describe(),
                     'room' => $r->room?->code,
                 ])->values(),
+                'starts_on' => ($starts[$section->id] ?? null)?->toDateString(),
                 'eligible' => $reasons === [],
                 'reasons' => $reasons,
             ];

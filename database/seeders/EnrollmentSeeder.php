@@ -54,7 +54,9 @@ class EnrollmentSeeder extends Seeder
             [
                 'name' => 'Đăng ký học phần HK2 2026–2027 — vòng 1',
                 'opens_at' => CarbonImmutable::now('UTC')->subDay()->startOfHour(),
-                'closes_at' => CarbonImmutable::now('UTC')->addDays(30)->startOfHour(),
+                // Đóng trước ngày bắt đầu học của học kỳ (ràng buộc ngày học sau ngày đóng đăng ký)
+                'closes_at' => CarbonImmutable::now('UTC')->addDays(30)->startOfHour()
+                    ->min(CarbonImmutable::parse($term->start_date->toDateString(), config('studentmanager.display_timezone'))->subDay()->endOfDay()->utc()->startOfHour()),
                 'status' => PeriodStatus::Published,
             ],
         );

@@ -106,6 +106,16 @@ class RegistrationPeriodService extends BaseService
             $this->fail('Thời gian mở đợt phải trước thời gian đóng.', 'Nhập lại thời gian mở – đóng (giờ Việt Nam).');
         }
 
+        // Ngày bắt đầu học phải sau ngày đóng đăng ký
+        $termStart = CarbonImmutable::parse($term->start_date->toDateString(), $closes->getTimezone());
+
+        if ($closes->startOfDay()->gte($termStart)) {
+            $this->fail(
+                'Đợt đăng ký đóng ngày '.$closes->format('d/m/Y').", không trước ngày bắt đầu học của {$term->name} (".$termStart->format('d/m/Y').').',
+                'Chọn thời gian đóng đăng ký trước ngày '.$termStart->format('d/m/Y').', hoặc mở đợt cho học kỳ sau.'
+            );
+        }
+
         $min = isset($data['min_credits']) ? (int) $data['min_credits'] : null;
         $max = isset($data['max_credits']) ? (int) $data['max_credits'] : null;
 

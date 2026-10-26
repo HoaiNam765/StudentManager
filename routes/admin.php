@@ -14,6 +14,7 @@ use App\Http\Controllers\Pages\Admin\StudentPageController;
 use App\Http\Controllers\Pages\Admin\SubjectPageController;
 use App\Http\Controllers\Pages\Admin\SystemOperationPageController;
 use App\Http\Controllers\Pages\Admin\TimetablePageController;
+use App\Http\Controllers\Pages\Admin\TrainingFrameworkPageController;
 use App\Http\Controllers\Pages\AnnouncementPageController;
 use App\Http\Controllers\Pages\AttendancePageController;
 use App\Modules\AcademicYear\Http\Controllers\AcademicCalendarController;
@@ -47,6 +48,7 @@ use App\Modules\Room\Http\Controllers\RoomController;
 use App\Modules\SchoolClass\Http\Controllers\AdminClassController;
 use App\Modules\SchoolClass\Http\Controllers\AdminClassRosterController;
 use App\Modules\SchoolClass\Http\Controllers\CourseSectionController;
+use App\Modules\SchoolClass\Http\Controllers\TrainingFrameworkController;
 use App\Modules\Student\Http\Controllers\AdmissionController;
 use App\Modules\Student\Http\Controllers\StudentChangeRequestController;
 use App\Modules\Student\Http\Controllers\StudentController;
@@ -97,6 +99,7 @@ Route::middleware('auth')->group(function (): void {
     Route::get('sinh-vien/{student}', [StudentPageController::class, 'show'])->whereNumber('student')->middleware('permission:STU.view')->name('pages.students.show');
     Route::get('sinh-vien/{student}/sua', [StudentPageController::class, 'edit'])->whereNumber('student')->middleware('permission:STU.update')->name('pages.students.edit');
     Route::get('lop-hanh-chinh', [StudentPageController::class, 'classes'])->middleware('permission:CLS.view')->name('pages.admin-classes');
+    Route::get('chuong-trinh-khung', [TrainingFrameworkPageController::class, 'index'])->middleware('permission:CLS.view')->name('pages.training-frameworks');
 
     // Phân quyền (AUTH): chỉ người có quyền trên toàn trường, mặc định là ADMIN
     Route::middleware('permission:AUTH.view,ALL')->group(function (): void {
@@ -501,6 +504,26 @@ Route::middleware('auth')->group(function (): void {
     Route::post('course-sections/{courseSection}/unlock', [CourseSectionController::class, 'unlock'])->whereNumber('courseSection')->middleware('permission:CLS.approve,ALL')->name('course-sections.unlock');
     Route::post('course-sections/{courseSection}/status/{status}', [CourseSectionController::class, 'transition'])
         ->whereNumber('courseSection')->middleware('permission:CLS.update,ALL')->name('course-sections.status');
+
+    // Chương trình khung theo khoa – khóa – học kỳ: xem = CLS.view (DEAN khoa mình); lập, gợi ý từ CTĐT, mở lớp hàng loạt = CLS
+    // toàn trường (ACAD); gửi thông báo cho sinh viên khoa – khóa = NOT.create (phạm vi kiểm tra trong AudienceResolver).
+    Route::middleware('permission:CLS.view')->group(function (): void {
+        Route::get('training-frameworks', [TrainingFrameworkController::class, 'index'])->name('training-frameworks.index');
+        Route::get('training-frameworks/{trainingFramework}', [TrainingFrameworkController::class, 'show'])->whereNumber('trainingFramework')->name('training-frameworks.show');
+        Route::get('training-frameworks/{trainingFramework}/announcement-draft', [TrainingFrameworkController::class, 'announcementDraft'])->whereNumber('trainingFramework')->name('training-frameworks.announcement-draft');
+    });
+    Route::middleware('permission:CLS.create,ALL')->group(function (): void {
+        Route::post('training-frameworks', [TrainingFrameworkController::class, 'store'])->name('training-frameworks.store');
+        Route::put('training-frameworks/{trainingFramework}', [TrainingFrameworkController::class, 'update'])->whereNumber('trainingFramework')->name('training-frameworks.update');
+        Route::delete('training-frameworks/{trainingFramework}', [TrainingFrameworkController::class, 'destroy'])->whereNumber('trainingFramework')->name('training-frameworks.destroy');
+        Route::post('training-frameworks/{trainingFramework}/items', [TrainingFrameworkController::class, 'storeItem'])->whereNumber('trainingFramework')->name('training-frameworks.items.store');
+        Route::put('training-framework-items/{trainingFrameworkItem}', [TrainingFrameworkController::class, 'updateItem'])->name('training-framework-items.update');
+        Route::delete('training-framework-items/{trainingFrameworkItem}', [TrainingFrameworkController::class, 'destroyItem'])->name('training-framework-items.destroy');
+        Route::post('training-frameworks/{trainingFramework}/suggest', [TrainingFrameworkController::class, 'suggest'])->whereNumber('trainingFramework')->name('training-frameworks.suggest');
+        Route::post('training-frameworks/{trainingFramework}/open-sections', [TrainingFrameworkController::class, 'openSections'])->whereNumber('trainingFramework')->name('training-frameworks.open-sections');
+    });
+    Route::post('training-frameworks/{trainingFramework}/notify', [TrainingFrameworkController::class, 'notify'])
+        ->whereNumber('trainingFramework')->middleware(['permission:CLS.view', 'permission:NOT.create'])->name('training-frameworks.notify');
 
     // Đợt đăng ký học phần (ENR, FR-ENR-001, 002): xem = ENR.view, cấu hình = ACAD (ENR toàn trường);
     // xem danh sách lớp một sinh viên được chọn = ENR.view + quyền xem hồ sơ sinh viên đó

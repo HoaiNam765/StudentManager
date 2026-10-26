@@ -3,6 +3,7 @@
 namespace App\Modules\SchoolClass;
 
 use App\Modules\AcademicYear\Models\Term;
+use App\Modules\Faculty\Models\Faculty;
 use App\Modules\Faculty\Models\Major;
 use App\Modules\Faculty\Models\Specialization;
 use App\Modules\Faculty\Models\TrainingType;
@@ -11,6 +12,8 @@ use App\Modules\SchoolClass\Models\AdminClass;
 use App\Modules\SchoolClass\Models\Cohort;
 use App\Modules\SchoolClass\Models\CourseSection;
 use App\Modules\SchoolClass\Models\SectionInstructor;
+use App\Modules\SchoolClass\Models\TrainingFramework;
+use App\Modules\SchoolClass\Models\TrainingFrameworkItem;
 use App\Modules\SchoolClass\Policies\SchoolClassPolicy;
 use App\Modules\SchoolClass\Services\SectionSubjectAssignments;
 use App\Modules\SchoolClass\Services\SectionTeachingAssignments;
@@ -42,7 +45,7 @@ class SchoolClassServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        foreach ([Cohort::class, AdminClass::class, CourseSection::class, SectionInstructor::class] as $model) {
+        foreach ([Cohort::class, AdminClass::class, CourseSection::class, SectionInstructor::class, TrainingFramework::class, TrainingFrameworkItem::class] as $model) {
             Gate::policy($model, SchoolClassPolicy::class);
         }
 
@@ -67,5 +70,11 @@ class SchoolClassServiceProvider extends ServiceProvider
         $references->register(Term::class, 'course_sections', 'term_id', 'lớp học phần');
         $references->register(Room::class, 'course_sections', 'room_id', 'lớp học phần');
         $references->register(Lecturer::class, 'section_instructors', 'lecturer_id', 'phân công lớp học phần');
+
+        // Chương trình khung theo khoa – khóa – học kỳ
+        $references->register(Faculty::class, 'training_frameworks', 'faculty_id', 'chương trình khung');
+        $references->register(Cohort::class, 'training_frameworks', 'cohort_id', 'chương trình khung');
+        $references->register(Term::class, 'training_frameworks', 'term_id', 'chương trình khung');
+        $references->register(Subject::class, 'training_framework_items', 'subject_id', 'chương trình khung');
     }
 }

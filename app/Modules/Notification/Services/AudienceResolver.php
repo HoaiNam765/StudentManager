@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\Builder;
  * Tính người nhận của thông báo thủ công (FR-NOT-006, 015) và chặn đối tượng ngoài phạm vi người gửi (BR-NOT-05).
  *
  * Bộ chọn: `{"targets": [{"type": "all|faculty|major|cohort|admin_class|course_section", "id": 1}], "student_codes": [...],
- * "group_id": 3}`. Người nhận là tài khoản của sinh viên đang học / bảo lưu thuộc các đối tượng đã chọn.
+ * "group_id": 3}`. Đích `faculty` / `major` nhận thêm `cohort_id` để chỉ lấy sinh viên của khoa / ngành **và** khóa đó. Người nhận là tài khoản của sinh viên đang học / bảo lưu thuộc các đối tượng đã chọn.
  * - Toàn trường, khóa: cần NOT.create toàn trường (Phòng Đào tạo, CTSV…).
  * - Khoa, ngành: toàn trường, hoặc lãnh đạo của khoa đó.
  * - Lớp hành chính, lớp học phần, danh sách MSSV: đối tượng phải nằm trong phạm vi NOT.create của người gửi (khoa: lớp của
@@ -61,6 +61,18 @@ class AudienceResolver extends BaseService
         $query->where(function (Builder $any) use ($audience, $actor, $global, &$labels): void {
             foreach ($audience['targets'] as $target) {
                 [$label, $apply] = $this->target($actor, $global, $target['type'], $target['id'] ?? null);
+
+                // Khoa / ngành kèm khóa: chỉ sinh viên thuộc cả hai (ví dụ "Khoa CNTT – Khóa K2026", chương trình khung)
+                if (in_array($target['type'], ['faculty', 'major'], true) && ! empty($target['cohort_id'])) {
+                    $cohort = Cohort::query()->findOrFail($target['cohort_id']);
+                    $label .= " – Khóa {$cohort->code}";
+                    $inner = $apply;
+                    $apply = function (Builder $q) use ($inner, $cohort): void {
+                        $inner($q);
+                        $q->where('cohort', $cohort->start_year);
+                    };
+                }
+
                 $labels[] = $label;
                 $any->orWhere(fn (Builder $q) => $apply($q));
             }
@@ -114,10 +126,14 @@ class AudienceResolver extends BaseService
         ];
     }
 
-    /** @return array{targets: list<array{type: string, id: ?int}>, student_codes: list<string>} */
+    /** @return array{targets: list<array{type: string, id: ?int, cohort_id: ?int}>, student_codes: list<string>} */
     private function normalize(User $actor, array $audience): array
     {
-        $targets = collect($audience['targets'] ?? [])->map(fn ($t) => ['type' => (string) ($t['type'] ?? ''), 'id' => isset($t['id']) ? (int) $t['id'] : null]);
+        $targets = collect($audience['targets'] ?? [])->map(fn ($t) => [
+            'type' => (string) ($t['type'] ?? ''),
+            'id' => isset($t['id']) ? (int) $t['id'] : null,
+            'cohort_id' => isset($t['cohort_id']) ? (int) $t['cohort_id'] : null,
+        ]);
         $codes = collect($audience['student_codes'] ?? [])->map(fn ($c) => trim((string) $c))->filter();
 
         if (! empty($audience['group_id'])) {
@@ -138,7 +154,7 @@ class AudienceResolver extends BaseService
         }
 
         return [
-            'targets' => $targets->unique(fn ($t) => $t['type'].':'.$t['id'])->values()->all(),
+            'targets' => $targets->unique(fn ($t) => $t['type'].':'.$t['id'].':'.($t['cohort_id'] ?? ''))->values()->all(),
             'student_codes' => $codes->unique()->values()->all(),
         ];
     }

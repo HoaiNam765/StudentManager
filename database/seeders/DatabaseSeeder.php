@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
         CurriculumSeeder::class,      // CUR: chương trình đào tạo
         TeacherSeeder::class,         // TCH: giảng viên
         GradeStructureSeeder::class,  // SUB: cơ cấu điểm mặc định của học phần
+        SyllabusSeeder::class,        // SUB: đề cương mẫu đã duyệt (dev) để mở lớp được (BR-SUB-08)
         SchoolClassSeeder::class,     // CLS: khóa, lớp hành chính, lớp học phần
         StudentSeeder::class,         // STU: hồ sơ sinh viên chờ nhập học
         TimetableSeeder::class,       // TTB: khung tiết học, mẫu lịch lớp học phần

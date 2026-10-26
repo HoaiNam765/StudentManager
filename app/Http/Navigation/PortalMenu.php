@@ -50,6 +50,7 @@ class PortalMenu
                 ['Học phần', 'menu_book', 'admin.pages.subjects', 'SUB.view'],
                 ['Sinh viên', 'school', 'admin.pages.students', 'STU.view'],
                 ['Khóa & Lớp hành chính', 'diversity_3', 'admin.pages.admin-classes', 'CLS.view'],
+                ['Chương trình khung', 'account_tree', 'admin.pages.training-frameworks', 'CLS.view'],
                 ['Lớp học phần', 'groups', 'admin.pages.course-sections', 'CLS.view'],
                 ['Điểm danh & Chuyên cần', 'event_available', 'admin.pages.attendance', 'ATT.view'],
                 ['Quản lý & Duyệt điểm', 'verified', 'admin.pages.grades', 'GRD.view'],

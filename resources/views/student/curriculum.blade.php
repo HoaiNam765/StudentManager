@@ -147,6 +147,17 @@
 <section class="bg-surface-container-lowest rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
 <!-- Search and Filter Dropdowns -->
 <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+<!-- Chế độ xem: theo khối kiến thức / theo học kỳ -->
+<div id="curriculum-view-toggle" role="group" aria-label="Chế độ xem chương trình đào tạo" class="flex w-full sm:inline-flex sm:w-auto rounded-lg border border-slate-300 overflow-hidden shadow-sm no-print">
+<button type="button" data-curriculum-view="blocks" aria-pressed="true" onclick="setCurriculumView('blocks')" class="inline-flex flex-1 sm:flex-none items-center justify-center gap-1.5 px-3 py-2 text-center sm:whitespace-nowrap font-label-md text-label-md font-semibold transition-colors bg-primary text-white">
+<span class="material-symbols-outlined text-[16px]" data-icon="account_tree">account_tree</span>
+<span>Theo khối kiến thức</span>
+</button>
+<button type="button" data-curriculum-view="terms" aria-pressed="false" onclick="setCurriculumView('terms')" class="inline-flex flex-1 sm:flex-none items-center justify-center gap-1.5 px-3 py-2 text-center sm:whitespace-nowrap font-label-md text-label-md font-semibold transition-colors border-l border-slate-300 bg-surface-container-lowest text-secondary hover:bg-slate-50">
+<span class="material-symbols-outlined text-[16px]" data-icon="calendar_month">calendar_month</span>
+<span>Theo học kỳ</span>
+</button>
+</div>
 <!-- Input Tìm kiếm -->
 <div class="relative w-full sm:w-80">
 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-outline" data-icon="search">search</span>
@@ -162,8 +173,8 @@
 </select>
 <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-[18px] text-outline pointer-events-none">expand_more</span>
 </div>
-<!-- Dropdown Khối kiến thức -->
-<div class="relative">
+<!-- Dropdown Khối kiến thức (chỉ chế độ khối) -->
+<div id="curriculum-block-filter" class="relative">
 <select id="curriculum-block" onchange="filterCurriculum()" aria-label="Tất cả khối kiến thức" class="appearance-none bg-surface-container-lowest border border-slate-300 rounded-lg pl-3 pr-8 py-2 font-body-sm text-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm cursor-pointer">
 <option value="all">Tất cả khối kiến thức</option>
 @foreach ($curriculum?->blocks ?? [] as $block)<option value="{{ $block->id }}">{{ $block->name }}</option>@endforeach
@@ -184,6 +195,7 @@
 </div>
 </section>
 <!-- SECTION 3: DANH SÁCH 5 KHỐI KIẾN THỨC DẠNG ACCORDION -->
+<div id="curriculum-blocks">
 <div class="flex flex-col gap-4">
 @forelse ($curriculum?->blocks ?? [] as $block)
 <!-- ==================== KHỐI 1 ==================== -->
@@ -245,11 +257,172 @@
 @empty<p class="p-5 text-secondary">Chưa được gán chương trình đào tạo.</p>@endforelse
 </div>
 </div>
+<!-- SECTION 3b: CHƯƠNG TRÌNH KHUNG THEO HỌC KỲ -->
+@php
+  $termRows = collect($curriculumRows);
+  // Tín chỉ tối thiểu của một nhóm tự chọn chỉ tính vào tổng của học kỳ đầu tiên nhóm xuất hiện
+  $groupFirstTerm = $termRows->whereNotNull('group_id')->groupBy('group_id')->map(fn ($group) => $group->min('term'));
+  $termCount = $curriculum === null ? 0 : max($curriculum->standard_terms ?? 0, (int) $termRows->max('term'));
+@endphp
+<div id="curriculum-terms" hidden>
+<div class="flex flex-col gap-4">
+@forelse ($termCount > 0 ? range(1, $termCount) : [] as $termNo)
+@php
+  $inTerm = $termRows->where('term', $termNo);
+  $compulsory = $inTerm->whereNull('group_id');
+  $groups = $inTerm->whereNotNull('group_id')->groupBy('group_id');
+  $compulsoryCredits = $compulsory->sum('credits');
+  $electiveCredits = $groups->filter(fn ($group, $groupId) => $groupFirstTerm->get($groupId) === $termNo)
+      ->sum(fn ($group) => $group->first()['group_min_credits'] ?? 0);
+  $parts = [
+      ['label' => 'Học phần bắt buộc', 'credits' => $compulsoryCredits, 'groups' => $compulsory->isEmpty() ? collect() : collect([0 => $compulsory])],
+      ['label' => 'Học phần tự chọn', 'credits' => $electiveCredits, 'groups' => $groups],
+  ];
+  $stt = 0;
+@endphp
+<div class="bg-surface-container-lowest rounded-xl border border-slate-200 overflow-hidden shadow-sm transition-all duration-200" data-term="{{ $termNo }}">
+<!-- Accordion Header -->
+<div onclick="this.nextElementSibling.hidden = !this.nextElementSibling.hidden" role="button" tabindex="0" onkeydown="if(event.key === 'Enter' || event.key === ' '){event.preventDefault();this.click()}" class="p-5 flex items-center justify-between cursor-pointer hover:bg-slate-50/70 border-b border-slate-100">
+<div class="flex items-center gap-3">
+<span class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-label-md">{{ $termNo }}</span>
+<div>
+<div class="flex items-center gap-2">
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface">Học kỳ {{ $termNo }}</h2>
+<span class="font-body-sm text-body-sm text-secondary" data-term-total>(Tổng: {{ $compulsoryCredits + $electiveCredits }} TC)</span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary mt-0.5">Bắt buộc: {{ $compulsoryCredits }} TC • Tự chọn: {{ $electiveCredits }} TC</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<!-- Status Badge -->
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 font-label-md text-label-md font-semibold">
+<span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+                {{ $inTerm->where('passed', true)->sum('credits') }} / {{ $compulsoryCredits + $electiveCredits }} TC đã đạt
+              </span>
+<span class="material-symbols-outlined text-outline text-[22px]">keyboard_arrow_up</span>
+</div>
+</div>
+<!-- Academic Table -->
+<div data-block-table class="overflow-x-auto">
+@if ($inTerm->isEmpty())
+<p class="p-5 font-body-sm text-body-sm text-secondary">Chưa có học phần dự kiến trong học kỳ này.</p>
+@else
+<table class="w-full text-left border-collapse curriculum-term-table">
+<thead>
+<tr class="bg-slate-50 border-b border-slate-200 text-secondary font-label-md text-label-md uppercase tracking-wider">
+<th class="py-3 px-4 w-12 text-center">STT</th>
+<th class="py-3 px-4 w-28">Mã HP</th>
+<th class="py-3 px-4 curriculum-name">Tên học phần</th>
+<th class="py-3 px-4 w-36">Điều kiện</th>
+<th class="py-3 px-4 w-20 text-center">Số TC</th>
+<th class="py-3 px-4 w-20 text-center">Số tiết LT</th>
+<th class="py-3 px-4 w-20 text-center">Số tiết TH</th>
+<th class="py-3 px-4 w-40">Nhóm tự chọn</th>
+<th class="py-3 px-4 w-24 text-center">TC bắt buộc của nhóm</th>
+<th class="py-3 px-4 w-20 text-center">Đạt</th>
+</tr>
+</thead>
+@foreach ($parts as $part)
+@continue($part['groups']->isEmpty())
+<tbody data-term-section class="divide-y divide-slate-100 font-body-sm text-body-sm">
+<tr data-section-head class="bg-slate-50/60">
+<td colspan="10" class="py-2 px-4 font-label-md text-label-md font-semibold text-on-surface">{{ $part['label'] }} <span class="font-normal text-secondary">({{ $part['credits'] }} TC)</span></td>
+</tr>
+@foreach ($part['groups'] as $groupId => $groupRows)
+@if ($groupId)
+<tr data-group-head data-group="{{ $groupId }}">
+<td colspan="10" class="py-2 px-4 text-secondary">
+<span class="font-semibold text-on-surface">Nhóm tự chọn: {{ $groupRows->first()['group_name'] }}</span>
+                — chọn tối thiểu {{ $groupRows->first()['group_min_credits'] }} TC
+                @if ($groupFirstTerm->get($groupId) !== $termNo)(đã tính vào tổng học kỳ {{ $groupFirstTerm->get($groupId) }})@endif
+</td>
+</tr>
+@endif
+@foreach ($groupRows as $row)
+<tr class="hover:bg-slate-50/80 transition-colors" data-curriculum-row data-status="{{ $row['passed'] ? 'completed' : ($row['studying'] ? 'in_progress' : 'unregistered') }}" @if ($groupId) data-group="{{ $groupId }}" @endif>
+<td class="py-3 px-4 text-center text-secondary">{{ ++$stt }}</td>
+<td class="py-3 px-4 font-mono font-medium text-primary">{{ $row['code'] }}</td>
+<td class="py-3 px-4 font-medium text-on-surface curriculum-name">{{ $row['name'] }}</td>
+<td class="py-3 px-4 text-secondary">
+@forelse ($row['requirements'] as $requirement)
+<span class="block"><span class="font-mono">{{ $requirement['code'] }}</span> ({{ mb_strtolower($requirement['type']) }})</span>
+@empty
+—
+@endforelse
+</td>
+<td class="py-3 px-4 text-center font-semibold">{{ $row['credits'] }}</td>
+<td class="py-3 px-4 text-center">{{ $row['theory_periods'] ?? '—' }}</td>
+<td class="py-3 px-4 text-center">{{ $row['practice_periods'] ?? '—' }}</td>
+<td class="py-3 px-4 text-secondary">{{ $row['group_name'] }}</td>
+<td class="py-3 px-4 text-center">{{ $row['group_min_credits'] }}</td>
+<td class="py-3 px-4 text-center">
+@if ($row['passed'])
+<span class="font-bold text-emerald-700 text-[18px]" title="Đã đạt" aria-label="Đã đạt">✓</span>
+@elseif ($row['studying'])
+<span class="inline-block px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 font-label-sm text-label-sm font-semibold whitespace-nowrap">Đang học</span>
+@endif
+</td>
+</tr>
+@endforeach
+@endforeach
+</tbody>
+@endforeach
+</table>
+@endif
+</div>
+</div>
+@empty<p class="p-5 text-secondary">Chưa được gán chương trình đào tạo.</p>@endforelse
+@if ($termCount > 0)
+<p class="font-body-sm text-body-sm text-secondary flex items-start gap-1.5 px-1">
+<span class="material-symbols-outlined text-[16px] text-primary" data-icon="info">info</span>
+<span>Học phần tự chọn: sinh viên học đủ số tín chỉ bắt buộc của từng nhóm, không lấy học phần nhóm này thay cho nhóm khác.</span>
+</p>
+@endif
+</div>
+</div>
+</div>
+<style>
+@media screen {
+ .curriculum-term-table .curriculum-name { min-width: 14rem; }
+ .curriculum-term-table td:nth-child(2) { white-space: nowrap; }
+}
+@media print {
+ [data-block-table] { overflow: visible !important; }
+ .curriculum-term-table { font-size: 10px; }
+ .curriculum-term-table th, .curriculum-term-table td { padding: 4px 6px !important; }
+ .curriculum-term-table tr { break-inside: avoid; }
+}
+</style>
 <script>
 function filterCurriculum() {
  const fold = s => s.toLocaleLowerCase('vi').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g,'d');
  const q=fold(document.getElementById('curriculum-search').value), status=document.getElementById('curriculum-status').value, block=document.getElementById('curriculum-block').value;
- document.querySelectorAll('[data-curriculum-row]').forEach(row => row.hidden = !fold(row.textContent).includes(q) || (status!=='all' && row.dataset.status!==status) || (block!=='all' && row.dataset.block!==block));
+ document.querySelectorAll('[data-curriculum-row]').forEach(row => row.hidden = !fold(row.textContent).includes(q) || (status!=='all' && row.dataset.status!==status) || (block!=='all' && row.dataset.block !== undefined && row.dataset.block!==block));
+ // Chế độ học kỳ: ẩn tiêu đề mục / nhóm tự chọn khi không còn dòng nào khớp
+ document.querySelectorAll('[data-term-section]').forEach(body => {
+  body.querySelector('[data-section-head]').hidden = !body.querySelector('[data-curriculum-row]:not([hidden])');
+  body.querySelectorAll('[data-group-head]').forEach(head => head.hidden = !body.querySelector('[data-curriculum-row][data-group="' + head.dataset.group + '"]:not([hidden])'));
+ });
 }
+function setCurriculumView(view) {
+ const terms = view === 'terms';
+ document.getElementById('curriculum-blocks').hidden = terms;
+ document.getElementById('curriculum-terms').hidden = !terms;
+ document.getElementById('curriculum-block-filter').hidden = terms;
+ if (terms) document.getElementById('curriculum-block').value = 'all';
+ document.querySelectorAll('[data-curriculum-view]').forEach(button => {
+  const active = button.dataset.curriculumView === view;
+  button.setAttribute('aria-pressed', active ? 'true' : 'false');
+  ['bg-primary', 'text-white'].forEach(c => button.classList.toggle(c, active));
+  ['bg-surface-container-lowest', 'text-secondary', 'hover:bg-slate-50'].forEach(c => button.classList.toggle(c, !active));
+ });
+ try { localStorage.setItem('curriculum-view', view); } catch (e) {}
+ filterCurriculum();
+}
+(function () {
+ let saved = null;
+ try { saved = localStorage.getItem('curriculum-view'); } catch (e) {}
+ if (saved === 'terms') setCurriculumView('terms');
+})();
 </script>
 @endsection

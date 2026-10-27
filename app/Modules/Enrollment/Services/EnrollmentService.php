@@ -238,8 +238,12 @@ class EnrollmentService extends BaseService
     /** Đợt đang mở cho sinh viên ở học kỳ của lớp; cán bộ đăng ký thay ngoài đợt dùng đợt gần nhất của học kỳ. */
     private function periodFor(Student $student, CourseSection $section): RegistrationPeriod
     {
-        $period = $this->access->openPeriodsFor($student)->firstWhere('term_id', $section->term_id)
-            ?? RegistrationPeriod::query()->where('term_id', $section->term_id)->where('status', '!=', 'draft')->orderByDesc('opens_at')->first();
+        if ($section->registration_period_id !== null) {
+            return RegistrationPeriod::query()->findOrFail($section->registration_period_id);
+        }
+
+        $period = $this->access->openPeriodsFor($student)->whereNull('training_framework_id')->firstWhere('term_id', $section->term_id)
+            ?? RegistrationPeriod::query()->whereNull('training_framework_id')->where('term_id', $section->term_id)->where('status', '!=', 'draft')->orderByDesc('opens_at')->first();
 
         if ($period === null) {
             $this->fail("Học kỳ của lớp {$section->code} chưa có đợt đăng ký nào.", 'Phòng Đào tạo cần mở đợt đăng ký cho học kỳ này (FR-ENR-001).');

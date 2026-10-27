@@ -52,10 +52,10 @@
         <section class="col-span-12 xl:col-span-7 space-y-4" aria-labelledby="sections-heading">
             <h2 id="sections-heading" class="sr-only">Danh sách lớp học phần được chọn</h2>
             <div class="bg-surface-container-lowest p-2 rounded-xl border border-outline-variant shadow-sm flex flex-wrap items-center gap-2" role="tablist" aria-label="Lọc lớp học phần">
-                <button type="button" role="tab" data-filter="all" class="flex-1 min-w-[120px] py-2 px-3 rounded-lg text-label-md text-center transition-colors">Tất cả lớp trong CTĐT <span data-count="all"></span></button>
+                <button type="button" role="tab" data-filter="all" class="flex-1 min-w-[120px] py-2 px-3 rounded-lg text-label-md text-center transition-colors">Tất cả học phần của đợt <span data-count="all"></span></button>
                 <button type="button" role="tab" data-filter="eligible" class="flex-1 min-w-[120px] py-2 px-3 rounded-lg text-label-md text-center transition-colors">Đăng ký được <span data-count="eligible"></span></button>
                 <button type="button" role="tab" data-filter="mine" class="flex-1 min-w-[120px] py-2 px-3 rounded-lg text-label-md text-center transition-colors">Đã đăng ký <span data-count="mine"></span></button>
-                <button type="button" disabled title="Chưa có BE: cần dữ liệu điểm (GRD) để biết học phần học lại / cải thiện" class="flex-1 min-w-[120px] py-2 px-3 rounded-lg text-label-md text-center text-outline cursor-not-allowed">Học lại / cải thiện (chưa có BE)</button>
+                <button type="button" disabled title="Học cải thiện sẽ được triển khai sau" class="flex-1 min-w-[120px] py-2 px-3 rounded-lg text-label-md text-center text-outline cursor-not-allowed">Học cải thiện (chưa triển khai)</button>
             </div>
 
             <div class="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant shadow-sm space-y-3">

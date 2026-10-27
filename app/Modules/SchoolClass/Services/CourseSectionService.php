@@ -5,6 +5,7 @@ namespace App\Modules\SchoolClass\Services;
 use App\Modules\AcademicYear\Models\Term;
 use App\Modules\AcademicYear\Models\TermStatus;
 use App\Modules\Curriculum\Services\CurriculumCatalog;
+use App\Modules\Enrollment\Services\OfferingLecturers;
 use App\Modules\Room\Models\Room;
 use App\Modules\SchoolClass\Enums\SectionStatus;
 use App\Modules\SchoolClass\Events\CourseSectionCancelled;
@@ -114,6 +115,17 @@ class CourseSectionService extends BaseService
      */
     public function assign(CourseSection $section, Lecturer $lecturer, string $role, bool $confirmOverload = false): array
     {
+        if ($section->registrationPeriod?->framework !== null) {
+            $availability = app(OfferingLecturers::class);
+            if (! $availability->inFaculty($section->registrationPeriod->framework->faculty_id)->whereKey($lecturer->id)->exists()) {
+                $this->fail('Giảng viên không thuộc khoa của đợt đăng ký.', 'Chọn giảng viên đang công tác trong khoa của chương trình khung.');
+            }
+            foreach (ScheduleRule::query()->where('course_section_id', $section->id)->get() as $rule) {
+                if ($reason = $availability->conflict($lecturer, $section->term, $rule->getAttributes(), $section->id)) {
+                    $this->fail($reason, 'Chọn giảng viên hoặc lịch học khác.');
+                }
+            }
+        }
         if (! $section->status->isActive()) {
             $this->fail("Lớp {$section->code} đã {$section->status->label()}.", 'Chỉ phân công giảng viên cho lớp còn hoạt động.');
         }
@@ -143,11 +155,17 @@ class CourseSectionService extends BaseService
 
         $instructor = $this->audit->withReason(
             $warnings === [] ? 'Phân công giảng viên' : 'Phân công giảng viên (đã xác nhận vượt định mức)',
-            fn () => SectionInstructor::create([
-                'course_section_id' => $section->id,
-                'lecturer_id' => $lecturer->id,
-                'role' => $role,
-            ]),
+            function () use ($section, $lecturer, $role): SectionInstructor {
+                $instructor = SectionInstructor::withTrashed()->firstOrNew([
+                    'course_section_id' => $section->id, 'lecturer_id' => $lecturer->id,
+                ]);
+                if ($instructor->exists && $instructor->trashed()) {
+                    $instructor->restore();
+                }
+                $instructor->fill(['role' => $role])->save();
+
+                return $instructor;
+            },
         );
 
         return ['instructor' => $instructor->load('lecturer'), 'warnings' => $warnings];

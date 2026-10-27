@@ -77,6 +77,9 @@ class TrainingFrameworkService extends BaseService
 
     public function delete(TrainingFramework $framework): void
     {
+        if (RegistrationPeriod::query()->where('training_framework_id', $framework->id)->exists()) {
+            $this->fail('Chương trình khung đang được tham chiếu bởi đợt đăng ký.', 'Sửa học phần trong khung hoặc xóa đợt nháp chưa có lớp trước khi xóa khung.');
+        }
         $opened = CourseSection::query()->whereIn('training_framework_item_id', $framework->items()->select('id'))->count();
 
         if ($opened > 0) {
@@ -139,7 +142,7 @@ class TrainingFrameworkService extends BaseService
     {
         $this->assertTermOpen($item->framework->term);
 
-        if ($item->sections()->exists()) {
+        if ($item->sections()->whereNull('registration_period_id')->exists()) {
             $this->fail('Học phần này đã mở lớp từ chương trình khung nên không xóa được.', 'Hủy / xóa các lớp đã mở trước, hoặc giảm số lớp dự kiến.');
         }
 

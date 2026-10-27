@@ -3,6 +3,7 @@
 namespace App\Modules\Timetable\Services;
 
 use App\Modules\AcademicYear\Models\Term;
+use App\Modules\Enrollment\Services\OfferingLecturers;
 use App\Modules\Room\Models\Room;
 use App\Modules\Room\Services\RoomAvailability;
 use App\Modules\SchoolClass\Enums\SectionStatus;
@@ -292,6 +293,15 @@ class ScheduleRuleService extends BaseService
      */
     private function assertNoConflict(CourseSection $section, ScheduleRule $candidate): array
     {
+        if ($section->registration_period_id !== null) {
+            foreach ($section->instructors()->with('lecturer')->get() as $instructor) {
+                $reason = app(OfferingLecturers::class)
+                    ->conflict($instructor->lecturer, $section->term, $candidate->getAttributes(), $section->id);
+                if ($reason !== null) {
+                    $this->fail($reason, 'Chọn giảng viên hoặc lịch học khác.');
+                }
+            }
+        }
         $found = $this->conflicts->check($section, $candidate);
 
         if ($found['block'] !== []) {

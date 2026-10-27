@@ -61,6 +61,12 @@ class EnrollmentRules
         $section->loadMissing('subject');
         $reasons = [];
 
+        // Không cho dùng đợt khác cùng học kỳ để vượt giới hạn khóa hoặc thời gian của lớp.
+        if (($section->registration_period_id !== null && $section->registration_period_id !== $period->id)
+            || ($period->training_framework_id !== null && $section->registration_period_id !== $period->id)) {
+            $reasons[] = 'Lớp học phần không thuộc danh sách được mở trong đợt đăng ký này.';
+        }
+
         if (! in_array('period', $skip, true)) {
             $reasons = [...$reasons, ...$this->access->problems($period, $student)];
         }

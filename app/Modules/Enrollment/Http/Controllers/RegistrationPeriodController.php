@@ -56,9 +56,14 @@ class RegistrationPeriodController extends Controller
         return response()->json($this->present($period->load('term.academicYear', 'targets.cohort', 'targets.major', 'targets.adminClass')));
     }
 
-    public function publish(RegistrationPeriod $registrationPeriod): JsonResponse
+    public function publish(Request $request, RegistrationPeriod $registrationPeriod): JsonResponse
     {
-        return response()->json($this->present($this->periods->publish($registrationPeriod)->load('term.academicYear', 'targets')));
+        return response()->json($this->present($this->periods->publish($registrationPeriod, $request->user())->load('term.academicYear', 'targets')));
+    }
+
+    public function openEarly(Request $request, RegistrationPeriod $registrationPeriod): JsonResponse
+    {
+        return response()->json($this->present($this->periods->openEarly($registrationPeriod, $request->user())->load('term.academicYear', 'targets')));
     }
 
     public function destroy(RegistrationPeriod $registrationPeriod): Response
@@ -80,6 +85,7 @@ class RegistrationPeriodController extends Controller
 
         return $request->validate([
             'term_id' => [$creating ? 'required' : 'prohibited', 'integer', 'exists:terms,id'],
+            'training_framework_id' => [$creating ? 'sometimes' : 'prohibited', 'nullable', 'integer', 'exists:training_frameworks,id'],
             'name' => [$required, 'string', 'max:255'],
             'round' => [$required, Rule::enum(RegistrationRound::class)],
             'opens_at' => ['sometimes', 'nullable', 'date_format:Y-m-d H:i'],
@@ -104,6 +110,9 @@ class RegistrationPeriodController extends Controller
         return [
             'id' => $period->id,
             'name' => $period->name,
+            'training_framework_id' => $period->training_framework_id,
+            'framework_label' => $period->framework ? $period->framework->faculty->name.' – '.$period->framework->cohort->code : null,
+            'preview_at' => $period->preview_at?->setTimezone($tz)->format('Y-m-d H:i'),
             'term' => $period->term ? ['id' => $period->term->id, 'name' => $period->term->name, 'academic_year' => $period->term->academicYear?->name] : null,
             'round' => $period->round->value,
             'round_label' => $period->round->label(),
@@ -112,7 +121,7 @@ class RegistrationPeriodController extends Controller
             'min_credits' => $period->min_credits,
             'max_credits' => $period->max_credits,
             'status' => $period->status->value,
-            'status_label' => $period->status->label(),
+            'status_label' => $period->status === PeriodStatus::Draft && $period->preview_at !== null ? 'Đã thông báo – chỉ xem trước' : $period->status->label(),
             'is_open' => $period->isOpenAt(now()),
             'targets' => $period->targets->map(fn (RegistrationPeriodTarget $t) => [
                 'cohort_id' => $t->cohort_id,

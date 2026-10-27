@@ -16,7 +16,7 @@ const fold = (text) => String(text ?? '').toLowerCase().normalize('NFD').replace
 
 export default function studentRegistration(root) {
     const page = pageData();
-    const state = { options: null, enrollments: [], result: null, periodId: null, filter: 'all', search: '', day: '', clockOffset: 0, timer: null };
+    const state = { options: null, enrollments: [], result: null, periodId: Number(new URLSearchParams(location.search).get('period_id')) || null, filter: 'all', search: '', day: '', clockOffset: 0, timer: null };
     const field = (name) => root.querySelectorAll(`[data-field="${name}"]`);
     const setText = (name, value) => field(name).forEach((node) => { node.textContent = value; });
     const region = (name) => root.querySelector(`[data-region="${name}"]`);
@@ -86,14 +86,14 @@ export default function studentRegistration(root) {
     }
 
     function renderPeriod() {
-        const { period, problems = [], open_periods: openPeriods = [] } = state.options;
+        const { period, problems = [], visible_periods: openPeriods = [] } = state.options;
         const deadlineBox = root.querySelector('[data-field="deadline-box"]');
         root.querySelector('[data-period-select]')?.remove();
 
         if (!period) {
             stopCountdown();
-            setText('period-state', 'Chưa có đợt mở');
-            setText('period-name', 'Hiện không có đợt đăng ký học phần nào đang mở');
+            setText('period-state', 'Chưa có thông báo');
+            setText('period-name', 'Chưa có danh sách học phần được thông báo cho khóa của bạn');
             setText('period-term', 'Khi Phòng Đào tạo mở đợt cho khóa / ngành / lớp của bạn, danh sách lớp sẽ hiện ở đây.');
             deadlineBox.hidden = true;
             showAlert(region('alert'), problems.length ? { message: problems.join(' '), reasons: problems } : null, 'info');
@@ -101,7 +101,7 @@ export default function studentRegistration(root) {
             return;
         }
 
-        setText('period-state', 'Cổng đăng ký trực tuyến');
+        setText('period-state', period.is_open ? 'Đang mở đăng ký' : period.preview_only ? 'Xem trước – chưa công bố đăng ký' : 'Chờ đến giờ mở đăng ký');
         setText('period-name', period.name);
         setText('period-term', `${period.term} · Mở ${formatVn(period.opens_at)} – đóng ${formatVn(period.closes_at)}`);
         setText('closes-at', `Đóng lúc ${formatVn(period.closes_at)} (giờ máy chủ)`);
@@ -119,7 +119,8 @@ export default function studentRegistration(root) {
 
         // Đồng hồ theo giờ máy chủ (BR-ENR-11): lệch giữa máy chủ và trình duyệt tính một lần khi tải
         state.clockOffset = toDate(state.options.server_time) - Date.now();
-        startCountdown(toDate(`${period.closes_at}:00`));
+        if (period.preview_only) { stopCountdown(); deadlineBox.hidden = true; }
+        else { startCountdown(toDate(`${period.is_open ? period.closes_at : period.opens_at}:00`)); setText('closes-at', `${period.is_open ? 'Đóng' : 'Mở'} lúc ${formatVn(period.is_open ? period.closes_at : period.opens_at)} (giờ máy chủ)`); }
 
         showAlert(region('alert'), problems.length ? { message: problems.join(' '), reasons: problems } : null, 'warning');
     }
@@ -170,7 +171,7 @@ export default function studentRegistration(root) {
         }
 
         if (!state.options.period) {
-            container.replaceChildren(emptyBlock('Chưa có lớp để đăng ký', 'Danh sách lớp chỉ hiện khi có đợt đăng ký đang mở.', 'event_busy'));
+            container.replaceChildren(emptyBlock('Chưa có lớp để đăng ký', 'Danh sách hiện sau khi Phòng Đào tạo thông báo cho khóa của bạn.', 'event_busy'));
             setText('shown-count', '');
             updateTabs({ all: 0, eligible: 0, mine: 0 });
 
@@ -204,13 +205,13 @@ export default function studentRegistration(root) {
         setText('shown-count', `Hiển thị ${shown.length} / ${sections.length} lớp học phần`);
 
         if (sections.length === 0) {
-            container.replaceChildren(emptyBlock('Không có lớp nào để chọn', 'Học kỳ của đợt này chưa có lớp thuộc chương trình đào tạo của bạn, hoặc bạn chưa được gán CTĐT. Liên hệ Phòng Đào tạo nếu thấy sai.', 'search_off'));
+            container.replaceChildren(emptyBlock('Không có lớp nào để chọn', 'Đợt này chưa có học phần phù hợp với bạn. Liên hệ Phòng Đào tạo nếu thấy sai.', 'search_off'));
 
             return;
         }
 
         if (shown.length === 0) {
-            container.replaceChildren(emptyBlock('Không có lớp phù hợp bộ lọc', 'Đổi từ khóa tìm, thứ trong tuần hoặc chọn "Tất cả lớp trong CTĐT".', 'filter_alt_off'));
+            container.replaceChildren(emptyBlock('Không có lớp phù hợp bộ lọc', 'Đổi từ khóa tìm, thứ trong tuần hoặc chọn "Tất cả học phần của đợt".', 'filter_alt_off'));
 
             return;
         }
@@ -449,7 +450,7 @@ export default function studentRegistration(root) {
             const left = closesAt - (Date.now() + state.clockOffset);
 
             if (left <= 0) {
-                setText('countdown', 'Đã hết thời gian đăng ký');
+                setText('countdown', state.options?.period?.is_open ? 'Đã hết thời gian đăng ký' : 'Đã đến giờ mở – bấm Làm mới để cập nhật');
                 stopCountdown();
 
                 return;

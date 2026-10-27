@@ -39,15 +39,17 @@ class RegistrationOptionsController extends Controller
     private function respond(Request $request, Student $student): JsonResponse
     {
         $open = $this->access->openPeriodsFor($student);
+        $visible = $this->access->visiblePeriodsFor($student);
         $period = $request->filled('period_id')
-            ? RegistrationPeriod::query()->with('term')->findOrFail($request->integer('period_id'))
-            : $open->first();
+            ? $visible->firstWhere('id', $request->integer('period_id'))
+            : ($open->first() ?? $visible->first());
+        abort_if($request->filled('period_id') && $period === null, 404);
 
         if ($period === null) {
             return response()->json([
                 'student' => $student->only('id', 'student_code', 'full_name'),
                 'period' => null,
-                'problems' => ['Hiện không có đợt đăng ký nào đang mở cho sinh viên này.'],
+                'problems' => ['Chưa có danh sách học phần được thông báo cho khóa của bạn.'],
                 'sections' => [],
             ]);
         }
@@ -60,6 +62,9 @@ class RegistrationOptionsController extends Controller
             'period' => [
                 'id' => $period->id,
                 'name' => $period->name,
+                'status' => $period->status->value,
+                'is_open' => $period->isOpenAt($this->access->now()),
+                'preview_only' => $period->status->value === 'draft',
                 'term_id' => $period->term_id,
                 'term' => $period->term->name,
                 'opens_at' => $period->opens_at->setTimezone($tz)->format('Y-m-d H:i'),
@@ -68,6 +73,7 @@ class RegistrationOptionsController extends Controller
                 'max_credits' => $period->max_credits,
             ],
             'open_periods' => $open->map(fn (RegistrationPeriod $p) => $p->only('id', 'name'))->values(),
+            'visible_periods' => $visible->map(fn (RegistrationPeriod $p) => $p->only('id', 'name'))->values(),
             'credit_limits' => $this->limits->for($student, $period),
             'problems' => $this->access->problems($period, $student),
             'sections' => $this->sections->listFor($student, $period),

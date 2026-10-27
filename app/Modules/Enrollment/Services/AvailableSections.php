@@ -31,16 +31,19 @@ class AvailableSections
     {
         $curriculum = $this->curricula->current($student);
 
-        if ($curriculum === null) {
+        if ($curriculum === null && $period->training_framework_id === null) {
             return [];
         }
 
-        $items = CurriculumSubject::query()->where('curriculum_id', $curriculum->id)->get()->keyBy('subject_id');
+        $items = CurriculumSubject::query()->where('curriculum_id', $curriculum?->id)->get()->keyBy('subject_id');
+        $frameworkItems = $period->framework?->items->keyBy('subject_id');
 
         $sections = CourseSection::query()
             ->with(['subject:id,code,name,credits', 'room:id,code', 'instructors.lecturer:id,code,full_name'])
             ->where('term_id', $period->term_id)
-            ->whereIn('subject_id', $items->keys())
+            ->when($period->training_framework_id !== null,
+                fn ($q) => $q->where('registration_period_id', $period->id),
+                fn ($q) => $q->whereNull('registration_period_id')->whereIn('subject_id', $items->keys()))
             ->where('status', '!=', SectionStatus::Cancelled)
             ->orderBy('code')
             ->get();
@@ -48,7 +51,7 @@ class AvailableSections
         $rules = ScheduleRule::query()->with('room:id,code')->whereIn('course_section_id', $sections->pluck('id'))->get()->groupBy('course_section_id');
         $starts = $this->startDates->for($sections->pluck('id'));
 
-        return $sections->map(function (CourseSection $section) use ($items, $rules, $starts, $student, $period): array {
+        return $sections->map(function (CourseSection $section) use ($items, $frameworkItems, $rules, $starts, $student, $period): array {
             $item = $items->get($section->subject_id);
             $remaining = $this->rules->remaining($section);
             $reasons = $this->rules->check($student, $section, $period);
@@ -57,8 +60,9 @@ class AvailableSections
                 'id' => $section->id,
                 'code' => $section->code,
                 'subject' => $section->subject->only('id', 'code', 'name', 'credits'),
-                'planned_term' => $item->planned_term,
-                'compulsory' => $item->curriculum_elective_group_id === null,
+                'planned_term' => $item?->planned_term,
+                'compulsory' => $frameworkItems?->get($section->subject_id)?->compulsory
+                    ?? ($item !== null && $item->curriculum_elective_group_id === null),
                 'status' => $section->status->value,
                 'status_label' => $section->status->label(),
                 'max_size' => $section->max_size,

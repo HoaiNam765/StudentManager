@@ -2,6 +2,7 @@
 
 namespace App\Modules\Enrollment\Services;
 
+use App\Models\User;
 use App\Modules\AcademicYear\Models\MilestoneType;
 use App\Modules\AcademicYear\Models\Term;
 use App\Modules\AcademicYear\Models\TermStatus;
@@ -10,6 +11,7 @@ use App\Modules\Enrollment\Enums\PeriodStatus;
 use App\Modules\Enrollment\Models\RegistrationPeriod;
 use App\Modules\SchoolClass\Models\AdminClass;
 use App\Modules\SchoolClass\Models\Cohort;
+use App\Modules\SchoolClass\Models\TrainingFramework;
 use App\Support\Services\BaseService;
 use Carbon\CarbonImmutable;
 
@@ -34,6 +36,13 @@ class RegistrationPeriodService extends BaseService
     {
         $term = Term::query()->findOrFail($data['term_id']);
         $attributes = $this->attributes($term, $data);
+        if (isset($data['training_framework_id'])) {
+            $framework = TrainingFramework::query()->findOrFail($data['training_framework_id']);
+            if ($framework->term_id !== $term->id) {
+                $this->fail('Chương trình khung không thuộc học kỳ đã chọn.', 'Chọn khung đúng học kỳ của đợt.');
+            }
+            $attributes['training_framework_id'] = $framework->id;
+        }
 
         return $this->transaction(function () use ($attributes, $data): RegistrationPeriod {
             $period = RegistrationPeriod::create([...$attributes, 'status' => PeriodStatus::Draft]);
@@ -69,15 +78,44 @@ class RegistrationPeriodService extends BaseService
         });
     }
 
-    public function publish(RegistrationPeriod $period): RegistrationPeriod
+    public function publish(RegistrationPeriod $period, ?User $actor = null): RegistrationPeriod
     {
-        if ($period->status !== PeriodStatus::Draft) {
-            $this->fail("Đợt {$period->name} đang {$period->status->label()}.", 'Chỉ công bố đợt đang ở trạng thái nháp.');
-        }
+        return $this->transaction(function () use ($period, $actor): RegistrationPeriod {
+            $period = RegistrationPeriod::query()->lockForUpdate()->findOrFail($period->id);
+            if ($period->status !== PeriodStatus::Draft) {
+                $this->fail("Đợt {$period->name} đang {$period->status->label()}.", 'Chỉ công bố đợt đang ở trạng thái nháp.');
+            }
 
-        $period->update(['status' => PeriodStatus::Published]);
+            $this->attributes($period->term, [
+                'name' => $period->name, 'round' => $period->round->value,
+                'opens_at' => $this->local($period->opens_at), 'closes_at' => $this->local($period->closes_at),
+            ]);
+            if ($period->training_framework_id !== null && $period->preview_at === null) {
+                $this->fail('Cần thông báo danh sách học phần để sinh viên xem trước.', 'Bấm Thông báo xem trước rồi công bố thời gian đăng ký.');
+            }
+            app(RegistrationOfferingService::class)->activateSections($period);
+            $period->update(['status' => PeriodStatus::Published]);
+            if ($actor !== null) {
+                app(RegistrationOfferingService::class)->notify($period, $actor);
+            }
 
-        return $period->refresh();
+            return $period->refresh();
+        });
+    }
+
+    public function openEarly(RegistrationPeriod $period, User $actor): RegistrationPeriod
+    {
+        return $this->transaction(function () use ($period, $actor): RegistrationPeriod {
+            $period = RegistrationPeriod::query()->lockForUpdate()->findOrFail($period->id);
+            if ($period->status !== PeriodStatus::Published || ! $period->opens_at->isFuture() || ! $period->closes_at->isFuture()) {
+                $this->fail('Chỉ mở sớm đợt đã công bố và chưa đến giờ mở.', 'Kiểm tra trạng thái và thời gian của đợt.');
+            }
+            app(RegistrationOfferingService::class)->assertReady($period);
+            $period->update(['opens_at' => now()]);
+            app(RegistrationOfferingService::class)->notify($period, $actor);
+
+            return $period->refresh();
+        });
     }
 
     public function delete(RegistrationPeriod $period): void
@@ -87,6 +125,9 @@ class RegistrationPeriodService extends BaseService
         }
 
         $this->transaction(function () use ($period): void {
+            if ($period->sections()->exists()) {
+                $this->fail('Đợt đã có kế hoạch lớp học phần.', 'Giữ đợt để lưu lịch sử; xóa từng học phần hoặc điều chỉnh thời gian.');
+            }
             $period->targets()->delete();
             $period->delete();
         });

@@ -5,6 +5,8 @@ namespace App\Modules\Enrollment\Models;
 use App\Modules\AcademicYear\Models\Term;
 use App\Modules\Enrollment\Enums\PeriodStatus;
 use App\Modules\Enrollment\Enums\RegistrationRound;
+use App\Modules\SchoolClass\Models\CourseSection;
+use App\Modules\SchoolClass\Models\TrainingFramework;
 use App\Support\Models\StandardModel;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
@@ -23,6 +25,7 @@ class RegistrationPeriod extends StandardModel
             'status' => PeriodStatus::class,
             'opens_at' => 'immutable_datetime',
             'closes_at' => 'immutable_datetime',
+            'preview_at' => 'immutable_datetime',
             'min_credits' => 'integer',
             'max_credits' => 'integer',
         ];
@@ -36,6 +39,16 @@ class RegistrationPeriod extends StandardModel
     public function targets(): HasMany
     {
         return $this->hasMany(RegistrationPeriodTarget::class);
+    }
+
+    public function framework(): BelongsTo
+    {
+        return $this->belongsTo(TrainingFramework::class, 'training_framework_id');
+    }
+
+    public function sections(): HasMany
+    {
+        return $this->hasMany(CourseSection::class);
     }
 
     /** Đợt đã công bố và đang trong cửa sổ thời gian tại $at (giờ máy chủ). */

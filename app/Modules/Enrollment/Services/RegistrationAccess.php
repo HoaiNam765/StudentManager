@@ -50,6 +50,13 @@ class RegistrationAccess extends BaseService
     /** Sinh viên thuộc đối tượng của đợt. */
     public function targets(RegistrationPeriod $period, Student $student): bool
     {
+        if ($period->training_framework_id !== null) {
+            $period->loadMissing('framework.cohort');
+            if ($period->framework === null || $period->framework->cohort->start_year !== $student->cohort
+                || $student->major?->faculty_id !== $period->framework->faculty_id) {
+                return false;
+            }
+        }
         $period->loadMissing('targets.cohort');
 
         if ($period->targets->isEmpty()) {
@@ -61,6 +68,15 @@ class RegistrationAccess extends BaseService
         return $period->targets->contains(fn (RegistrationPeriodTarget $t) => ($t->cohort_id === null || $t->cohort?->start_year === $student->cohort)
             && ($t->major_id === null || $t->major_id === $student->major_id)
             && ($t->admin_class_id === null || $t->admin_class_id === $classId));
+    }
+
+    /** Đợt đã thông báo để xem trước, hoặc đã công bố; tuyệt đối không lộ bản nháp. */
+    public function visiblePeriodsFor(Student $student): Collection
+    {
+        return RegistrationPeriod::query()->with('targets', 'term', 'framework.cohort')
+            ->where(fn ($q) => $q->where('status', 'published')->orWhere(fn ($q) => $q->where('status', 'draft')->whereNotNull('preview_at')))
+            ->where('closes_at', '>', $this->now())->orderBy('opens_at')->get()
+            ->filter(fn (RegistrationPeriod $p) => $this->targets($p, $student))->values();
     }
 
     /**
@@ -80,7 +96,9 @@ class RegistrationAccess extends BaseService
             $problems[] = "Sinh viên không thuộc đối tượng của đợt {$period->name}.";
         }
 
-        if (! $period->isOpenAt($this->now())) {
+        if ($period->status->value === 'draft') {
+            $problems[] = 'Danh sách chỉ để xem trước. Phòng Đào tạo chưa công bố mở đăng ký.';
+        } elseif (! $period->isOpenAt($this->now())) {
             $tz = config('studentmanager.display_timezone');
             $problems[] = "Đợt {$period->name} mở từ ".$period->opens_at->setTimezone($tz)->format('H:i d/m/Y')
                 .' đến '.$period->closes_at->setTimezone($tz)->format('H:i d/m/Y').' (giờ máy chủ, BR-ENR-11).';

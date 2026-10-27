@@ -33,9 +33,6 @@ class TrainingFrameworkPageController extends Controller
                 'itemUpdate' => route('admin.training-framework-items.update', ['trainingFrameworkItem' => '__ID__']),
                 'itemDestroy' => route('admin.training-framework-items.destroy', ['trainingFrameworkItem' => '__ID__']),
                 'suggest' => route('admin.training-frameworks.suggest', $id),
-                'openSections' => route('admin.training-frameworks.open-sections', $id),
-                'draft' => route('admin.training-frameworks.announcement-draft', $id),
-                'notify' => route('admin.training-frameworks.notify', $id),
                 'terms' => route('admin.academic-years.index'),
                 'faculties' => route('admin.units.index', ['unitType' => 'faculties']),
                 'cohorts' => route('admin.cohorts.index'),
@@ -44,7 +41,6 @@ class TrainingFrameworkPageController extends Controller
             'links' => ['section' => route('admin.pages.course-sections.show', ['courseSection' => '__ID__'])],
             'can' => [
                 'create' => $this->access->allowsGlobally($user, 'CLS', PermissionAction::Create),
-                'notify' => $this->access->allows($user, 'NOT', PermissionAction::Create),
             ],
         ]]);
     }

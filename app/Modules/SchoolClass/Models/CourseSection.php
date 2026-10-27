@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Modules\AcademicYear\Models\Term;
 use App\Modules\Auth\Contracts\HasDataScope;
 use App\Modules\Auth\Enums\DataScope;
+use App\Modules\Enrollment\Models\RegistrationPeriod;
 use App\Modules\Faculty\Models\Department;
 use App\Modules\Faculty\Services\FacultyAccess;
 use App\Modules\Room\Models\Room;
@@ -26,6 +27,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class CourseSection extends StandardModel implements HasDataScope
 {
+    public function registrationPeriod(): BelongsTo
+    {
+        return $this->belongsTo(RegistrationPeriod::class);
+    }
+
     use HasVietnameseSearch;
 
     protected $guarded = [];

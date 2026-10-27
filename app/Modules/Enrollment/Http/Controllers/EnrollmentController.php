@@ -50,7 +50,7 @@ class EnrollmentController extends Controller
     {
         $data = $request->validate([
             'course_section_id' => ['required', 'integer', 'exists:course_sections,id'],
-            'type' => ['sometimes', Rule::in([EnrollmentRules::TYPE_NORMAL, EnrollmentRules::TYPE_RETAKE, EnrollmentRules::TYPE_IMPROVE])],
+            'type' => ['sometimes', Rule::in([EnrollmentRules::TYPE_NORMAL, EnrollmentRules::TYPE_RETAKE])],
         ], [], ['course_section_id' => 'lớp học phần', 'type' => 'loại đăng ký']);
 
         $enrollment = $this->enrollments->register(

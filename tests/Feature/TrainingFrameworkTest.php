@@ -151,13 +151,12 @@ class TrainingFrameworkTest extends TestCase
         $make($otherMajor->id, 2026);
 
         $this->actingAs($this->acad);
-        $draft = $this->getJson(route('admin.training-frameworks.announcement-draft', $framework))->assertOk()->json();
+        $draft = app(TrainingFrameworkService::class)->draftAnnouncement($framework);
         $this->assertSame(2, $draft['students']);
 
-        $sent = $this->postJson(route('admin.training-frameworks.notify', $framework), ['title' => $draft['title'], 'body' => $draft['body']])
-            ->assertCreated()->assertJsonPath('recipients', 2)->json();
-
-        $recipients = DB::table('notification_recipients')->where('notification_id', $sent['notification_id'])->pluck('user_id')->sort()->values()->all();
+        $this->postJson("/admin/training-frameworks/{$framework->id}/open-sections")->assertNotFound();
+        $sent = app(TrainingFrameworkService::class)->notify($this->acad, $framework, $draft['title'], $draft['body']);
+        $recipients = DB::table('notification_recipients')->where('notification_id', $sent->id)->pluck('user_id')->sort()->values()->all();
         $this->assertSame(collect($inside)->pluck('user_id')->sort()->values()->all(), $recipients);
         $this->assertNotNull($framework->refresh()->notified_at);
     }

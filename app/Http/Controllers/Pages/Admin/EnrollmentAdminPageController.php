@@ -25,6 +25,14 @@ class EnrollmentAdminPageController extends Controller
                 'periodStore' => route('admin.registration-periods.store'),
                 'periodUpdate' => route('admin.registration-periods.update', ['registrationPeriod' => '__ID__']),
                 'periodPublish' => route('admin.registration-periods.publish', ['registrationPeriod' => '__ID__']),
+                'periodOpenEarly' => route('admin.registration-periods.open-early', ['registrationPeriod' => '__ID__']),
+                'frameworks' => route('admin.training-frameworks.index'),
+                'offerings' => route('admin.registration-periods.offerings.index', ['registrationPeriod' => '__ID__']),
+                'offeringStore' => route('admin.registration-periods.offerings.store', ['registrationPeriod' => '__ID__']),
+                'offeringUpdate' => route('admin.registration-periods.offerings.update', ['registrationPeriod' => '__ID__', 'courseSection' => '__SECTION__']),
+                'offeringDelete' => route('admin.registration-periods.offerings.destroy', ['registrationPeriod' => '__ID__', 'courseSection' => '__SECTION__']),
+                'lecturerOptions' => route('admin.registration-periods.lecturers', ['registrationPeriod' => '__ID__']),
+                'announce' => route('admin.registration-periods.announce', ['registrationPeriod' => '__ID__']),
                 'periodDelete' => route('admin.registration-periods.destroy', ['registrationPeriod' => '__ID__']),
                 'stats' => route('admin.enrollment-stats'),
                 'preview' => route('admin.terms.registration.finalize-preview', ['term' => '__TERM__']),
@@ -42,6 +50,10 @@ class EnrollmentAdminPageController extends Controller
                 'delete' => $this->access->allowsGlobally($user, 'ENR', PermissionAction::Delete),
                 'approve' => $this->access->allowsGlobally($user, 'ENR', PermissionAction::Approve),
                 'classUpdate' => $this->access->allowsGlobally($user, 'CLS', PermissionAction::Update),
+                'offerings' => $this->access->allowsGlobally($user, 'CLS', PermissionAction::Create)
+                    && $this->access->allowsGlobally($user, 'TTB', PermissionAction::Create)
+                    && $this->access->allowsGlobally($user, 'ENR', PermissionAction::Update),
+                'notify' => $this->access->allows($user, 'NOT', PermissionAction::Create),
             ],
         ]]);
     }

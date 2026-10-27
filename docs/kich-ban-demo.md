@@ -73,7 +73,7 @@ Chức năng nhóm bổ sung: lập kế hoạch mở lớp theo **khoa – khó
 1. **Lớp học phần** (`/admin/lop-hoc-phan`): chọn HK2 → mở lớp `TOAN103.262.02` vừa tạo:
    - **Phân công giảng viên**: chọn `GV0001`, vai trò chính (vượt định mức tiết thì hệ thống cảnh báo).
 2. **Xếp thời khóa biểu** (`/admin/thoi-khoa-bieu`): chọn lớp `TOAN103.262.02` → chọn phòng (ví dụ A101), Thứ Bảy, tiết 1–3, tuần 1–15 → **Lưu lịch** → **Kiểm tra lại** (đã thử: không xung đột; nếu báo trùng phòng / giảng viên thì đổi thứ hoặc tiết) → **Sinh buổi học** (tự bỏ ngày nghỉ lễ): 15 buổi từ 30/01 đến 08/05/2027.
-3. Quay lại **Lớp học phần** → chuyển trạng thái lớp sang **Mở đăng ký**. Lớp chưa có giảng viên chính thì hệ thống chặn — có thể cho xem trước bước này.
+3. Quay lại **Lớp học phần** → chuyển trạng thái lớp sang **Mở đăng ký**. Lớp chưa có giảng viên chính, hoặc lớp trực tiếp / kết hợp chưa xếp lịch, thì hệ thống chặn — có thể cho xem trước bước này (mở một lớp vừa tạo chưa xếp lịch).
 4. **Công bố thời khóa biểu HK1**: ở `/admin/thoi-khoa-bieu` chọn Học kỳ 1 → **Công bố thời khóa biểu**. Sau bước này giảng viên mới thấy lịch dạy HK1 (dữ liệu mẫu để HK1 ở trạng thái nháp).
 5. (Tùy thời gian) **Nghỉ, dạy bù & lịch phòng** (`/admin/thoi-khoa-bieu/day-bu`): xếp buổi dạy bù, tra lịch phòng.
 

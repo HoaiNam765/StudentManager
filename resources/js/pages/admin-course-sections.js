@@ -206,7 +206,7 @@ export default function adminCourseSections(root) {
     }
 
     async function transition(button, item, status, label) {
-        const ok = await confirmDialog({ title: `${label} ${item.code}?`, message: status === 'registration_open' ? 'Lớp phải có ít nhất một giảng viên chính trước khi mở đăng ký.' : 'Trạng thái chỉ được chuyển từng bước theo quy trình.', confirmText: label });
+        const ok = await confirmDialog({ title: `${label} ${item.code}?`, message: status === 'registration_open' ? 'Lớp phải có ít nhất một giảng viên chính và đã xếp lịch (trừ lớp trực tuyến) trước khi mở đăng ký.' : 'Trạng thái chỉ được chuyển từng bước theo quy trình.', confirmText: label });
         if (!ok) return;
         try { await withBusy(button, () => api.post(tpl(page.api.status, item.id, status), {})); toast(`Đã chuyển: ${label}.`, 'success'); await loadAll(); await loadDetail(item.id); }
         catch (error) { showAlert(region('alert'), error); }

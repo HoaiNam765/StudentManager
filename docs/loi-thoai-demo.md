@@ -54,7 +54,7 @@ Trước khi vào phòng: đã làm bước 0 (dựng dữ liệu, mở hai trì
 >
 > Sang **Xếp thời khóa biểu**: chọn thứ Bảy, tiết 1 đến 3, phòng A101, tuần 1 đến 15 → lưu → **Kiểm tra xung đột**: hệ thống kiểm tra trùng phòng, trùng giảng viên, phòng thiếu chỗ, sai loại phòng. Không có xung đột → **Sinh buổi học**: tạo 15 buổi cụ thể, tự bỏ ngày nghỉ lễ.
 >
-> Quay lại lớp, chuyển sang **Mở đăng ký**. Lớp chưa có giảng viên chính thì hệ thống không cho mở.
+> Quay lại lớp, chuyển sang **Mở đăng ký**. Lớp chưa có giảng viên chính, hoặc học trực tiếp mà chưa xếp lịch, thì hệ thống không cho mở — để sinh viên luôn thấy giờ học và ngày bắt đầu học.
 >
 > Em cũng **công bố thời khóa biểu học kỳ 1** — có công bố thì giảng viên mới thấy lịch dạy; sau công bố, đổi lịch phải có lý do và báo trước.
 

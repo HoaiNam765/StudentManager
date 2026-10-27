@@ -14,6 +14,7 @@ use App\Modules\Subject\Models\Subject;
 use App\Modules\Subject\Services\SyllabusService;
 use App\Modules\Teacher\Models\Lecturer;
 use App\Modules\Timetable\Contracts\SectionStudents;
+use App\Modules\Timetable\Models\ScheduleRule;
 use App\Support\Audit\AuditEvent;
 use App\Support\Audit\AuditLogger;
 use App\Support\References\ReferenceRegistry;
@@ -28,8 +29,9 @@ use Illuminate\Support\Facades\DB;
  * - Mã tự sinh `<mã học phần>.<năm><thứ tự học kỳ>.<số thứ tự>` (ví dụ INT101.261.01), duy nhất (FR-CLS-010).
  * - Sĩ số tối thiểu ≤ tối đa; tối đa không vượt mức cấu hình và sức chứa phòng được xếp (BR-CLS-02).
  * - Giảng viên đang làm việc; vượt định mức tiết trong học kỳ thì cảnh báo và phải xác nhận (`confirm_overload`).
- * - Phải có ít nhất một giảng viên chính trước khi Mở đăng ký (BR-CLS-04). Trạng thái chỉ đi tới bước kế tiếp; hủy
- *   được ở ba bước đầu và phải có lý do. Xóa hẳn chỉ lớp Dự kiến chưa có dữ liệu liên quan (BR-CLS-06).
+ * - Phải có ít nhất một giảng viên chính trước khi Mở đăng ký (BR-CLS-04). Lớp trực tiếp / kết hợp còn phải có mẫu lịch
+ *   (TTB xếp lịch trước khi mở đăng ký — luồng CLS bước 3, FR-TTB-002); lớp trực tuyến không bắt buộc. Trạng thái chỉ đi
+ *   tới bước kế tiếp; hủy được ở ba bước đầu và phải có lý do. Xóa hẳn chỉ lớp Dự kiến chưa có dữ liệu liên quan (BR-CLS-06).
  */
 class CourseSectionService extends BaseService
 {
@@ -187,6 +189,16 @@ class CourseSectionService extends BaseService
             $this->fail(
                 "Lớp {$section->code} chưa có giảng viên chính nên chưa mở đăng ký được.",
                 'Phân công ít nhất một giảng viên chính rồi mở đăng ký lại (BR-CLS-04).'
+            );
+        }
+
+        // Không có lịch thì sinh viên không thấy giờ học, ngày bắt đầu học và không kiểm tra được trùng lịch / ngày học sau
+        // ngày đóng đăng ký. Lớp trực tuyến có thể học không đồng bộ nên cho qua.
+        if ($to === SectionStatus::RegistrationOpen && $section->delivery_mode !== 'online'
+            && ! ScheduleRule::query()->where('course_section_id', $section->id)->exists()) {
+            $this->fail(
+                "Lớp {$section->code} chưa có lịch học nên chưa mở đăng ký được.",
+                'Xếp lịch ở trang Xếp thời khóa biểu trước khi mở đăng ký (FR-TTB-002); chỉ lớp trực tuyến được mở khi chưa có lịch.'
             );
         }
 

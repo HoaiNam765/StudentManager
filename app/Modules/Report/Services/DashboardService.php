@@ -74,7 +74,7 @@ class DashboardService
     {
         $lecturer = Lecturer::query()
             ->where('user_id', $user->id)
-            ->firstOrFail();
+            ->firstOr(fn () => abort(404, 'Tài khoản chưa gắn với hồ sơ giảng viên.'));
 
         return [
             'lecturer' => [

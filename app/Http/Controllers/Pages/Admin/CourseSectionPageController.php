@@ -44,6 +44,8 @@ class CourseSectionPageController extends Controller
                 'update' => $this->access->allowsGlobally($user, 'CLS', PermissionAction::Update),
                 'delete' => $this->access->allowsGlobally($user, 'CLS', PermissionAction::Delete),
                 'approve' => $this->access->allowsGlobally($user, 'CLS', PermissionAction::Approve),
+                // FIN xem được lớp (CLS.view) nhưng không có ROM.view: không gọi API phòng để khỏi 403 cả trang
+                'viewRooms' => $this->access->allows($user, 'ROM', PermissionAction::View),
             ],
         ]]);
     }

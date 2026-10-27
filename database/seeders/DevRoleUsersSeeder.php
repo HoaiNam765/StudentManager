@@ -5,22 +5,32 @@ namespace Database\Seeders;
 use App\Models\User;
 use App\Modules\Auth\Enums\ProfileType;
 use App\Modules\Auth\Models\Role;
+use App\Modules\Faculty\Models\Department;
 use App\Modules\Faculty\Models\Faculty;
 use App\Modules\Faculty\Models\LeadershipTerm;
 use App\Modules\Faculty\Services\LeadershipService;
+use App\Modules\SchoolClass\Models\AdminClass;
+use App\Modules\SchoolClass\Models\AdvisorAssignment;
+use App\Modules\SchoolClass\Services\AdvisorAssignmentService;
 use App\Modules\Student\Enums\StudentStatus;
 use App\Modules\Student\Models\Student;
+use App\Modules\Teacher\Models\Lecturer;
+use App\Modules\Teacher\Services\LecturerService;
 use Illuminate\Database\Seeder;
 
 /**
  * Tài khoản mẫu cho từng vai trò, chỉ dùng ở môi trường phát triển (BR-SYS-10). Mật khẩu giả: xem hằng PASSWORD.
  * Tên đăng nhập `<vai trò viết thường>.test`, ví dụ `acad.test`, `stu.test`. Tài khoản DEAN được giao nhiệm kỳ
- * trưởng khoa CNTT (nếu có dữ liệu khoa) để có phạm vi FACULTY thật. Tài khoản của sinh viên đã nhập học cũng dùng
- * mật khẩu giả này. Chạy lặp lại an toàn; không chạy ở production.
+ * trưởng khoa CNTT (nếu có dữ liệu khoa) để có phạm vi FACULTY thật; tài khoản ADV được gắn hồ sơ giảng viên ADVISOR_CODE
+ * và cố vấn một lớp hành chính để có phạm vi ADVISEE thật. Tài khoản của sinh viên đã nhập học cũng dùng mật khẩu giả
+ * này. Chạy lặp lại an toàn; không chạy ở production.
  */
 class DevRoleUsersSeeder extends Seeder
 {
     public const PASSWORD = 'password';
+
+    /** Mã hồ sơ giảng viên của tài khoản cố vấn mẫu `adv.test`. */
+    public const ADVISOR_CODE = 'GV9001';
 
     /** Vai trò => [họ tên, loại hồ sơ] */
     public const ACCOUNTS = [
@@ -70,6 +80,10 @@ class DevRoleUsersSeeder extends Seeder
                     $user->roles()->attach($role->id, ['valid_from' => $today]);
                 }
             }
+
+            if ($code === 'ADV') {
+                $this->makeAdvisor($user, $today);
+            }
         }
 
         $this->prepareAdmittedStudents();
@@ -91,6 +105,46 @@ class DevRoleUsersSeeder extends Seeder
                 'temporary_password_expires_at' => null,
                 'password_changed_at' => now(),
             ])->save());
+    }
+
+    /**
+     * Cố vấn học tập: cổng giảng viên cần hồ sơ giảng viên gắn với tài khoản (`lecturers.user_id`), phạm vi ADVISEE cần một
+     * phân công cố vấn đang hiệu lực. Gắn hồ sơ ADVISOR_CODE (tạo nếu chưa có) và cố vấn lớp hành chính đầu tiên (theo mã)
+     * chưa có cố vấn. Chưa có bộ môn / lớp hoặc mã đã dùng cho hồ sơ khác thì bỏ qua phần tương ứng.
+     */
+    private function makeAdvisor(User $user, string $today): void
+    {
+        $lecturer = Lecturer::query()->where('user_id', $user->id)->first();
+
+        if ($lecturer === null) {
+            $department = Department::query()->active()->where('code', 'BM-KTPM')->first() ?? Department::query()->active()->orderBy('code')->first();
+
+            if ($department === null || Lecturer::withTrashed()->where('code', self::ADVISOR_CODE)->exists()) {
+                return;
+            }
+
+            $lecturer = app(LecturerService::class)->create([
+                'code' => self::ADVISOR_CODE,
+                'full_name' => $user->name,
+                'email' => $user->email,
+                'department_id' => $department->id,
+                'hired_on' => '2015-09-01',
+                'account' => 'link',
+                'user_id' => $user->id,
+            ]);
+        }
+
+        if (! $lecturer->isAssignable() || AdvisorAssignment::query()->where('lecturer_id', $lecturer->id)->current()->exists()) {
+            return;
+        }
+
+        $class = AdminClass::query()->active()
+            ->whereDoesntHave('advisorAssignments', fn ($q) => $q->where(fn ($period) => $period->whereNull('effective_to')->orWhereDate('effective_to', '>=', $today)))
+            ->orderBy('code')->first();
+
+        if ($class !== null) {
+            app(AdvisorAssignmentService::class)->assign($class, $lecturer, $today, 'Tài khoản mẫu');
+        }
     }
 
     /** Trưởng khoa: giao nhiệm kỳ (sinh vai trò DEAN có phạm vi khoa); chưa có khoa thì gán DEAN trực tiếp. */

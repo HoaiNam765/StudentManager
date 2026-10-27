@@ -71,6 +71,8 @@ Route::middleware('auth')->group(function (): void {
     // Kết quả đăng ký, thời khóa biểu cá nhân, phiếu đăng ký PDF (FR-ENR-010)
     Route::get('/registration/result', [EnrollmentResultController::class, 'mine'])->middleware('permission:ENR.view')->name('registration.result');
     Route::get('/registration/result/slip', [EnrollmentResultController::class, 'mineSlip'])->middleware('permission:ENR.view')->name('registration.slip');
+    // Học kỳ có đăng ký của tôi (chọn học kỳ ở trang kết quả; sinh viên không gọi được /admin/academic-years, #285)
+    Route::get('/registration/terms', [EnrollmentResultController::class, 'mineTerms'])->middleware('permission:ENR.view')->name('registration.terms');
 
     // Trang giao diện gọi các API ở trên (docs/fe-be-mapping.md, nhóm a); cùng quyền với API chính của trang
     Route::get('/dang-ky-hoc-phan', [RegistrationPageController::class, 'index'])->middleware('permission:ENR.view')->name('pages.registration');

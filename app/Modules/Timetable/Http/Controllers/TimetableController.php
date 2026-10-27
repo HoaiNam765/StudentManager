@@ -58,7 +58,9 @@ class TimetableController extends Controller
 
     public function mineLecturer(Request $request): JsonResponse
     {
-        $lecturer = Lecturer::query()->where('user_id', $request->user()->id)->firstOrFail();
+        $lecturer = Lecturer::query()->where('user_id', $request->user()->id)->firstOr(
+            fn () => abort(404, 'Tài khoản chưa gắn với hồ sơ giảng viên.')
+        );
 
         return $this->respond($request, 'lecturer', $lecturer->id, false);
     }

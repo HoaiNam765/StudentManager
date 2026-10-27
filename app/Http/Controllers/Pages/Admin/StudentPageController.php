@@ -134,6 +134,7 @@ class StudentPageController extends Controller
     public function classes(Request $request): View
     {
         $user = $request->user();
+        $editCohort = $this->access->allows($user, 'CLS', PermissionAction::Create) || $this->access->allows($user, 'CLS', PermissionAction::Update);
 
         return view('admin.admin-class.index', ['pageData' => [
             'api' => $this->lookupApis() + [
@@ -166,6 +167,8 @@ class StudentPageController extends Controller
                 'updateAll' => $this->access->allowsGlobally($user, 'CLS', PermissionAction::Update),
                 'delete' => $this->access->allows($user, 'CLS', PermissionAction::Delete),
                 'export' => $this->access->allows($user, 'CLS', PermissionAction::Export),
+                // Bộ quy chế chỉ dùng trong form khóa tuyển sinh; DEAN, EXAM, CTSV, FIN không có SYS.view nên không gọi (tránh 403 ghi nhật ký)
+                'policySets' => $editCohort && $this->access->allows($user, 'SYS', PermissionAction::View),
             ],
             'totalClasses' => AdminClass::query()->count(),
         ]]);

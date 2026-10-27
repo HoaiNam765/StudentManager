@@ -38,6 +38,30 @@ class EnrollmentReport
     }
 
     /**
+     * Học kỳ sinh viên có đăng ký (còn hiệu lực hoặc đã rút) cùng học kỳ mặc định, mới nhất trước, nhóm theo năm học:
+     * `[{id, name, terms: [{id, name}]}]`.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function terms(Student $student): array
+    {
+        $ids = Enrollment::query()->where('student_id', $student->id)
+            ->whereIn('status', [...EnrollmentStatus::activeValues(), EnrollmentStatus::Withdrawn->value])
+            ->distinct()->pluck('term_id')
+            ->push($this->defaultTerm()?->id)
+            ->filter()->unique();
+
+        return Term::query()->with('academicYear:id,name')->whereIn('id', $ids)->orderByDesc('start_date')->get()
+            ->groupBy('academic_year_id')
+            ->map(fn (Collection $terms) => [
+                'id' => $terms->first()->academicYear?->id,
+                'name' => $terms->first()->academicYear?->name,
+                'terms' => $terms->map(fn (Term $term) => $term->only('id', 'name'))->values()->all(),
+            ])
+            ->values()->all();
+    }
+
+    /**
      * Kết quả đăng ký của sinh viên trong học kỳ: các học phần (còn hiệu lực và đã rút), tổng tín chỉ, thời khóa biểu tuần.
      *
      * @return array<string, mixed>

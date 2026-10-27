@@ -36,7 +36,10 @@ export default function teacherSections(root) {
                 }
             });
             termSelect.replaceChildren(...terms.map((t) => el('option', { value: t.id }, `${t.name} · ${t.year ?? ''}`)));
-            const current = state.sections.find((s) => ['in_progress', 'registration_closed', 'registration_open'].includes(s.status))?.term?.id;
+            // Ưu tiên học kỳ đang dạy, rồi mới tới học kỳ đang đăng ký
+            const current = ['in_progress', 'registration_closed', 'registration_open']
+                .map((status) => state.sections.find((s) => s.status === status)?.term?.id)
+                .find(Boolean);
             const fromHash = state.sections.find((s) => `#lop-${s.id}` === window.location.hash);
             termSelect.value = String(fromHash?.term?.id ?? current ?? terms.at(-1)?.id ?? '');
             render();

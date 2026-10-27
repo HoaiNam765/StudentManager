@@ -152,7 +152,10 @@ export default function teacherSchedule(root) {
             const list = await sectionsRequest;
             const termIds = [...new Set(list.map((s) => s.term?.id))];
             // Học kỳ hiện tại = học kỳ có lớp đang học / đang đăng ký, nếu không có thì học kỳ mới nhất
-            const current = list.find((s) => ['in_progress', 'registration_closed', 'registration_open'].includes(s.status))?.term?.id ?? termIds.at(-1);
+            // Ưu tiên học kỳ đang dạy, rồi mới tới học kỳ đang đăng ký
+            const current = ['in_progress', 'registration_closed', 'registration_open']
+                .map((status) => list.find((s) => s.status === status)?.term?.id)
+                .find(Boolean) ?? termIds.at(-1);
             const shown = list.filter((s) => s.term?.id === current);
             field('term').textContent = shown[0] ? `(${shown[0].term?.name} · ${shown[0].academic_year?.name ?? ''})` : '';
             field('section-count').textContent = `${shown.length} lớp`;

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Pages\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Modules\AcademicYear\Models\Term;
+use App\Modules\AcademicYear\Models\TermStatus;
 use App\Modules\Auth\Enums\PermissionAction;
 use App\Modules\Auth\Services\AccessControl;
 use App\Modules\Enrollment\Models\Enrollment;
@@ -33,7 +34,12 @@ class GradeAdminPageController extends Controller
         $terms = Term::query()->orderByDesc('start_date')->get();
         $faculties = Faculty::query()->orderBy('name')->get();
 
-        $selectedTermId = $request->integer('term_id') ?: ($terms->first()?->id ?? null);
+        // Mặc định: học kỳ đang học / đang thi – chấm điểm, rồi học kỳ gần nhất đã bắt đầu (không lấy học kỳ chưa tới)
+        $today = now(config('studentmanager.display_timezone'))->toDateString();
+        $defaultTerm = $terms->first(fn (Term $t) => in_array($t->status, [TermStatus::IN_PROGRESS, TermStatus::EXAM_GRADING], true))
+            ?? $terms->first(fn (Term $t) => $t->start_date->toDateString() <= $today)
+            ?? $terms->first();
+        $selectedTermId = $request->integer('term_id') ?: $defaultTerm?->id;
         $selectedFacultyId = $request->integer('faculty_id') ?: null;
         $selectedStatus = $request->string('status')->toString();
         $activeTab = $request->string('tab', 'workflow')->toString();

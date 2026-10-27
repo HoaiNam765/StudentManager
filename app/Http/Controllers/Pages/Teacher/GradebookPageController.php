@@ -42,7 +42,11 @@ class GradebookPageController extends Controller
         // Học kỳ mới nhất trước (theo ngày bắt đầu học kỳ), bỏ lớp đã hủy
         $sections = $sectionsQuery->where('status', '!=', SectionStatus::Cancelled->value)->orderBy('code')->get()
             ->sortByDesc(fn (CourseSection $s) => $s->term?->start_date?->format('Y-m-d'))->values();
-        $selectedSectionId = $request->integer('course_section_id') ?: ($sections->first()?->id ?? null);
+        // Mặc định mở lớp đang học (nhập điểm), rồi lớp đã kết thúc, cuối cùng mới tới lớp đầu danh sách
+        $default = $sections->first(fn (CourseSection $s) => $s->status === SectionStatus::InProgress)
+            ?? $sections->first(fn (CourseSection $s) => $s->status === SectionStatus::Finished)
+            ?? $sections->first();
+        $selectedSectionId = $request->integer('course_section_id') ?: $default?->id;
 
         $selectedSection = null;
         $workflow = null;

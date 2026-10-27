@@ -107,6 +107,7 @@ export default function adminEnrollment(root) {
     }
 
     async function finalizeTerm(event) {
+        const button = event.currentTarget;
         // Re-read the backend preview immediately before a consequential action.
         let preview;
         try { preview = await api.get(url(page.api.preview, termSelect.value)); }
@@ -123,7 +124,7 @@ export default function adminEnrollment(root) {
         const ok = await confirmDialog({ title: needsAcknowledgement ? 'Xác nhận ngoại lệ thiếu tín chỉ?' : 'Chốt đăng ký học kỳ?', message, danger: needsAcknowledgement, confirmText: needsAcknowledgement ? 'Tôi đã kiểm tra, chốt đăng ký' : 'Chốt đăng ký' });
         if (!ok) return;
         try {
-            await withBusy(event.currentTarget, () => api.post(url(page.api.finalize, termSelect.value), { acknowledge_under_min: needsAcknowledgement }));
+            await withBusy(button, () => api.post(url(page.api.finalize, termSelect.value), { acknowledge_under_min: needsAcknowledgement }));
             toast('Đã chốt đăng ký học kỳ.', 'success'); await loadAll();
         } catch (error) { showAlert(region('alert'), error); }
     }

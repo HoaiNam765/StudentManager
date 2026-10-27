@@ -6,13 +6,16 @@ use App\Models\User;
 use App\Modules\Curriculum\Models\Curriculum;
 use App\Modules\Curriculum\Models\CurriculumBlock;
 use App\Modules\Curriculum\Models\CurriculumSubject;
+use App\Modules\Curriculum\Models\ElectiveGroup;
 use App\Modules\Faculty\Models\Department;
 use App\Modules\Grade\Models\CumulativeGpa;
+use App\Modules\Grade\Services\TranscriptService;
 use App\Modules\Student\Models\Student;
 use App\Modules\Student\Models\StudentChangeRequest;
 use App\Modules\Student\Models\StudentContact;
 use App\Modules\Student\Models\StudentCurriculum;
 use App\Modules\Subject\Models\Subject;
+use App\Modules\Subject\Models\SubjectRelation;
 use Database\Seeders\AcademicYearSeeder;
 use Database\Seeders\FacultySeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -131,5 +134,52 @@ class StudentPortalWiringTest extends TestCase
 
         $this->get(route('student.pages.curriculum'))->assertOk()->assertSee('PORTAL101')
             ->assertSee('Học phần từ cơ sở dữ liệu')->assertSee('0 / 3 TC đã đạt')->assertDontSee('Hoàn thành 100%');
+    }
+
+    public function test_curriculum_term_view_groups_subjects_by_planned_term(): void
+    {
+        $curriculum = Curriculum::create([
+            'code' => 'PORTAL-HK', 'name' => 'Chương trình theo học kỳ', 'major_id' => $this->student->major_id,
+            'training_type_id' => $this->student->training_type_id, 'cohort_from' => 2026,
+            'total_credits' => 9, 'standard_terms' => 3, 'status' => 'published',
+        ]);
+        $block = CurriculumBlock::create(['curriculum_id' => $curriculum->id, 'name' => 'Khối kiểm thử', 'block_type' => 'general', 'required_credits' => 9]);
+        $group = ElectiveGroup::create(['curriculum_id' => $curriculum->id, 'curriculum_block_id' => $block->id, 'name' => 'Nhóm kiểm thử', 'min_credits' => 2]);
+        $subjects = collect([
+            ['PORTAL201', 3, 30, 15, 1, null], ['PORTAL202', 2, 30, 0, 1, $group->id], ['PORTAL203', 2, 30, 0, 1, $group->id],
+            ['PORTAL204', 4, 45, 30, 2, null],
+        ])->mapWithKeys(function ($s) use ($curriculum, $block) {
+            $subject = Subject::create([
+                'code' => $s[0], 'name' => 'Học phần '.$s[0], 'department_id' => Department::firstOrFail()->id, 'credits' => $s[1],
+                'theory_credits' => $s[1], 'theory_periods' => $s[2], 'practice_periods' => $s[3], 'knowledge_block' => 'general',
+            ]);
+            CurriculumSubject::create(['curriculum_id' => $curriculum->id, 'curriculum_block_id' => $block->id, 'subject_id' => $subject->id,
+                'planned_term' => $s[4], 'curriculum_elective_group_id' => $s[5]]);
+
+            return [$s[0] => $subject];
+        });
+        SubjectRelation::create(['subject_id' => $subjects['PORTAL204']->id, 'related_subject_id' => $subjects['PORTAL201']->id, 'type' => 'prerequisite']);
+        StudentCurriculum::create(['student_id' => $this->student->id, 'curriculum_id' => $curriculum->id, 'effective_from' => now()->toDateString()]);
+        // Kết quả học tập lấy từ bảng điểm đã công bố; giả lập một học phần đã đạt
+        $this->mock(TranscriptService::class)->shouldReceive('personal')->andReturn(['terms' => [['name' => 'HK1 – 2026-2027', 'rows' => [
+            ['subject_code' => 'PORTAL201', 'subject_name' => 'Học phần PORTAL201', 'credits' => 3, 'is_passed' => true, 'score10' => 8.0, 'letter' => 'B+'],
+        ]]]]);
+
+        // Tổng HK1 = 3 bắt buộc + 2 tối thiểu của nhóm (tính một lần, không cộng từng học phần tự chọn)
+        $this->get(route('student.pages.curriculum'))->assertOk()
+            ->assertSee('Theo học kỳ')->assertSee('✓', false)
+            ->assertSeeInOrder(['Học kỳ 1', '(Tổng: 5 TC)', 'Học phần bắt buộc', 'PORTAL201', 'Học phần tự chọn',
+                'Nhóm tự chọn: Nhóm kiểm thử', 'chọn tối thiểu 2 TC', 'PORTAL202', 'PORTAL203',
+                'Học kỳ 2', '(Tổng: 4 TC)', 'PORTAL204', 'PORTAL201', '(tiên quyết)', 'Học kỳ 3', '(Tổng: 0 TC)'])
+            ->assertSee('3 / 5 TC đã đạt')
+            ->assertSee('không lấy học phần nhóm này thay cho nhóm khác');
+    }
+
+    public function test_curriculum_term_view_without_profile_or_curriculum(): void
+    {
+        // "Học kỳ 1" còn có ở nhãn học kỳ hiện tại trên đầu trang nên kiểm tra khối học kỳ bằng thuộc tính data-term
+        $this->get(route('student.pages.curriculum'))->assertOk()->assertDontSee('data-term=', false);
+        $this->actingAs($this->userWithRoles('STU'))->get(route('student.pages.curriculum'))->assertOk()
+            ->assertSee('Chưa được gán chương trình đào tạo')->assertDontSee('data-term=', false);
     }
 }

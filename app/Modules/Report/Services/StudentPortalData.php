@@ -9,6 +9,8 @@ use App\Modules\Grade\Services\TranscriptService;
 use App\Modules\SchoolClass\Models\AdvisorAssignment;
 use App\Modules\Student\Models\Student;
 use App\Modules\Student\Services\StudentCurriculumService;
+use App\Modules\Subject\Enums\RelationType;
+use App\Modules\Subject\Models\SubjectRelation;
 use Illuminate\Support\Str;
 
 /** Adapts the existing academic services to the student portal's Blade templates. */
@@ -42,6 +44,12 @@ class StudentPortalData
         $currentCredits = $enrollments->unique('subject_id')->sum(fn ($e) => $e->subject?->credits ?? 0);
         $currentPercent = $required > 0 ? min(100 - $percent, round($currentCredits * 100 / $required, 1)) : 0;
         $membership = $profile?->adminClassMembers()->current()->with('adminClass')->first();
+        // Tiên quyết / học trước của mọi học phần trong CTĐT: một truy vấn, tránh N+1
+        $requirements = $curriculum === null ? collect() : SubjectRelation::query()
+            ->whereIn('subject_id', $curriculum->items->pluck('subject_id'))
+            ->whereIn('type', [RelationType::Prerequisite->value, RelationType::Prior->value])
+            ->with('relatedSubject:id,code')->get()->sortBy(fn ($r) => $r->relatedSubject?->code)->groupBy('subject_id')
+            ->map(fn ($relations) => $relations->map(fn ($r) => ['code' => $r->relatedSubject?->code, 'type' => $r->type->label()])->values()->all());
 
         return [
             'profile' => $profile,
@@ -88,7 +96,11 @@ class StudentPortalData
             'curriculumRows' => $curriculum?->items->sortBy('planned_term')->map(fn ($item) => [
                 'block_id' => $item->curriculum_block_id,
                 'code' => $item->subject?->code, 'name' => $item->subject?->name, 'credits' => $item->subject?->credits,
+                'theory_periods' => $item->subject?->theory_periods, 'practice_periods' => $item->subject?->practice_periods,
                 'term' => $item->planned_term, 'type' => $item->isElective() ? 'Tự chọn' : 'Bắt buộc',
+                'group_id' => $item->curriculum_elective_group_id, 'group_name' => $item->electiveGroup?->name,
+                'group_min_credits' => $item->electiveGroup?->min_credits,
+                'requirements' => $requirements->get($item->subject_id, []),
                 'passed' => $passed->has($item->subject?->code),
                 'studying' => $enrollments->contains('subject_id', $item->subject_id),
                 'score' => $results->where('subject_code', $item->subject?->code)->last()['score10'] ?? null,

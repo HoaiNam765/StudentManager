@@ -162,6 +162,9 @@ class RegistrationOfferingWorkflowTest extends TestCase
         $this->getJson($this->endpoint('offerings.index'))->assertOk()->assertJsonCount(0, 'sections');
         $this->assertSame(1, $this->framework->items()->count());
         $this->postJson($this->endpoint('announce'))->assertUnprocessable();
+        // Lớp đã bỏ vẫn giữ lịch sử nên đợt không xóa được; thông báo chỉ cách dùng lại đợt
+        $this->deleteJson(route('admin.registration-periods.destroy', $this->period))
+            ->assertUnprocessable()->assertJsonFragment(['message' => 'Đợt đã có lớp học phần (kể cả lớp đã bỏ khỏi đợt) nên không xóa được, để giữ lịch sử lớp. Dùng lại đợt nháp này: bấm Sửa để đổi tên / thời gian rồi thêm lớp mới.']);
         $this->actingAs($this->acad)->get(route('admin.pages.enrollment'))->assertOk();
     }
 

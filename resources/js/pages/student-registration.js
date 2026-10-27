@@ -119,6 +119,8 @@ export default function studentRegistration(root) {
 
         // Đồng hồ theo giờ máy chủ (BR-ENR-11): lệch giữa máy chủ và trình duyệt tính một lần khi tải
         state.clockOffset = toDate(state.options.server_time) - Date.now();
+        // Nhãn tĩnh của khung đếm ngược: trước giờ mở thì đếm tới giờ mở, không phải hạn đóng
+        deadlineBox.firstElementChild.textContent = period.is_open ? 'Hạn đóng đợt' : 'Mở đăng ký sau';
         if (period.preview_only) { stopCountdown(); deadlineBox.hidden = true; }
         else { startCountdown(toDate(`${period.is_open ? period.closes_at : period.opens_at}:00`)); setText('closes-at', `${period.is_open ? 'Đóng' : 'Mở'} lúc ${formatVn(period.is_open ? period.closes_at : period.opens_at)} (giờ máy chủ)`); }
 

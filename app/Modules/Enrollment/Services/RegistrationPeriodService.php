@@ -126,7 +126,10 @@ class RegistrationPeriodService extends BaseService
 
         $this->transaction(function () use ($period): void {
             if ($period->sections()->exists()) {
-                $this->fail('Đợt đã có kế hoạch lớp học phần.', 'Giữ đợt để lưu lịch sử; xóa từng học phần hoặc điều chỉnh thời gian.');
+                $this->fail(
+                    'Đợt đã có lớp học phần (kể cả lớp đã bỏ khỏi đợt) nên không xóa được, để giữ lịch sử lớp.',
+                    'Dùng lại đợt nháp này: bấm Sửa để đổi tên / thời gian rồi thêm lớp mới.'
+                );
             }
             $period->targets()->delete();
             $period->delete();

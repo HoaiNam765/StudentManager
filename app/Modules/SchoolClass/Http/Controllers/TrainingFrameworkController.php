@@ -3,6 +3,7 @@
 namespace App\Modules\SchoolClass\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Modules\AcademicYear\Models\Term;
 use App\Modules\Auth\Enums\PermissionAction;
 use App\Modules\Auth\Services\AccessControl;
 use App\Modules\SchoolClass\Enums\SectionStatus;
@@ -55,9 +56,31 @@ class TrainingFrameworkController extends Controller
             'cohort_id' => ['required', 'integer', 'exists:cohorts,id'],
             'term_id' => ['required', 'integer', 'exists:terms,id'],
             'note' => ['nullable', 'string', 'max:1000'],
+            'suggest' => ['sometimes', 'boolean'],
         ], [], ['faculty_id' => 'khoa', 'cohort_id' => 'khóa', 'term_id' => 'học kỳ', 'note' => 'ghi chú']);
 
-        return response()->json($this->presentDetail($this->frameworks->create($data)), 201);
+        // Lập khung là lấy luôn học phần của học kỳ thứ n theo CTĐT (sửa / thêm / bớt sau); suggest = false để lập khung trống
+        $framework = $this->frameworks->create($data);
+        $message = ($data['suggest'] ?? true) ? $this->frameworks->suggestFromCurriculum($framework)['message'] : null;
+
+        return response()->json($this->presentDetail($framework->refresh()) + ['message' => $message], 201);
+    }
+
+    /** Chọn học kỳ + khoa: các khóa của khoa, học kỳ thứ mấy của khóa, khung đã lập chưa. */
+    public function cohortOptions(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'term_id' => ['required', 'integer', 'exists:terms,id'],
+            'faculty_id' => ['required', 'integer', 'exists:faculties,id'],
+        ], [], ['term_id' => 'học kỳ', 'faculty_id' => 'khoa']);
+
+        return response()->json(collect($this->frameworks->cohortOptions(Term::query()->findOrFail($data['term_id']), $data['faculty_id']))
+            ->map(fn (array $row) => [
+                'cohort' => $row['cohort']->only('id', 'code', 'start_year'),
+                'planned_term' => $row['planned_term'],
+                'students' => $row['students'],
+                'framework' => $row['framework'] === null ? null : ['id' => $row['framework']->id, 'items_count' => $row['framework']->items_count],
+            ])->values());
     }
 
     public function update(Request $request, TrainingFramework $trainingFramework): JsonResponse

@@ -13,7 +13,7 @@ Mật khẩu mọi tài khoản: `password`. Chạy `php artisan serve`, mở ht
 ## Tổng quan thứ tự
 
 ```
-Lịch học vụ → Chương trình khung (môn theo khoa – khóa – học kỳ) → Tạo đợt đăng ký từ khung (số lớp + giảng viên của khoa)
+(Năm học / học kỳ mới) → Lịch học vụ → Chương trình khung: chọn học kỳ + khoa, bấm khóa (môn tự lấy từ CTĐT) → Tạo đợt đăng ký (số lớp + giảng viên của khoa)
 → Xếp lịch từng lớp (trang Đăng ký học phần) → Thông báo xem trước → Công bố → (đúng giờ / Mở ngay)
 → Sinh viên đăng ký → (hết đợt) Xử lý lớp thiếu sĩ số → Chốt đăng ký → Sinh buổi học, công bố TKB
 → (học kỳ bắt đầu) Đang học → Điểm danh → Nhập điểm → Nộp → Duyệt → Công bố → GPA
@@ -23,6 +23,14 @@ Bước 1–6 làm được ngay hôm nay. Bước 7 chỉ làm được **sau k
 
 ---
 
+## Bước 0 (nếu cần). Tạo năm học / học kỳ mới — `acad.test`
+
+Ví dụ dùng HK2 2026–2027 có sẵn. Muốn một học kỳ hoàn toàn mới (đã chạy thử với HK1 2027–2028):
+
+1. **Năm học & Lịch học vụ** (`/admin/nam-hoc`) → **Tạo / sửa năm học**: tên `2027-2028`, bắt đầu 16/08/2027, kết thúc 13/08/2028 → **Lưu năm học** (không chồng lên năm 2026–2027 kết thúc 14/08/2027).
+2. **Tạo học kỳ**: Năm học `2027-2028`, tên `Học kỳ 1`, loại **Học kỳ chính**, 18 tuần, 06/09/2027 → 09/01/2028 → **Tạo học kỳ** → học kỳ ở trạng thái *Dự kiến*.
+3. Rồi làm từ Bước 1 với học kỳ mới: ở trang Chương trình khung chọn **Học kỳ 1 · 2027-2028** + **CNTT** → hiện **K2026 (học kỳ thứ 3)** và **K2025 (học kỳ thứ 5)**; bấm K2026 → khung có 7 môn học kỳ 3 → **Tạo đợt đăng ký** (giờ đóng mặc định 10 ngày trước ngày học).
+
 ## Bước 1. Lịch học vụ của học kỳ — `acad.test`
 
 **Năm học & Lịch học vụ** (`/admin/nam-hoc`) → mục **Các mốc lịch học vụ** → chọn **Học kỳ 2 · 2026-2027** → **Sao chép lịch** từ **Học kỳ 1 · 2026-2027**. Các mốc tự dời theo ngày bắt đầu học kỳ (mở / đóng đăng ký, bắt đầu học, hạn hủy, hạn rút…). Sửa ngày nào cần rồi **Lưu lịch học vụ**.
@@ -31,9 +39,9 @@ Bước 1–6 làm được ngay hôm nay. Bước 7 chỉ làm được **sau k
 
 ## Bước 2. Chương trình khung — `acad.test`
 
-**Chương trình khung** (`/admin/chuong-trinh-khung`) → **Lập chương trình khung**: Học kỳ 2 · 2026-2027, khoa **CNTT**, khóa **K2025** → **Lập khung**.
+**Chương trình khung** (`/admin/chuong-trinh-khung`) → chọn **Học kỳ 2 · 2026-2027** và khoa **CNTT** → danh sách hiện các khóa của khoa → bấm **Khóa K2025** ("Học kỳ thứ 4 của khóa · 50 sinh viên · Chưa lập").
 
-Bấm **Gợi ý từ CTĐT**. Hệ thống tính HK2 năm 2026–2027 là **học kỳ thứ 4** của khóa 2025 → thêm **11 học phần** có "học kỳ dự kiến = 4" trong CTĐT các ngành của khoa (50 sinh viên):
+Hệ thống lập khung và lấy luôn **11 học phần** có "học kỳ dự kiến = 4" trong CTĐT các ngành của khoa:
 
 | Mã | Học phần | TC |
 |---|---|---|
@@ -45,7 +53,7 @@ Bấm **Gợi ý từ CTĐT**. Hệ thống tính HK2 năm 2026–2027 là **h�
 | LLCT104 | Lịch sử Đảng Cộng sản Việt Nam | 2 |
 | LLCT105 | Tư tưởng Hồ Chí Minh | 2 |
 
-> Lần sau chọn ba ô **Học kỳ – Khoa – Khóa** ở đầu trang là khung tự mở.
+> Lần sau bấm lại khóa đó là mở khung đã lập.
 
 ## Bước 3. Tạo đợt đăng ký từ chương trình khung — `acad.test`
 

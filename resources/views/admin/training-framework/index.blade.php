@@ -8,7 +8,7 @@
     <section class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm p-5 flex flex-col xl:flex-row xl:items-end justify-between gap-4">
         <div>
             <h1 class="text-headline-lg font-bold text-on-surface">Chương trình khung theo khoa – khóa – học kỳ</h1>
-            <p class="mt-1 text-sm text-on-surface-variant">Chọn học kỳ – khoa – khóa để xem môn học của khung, rồi bấm <strong>Tạo đợt đăng ký</strong> để mở lớp và phân công giảng viên của khoa. Lịch học, thông báo xem trước và công bố làm tiếp ở mục Đăng ký học phần.</p>
+            <p class="mt-1 text-sm text-on-surface-variant">Chọn <strong>học kỳ</strong> và <strong>khoa</strong> → danh sách hiện các khóa của khoa; bấm một khóa là có chương trình khung (môn lấy từ CTĐT). Rồi bấm <strong>Tạo đợt đăng ký</strong> để nhập số lớp và giảng viên của khoa. Lịch học, thông báo xem trước và công bố làm tiếp ở mục Đăng ký học phần.</p>
         </div>
         <div class="grid sm:grid-cols-4 gap-2 w-full xl:w-auto items-end">
             <label class="text-xs font-semibold text-on-surface-variant">Học kỳ

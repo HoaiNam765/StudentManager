@@ -45,6 +45,10 @@ export default function adminTrainingFrameworks(root) {
     async function loadList() {
         region('list').replaceChildren(loadingBlock(4));
         showAlert(region('alert'), null);
+        // Chọn học kỳ + khoa (chưa chọn khóa): hiện từng khóa của khoa, bấm vào là mở / lập khung
+        if (filters.term.value && filters.faculty.value && !filters.cohort.value) {
+            return loadCohorts();
+        }
         try {
             const list = rows(await api.get(page.api.list, { term_id: filters.term.value, faculty_id: filters.faculty.value, cohort_id: filters.cohort.value }));
             // Chọn đủ học kỳ – khoa – khóa thì mở luôn khung tương ứng
@@ -57,6 +61,55 @@ export default function adminTrainingFrameworks(root) {
                 : emptyBlock('Chưa có chương trình khung', page.can.create ? 'Bấm "Lập chương trình khung" để bắt đầu.' : 'Thay bộ lọc để xem khung khác.', 'account_tree'));
         } catch (error) {
             region('list').replaceChildren(errorBlock(error, loadList));
+        }
+    }
+
+    async function loadCohorts() {
+        try {
+            const options = await api.get(page.api.cohortOptions, { term_id: filters.term.value, faculty_id: filters.faculty.value });
+            region('list').replaceChildren(options.length
+                ? el('div', { class: 'space-y-2' },
+                    el('p', { class: 'text-xs text-on-surface-variant' }, 'Các khóa đang học của khoa. Bấm một khóa để xem chương trình khung; khóa chưa có khung thì hệ thống lập và lấy môn từ CTĐT.'),
+                    options.map(cohortCard))
+                : emptyBlock('Khoa chưa có sinh viên', 'Chọn khoa khác.', 'groups'));
+        } catch (error) {
+            region('list').replaceChildren(errorBlock(error, loadCohorts));
+        }
+    }
+
+    function cohortCard(option) {
+        const fw = option.framework;
+        const active = fw && state.selectedId === fw.id;
+        const note = option.planned_term ? `Học kỳ thứ ${option.planned_term} của khóa` : 'Học kỳ hè / trước khi khóa nhập học';
+
+        return el('button', {
+            type: 'button',
+            class: `w-full text-left rounded-xl border p-4 transition hover:border-primary/50 hover:bg-surface-container-low ${active ? 'border-primary bg-primary/5' : 'border-outline-variant'}`,
+            onclick: (event) => openCohort(event.currentTarget, option),
+        },
+        el('div', { class: 'flex items-start justify-between gap-2' },
+            el('p', { class: 'font-bold text-on-surface' }, `Khóa ${option.cohort.code}`),
+            el('span', { class: `rounded-full px-2 py-0.5 text-[11px] font-semibold ${fw ? 'bg-emerald-50 text-emerald-800' : 'bg-slate-100 text-slate-700'}` }, fw ? `${fw.items_count} môn` : 'Chưa lập')),
+        el('p', { class: 'text-sm text-on-surface-variant' }, `${note} · ${option.students} sinh viên`));
+    }
+
+    async function openCohort(button, option) {
+        if (option.framework) {
+            state.selectedId = option.framework.id;
+            await loadDetail(option.framework.id);
+            return loadCohorts();
+        }
+        if (!page.can.create) {
+            return showAlert(region('alert'), 'Khóa này chưa có chương trình khung. Phòng Đào tạo lập khung trước.', 'info');
+        }
+        try {
+            const fw = await withBusy(button, () => api.post(page.api.store, { term_id: Number(filters.term.value), faculty_id: Number(filters.faculty.value), cohort_id: option.cohort.id }));
+            state.selectedId = fw.id;
+            region('detail').replaceChildren(renderDetail(fw));
+            toast(fw.items.length ? `Đã lập khung khóa ${option.cohort.code}: ${fw.items.length} môn của học kỳ ${fw.planned_term} theo CTĐT. Bấm "Tạo đợt đăng ký" để nhập số lớp và giảng viên.` : (fw.message ?? 'Đã lập khung; thêm học phần thủ công.'), fw.items.length ? 'success' : 'info');
+            await loadCohorts();
+        } catch (error) {
+            showAlert(region('alert'), error);
         }
     }
 
@@ -151,7 +204,7 @@ export default function adminTrainingFrameworks(root) {
     async function createFramework() {
         const done = await formDialog({
             title: 'Lập chương trình khung',
-            description: 'Mỗi khoa – khóa – học kỳ có một chương trình khung.',
+            description: 'Mỗi khoa – khóa – học kỳ có một chương trình khung; hệ thống lấy luôn các môn của học kỳ đó theo CTĐT.',
             fields: [
                 { name: 'term_id', label: 'Học kỳ', type: 'select', required: true, value: filters.term.value, options: state.terms.map((t) => ({ value: t.id, label: termLabel(t) })) },
                 { name: 'faculty_id', label: 'Khoa', type: 'select', required: true, value: filters.faculty.value, options: state.faculties.map((f) => ({ value: f.id, label: `${f.code} – ${f.name}` })) },
@@ -164,7 +217,7 @@ export default function adminTrainingFrameworks(root) {
 
         if (done) {
             state.selectedId = done.id;
-            toast('Đã lập chương trình khung. Bấm "Gợi ý từ CTĐT" để lấy học phần.', 'success');
+            toast(done.items?.length ? `Đã lập chương trình khung với ${done.items.length} môn theo CTĐT.` : (done.message ?? 'Đã lập chương trình khung; thêm học phần thủ công.'), done.items?.length ? 'success' : 'info');
             await loadList();
             await loadDetail(done.id);
         }

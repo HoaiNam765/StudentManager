@@ -25,7 +25,13 @@ class GradePageController extends Controller
         $student = Student::query()->where('user_id', $user->id)->first();
 
         $terms = Term::query()->orderByDesc('start_date')->get();
-        $selectedTermId = $request->integer('term_id') ?: ($terms->first()?->id ?? null);
+        // Mặc định mở học kỳ gần nhất sinh viên đã có GPA (điểm đã công bố); chưa có thì học kỳ gần nhất đã bắt đầu
+        $today = now(config('studentmanager.display_timezone'))->toDateString();
+        $gradedTermIds = $student === null ? [] : TermGpa::query()->where('student_id', $student->id)->pluck('term_id')->all();
+        $defaultTerm = $terms->first(fn (Term $t) => in_array($t->id, $gradedTermIds, true))
+            ?? $terms->first(fn (Term $t) => $t->start_date->toDateString() <= $today)
+            ?? $terms->first();
+        $selectedTermId = $request->integer('term_id') ?: $defaultTerm?->id;
 
         $termGpa = null;
         $cumulativeGpa = null;

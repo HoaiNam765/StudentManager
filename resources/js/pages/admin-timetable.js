@@ -149,24 +149,27 @@ export default function adminTimetable(root) {
     }
 
     async function publishTimetable(event) {
+        const button = event.currentTarget;
         const ok = await confirmDialog({ title: 'Công bố thời khóa biểu?', message: 'Sau khi công bố, sinh viên và giảng viên mới xem được lịch. Thay đổi tiếp theo phải có lý do.', confirmText: 'Công bố' });
         if (!ok) return;
-        try { await withBusy(event.currentTarget, () => api.post(url(page.api.timetablePublish, termSelect.value), {})); toast('Đã công bố thời khóa biểu.', 'success'); await loadTermStatus(); }
+        try { await withBusy(button, () => api.post(url(page.api.timetablePublish, termSelect.value), {})); toast('Đã công bố thời khóa biểu.', 'success'); await loadTermStatus(); }
         catch (error) { showAlert(region('alert'), error); }
     }
 
     async function lockTimetable(event) {
+        const button = event.currentTarget;
         const ok = await confirmDialog({ title: 'Khóa thời khóa biểu?', message: 'Sau khi khóa không thể thêm, sửa, xóa lịch hoặc dạy bù bằng luồng thông thường.', danger: true, confirmText: 'Khóa' });
         if (!ok) return;
-        try { await withBusy(event.currentTarget, () => api.post(url(page.api.timetableLock, termSelect.value), {})); toast('Đã khóa thời khóa biểu.', 'success'); await loadTermStatus(); }
+        try { await withBusy(button, () => api.post(url(page.api.timetableLock, termSelect.value), {})); toast('Đã khóa thời khóa biểu.', 'success'); await loadTermStatus(); }
         catch (error) { showAlert(region('alert'), error); }
     }
 
     async function generateSessions(event) {
+        const button = event.currentTarget;
         const id = sectionSelect.value; if (!id) return;
         const ok = await confirmDialog({ title: 'Sinh lại các buổi học?', message: 'Backend giữ các buổi đã diễn ra/đã dạy và sinh lại các buổi tương lai theo mẫu lịch, có xét ngày nghỉ.', confirmText: 'Sinh buổi' });
         if (!ok) return;
-        try { await withBusy(event.currentTarget, () => api.post(url(page.api.generateSessions, id), {})); toast('Đã sinh các buổi học.', 'success'); }
+        try { await withBusy(button, () => api.post(url(page.api.generateSessions, id), {})); toast('Đã sinh các buổi học.', 'success'); }
         catch (error) { showAlert(region('alert'), error); }
     }
 

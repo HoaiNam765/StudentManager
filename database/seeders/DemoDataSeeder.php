@@ -53,6 +53,12 @@ class DemoDataSeeder extends Seeder
     /** @var array<int, float> năng lực giả của từng sinh viên (mức điểm trung bình) */
     private array $ability = [];
 
+    /** @var array<int, list<Lecturer>> giảng viên theo bộ môn (0 = toàn trường), xếp theo mã */
+    private array $lecturerPools = [];
+
+    /** @var array<int, int> lượt phân công đã dùng của từng bộ môn */
+    private array $lecturerTurns = [];
+
     public function run(): void
     {
         if (app()->isProduction()) {
@@ -317,14 +323,37 @@ class DemoDataSeeder extends Seeder
             'language' => 'vi',
             'status' => $status,
         ]);
-        $lecturer = Lecturer::query()->where('department_id', $subject->department_id)->working()->inRandomOrder()->first()
-            ?? Lecturer::query()->working()->inRandomOrder()->first();
+        $lecturer = $this->nextLecturer($subject->department_id) ?? $this->nextLecturer(null);
 
         if ($lecturer !== null) {
             SectionInstructor::query()->create(['course_section_id' => $section->id, 'lecturer_id' => $lecturer->id, 'role' => 'main']);
         }
 
         return $section;
+    }
+
+    /**
+     * Giảng viên dạy lớp: chia lần lượt theo mã giảng viên trong bộ môn (null = toàn trường) để dựng lại dữ liệu bao nhiêu
+     * lần cũng cùng phân công (kịch bản demo dựa vào đó); bỏ tài khoản cố vấn dùng thử của DevRoleUsersSeeder.
+     */
+    private function nextLecturer(?int $departmentId): ?Lecturer
+    {
+        $key = $departmentId ?? 0;
+        $this->lecturerPools[$key] ??= Lecturer::query()
+            ->when($departmentId !== null, fn ($q) => $q->where('department_id', $departmentId))
+            ->working()
+            ->where('code', '!=', DevRoleUsersSeeder::ADVISOR_CODE)
+            ->orderBy('code')
+            ->get()
+            ->all();
+
+        if ($this->lecturerPools[$key] === []) {
+            return null;
+        }
+
+        $this->lecturerTurns[$key] = ($this->lecturerTurns[$key] ?? -1) + 1;
+
+        return $this->lecturerPools[$key][$this->lecturerTurns[$key] % count($this->lecturerPools[$key])];
     }
 
     /** @return Collection<int, Enrollment> */

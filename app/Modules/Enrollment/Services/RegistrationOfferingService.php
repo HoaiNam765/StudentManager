@@ -10,11 +10,13 @@ use App\Modules\Room\Models\Room;
 use App\Modules\SchoolClass\Enums\SectionStatus;
 use App\Modules\SchoolClass\Models\CourseSection;
 use App\Modules\SchoolClass\Models\SectionInstructor;
+use App\Modules\SchoolClass\Models\TrainingFramework;
 use App\Modules\SchoolClass\Services\CourseSectionService;
 use App\Modules\Teacher\Models\Lecturer;
 use App\Modules\Timetable\Models\ScheduleRule;
 use App\Modules\Timetable\Services\ScheduleRuleService;
 use App\Modules\Timetable\Services\SectionStartDates;
+use App\Support\Exceptions\BusinessRuleException;
 use App\Support\Services\BaseService;
 
 /** Lớp của từng đợt độc lập với danh mục học phần của chương trình khung. */
@@ -71,6 +73,57 @@ class RegistrationOfferingService extends BaseService
             $this->schedules->create($section, $data['schedule'] + ['reason' => 'Xếp lịch mở học phần']);
 
             return $section->refresh();
+        });
+    }
+
+    /**
+     * Tạo đợt nháp gắn chương trình khung và mở sẵn các lớp (sĩ số, giảng viên chính của khoa) trong một giao dịch, từ
+     * trang Chương trình khung. Lịch học xếp sau ở trang Đăng ký học phần; thiếu lịch thì chưa thông báo / công bố được.
+     * Số lớp dự kiến của từng học phần trong khung cập nhật theo số lớp vừa mở.
+     *
+     * @param  array<string, mixed>  $period  tên, vòng, giờ mở / đóng, khung tín chỉ như khi tạo đợt
+     * @param  list<array{item_id: int, lecturer_id: int, max_size?: ?int}>  $classes
+     */
+    public function createFromFramework(TrainingFramework $framework, array $period, array $classes, bool $confirmOverload = false): RegistrationPeriod
+    {
+        if ($classes === []) {
+            $this->fail('Chưa có lớp nào để mở.', 'Nhập số lớp ít nhất 1 cho một học phần và chọn giảng viên cho từng lớp.');
+        }
+
+        return $this->transaction(function () use ($framework, $period, $classes, $confirmOverload): RegistrationPeriod {
+            $created = app(RegistrationPeriodService::class)->create(
+                $period + ['term_id' => $framework->term_id, 'training_framework_id' => $framework->id, 'targets' => []]
+            );
+            $items = $framework->items()->with('subject')->get()->keyBy('id');
+            $defaultMin = (int) config('studentmanager.course_section.default_min_size', 15);
+            $defaultMax = (int) config('studentmanager.course_section.default_max_size', 60);
+            $counts = [];
+
+            foreach ($classes as $class) {
+                $item = $items->get((int) $class['item_id'])
+                    ?? $this->fail('Học phần không thuộc chương trình khung này.', 'Tải lại trang rồi chọn lại học phần.');
+                $counts[$item->id] = ($counts[$item->id] ?? 0) + 1;
+                $max = (int) ($class['max_size'] ?? $item->max_size ?? $defaultMax);
+
+                try {
+                    $section = $this->sections->open([
+                        'subject_id' => $item->subject_id, 'term_id' => $framework->term_id,
+                        'registration_period_id' => $created->id, 'training_framework_item_id' => $item->id,
+                        'min_size' => min($defaultMin, $max), 'max_size' => $max,
+                        'section_type' => 'theory', 'delivery_mode' => 'in_person',
+                    ]);
+                    // assign kiểm tra giảng viên thuộc khoa của khung (đợt đã gắn khung)
+                    $this->sections->assign($section, Lecturer::query()->findOrFail($class['lecturer_id']), SectionInstructor::MAIN, $confirmOverload);
+                } catch (BusinessRuleException $e) {
+                    $this->fail("{$item->subject->code} – lớp thứ {$counts[$item->id]}: {$e->getMessage()}", $e->hint());
+                }
+            }
+
+            foreach ($counts as $itemId => $count) {
+                $items->get($itemId)->update(['planned_sections' => $count]);
+            }
+
+            return $created->refresh();
         });
     }
 

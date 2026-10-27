@@ -23,12 +23,13 @@ class RoomApiTest extends TestCase
         $this->seed(RoomSeeder::class);
     }
 
-    public function test_seeder_co_20_phong_mau_va_chay_lap_lai_an_toan(): void
+    public function test_seeder_co_50_phong_5_toa_va_chay_lap_lai_an_toan(): void
     {
         $this->seed(RoomSeeder::class);
 
-        $this->assertSame(20, Room::count());
+        $this->assertSame(50, Room::count());
         $this->assertSame(5, RoomType::count());
+        $this->assertSame(['A101', 'A110', 'E101', 'E110'], Room::query()->whereIn('code', ['A101', 'A110', 'E101', 'E110', 'A111', 'A201'])->orderBy('code')->pluck('code')->all());
         $this->assertTrue(Room::all()->every(fn (Room $room) => $room->exam_capacity <= $room->capacity && $room->capacity > 0));
     }
 
@@ -39,12 +40,12 @@ class RoomApiTest extends TestCase
         $lab = RoomType::query()->where('code', RoomType::COMPUTER_LAB)->firstOrFail();
 
         $id = $this->postJson('/admin/rooms', [
-            'building_id' => $building->id, 'room_type_id' => $lab->id, 'code' => 'b104 ',
+            'building_id' => $building->id, 'room_type_id' => $lab->id, 'code' => 'b111 ',
             'floor' => 1, 'capacity' => 40, 'exam_capacity' => 40, 'equipment' => ['40 máy tính'],
-        ])->assertCreated()->assertJsonPath('code', 'B104')->assertJsonPath('status', 'available')->json('id');
+        ])->assertCreated()->assertJsonPath('code', 'B111')->assertJsonPath('status', 'available')->json('id');
 
         $this->postJson('/admin/rooms', [
-            'building_id' => $building->id, 'room_type_id' => $lab->id, 'code' => 'B105', 'capacity' => 40, 'exam_capacity' => 50,
+            'building_id' => $building->id, 'room_type_id' => $lab->id, 'code' => 'B112', 'capacity' => 40, 'exam_capacity' => 50,
         ])->assertStatus(422)->assertJsonPath('message', fn ($m) => str_contains($m, 'Sức chứa thi (50)'));
 
         $this->postJson("/admin/rooms/{$id}/maintenances", ['starts_on' => '2026-10-10', 'ends_on' => '2026-10-15', 'reason' => 'Nâng cấp máy'])->assertCreated();
@@ -63,10 +64,10 @@ class RoomApiTest extends TestCase
     {
         $this->actingAs($this->userWithRoles('STU'));
 
-        $this->getJson('/admin/rooms?min_capacity=100')->assertOk()->assertJsonPath('total', 2);
-        $this->getJson('/admin/rooms?room_type_id='.RoomType::query()->where('code', 'MT')->value('id'))->assertOk()->assertJsonPath('total', 3);
-        $this->getJson('/admin/rooms?q=a40')->assertOk()->assertJsonPath('total', 2);
-        $this->getJson('/admin/campuses')->assertOk()->assertJsonPath('0.buildings_count', 2);
+        $this->getJson('/admin/rooms?min_capacity=100')->assertOk()->assertJsonPath('total', 10);
+        $this->getJson('/admin/rooms?room_type_id='.RoomType::query()->where('code', 'MT')->value('id'))->assertOk()->assertJsonPath('total', 10);
+        $this->getJson('/admin/rooms?q=d10')->assertOk()->assertJsonPath('total', 9);
+        $this->getJson('/admin/campuses')->assertOk()->assertJsonPath('0.buildings_count', 5);
 
         $roomId = Room::query()->value('id');
         $this->postJson('/admin/rooms', [])->assertForbidden();
@@ -81,13 +82,13 @@ class RoomApiTest extends TestCase
     public function test_quan_tri_xoa_phong_chua_dung_va_khong_xoa_toa_nha_con_phong(): void
     {
         $this->actingAs($this->userWithRoles('ADMIN'));
-        $room = Room::query()->where('code', 'B303')->firstOrFail();
+        $room = Room::query()->where('code', 'B110')->firstOrFail();
 
         $this->deleteJson("/admin/rooms/{$room->id}")->assertNoContent();
         $this->deleteJson('/admin/buildings/'.$room->building_id)->assertStatus(422)->assertJsonPath('message', fn ($m) => str_contains($m, 'đã có phòng'));
 
         $this->postJson('/admin/rooms', [
-            'building_id' => $room->building_id, 'room_type_id' => $room->room_type_id, 'code' => 'B303', 'capacity' => 50,
+            'building_id' => $room->building_id, 'room_type_id' => $room->room_type_id, 'code' => 'B110', 'capacity' => 50,
         ])->assertStatus(422)->assertJsonPath('message', fn ($m) => str_contains($m, 'không được cấp lại'));
     }
 }

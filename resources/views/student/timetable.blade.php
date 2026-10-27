@@ -18,6 +18,16 @@
               Xem theo Học kỳ
             </a>
 </div>
+<form method="get" action="{{ route('student.pages.timetable') }}" class="flex items-center gap-2">
+@if (request('view') === 'term')<input type="hidden" name="view" value="term">@endif
+<label for="timetable-term" class="font-label-md text-label-md text-secondary">Học kỳ</label>
+<select id="timetable-term" name="term_id" onchange="this.form.submit()" class="px-3 py-1.5 border border-outline-variant rounded-lg bg-surface-container-lowest text-on-surface font-label-md text-label-md">
+@foreach ($terms as $option)
+<option value="{{ $option['id'] }}" @selected($option['id'] === $schedule['term']['id'])>{{ $option['label'] }}</option>
+@endforeach
+</select>
+<noscript><button type="submit" class="px-3 py-1.5 border border-outline-variant rounded-lg font-label-md text-label-md">Xem</button></noscript>
+</form>
 </div>
 <!-- Center: Week Navigator Controls -->
 <div class="flex items-center gap-2">

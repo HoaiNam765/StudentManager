@@ -146,6 +146,42 @@ class RegistrationOfferingWorkflowTest extends TestCase
         $this->assertDatabaseHas('schedule_rules', ['course_section_id' => $id, 'day_of_week' => 6, 'deleted_at' => null]);
     }
 
+    public function test_open_registration_from_framework_page_with_class_count_and_faculty_lecturers(): void
+    {
+        $item = $this->framework->items()->firstOrFail();
+        $inFaculty = Lecturer::whereHas('department', fn ($q) => $q->where('faculty_id', $this->framework->faculty_id))->orderBy('code')->take(2)->get();
+        $outside = Lecturer::whereHas('department', fn ($q) => $q->where('faculty_id', '!=', $this->framework->faculty_id))->firstOrFail();
+        $options = $this->getJson(route('admin.training-frameworks.lecturer-options', $this->framework))->assertOk()->json();
+        $this->assertTrue(collect($options)->contains('id', $inFaculty[0]->id));
+        $this->assertFalse(collect($options)->contains('id', $outside->id));
+        $this->assertArrayHasKey('load', $options[0]);
+
+        $url = route('admin.training-frameworks.registration-periods.store', $this->framework);
+        $body = ['name' => 'Đợt mở từ khung', 'round' => 'round_2', 'opens_at' => '2026-11-02 08:00', 'closes_at' => '2026-12-20 17:00',
+            'classes' => [['item_id' => $item->id, 'lecturer_id' => $inFaculty[0]->id, 'max_size' => 40], ['item_id' => $item->id, 'lecturer_id' => $outside->id]]];
+        $periods = RegistrationPeriod::count();
+        // Giảng viên ngoài khoa: hoàn tác cả đợt lẫn lớp đã mở trước đó
+        $this->postJson($url, $body)->assertUnprocessable()->assertJsonPath('message', fn ($m) => str_contains($m, 'lớp thứ 2'));
+        $this->assertSame($periods, RegistrationPeriod::count());
+
+        $body['classes'][1]['lecturer_id'] = $inFaculty[1]->id;
+        $created = $this->postJson($url, $body)->assertCreated()->assertJsonPath('sections', 2)->json();
+        $period = RegistrationPeriod::findOrFail($created['id']);
+        $this->assertSame($this->framework->id, $period->training_framework_id);
+        $this->assertSame('draft', $period->status->value);
+        $sections = $period->sections()->with('instructors')->orderBy('code')->get();
+        $this->assertSame([$inFaculty[0]->id, $inFaculty[1]->id], $sections->map(fn ($s) => $s->instructors->first()->lecturer_id)->all());
+        $this->assertSame(40, $sections[0]->max_size);
+        $this->assertSame(2, $item->refresh()->planned_sections);
+
+        // Lịch xếp tiếp ở trang Đăng ký học phần; còn lớp chưa có lịch thì chưa thông báo được
+        $this->period = $period;
+        $this->putJson($this->endpoint('offerings.update', $sections[0]->id), array_replace($this->payload, ['lecturer_id' => $inFaculty[0]->id]))->assertOk();
+        $this->postJson($this->endpoint('announce'))->assertUnprocessable()->assertJsonPath('message', fn ($m) => str_contains($m, $sections[1]->code));
+
+        $this->actingAs($this->studentUser)->postJson($url, $body)->assertForbidden();
+    }
+
     public function test_edit_delete_offerings_does_not_modify_framework_and_forbidden_roles_cannot_write(): void
     {
         $this->actingAs($this->studentUser)->postJson($this->endpoint('offerings.store'), $this->payload)->assertForbidden();

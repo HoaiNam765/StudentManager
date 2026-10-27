@@ -9,8 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
- * Trang chương trình khung theo khoa – khóa – học kỳ: lập danh sách học phần dự kiến, gợi ý từ CTĐT, mở lớp học phần
- * hàng loạt, gửi thông báo cho sinh viên khoa – khóa. Chỉ trả view + URL API; dữ liệu do
+ * Trang chương trình khung theo khoa – khóa – học kỳ: lập danh sách học phần dự kiến, gợi ý từ CTĐT, tạo đợt đăng ký
+ * kèm số lớp và giảng viên của khoa (lịch, thông báo, công bố ở trang Đăng ký học phần). Chỉ trả view + URL API; dữ liệu do
  * resources/js/pages/admin-training-frameworks.js gọi.
  */
 class TrainingFrameworkPageController extends Controller
@@ -37,10 +37,19 @@ class TrainingFrameworkPageController extends Controller
                 'faculties' => route('admin.units.index', ['unitType' => 'faculties']),
                 'cohorts' => route('admin.cohorts.index'),
                 'subjects' => route('admin.subjects.index'),
+                'lecturers' => route('admin.training-frameworks.lecturer-options', $id),
+                'openRegistration' => route('admin.training-frameworks.registration-periods.store', $id),
             ],
-            'links' => ['section' => route('admin.pages.course-sections.show', ['courseSection' => '__ID__'])],
+            'links' => [
+                'section' => route('admin.pages.course-sections.show', ['courseSection' => '__ID__']),
+                'enrollment' => route('admin.pages.enrollment'),
+            ],
             'can' => [
                 'create' => $this->access->allowsGlobally($user, 'CLS', PermissionAction::Create),
+                // Cùng điều kiện với route tạo đợt từ khung
+                'openRegistration' => $this->access->allowsGlobally($user, 'ENR', PermissionAction::Create)
+                    && $this->access->allowsGlobally($user, 'ENR', PermissionAction::Update)
+                    && $this->access->allowsGlobally($user, 'CLS', PermissionAction::Create),
             ],
         ]]);
     }

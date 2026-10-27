@@ -36,25 +36,23 @@ Trước khi vào phòng: đã làm bước 0 (dựng dữ liệu, mở hai trì
 >
 > *(Thêm sinh viên → Nhập học)* Em thêm một thí sinh mới… lưu, hồ sơ ở trạng thái **Chờ nhập học**. Giờ em bấm **Xác nhận nhập học**: chỉ một thao tác, hệ thống **cấp mã số sinh viên** theo quy tắc khóa + mã ngành + số thứ tự, cấp email trường, tạo tài khoản, gán chương trình đào tạo và xếp vào lớp hành chính. Tất cả nằm trong một giao dịch — bước nào lỗi thì hoàn tác hết.
 
-## C. Chương trình khung (2 phút) — `acad.test`
+## C. Chương trình khung → tạo đợt đăng ký (3 phút) — `acad.test`
 
 > Mỗi ngành có **chương trình đào tạo** 8 học kỳ, khoảng 130 tín chỉ, áp dụng theo khóa. Trước mỗi học kỳ, Phòng Đào tạo cần biết **mỗi khoa, mỗi khóa học những môn gì** — đó là **chương trình khung**.
 >
-> Em chọn: học kỳ 2 năm 2026–2027, khoa Công nghệ thông tin, khóa 2026 → lập khung.
+> Em chọn học kỳ 2 năm 2026–2027, khoa Công nghệ thông tin, khóa 2026 → lập khung → **Gợi ý từ chương trình đào tạo**: hệ thống tự tính đây là **học kỳ thứ 2 của khóa 2026** và lấy đúng 9 môn, kèm số lớp dự kiến theo số sinh viên.
 >
-> Bấm **Gợi ý từ chương trình đào tạo**: hệ thống tự tính học kỳ này là **học kỳ thứ 2 của khóa 2026**, lấy đúng 9 môn học kỳ 2 trong chương trình đào tạo các ngành của khoa. Cán bộ thêm, bớt được — điều chỉnh ở đây không làm thay đổi chương trình đào tạo gốc.
+> Từ khung, em bấm **Tạo đợt đăng ký**: mỗi môn nhập **số lớp**, sĩ số, và chọn **giảng viên của khoa** cho từng lớp — danh sách chỉ có giảng viên khoa Công nghệ thông tin, kèm số tiết đã nhận để chia đều. Bấm tạo: hệ thống tạo đợt và mở lớp **trong một giao dịch** — một lớp lỗi thì không tạo gì — rồi chuyển sang trang đăng ký học phần.
 
-## D. Mở lớp trong đợt đăng ký, xem trước, công bố (4 phút) — `acad.test`
+## D. Xếp lịch, xem trước, công bố (3 phút) — `acad.test`
 
-> Có danh sách môn rồi, em sang **Đăng ký học phần**, tạo **đợt đăng ký gắn với chương trình khung** vừa lập: chọn giờ mở, giờ đóng. Ngày đóng phải **trước ngày bắt đầu học** — em thử đặt sau thì hệ thống chặn.
+> Lớp vừa mở ghi "chưa xếp lịch". Em xếp lịch: chọn thứ Hai tiết 1 đến 4 thì thầy Nguyễn Văn An bị khóa vì **trùng lịch** với lớp thầy đang dạy; chọn phòng B101 thì hệ thống báo **trùng phòng**. Chuyển sang thứ Bảy, phòng A101 → lưu.
 >
-> Trong đợt, em thêm lớp từ các môn của khung: chọn lịch học, phòng, rồi **giảng viên**. Danh sách chỉ có giảng viên **thuộc khoa**, và giảng viên nào **trùng lịch** thì bị khóa — như thầy Nguyễn Văn An đang dạy thứ Tư tiết 1 đến 4. Em chọn thứ Hai thì hệ thống báo **trùng phòng** với lớp khác và không tạo lớp. Chuyển sang thứ Bảy → lưu: lớp, giảng viên, lịch được lưu **trong một giao dịch**.
+> Em bấm **Công bố** luôn thì bị chặn: phải **thông báo xem trước** đã — và lớp nào chưa có lịch thì cũng không thông báo được. Em bấm **Thông báo xem trước**: 50 sinh viên khoa Công nghệ thông tin khóa 2026 nhận thông báo.
 >
-> Em bấm **Công bố** luôn thì bị chặn: phải **thông báo xem trước** đã. Em bấm **Thông báo xem trước** — 50 sinh viên khoa Công nghệ thông tin khóa 2026 nhận thông báo.
+> *(Cửa sổ sinh viên)* Sinh viên bấm thông báo là tới đúng đợt: thấy môn, giảng viên, lịch, phòng, **ngày bắt đầu học**, nhưng **chưa đăng ký được**.
 >
-> *(Cửa sổ sinh viên)* Sinh viên bấm thông báo là tới đúng đợt: thấy môn, giảng viên, lịch, **ngày bắt đầu học**, nhưng **chưa đăng ký được**.
->
-> *(Quay lại cán bộ)* Em **Công bố**: đợt chờ đến giờ mở, đúng giờ thì máy chủ tự cho đăng ký, không cần tác vụ hẹn giờ. Em bấm **Mở ngay** để demo — đợt mở sớm, hạn đóng giữ nguyên, sinh viên nhận thêm thông báo.
+> *(Quay lại cán bộ)* Em **Công bố**: đợt chờ đến giờ mở, đúng giờ thì máy chủ tự cho đăng ký. Em bấm **Mở ngay** để demo — đợt mở sớm, hạn đóng giữ nguyên.
 >
 > Em cũng **công bố thời khóa biểu học kỳ 1** — có công bố thì giảng viên mới thấy lịch dạy; sau công bố, đổi lịch phải có lý do và báo trước.
 
@@ -62,7 +60,7 @@ Trước khi vào phòng: đã làm bước 0 (dựng dữ liệu, mở hai trì
 
 > Đổi sang **sinh viên**. Đợt đang mở, có đồng hồ đếm ngược, khung tín chỉ tối thiểu – tối đa. Mỗi lớp ghi rõ lịch, giảng viên, phòng, **ngày bắt đầu học**.
 >
-> Em đăng ký lớp Xác suất thống kê → thành công. Sang **Thời khóa biểu** tuần đầu học kỳ 2: lớp vừa đăng ký **hiện ngay**, ghi "lịch dự kiến". Hủy đăng ký thì lịch mất theo. **Kết quả đăng ký** có phiếu PDF để in.
+> Em đăng ký lớp Xác suất thống kê → thành công. Sang **Thời khóa biểu**, chọn **học kỳ 2**: lớp vừa đăng ký **hiện ngay** kèm phòng, ghi "lịch dự kiến". Hủy đăng ký thì lịch mất theo. **Kết quả đăng ký** có phiếu PDF để in.
 >
 > Lớp không đăng ký được thì ghi lý do và cách khắc phục — ví dụ Kỹ thuật lập trình: **thiếu học phần tiên quyết** Nhập môn lập trình, vì em này đang học môn đó, chưa có điểm. Các quy tắc khác: sai khoa – khóa, lớp hết chỗ, trùng lịch, vượt tín chỉ tối đa, môn đã đạt.
 >

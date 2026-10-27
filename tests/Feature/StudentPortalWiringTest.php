@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Modules\AcademicYear\Models\Term;
 use App\Modules\Curriculum\Models\Curriculum;
 use App\Modules\Curriculum\Models\CurriculumBlock;
 use App\Modules\Curriculum\Models\CurriculumSubject;
@@ -16,6 +17,7 @@ use App\Modules\Student\Models\StudentContact;
 use App\Modules\Student\Models\StudentCurriculum;
 use App\Modules\Subject\Models\Subject;
 use App\Modules\Subject\Models\SubjectRelation;
+use Carbon\CarbonImmutable;
 use Database\Seeders\AcademicYearSeeder;
 use Database\Seeders\FacultySeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -69,6 +71,19 @@ class StudentPortalWiringTest extends TestCase
         $this->get(route('student.pages.timetable', ['date' => '2026-10-22']))->assertOk()
             ->assertSee('chưa công bố')->assertDontSee('241_71ITEC3201_01');
         $this->get(route('student.pages.timetable', ['date' => 'invalid']))->assertSessionHasErrors('date');
+    }
+
+    public function test_timetable_term_selector_opens_first_week_of_chosen_term(): void
+    {
+        $today = now(config('studentmanager.display_timezone'))->toDateString();
+        $other = Term::query()->with('academicYear')->where(fn ($q) => $q->where('start_date', '>', $today)->orWhere('end_date', '<', $today))
+            ->orderBy('start_date')->firstOrFail();
+
+        $this->get(route('student.pages.timetable', ['term_id' => $other->id]))->assertOk()
+            ->assertSee('name="term_id"', false)
+            ->assertSee('value="'.$other->id.'" selected', false)
+            ->assertSee($other->name.' · '.$other->academicYear->name)
+            ->assertSee(CarbonImmutable::parse($other->start_date)->startOfWeek()->format('d/m/Y'));
     }
 
     public function test_profile_form_persists_only_own_validated_fields_and_preserves_masked_address(): void

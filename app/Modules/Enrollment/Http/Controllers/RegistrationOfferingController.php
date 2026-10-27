@@ -3,12 +3,16 @@
 namespace App\Modules\Enrollment\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Enrollment\Enums\RegistrationRound;
 use App\Modules\Enrollment\Models\RegistrationPeriod;
 use App\Modules\Enrollment\Services\OfferingLecturers;
 use App\Modules\Enrollment\Services\RegistrationOfferingService;
 use App\Modules\Room\Models\Room;
 use App\Modules\SchoolClass\Models\CourseSection;
+use App\Modules\SchoolClass\Models\TrainingFramework;
+use App\Modules\SchoolClass\Services\CourseSectionService;
 use App\Modules\Subject\Models\Subject;
+use App\Modules\Teacher\Models\Lecturer;
 use App\Modules\Timetable\Enums\WeekParity;
 use App\Modules\Timetable\Models\ScheduleRule;
 use Illuminate\Http\JsonResponse;
@@ -56,6 +60,49 @@ class RegistrationOfferingController extends Controller
 
             return $lecturer->only('id', 'code', 'full_name') + ['available' => $reason === null, 'reason' => $reason];
         }));
+    }
+
+    /** Giảng viên của khoa trong khung, kèm số tiết đã nhận trong học kỳ để chia lớp (chưa có lịch nên chưa xét trùng). */
+    public function frameworkLecturers(TrainingFramework $trainingFramework, OfferingLecturers $availability, CourseSectionService $sections): JsonResponse
+    {
+        $limit = (int) config('studentmanager.course_section.max_periods_per_term', 400);
+
+        return response()->json($availability->inFaculty($trainingFramework->faculty_id)->orderBy('full_name')->get()
+            ->map(fn (Lecturer $lecturer) => $lecturer->only('id', 'code', 'full_name') + [
+                'load' => $sections->loadInTerm($lecturer, $trainingFramework->term_id), 'limit' => $limit,
+            ]));
+    }
+
+    public function storeFromFramework(Request $request, TrainingFramework $trainingFramework): JsonResponse
+    {
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'round' => ['required', Rule::enum(RegistrationRound::class)],
+            'opens_at' => ['required', 'date_format:Y-m-d H:i'],
+            'closes_at' => ['required', 'date_format:Y-m-d H:i'],
+            'min_credits' => ['nullable', 'integer', 'min:0', 'max:60'],
+            'max_credits' => ['nullable', 'integer', 'min:1', 'max:60'],
+            'classes' => ['required', 'array', 'min:1', 'max:200'],
+            'classes.*.item_id' => ['required', 'integer'],
+            'classes.*.lecturer_id' => ['required', 'integer', 'exists:lecturers,id'],
+            'classes.*.max_size' => ['nullable', 'integer', 'min:1'],
+            'confirm_overload' => ['sometimes', 'boolean'],
+        ], [], [
+            'name' => 'tên đợt', 'round' => 'vòng', 'opens_at' => 'thời gian mở', 'closes_at' => 'thời gian đóng',
+            'min_credits' => 'tín chỉ tối thiểu', 'max_credits' => 'tín chỉ tối đa', 'classes' => 'lớp',
+            'classes.*.lecturer_id' => 'giảng viên', 'classes.*.max_size' => 'sĩ số tối đa',
+        ]);
+        $period = $this->offerings->createFromFramework(
+            $trainingFramework,
+            array_intersect_key($data, array_flip(['name', 'round', 'opens_at', 'closes_at', 'min_credits', 'max_credits'])),
+            $data['classes'],
+            (bool) ($data['confirm_overload'] ?? false),
+        );
+
+        return response()->json([
+            'id' => $period->id, 'term_id' => $period->term_id, 'name' => $period->name,
+            'sections' => $period->sections()->count(),
+        ], 201);
     }
 
     public function store(Request $request, RegistrationPeriod $registrationPeriod): JsonResponse

@@ -40,7 +40,7 @@ Trước khi vào phòng: đã làm bước 0 (dựng dữ liệu, mở hai trì
 
 > Mỗi ngành có **chương trình đào tạo** 8 học kỳ, khoảng 130 tín chỉ, áp dụng theo khóa. Trước mỗi học kỳ, Phòng Đào tạo cần biết **mỗi khoa, mỗi khóa học những môn gì** — đó là **chương trình khung**.
 >
-> Em chọn học kỳ 2 năm 2026–2027, khoa Công nghệ thông tin, khóa 2026 → lập khung → **Gợi ý từ chương trình đào tạo**: hệ thống tự tính đây là **học kỳ thứ 2 của khóa 2026** và lấy đúng 9 môn, kèm số lớp dự kiến theo số sinh viên.
+> Em chọn học kỳ 2 năm 2026–2027 và khoa Công nghệ thông tin: hệ thống hiện các khóa đang học của khoa, mỗi khóa đang ở học kỳ thứ mấy. Em bấm **khóa 2026**: hệ thống tự tính đây là **học kỳ thứ 2 của khóa** và lấy đúng 9 môn từ chương trình đào tạo, kèm số lớp dự kiến theo số sinh viên.
 >
 > Từ khung, em bấm **Tạo đợt đăng ký**: mỗi môn nhập **số lớp**, sĩ số, và chọn **giảng viên của khoa** cho từng lớp — danh sách chỉ có giảng viên khoa Công nghệ thông tin, kèm số tiết đã nhận để chia đều. Bấm tạo: hệ thống tạo đợt và mở lớp **trong một giao dịch** — một lớp lỗi thì không tạo gì — rồi chuyển sang trang đăng ký học phần.
 

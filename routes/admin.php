@@ -510,6 +510,7 @@ Route::middleware('auth')->group(function (): void {
     // toàn trường (ACAD); gửi thông báo cho sinh viên khoa – khóa = NOT.create (phạm vi kiểm tra trong AudienceResolver).
     Route::middleware('permission:CLS.view')->group(function (): void {
         Route::get('training-frameworks', [TrainingFrameworkController::class, 'index'])->name('training-frameworks.index');
+        Route::get('training-frameworks/cohort-options', [TrainingFrameworkController::class, 'cohortOptions'])->name('training-frameworks.cohort-options');
         Route::get('training-frameworks/{trainingFramework}', [TrainingFrameworkController::class, 'show'])->whereNumber('trainingFramework')->name('training-frameworks.show');
     });
     Route::middleware('permission:CLS.create,ALL')->group(function (): void {

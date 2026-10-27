@@ -25,6 +25,7 @@ class TrainingFrameworkPageController extends Controller
         return view('admin.training-framework.index', ['pageData' => [
             'api' => [
                 'list' => route('admin.training-frameworks.index'),
+                'cohortOptions' => route('admin.training-frameworks.cohort-options'),
                 'show' => route('admin.training-frameworks.show', $id),
                 'store' => route('admin.training-frameworks.store'),
                 'update' => route('admin.training-frameworks.update', $id),

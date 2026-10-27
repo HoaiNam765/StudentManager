@@ -171,4 +171,30 @@ class TrainingFrameworkTest extends TestCase
         $this->postJson(route('admin.training-frameworks.store'), $payload)->assertStatus(422);
         $this->get(route('admin.pages.training-frameworks'))->assertOk()->assertSee('admin-training-frameworks');
     }
+
+    public function test_chon_hoc_ky_va_khoa_thay_cac_khoa_lap_khung_tu_lay_mon_tu_ctdt(): void
+    {
+        $facultyId = Major::query()->findOrFail($this->curriculum->major_id)->faculty_id;
+        $k2025 = Cohort::query()->where('start_year', 2025)->firstOrFail();
+        Student::factory()->create(['major_id' => $this->curriculum->major_id, 'cohort' => 2025, 'status' => 'studying']);
+        $this->actingAs($this->acad);
+        $query = ['term_id' => $this->term->id, 'faculty_id' => $facultyId];
+
+        // Khóa có sinh viên hiện ra, chưa có khung
+        $this->getJson(route('admin.training-frameworks.cohort-options', $query))->assertOk()
+            ->assertJsonFragment(['cohort' => $k2025->only('id', 'code', 'start_year'), 'planned_term' => 4, 'students' => 1, 'framework' => null]);
+
+        // Lập khung = lấy luôn môn học kỳ thứ n theo CTĐT
+        $expected = CurriculumSubject::query()->where('planned_term', 2)
+            ->whereIn('curriculum_id', Curriculum::query()->inForce()->forCohort(2026)->whereIn('major_id', Major::query()->where('faculty_id', $facultyId)->select('id'))->select('id'))
+            ->distinct()->count('subject_id');
+        $created = $this->postJson(route('admin.training-frameworks.store'), $query + ['cohort_id' => $this->cohort->id])->assertCreated()->json();
+        $this->assertCount($expected, $created['items']);
+        $this->assertGreaterThan(0, $expected);
+
+        $this->getJson(route('admin.training-frameworks.cohort-options', $query))->assertOk()
+            ->assertJsonFragment(['framework' => ['id' => $created['id'], 'items_count' => $expected]]);
+        // Lập khung trống khi không muốn lấy từ CTĐT
+        $this->postJson(route('admin.training-frameworks.store'), $query + ['cohort_id' => $k2025->id, 'suggest' => false])->assertCreated()->assertJsonCount(0, 'items');
+    }
 }

@@ -293,11 +293,39 @@ class TrainingFrameworkService extends BaseService
     {
         $framework->loadMissing('cohort');
 
+        return $this->studentsOf($framework->faculty_id, $framework->cohort);
+    }
+
+    public function studentsOf(int $facultyId, Cohort $cohort): int
+    {
         return Student::query()
             ->whereIn('status', [StudentStatus::Studying->value, StudentStatus::Suspended->value])
-            ->where('cohort', $framework->cohort->start_year)
-            ->whereIn('major_id', Major::query()->select('id')->where('faculty_id', $framework->faculty_id))
+            ->where('cohort', $cohort->start_year)
+            ->whereIn('major_id', Major::query()->select('id')->where('faculty_id', $facultyId))
             ->count();
+    }
+
+    /**
+     * Các khóa đang có sinh viên của khoa ở học kỳ `$term`, kèm học kỳ thứ mấy của khóa và khung đã lập (nếu có) — để chọn
+     * học kỳ + khoa là thấy ngay khung của từng khóa.
+     *
+     * @return list<array{cohort: Cohort, planned_term: ?int, students: int, framework: ?TrainingFramework}>
+     */
+    public function cohortOptions(Term $term, int $facultyId): array
+    {
+        $frameworks = TrainingFramework::query()->withCount('items')
+            ->where(['term_id' => $term->id, 'faculty_id' => $facultyId])->get()->keyBy('cohort_id');
+        $rows = [];
+
+        foreach (Cohort::query()->orderByDesc('start_year')->get() as $cohort) {
+            $students = $this->studentsOf($facultyId, $cohort);
+
+            if ($students > 0 || $frameworks->has($cohort->id)) {
+                $rows[] = ['cohort' => $cohort, 'planned_term' => $this->cohortTermNumber($cohort, $term), 'students' => $students, 'framework' => $frameworks->get($cohort->id)];
+            }
+        }
+
+        return $rows;
     }
 
     /**

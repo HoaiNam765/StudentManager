@@ -62,9 +62,9 @@ Số liệu trong kịch bản lấy từ bộ dữ liệu mẫu (`demo:seed`), 
 
 Chương trình khung = **danh sách môn** mỗi khoa – khóa học trong một học kỳ. Từ khung, Phòng Đào tạo tạo luôn đợt đăng ký: số lớp mỗi môn và giảng viên của khoa.
 
-1. **Chương trình khung** (`/admin/chuong-trinh-khung`) → **Lập chương trình khung**: Học kỳ 2 · 2026-2027, khoa CNTT, khóa K2026 → **Lập khung**.
-2. Bấm **Gợi ý từ CTĐT**: hệ thống tính HK2 năm 2026–2027 là **học kỳ thứ 2** của khóa 2026, thêm đúng **9 học phần** học kỳ 2 trong CTĐT các ngành của khoa ("Đã thêm 9 học phần của học kỳ 2 theo CTĐT (50 sinh viên)"). Cột **Số lớp dự kiến** = 1 × 60 SV (50 sinh viên).
-3. Lần sau chỉ cần chọn ba ô **Học kỳ – Khoa – Khóa** ở đầu trang: khung tương ứng tự mở.
+1. **Chương trình khung** (`/admin/chuong-trinh-khung`) → ở đầu trang chọn **Học kỳ 2 · 2026-2027** và khoa **CNTT** → danh sách bên trái hiện các khóa của khoa: **K2026** (học kỳ thứ 2, 50 sinh viên, "Chưa lập") và **K2025** (học kỳ thứ 4).
+2. Bấm **Khóa K2026**: hệ thống lập khung và lấy luôn **9 học phần** học kỳ 2 trong CTĐT các ngành của khoa ("Đã lập khung khóa K2026: 9 môn của học kỳ 2 theo CTĐT"). Cột **Số lớp dự kiến** = 1 × 60 SV. Có thể thêm / sửa / xóa môn.
+3. Lần sau bấm lại khóa đó là mở khung đã lập (thẻ ghi "9 môn").
 4. Bấm **Tạo đợt đăng ký**. Hộp thoại có tên đợt (soạn sẵn), vòng, giờ mở / đóng (mặc định ngày mai 08:00 → 10 ngày trước ngày học), và bảng học phần: **Số lớp**, **Sĩ số tối đa**, **giảng viên từng lớp** (chỉ giảng viên khoa CNTT, kèm số tiết đã nhận / định mức):
    - Vòng: **Vòng 2**.
    - Để demo gọn: **Số lớp = 0** cho mọi môn trừ **TOAN103** (1 lớp, giảng viên `GV0001` Nguyễn Văn An) và **TOAN104** (1 lớp, `GV0008` Bùi Văn Khánh). Gõ số lớp 2 thì hiện thêm ô giảng viên lớp 2.

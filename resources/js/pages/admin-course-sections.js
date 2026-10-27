@@ -45,7 +45,7 @@ export default function adminCourseSections(root) {
         region('detail').replaceChildren(emptyBlock('Chọn một lớp để xem chi tiết', '', 'groups'));
         try {
             const [years, subjects, lecturers, rooms] = await Promise.all([
-                api.get(page.api.terms), api.get(page.api.subjects), api.get(page.api.lecturers), api.get(page.api.rooms),
+                api.get(page.api.terms), api.get(page.api.subjects), api.get(page.api.lecturers), page.can.viewRooms ? api.get(page.api.rooms) : { data: [] },
             ]);
             state.terms = (years?.data ?? []).flatMap((year) => (year.terms ?? []).map((term) => ({ ...term, academic_year: year.name })));
             state.subjects = subjects?.data ?? [];

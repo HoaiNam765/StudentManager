@@ -40,6 +40,12 @@ class EnrollmentResultController extends Controller
         return $this->slip($this->access->studentOf($request->user()), $this->term($request));
     }
 
+    /** Học kỳ sinh viên có đăng ký, nhóm theo năm học cùng dạng với GET /admin/academic-years (`data[].terms[]`). */
+    public function mineTerms(Request $request): JsonResponse
+    {
+        return response()->json(['data' => $this->report->terms($this->access->studentOf($request->user()))]);
+    }
+
     public function forStudent(Request $request, Student $student): JsonResponse
     {
         Gate::authorize('view', $student);

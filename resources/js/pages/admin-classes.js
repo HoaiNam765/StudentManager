@@ -43,7 +43,7 @@ export default function adminClasses(root) {
             fillSelect(form.elements.faculty_id, faculties, (f) => f.name);
             fillSelect(form.elements.major_id, majors, (m) => m.name);
             fillSelect(form.elements.cohort_id, state.cohorts, (c) => `${c.code} (${c.start_year})`);
-            state.policySets = rows(await api.get(page.api.policySets, { status: 'published' }).catch(() => []));
+            if (page.can.policySets) state.policySets = rows(await api.get(page.api.policySets, { status: 'published' }).catch(() => []));
         } catch (error) {
             showAlert(region('alert'), error);
         }

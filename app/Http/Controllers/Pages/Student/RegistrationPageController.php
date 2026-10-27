@@ -36,8 +36,8 @@ class RegistrationPageController extends Controller
     public function result(Request $request): View
     {
         return view('student.enrollment.result', ['pageData' => [
-            // Danh sách năm học – học kỳ để chọn học kỳ xem kết quả (ACY.view toàn trường: mọi vai trò có)
-            'api' => $this->api() + ['terms' => route('admin.academic-years.index')],
+            // Học kỳ có đăng ký của sinh viên để chọn học kỳ xem kết quả (sinh viên bị chặn vào /admin/..., #285)
+            'api' => $this->api() + ['terms' => route('student.registration.terms')],
             'links' => ['register' => route('student.pages.registration')],
             'termId' => $request->integer('term_id') ?: null,
             'school' => config('studentmanager.school.name'),

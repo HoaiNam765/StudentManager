@@ -36,39 +36,37 @@ Trước khi vào phòng: đã làm bước 0 (dựng dữ liệu, mở hai trì
 >
 > *(Thêm sinh viên → Nhập học)* Em thêm một thí sinh mới… lưu, hồ sơ ở trạng thái **Chờ nhập học**. Giờ em bấm **Xác nhận nhập học**: chỉ một thao tác, hệ thống **cấp mã số sinh viên** theo quy tắc khóa + mã ngành + số thứ tự, cấp email trường, tạo tài khoản, gán chương trình đào tạo và xếp vào lớp hành chính. Tất cả nằm trong một giao dịch — bước nào lỗi thì hoàn tác hết.
 
-## C. Chương trình khung → mở lớp → thông báo (3 phút) — `acad.test`
+## C. Chương trình khung (2 phút) — `acad.test`
 
-> Trước mỗi học kỳ, Phòng Đào tạo phải biết **mỗi khoa, mỗi khóa học những môn gì** để mở lớp. Nhóm làm chức năng **chương trình khung**.
+> Mỗi ngành có **chương trình đào tạo** 8 học kỳ, khoảng 130 tín chỉ, áp dụng theo khóa. Trước mỗi học kỳ, Phòng Đào tạo cần biết **mỗi khoa, mỗi khóa học những môn gì** — đó là **chương trình khung**.
 >
-> Em chọn: khoa Công nghệ thông tin, khóa 2026, học kỳ 2 năm 2026–2027 → lập khung.
+> Em chọn: học kỳ 2 năm 2026–2027, khoa Công nghệ thông tin, khóa 2026 → lập khung.
 >
-> Bấm **Gợi ý từ chương trình đào tạo**: hệ thống tự tính học kỳ 2 năm nay là **học kỳ thứ 2 của khóa 2026**, rồi lấy đúng 9 học phần của học kỳ đó trong chương trình đào tạo các ngành thuộc khoa, kèm số sinh viên để đề xuất số lớp. Cán bộ vẫn sửa, thêm, bớt được.
->
-> Bấm **Mở lớp**: hệ thống mở hàng loạt 9 lớp học phần. Mỗi lớp vẫn qua đủ kiểm tra như mở tay — học phần phải thuộc chương trình đào tạo đang áp dụng, có đề cương được duyệt, sĩ số hợp lệ. Bấm lại thì không mở trùng.
->
-> Cuối cùng **Soạn và gửi thông báo**: nội dung soạn sẵn danh sách môn, mã lớp, ngày bắt đầu học kỳ, thời gian đăng ký; gửi đúng sinh viên **thuộc cả khoa đó và khóa đó**.
+> Bấm **Gợi ý từ chương trình đào tạo**: hệ thống tự tính học kỳ này là **học kỳ thứ 2 của khóa 2026**, lấy đúng 9 môn học kỳ 2 trong chương trình đào tạo các ngành của khoa. Cán bộ thêm, bớt được — điều chỉnh ở đây không làm thay đổi chương trình đào tạo gốc.
 
-## D. Xếp lớp và thời khóa biểu (3 phút) — `acad.test`
+## D. Mở lớp trong đợt đăng ký, xem trước, công bố (4 phút) — `acad.test`
 
-> Lớp mới mở đang ở trạng thái **Dự kiến**. Em mở lớp Xác suất thống kê và **phân công giảng viên chính** — vượt định mức số tiết thì hệ thống cảnh báo.
+> Có danh sách môn rồi, em sang **Đăng ký học phần**, tạo **đợt đăng ký gắn với chương trình khung** vừa lập: chọn giờ mở, giờ đóng. Ngày đóng phải **trước ngày bắt đầu học** — em thử đặt sau thì hệ thống chặn.
 >
-> Sang **Xếp thời khóa biểu**: chọn thứ Bảy, tiết 1 đến 3, phòng A101, tuần 1 đến 15 → lưu → **Kiểm tra xung đột**: hệ thống kiểm tra trùng phòng, trùng giảng viên, phòng thiếu chỗ, sai loại phòng. Không có xung đột → **Sinh buổi học**: tạo 15 buổi cụ thể, tự bỏ ngày nghỉ lễ.
+> Trong đợt, em thêm lớp từ các môn của khung: chọn lịch học, phòng, rồi **giảng viên**. Danh sách chỉ có giảng viên **thuộc khoa**, và giảng viên nào **trùng lịch** thì bị khóa — như thầy Nguyễn Văn An đang dạy thứ Tư tiết 1 đến 4. Em chọn thứ Hai thì hệ thống báo **trùng phòng** với lớp khác và không tạo lớp. Chuyển sang thứ Bảy → lưu: lớp, giảng viên, lịch được lưu **trong một giao dịch**.
 >
-> Quay lại lớp, chuyển sang **Mở đăng ký**. Lớp chưa có giảng viên chính, hoặc học trực tiếp mà chưa xếp lịch, thì hệ thống không cho mở — để sinh viên luôn thấy giờ học và ngày bắt đầu học.
+> Em bấm **Công bố** luôn thì bị chặn: phải **thông báo xem trước** đã. Em bấm **Thông báo xem trước** — 50 sinh viên khoa Công nghệ thông tin khóa 2026 nhận thông báo.
+>
+> *(Cửa sổ sinh viên)* Sinh viên bấm thông báo là tới đúng đợt: thấy môn, giảng viên, lịch, **ngày bắt đầu học**, nhưng **chưa đăng ký được**.
+>
+> *(Quay lại cán bộ)* Em **Công bố**: đợt chờ đến giờ mở, đúng giờ thì máy chủ tự cho đăng ký, không cần tác vụ hẹn giờ. Em bấm **Mở ngay** để demo — đợt mở sớm, hạn đóng giữ nguyên, sinh viên nhận thêm thông báo.
 >
 > Em cũng **công bố thời khóa biểu học kỳ 1** — có công bố thì giảng viên mới thấy lịch dạy; sau công bố, đổi lịch phải có lý do và báo trước.
 
 ## E. Sinh viên đăng ký học phần (3 phút) — `2601030001`
 
-> Bây giờ em đổi sang **sinh viên** ở trình duyệt bên cạnh.
+> Đổi sang **sinh viên**. Đợt đang mở, có đồng hồ đếm ngược, khung tín chỉ tối thiểu – tối đa. Mỗi lớp ghi rõ lịch, giảng viên, phòng, **ngày bắt đầu học**.
 >
-> Chuông thông báo có ngay thông báo mở lớp Phòng Đào tạo vừa gửi.
+> Em đăng ký lớp Xác suất thống kê → thành công. Sang **Thời khóa biểu** tuần đầu học kỳ 2: lớp vừa đăng ký **hiện ngay**, ghi "lịch dự kiến". Hủy đăng ký thì lịch mất theo. **Kết quả đăng ký** có phiếu PDF để in.
 >
-> Vào **Đăng ký học phần**: đợt đăng ký học kỳ 2 đang mở, có đồng hồ đếm ngược, khung tín chỉ tối thiểu – tối đa. Mỗi lớp ghi rõ lịch học, giảng viên, phòng, **ngày bắt đầu học**.
+> Lớp không đăng ký được thì ghi lý do và cách khắc phục — ví dụ Kỹ thuật lập trình: **thiếu học phần tiên quyết** Nhập môn lập trình, vì em này đang học môn đó, chưa có điểm. Các quy tắc khác: sai khoa – khóa, lớp hết chỗ, trùng lịch, vượt tín chỉ tối đa, môn đã đạt.
 >
-> Lớp không đăng ký được thì ghi lý do cụ thể và cách khắc phục — ví dụ lớp Kỹ thuật lập trình: **thiếu học phần tiên quyết** Nhập môn lập trình, vì em này đang học môn đó, chưa đạt. Các quy tắc khác: lớp hết chỗ, trùng lịch, vượt tín chỉ tối đa, và ngày học phải sau ngày đóng đăng ký.
->
-> Em đăng ký lớp Xác suất thống kê → thành công. Sang **Kết quả đăng ký**: có phiếu đăng ký PDF để in. Sang **Thời khóa biểu** tuần đầu học kỳ 2: lớp vừa đăng ký **hiện ngay**, có ghi "lịch dự kiến". Nếu hủy đăng ký thì lịch mất theo.
+> Sinh viên cũng xem được **chương trình đào tạo theo học kỳ**: 8 học kỳ, tổng tín chỉ từng kỳ, môn bắt buộc, nhóm tự chọn, môn nào đã đạt.
 >
 > Một điểm kỹ thuật: khi nhiều sinh viên cùng tranh **chỗ cuối cùng**, hệ thống khóa dòng dữ liệu nên chỉ đúng một người đăng ký được — nhóm đã thử 12 tiến trình chạy song song.
 
@@ -90,7 +88,7 @@ Trước khi vào phòng: đã làm bước 0 (dựng dữ liệu, mở hai trì
 
 ## G. Sinh viên xem kết quả học tập (2 phút) — `2501010010`
 
-> Đây là một sinh viên khóa 2025 đã học hai học kỳ. **Kết quả học tập**: điểm từng môn, **GPA học kỳ**, **GPA tích lũy 3,94 — Xuất sắc**. GPA tự tính lại mỗi khi điểm được công bố, học lại thì lấy điểm cao nhất theo quy chế.
+> Đây là một sinh viên khóa 2025 đã học hai học kỳ. **Kết quả học tập**: điểm từng môn, **GPA học kỳ**, **GPA tích lũy 3,82 — Xuất sắc**. GPA tự tính lại mỗi khi điểm được công bố, học lại thì lấy điểm cao nhất theo quy chế.
 >
 > Ngoài ra sinh viên xem được **chuyên cần**, **tiến độ chương trình đào tạo**, và **tự cập nhật hồ sơ** — thông tin liên hệ thì sửa ngay; còn họ tên, ngày sinh, CCCD thì phải gửi yêu cầu kèm minh chứng để cán bộ duyệt.
 
@@ -106,7 +104,7 @@ Trước khi vào phòng: đã làm bước 0 (dựng dữ liệu, mở hai trì
 
 ## Kết thúc (1 phút)
 
-> Tóm lại, ở giai đoạn P1 nhóm đã làm xong vòng đời một học kỳ: **lập kế hoạch mở lớp → xếp lịch → đăng ký học phần → điểm danh → nhập, duyệt, công bố điểm → GPA**, với phân quyền theo vai trò và phạm vi dữ liệu, nhật ký kiểm toán, thông báo theo sự kiện.
+> Tóm lại, ở giai đoạn P1 nhóm đã làm xong vòng đời một học kỳ: **chương trình khung → mở lớp, xếp lịch trong đợt đăng ký → đăng ký học phần → điểm danh → nhập, duyệt, công bố điểm → GPA**, với phân quyền theo vai trò và phạm vi dữ liệu, nhật ký kiểm toán, thông báo theo sự kiện.
 >
 > Các phần như học phí, lịch thi, khảo sát, học bổng thuộc giai đoạn P2–P4; hiện mới có bản thiết kế giao diện, nhóm sẽ làm tiếp.
 >

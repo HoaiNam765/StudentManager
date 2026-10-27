@@ -367,6 +367,7 @@
 @endforeach
 </tbody>
 @endforeach
+<tbody data-term-empty hidden><tr><td colspan="10" class="py-4 px-4 text-center text-secondary">Không có học phần nào trong học kỳ này khớp bộ lọc.</td></tr></tbody>
 </table>
 @endif
 </div>
@@ -402,6 +403,11 @@ function filterCurriculum() {
  document.querySelectorAll('[data-term-section]').forEach(body => {
   body.querySelector('[data-section-head]').hidden = !body.querySelector('[data-curriculum-row]:not([hidden])');
   body.querySelectorAll('[data-group-head]').forEach(head => head.hidden = !body.querySelector('[data-curriculum-row][data-group="' + head.dataset.group + '"]:not([hidden])'));
+ });
+ // Học kỳ không còn dòng nào khớp: báo thay vì để bảng trống
+ document.querySelectorAll('.curriculum-term-table').forEach(table => {
+  const empty = table.querySelector('[data-term-empty]');
+  if (empty) empty.hidden = !!table.querySelector('[data-curriculum-row]:not([hidden])');
  });
 }
 function setCurriculumView(view) {

@@ -9,7 +9,9 @@ use App\Modules\Room\Models\RoomType;
 use Illuminate\Database\Seeder;
 
 /**
- * Dữ liệu mẫu phòng học (docs/BA.md mục 11.2: 20 phòng). Chỉ là dữ liệu giả; chạy lặp lại an toàn theo mã.
+ * Dữ liệu mẫu phòng học: 5 tòa nhà A–E, mỗi tòa 10 phòng tầng 1 (A101–A110 … E101–E110). Tòa A, B: phòng lý thuyết;
+ * C: phòng máy tính; D: phòng thí nghiệm (D101–D105) và phòng thi (D106–D110); E: hội trường (E101, E102) và giảng
+ * đường lớn. Chỉ là dữ liệu giả; chạy lặp lại an toàn theo mã.
  */
 class RoomSeeder extends Seeder
 {
@@ -22,29 +24,8 @@ class RoomSeeder extends Seeder
         RoomType::EXAM => 'Phòng thi',
     ];
 
-    /** [mã tòa nhà, mã phòng, loại, tầng, sức chứa học, sức chứa thi, thiết bị] */
-    private const ROOMS = [
-        ['A', 'A101', 'LT', 1, 60, 30, ['Máy chiếu', 'Loa']],
-        ['A', 'A102', 'LT', 1, 60, 30, ['Máy chiếu', 'Loa']],
-        ['A', 'A103', 'LT', 1, 60, 30, ['Máy chiếu']],
-        ['A', 'A104', 'LT', 1, 60, 30, ['Máy chiếu']],
-        ['A', 'A201', 'LT', 2, 80, 40, ['Máy chiếu', 'Loa', 'Điều hòa']],
-        ['A', 'A202', 'LT', 2, 80, 40, ['Máy chiếu', 'Loa', 'Điều hòa']],
-        ['A', 'A203', 'LT', 2, 80, 40, ['Máy chiếu', 'Điều hòa']],
-        ['A', 'A204', 'LT', 2, 80, 40, ['Máy chiếu', 'Điều hòa']],
-        ['A', 'A301', 'HT', 3, 200, 100, ['Máy chiếu', 'Âm thanh hội trường', 'Điều hòa']],
-        ['A', 'A302', 'HT', 3, 150, 75, ['Máy chiếu', 'Âm thanh hội trường', 'Điều hòa']],
-        ['A', 'A401', 'PT', 4, 40, 40, ['Camera giám sát']],
-        ['A', 'A402', 'PT', 4, 40, 40, ['Camera giám sát']],
-        ['B', 'B101', 'MT', 1, 45, 45, ['45 máy tính', 'Máy chiếu', 'Điều hòa']],
-        ['B', 'B102', 'MT', 1, 45, 45, ['45 máy tính', 'Máy chiếu', 'Điều hòa']],
-        ['B', 'B103', 'MT', 1, 40, 40, ['40 máy tính', 'Máy chiếu', 'Điều hòa']],
-        ['B', 'B201', 'TN', 2, 30, 0, ['Bàn thí nghiệm', 'Tủ hút']],
-        ['B', 'B202', 'TN', 2, 30, 0, ['Bàn thí nghiệm']],
-        ['B', 'B301', 'LT', 3, 50, 25, ['Máy chiếu']],
-        ['B', 'B302', 'LT', 3, 50, 25, ['Máy chiếu']],
-        ['B', 'B303', 'LT', 3, 50, 25, ['Máy chiếu']],
-    ];
+    /** Mã tòa nhà => tên. */
+    public const BUILDINGS = ['A' => 'Tòa nhà A', 'B' => 'Tòa nhà B', 'C' => 'Tòa nhà C', 'D' => 'Tòa nhà D', 'E' => 'Tòa nhà E'];
 
     public function run(): void
     {
@@ -56,21 +37,36 @@ class RoomSeeder extends Seeder
 
         $campus = Campus::firstOrCreate(['code' => 'CS1'], ['name' => 'Cơ sở chính', 'address' => 'Địa chỉ mẫu']);
 
-        $buildings = [
-            'A' => Building::firstOrCreate(['code' => 'A'], ['campus_id' => $campus->id, 'name' => 'Tòa nhà A', 'floors' => 5]),
-            'B' => Building::firstOrCreate(['code' => 'B'], ['campus_id' => $campus->id, 'name' => 'Tòa nhà B', 'floors' => 4]),
-        ];
+        foreach (self::BUILDINGS as $code => $name) {
+            $building = Building::firstOrCreate(['code' => $code], ['campus_id' => $campus->id, 'name' => $name, 'floors' => 5]);
 
-        foreach (self::ROOMS as [$building, $code, $type, $floor, $capacity, $examCapacity, $equipment]) {
-            Room::firstOrCreate(['code' => $code], [
-                'building_id' => $buildings[$building]->id,
-                'room_type_id' => $types[$type]->id,
-                'name' => "Phòng {$code}",
-                'floor' => $floor,
-                'capacity' => $capacity,
-                'exam_capacity' => $examCapacity,
-                'equipment' => $equipment,
-            ]);
+            foreach (range(1, 10) as $number) {
+                $roomCode = sprintf('%s1%02d', $code, $number);
+                [$type, $capacity, $examCapacity, $equipment] = self::profile($code, $number);
+                Room::firstOrCreate(['code' => $roomCode], [
+                    'building_id' => $building->id,
+                    'room_type_id' => $types[$type]->id,
+                    'name' => "Phòng {$roomCode}",
+                    'floor' => 1,
+                    'capacity' => $capacity,
+                    'exam_capacity' => $examCapacity,
+                    'equipment' => $equipment,
+                ]);
+            }
         }
+    }
+
+    /** @return array{0: string, 1: int, 2: int, 3: list<string>} [loại, sức chứa học, sức chứa thi, thiết bị] */
+    public static function profile(string $building, int $number): array
+    {
+        return match (true) {
+            $building === 'A' => [RoomType::LECTURE, 80, 40, ['Máy chiếu', 'Loa', 'Điều hòa']],
+            $building === 'B' => [RoomType::LECTURE, 60, 30, ['Máy chiếu', 'Loa']],
+            $building === 'C' => [RoomType::COMPUTER_LAB, 45, 45, ['45 máy tính', 'Máy chiếu', 'Điều hòa']],
+            $building === 'D' && $number <= 5 => [RoomType::LABORATORY, 30, 0, ['Bàn thí nghiệm', 'Tủ hút']],
+            $building === 'D' => [RoomType::EXAM, 40, 40, ['Camera giám sát']],
+            $number <= 2 => [RoomType::HALL, $number === 1 ? 200 : 150, $number === 1 ? 100 : 75, ['Máy chiếu', 'Âm thanh hội trường', 'Điều hòa']],
+            default => [RoomType::LECTURE, 120, 60, ['Máy chiếu', 'Âm thanh', 'Điều hòa']],
+        };
     }
 }

@@ -3,8 +3,8 @@ import { confirmDialog, el, emptyBlock, errorBlock, icon, loadingBlock, pageData
 import { dmy, fillSelect, formDialog, formJson, listAll, rows, tpl } from '../lookups.js';
 
 /**
- * Chương trình khung theo khoa – khóa – học kỳ: danh sách khung, chi tiết học phần và gợi ý từ CTĐT.
- * Việc mở lớp / công bố được thực hiện ở trang Đăng ký học phần.
+ * Chương trình khung theo khoa – khóa – học kỳ: danh sách khung, chi tiết học phần, gợi ý từ CTĐT và tạo đợt đăng ký
+ * kèm số lớp + giảng viên của khoa. Lịch học, thông báo xem trước và công bố làm tiếp ở trang Đăng ký học phần.
  */
 export default function adminTrainingFrameworks(root) {
     const page = pageData();
@@ -47,6 +47,11 @@ export default function adminTrainingFrameworks(root) {
         showAlert(region('alert'), null);
         try {
             const list = rows(await api.get(page.api.list, { term_id: filters.term.value, faculty_id: filters.faculty.value, cohort_id: filters.cohort.value }));
+            // Chọn đủ học kỳ – khoa – khóa thì mở luôn khung tương ứng
+            if (list.length === 1 && Object.values(filters).every((f) => f.value) && state.selectedId !== list[0].id) {
+                state.selectedId = list[0].id;
+                loadDetail(list[0].id);
+            }
             region('list').replaceChildren(list.length
                 ? el('div', { class: 'space-y-2' }, list.map(card))
                 : emptyBlock('Chưa có chương trình khung', page.can.create ? 'Bấm "Lập chương trình khung" để bắt đầu.' : 'Thay bộ lọc để xem khung khác.', 'account_tree'));
@@ -96,6 +101,7 @@ export default function adminTrainingFrameworks(root) {
             );
         }
         if (page.can.create) { actions.append(button('Sửa ghi chú', 'edit', editFramework)); actions.append(button('Xóa khung', 'delete', removeFramework)); }
+        if (page.can.openRegistration && fw.items.length) actions.prepend(button('Tạo đợt đăng ký', 'event_available', openRegistration, true));
 
         return el('div', { class: 'space-y-5' },
             el('div', {},
@@ -128,11 +134,15 @@ export default function adminTrainingFrameworks(root) {
         return el('div', { class: 'overflow-x-auto rounded-lg border border-outline-variant' },
             el('table', { class: 'w-full min-w-[760px] text-sm' },
                 el('caption', { class: 'sr-only' }, 'Học phần trong chương trình khung'),
-                el('thead', { class: 'bg-surface-container-low' }, el('tr', {}, th('Học phần'), th('TC', 'text-center'), th('Loại'), page.can.create ? th('') : null)),
+                el('thead', { class: 'bg-surface-container-low' }, el('tr', {}, th('Học phần'), th('TC', 'text-center'), th('Loại'), th('Số lớp dự kiến', 'text-center'), th('Lớp đã mở'), page.can.create ? th('') : null)),
                 el('tbody', {}, fw.items.map((item) => el('tr', { class: 'border-t border-outline-variant align-top' },
                     el('td', { class: 'px-3 py-2' }, el('p', { class: 'font-semibold' }, item.subject.name), el('p', { class: 'text-xs text-secondary' }, item.subject.code), item.note ? el('p', { class: 'text-xs text-on-surface-variant' }, item.note) : null),
                     el('td', { class: 'px-3 py-2 text-center' }, item.subject.credits),
                     el('td', { class: 'px-3 py-2' }, item.compulsory ? 'Bắt buộc' : 'Tự chọn'),
+                    el('td', { class: 'px-3 py-2 text-center' }, `${item.planned_sections} × ${item.max_size ?? item.default_max_size} SV`),
+                    el('td', { class: 'px-3 py-2 text-xs' }, item.sections.length
+                        ? item.sections.map((s) => el('p', { class: s.status === 'cancelled' ? 'line-through text-on-surface-variant' : '' }, `${s.code} · ${s.status_label}`))
+                        : el('span', { class: 'text-on-surface-variant' }, 'Chưa mở')),
                     page.can.create ? el('td', { class: 'px-3 py-2 whitespace-nowrap text-right' },
                         el('button', { type: 'button', class: 'text-primary text-xs font-semibold hover:underline mr-3', onclick: () => editItem(fw, item) }, 'Sửa'),
                         el('button', { type: 'button', class: 'text-error text-xs font-semibold hover:underline', onclick: () => removeItem(fw, item, alert) }, 'Xóa')) : null)))));
@@ -199,6 +209,8 @@ export default function adminTrainingFrameworks(root) {
         const done = await formDialog({
             title: `Sửa ${item.subject.code} – ${item.subject.name}`,
             fields: [
+                { name: 'planned_sections', label: 'Số lớp dự kiến', type: 'number', required: true, value: item.planned_sections, min: 1 },
+                { name: 'max_size', label: 'Sĩ số tối đa mỗi lớp', type: 'number', value: item.max_size ?? '', placeholder: `Mặc định ${item.default_max_size}`, min: 1 },
                 { name: 'compulsory', label: 'Học phần bắt buộc', type: 'checkbox', value: item.compulsory },
                 { name: 'note', label: 'Ghi chú', type: 'textarea', full: true, value: item.note ?? '' },
             ],
@@ -217,6 +229,105 @@ export default function adminTrainingFrameworks(root) {
         } catch (error) {
             showAlert(alert, error);
         }
+    }
+
+    /**
+     * Tạo đợt đăng ký từ khung: thông tin đợt + mỗi học phần số lớp, sĩ số, giảng viên từng lớp (giảng viên của khoa,
+     * kèm số tiết đã nhận trong học kỳ). Lịch học xếp tiếp ở trang Đăng ký học phần.
+     */
+    async function openRegistration(event, fw, alert) {
+        const button = event.currentTarget;
+        let lecturers;
+        try { lecturers = await withBusy(button, () => api.get(tpl(page.api.lecturers, fw.id))); }
+        catch (error) { showAlert(alert, error); return; }
+        if (!lecturers.length) { showAlert(alert, 'Khoa chưa có giảng viên đang công tác để phân công.', 'warning'); return; }
+
+        const inputClass = 'mt-1 w-full rounded-lg border border-outline-variant bg-white px-3 py-2 text-sm';
+        const smallInput = 'w-20 rounded-lg border border-outline-variant bg-white px-2 py-1.5 text-sm';
+        const lecturerLabel = (l) => `${l.full_name} (${l.code}) — ${l.load}/${l.limit} tiết`;
+        // Ngày theo giờ máy người dùng (toISOString đổi sang UTC sẽ lệch một ngày)
+        const ymd = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        const tomorrow = ymd(new Date(Date.now() + 86_400_000));
+        const start = fw.term?.start_date ? new Date(`${fw.term.start_date}T00:00:00`) : null;
+        const closeDay = start ? ymd(new Date(start.getTime() - 10 * 86_400_000)) : '';
+        const field = (label, control) => el('label', { class: 'text-sm' }, label, control);
+        const name = el('input', { name: 'name', required: true, class: inputClass, value: `Đăng ký ${fw.term?.name ?? ''} ${fw.term?.academic_year ?? ''} — ${fw.faculty?.code ?? ''} ${fw.cohort?.code ?? ''}`.replace(/\s+/g, ' ').trim() });
+        const round = el('select', { name: 'round', class: inputClass },
+            [['round_1', 'Vòng 1'], ['round_2', 'Vòng 2'], ['supplementary', 'Bổ sung']].map(([v, l]) => el('option', { value: v }, l)));
+        const opens = el('input', { type: 'datetime-local', required: true, class: inputClass, value: `${tomorrow}T08:00` });
+        const closes = el('input', { type: 'datetime-local', required: true, class: inputClass, value: closeDay ? `${closeDay}T23:00` : '' });
+        const minCredits = el('input', { type: 'number', min: 0, class: inputClass });
+        const maxCredits = el('input', { type: 'number', min: 1, class: inputClass });
+        const overload = el('input', { type: 'checkbox', class: 'mr-2' });
+
+        // Mỗi học phần: số lớp → bấy nhiêu ô chọn giảng viên (chia vòng tròn theo số tiết đang nhận, ít trước)
+        const byLoad = [...lecturers].sort((a, b) => a.load - b.load);
+        let turn = 0;
+        const rowsOf = fw.items.map((item) => {
+            const count = el('input', { type: 'number', min: 0, max: 20, value: item.planned_sections, class: smallInput, 'aria-label': `Số lớp ${item.subject.code}` });
+            const size = el('input', { type: 'number', min: 1, value: item.max_size ?? item.default_max_size, class: smallInput, 'aria-label': `Sĩ số ${item.subject.code}` });
+            const picks = el('div', { class: 'space-y-1' });
+            const render = () => {
+                const keep = [...picks.querySelectorAll('select')].map((s) => s.value);
+                picks.replaceChildren(...Array.from({ length: Math.max(0, Number(count.value) || 0) }, (_, i) => {
+                    const chosen = keep[i] ?? String(byLoad[turn++ % byLoad.length].id);
+                    return el('select', { class: 'w-full rounded-lg border border-outline-variant bg-white px-2 py-1.5 text-sm', 'aria-label': `Giảng viên lớp ${i + 1} ${item.subject.code}` },
+                        lecturers.map((l) => el('option', { value: l.id, selected: String(l.id) === chosen }, `Lớp ${i + 1}: ${lecturerLabel(l)}`)));
+                }));
+                if (!picks.children.length) picks.append(el('span', { class: 'text-xs text-on-surface-variant' }, 'Không mở lớp'));
+            };
+            count.addEventListener('input', render);
+            render();
+
+            return { item, count, size, picks, row: el('tr', { class: 'border-t border-outline-variant align-top' },
+                el('td', { class: 'px-2 py-2' }, el('p', { class: 'font-semibold' }, item.subject.code), el('p', { class: 'text-xs text-on-surface-variant' }, `${item.subject.name} · ${item.subject.credits} TC`)),
+                el('td', { class: 'px-2 py-2' }, count), el('td', { class: 'px-2 py-2' }, size), el('td', { class: 'px-2 py-2 min-w-[260px]' }, picks)) };
+        });
+
+        const message = el('div', { hidden: true });
+        const save = el('button', { type: 'submit', class: 'rounded-lg bg-primary text-white px-4 py-2 text-sm font-semibold' }, 'Tạo đợt và mở lớp');
+        const th = (text) => el('th', { scope: 'col', class: 'px-2 py-2 text-left text-xs font-semibold text-on-surface-variant' }, text);
+        const form = el('form', { class: 'space-y-4' },
+            el('h3', { class: 'font-bold text-base' }, `Tạo đợt đăng ký — ${fw.faculty?.name ?? ''} · Khóa ${fw.cohort?.code ?? ''}`),
+            el('p', { class: 'text-xs text-on-surface-variant' }, `${fw.term?.name ?? ''} · ${fw.term?.academic_year ?? ''}, bắt đầu học ${dmy(fw.term?.start_date)}. Đợt chỉ dành cho sinh viên của khoa – khóa này. Sau khi tạo, xếp lịch từng lớp, thông báo xem trước và công bố ở trang Đăng ký học phần.`),
+            message,
+            el('div', { class: 'grid sm:grid-cols-2 gap-3' },
+                el('div', { class: 'sm:col-span-2' }, field('Tên đợt', name)), field('Vòng', round), el('span'),
+                field('Mở lúc (giờ Việt Nam)', opens), field('Đóng lúc — trước ngày bắt đầu học', closes),
+                field('Tín chỉ tối thiểu (trống = theo quy chế)', minCredits), field('Tín chỉ tối đa (trống = theo quy chế)', maxCredits)),
+            el('div', { class: 'overflow-x-auto rounded-lg border border-outline-variant' },
+                el('table', { class: 'w-full min-w-[640px] text-sm' },
+                    el('thead', { class: 'bg-surface-container-low' }, el('tr', {}, th('Học phần'), th('Số lớp'), th('Sĩ số tối đa'), th('Giảng viên của khoa (đã nhận / định mức tiết)'))),
+                    el('tbody', {}, rowsOf.map((r) => r.row)))),
+            el('label', { class: 'flex items-center text-sm' }, overload, 'Đồng ý phân công dù giảng viên vượt định mức tiết'),
+            el('div', { class: 'flex justify-end gap-2' },
+                el('button', { type: 'button', class: 'rounded-lg border border-outline-variant px-4 py-2 text-sm font-semibold', onclick: () => dialog.close() }, 'Hủy'), save));
+        const dialog = el('dialog', { class: 'm-auto w-[min(96vw,900px)] max-h-[92vh] overflow-y-auto rounded-xl border border-outline-variant bg-white p-5 shadow-xl backdrop:bg-black/40' }, form);
+        dialog.addEventListener('close', () => dialog.remove());
+        document.body.append(dialog);
+        dialog.showModal();
+
+        form.addEventListener('submit', async (submitEvent) => {
+            submitEvent.preventDefault();
+            showAlert(message, null);
+            const classes = rowsOf.flatMap((r) => [...r.picks.querySelectorAll('select')].map((s) => ({ item_id: r.item.id, lecturer_id: Number(s.value), max_size: Number(r.size.value) || null })));
+            const body = {
+                name: name.value, round: round.value,
+                opens_at: opens.value.replace('T', ' '), closes_at: closes.value.replace('T', ' '),
+                min_credits: minCredits.value === '' ? null : Number(minCredits.value),
+                max_credits: maxCredits.value === '' ? null : Number(maxCredits.value),
+                classes, confirm_overload: overload.checked,
+            };
+            try {
+                const period = await withBusy(save, () => api.post(tpl(page.api.openRegistration, fw.id), body));
+                dialog.close();
+                toast(`Đã tạo đợt "${period.name}" với ${period.sections} lớp. Xếp lịch từng lớp rồi thông báo xem trước.`, 'success');
+                window.location.assign(`${page.links.enrollment}?term_id=${period.term_id}&period_id=${period.id}`);
+            } catch (error) {
+                showAlert(message, error);
+                message.scrollIntoView({ block: 'nearest' });
+            }
+        });
     }
 
     async function editFramework(event, fw) {

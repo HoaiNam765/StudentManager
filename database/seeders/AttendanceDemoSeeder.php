@@ -11,14 +11,16 @@ use App\Modules\SchoolClass\Enums\SectionStatus;
 use App\Modules\SchoolClass\Models\CourseSection;
 use App\Modules\SchoolClass\Models\SectionInstructor;
 use App\Modules\Timetable\Models\ClassSession;
+use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Dữ liệu demo điểm danh (#142–#144) cho học kỳ đang diễn ra: mỗi lớp học phần đang học chưa có buổi học thì sinh 15
- * buổi theo tuần (thứ và ca xoay vòng theo lớp), điểm danh các buổi đã qua (đa số có mặt, một ít vắng / có phép / đi
- * muộn; vài sinh viên vắng nhiều để có cảnh báo và cấm thi), tính lại tổng hợp. Chạy lại thì bỏ qua lớp đã có buổi học.
+ * Dữ liệu demo điểm danh (#142–#144) cho học kỳ đang diễn ra: mỗi lớp học phần đang học chưa có buổi học thì xếp lịch
+ * tuần 1–15 có phòng qua `TimetableSeeder::place` (sinh viên của lớp không bị trùng buổi; buổi sinh tự động, trùng ngày
+ * nghỉ thì Nghỉ), điểm danh các buổi đã qua (đa số có mặt, một ít vắng / có phép / đi muộn; vài sinh viên vắng nhiều để
+ * có cảnh báo và cấm thi), tính lại tổng hợp. Chạy lại thì bỏ qua lớp đã có buổi học.
  *
  *     php artisan db:seed --class=AttendanceDemoSeeder
  */
@@ -47,30 +49,42 @@ class AttendanceDemoSeeder extends Seeder
             ->whereNotIn('id', ClassSession::query()->select('course_section_id'))
             ->orderBy('id')->get();
         $recorded = 0;
+        $used = [];
+        // Lớp đông trước để còn nhiều buổi / phòng lớn
+        $sections = $sections->sortByDesc(fn (CourseSection $s) => Enrollment::query()->active()->where('course_section_id', $s->id)->count())->values();
 
-        foreach ($sections->values() as $index => $section) {
-            DB::transaction(function () use ($section, $index, $term, $today, $tz, &$recorded): void {
+        foreach ($sections as $index => $section) {
+            DB::transaction(function () use ($section, $index, $today, $term, $tz, &$recorded, &$used): void {
                 $instructor = SectionInstructor::query()->where('course_section_id', $section->id)->with('lecturer:id,user_id')->first();
-                $start = CarbonImmutable::parse($term->start_date->toDateString(), $tz)->startOfWeek()->addDays($index % 6);
-                $periodFrom = [1, 4, 7, 10][intdiv($index, 6) % 4];
                 $enrollments = Enrollment::query()->active()->where('course_section_id', $section->id)->get();
+                $students = $enrollments->map(fn (Enrollment $e) => "student:{$e->student_id}")->all();
+
+                // DemoDataSeeder tạo lớp thẳng ở trạng thái Đang học, mà mẫu lịch chỉ xếp được trước đó: tạm lùi trạng thái khi
+                // xếp (query builder, không ghi nhật ký) rồi trả lại. SessionService chỉ sinh buổi từ "hôm nay" nên đặt đồng
+                // hồ về ngày bắt đầu học kỳ để có đủ buổi đã qua.
+                CourseSection::query()->whereKey($section->id)->update(['status' => SectionStatus::RegistrationOpen->value]);
+                Carbon::setTestNow(CarbonImmutable::parse($term->start_date->toDateString(), $tz));
+                try {
+                    $placed = TimetableSeeder::place($section->refresh(), $index, $students, $used);
+                } finally {
+                    Carbon::setTestNow();
+                    CourseSection::query()->whereKey($section->id)->update(['status' => SectionStatus::InProgress->value]);
+                }
+
+                if ($placed === null) {
+                    $this->command?->warn("Không xếp được lịch cho lớp {$section->code}.");
+
+                    return;
+                }
+
                 // Hai sinh viên mỗi lớp vắng nhiều để có cảnh báo / cấm thi
                 $frequentAbsent = $enrollments->pluck('id')->shuffle()->take(2)->all();
+                $sessions = ClassSession::query()->where('course_section_id', $section->id)->where('status', 'planned')
+                    ->whereDate('date', '<', $today->toDateString())->orderBy('date')->get();
 
-                foreach (range(1, 15) as $week) {
-                    $date = $start->addWeeks($week - 1);
-                    $session = ClassSession::create([
-                        'course_section_id' => $section->id,
-                        'date' => $date->toDateString(),
-                        'week' => $week,
-                        'period_from' => $periodFrom,
-                        'period_to' => $periodFrom + 2,
-                        'status' => $date->lt($today) ? 'taught' : 'planned',
-                    ]);
-
-                    if (! $date->lt($today)) {
-                        continue;
-                    }
+                foreach ($sessions as $session) {
+                    $session->update(['status' => 'taught']);
+                    $date = CarbonImmutable::parse($session->date->toDateString());
 
                     foreach ($enrollments as $enrollment) {
                         $roll = mt_rand(1, 100);

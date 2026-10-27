@@ -113,7 +113,7 @@ export function formDialog({ title, description = '', fields, submitText = 'Lưu
                 return el('input', { type: 'checkbox', name: f.name, value: '1', checked: Boolean(f.value), class: 'h-4 w-4 rounded border-outline-variant text-primary' });
             }
 
-            return el('input', { type: f.type ?? 'text', name: f.name, value: f.value ?? '', class: base, required: f.required, accept: f.accept, maxlength: f.maxlength, min: f.min });
+            return el('input', { type: f.type ?? 'text', name: f.name, value: f.value ?? '', class: base, required: f.required, accept: f.accept, maxlength: f.maxlength, min: f.min, placeholder: f.placeholder });
         };
         const field = (f) => f.type === 'checkbox'
             ? el('label', { class: 'flex items-center gap-2 text-sm text-on-surface sm:col-span-2' }, input(f), f.label)

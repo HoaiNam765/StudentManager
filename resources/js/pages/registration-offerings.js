@@ -15,7 +15,9 @@ export async function showOfferings(container, page, period, changed) {
     const list = data.sections.map((section) => el('article', { class: 'rounded-xl border border-outline-variant p-3 space-y-2' },
         el('p', { class: 'font-semibold text-sm' }, `${section.code} · ${section.subject.name} (${section.subject.credits} TC)`),
         el('p', { class: 'text-xs text-on-surface-variant' }, `${section.lecturer?.full_name ?? 'Chưa phân công'} · Sĩ số ${section.min_size}–${section.max_size}`),
-        section.schedules.map((s) => el('p', { class: 'text-xs text-on-surface-variant' }, `${s.description} · ${s.room ?? '—'}`)),
+        section.schedules.length
+            ? section.schedules.map((s) => el('p', { class: 'text-xs text-on-surface-variant' }, `${s.description} · ${s.room ?? '—'}`))
+            : el('p', { class: 'text-xs font-semibold text-amber-700' }, 'Chưa xếp lịch — bấm "Sửa giảng viên / lịch" để chọn phòng, thứ, tiết.'),
         mutable ? el('div', { class: 'flex gap-2' }, button('Sửa giảng viên / lịch', () => edit(section)), button('Xóa khỏi đợt', async () => {
             if (!await confirmDialog({ title: `Bỏ lớp ${section.code}?`, message: 'Lớp dự kiến sẽ được hủy; chương trình khung giữ nguyên.', danger: true, confirmText: 'Xóa khỏi đợt' })) return;
             try { await api.del(url(page.api.offeringDelete, section.id)); await reload(); await changed(); }

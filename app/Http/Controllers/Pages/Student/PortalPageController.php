@@ -3,9 +3,14 @@
 namespace App\Http\Controllers\Pages\Student;
 
 use App\Http\Controllers\Controller;
+use App\Modules\AcademicYear\Models\Term;
+use App\Modules\AcademicYear\Models\TermType;
+use App\Modules\Enrollment\Models\Enrollment;
 use App\Modules\Faculty\Models\Major;
 use App\Modules\Report\Services\StudentPortalData;
+use App\Modules\SchoolClass\Models\CourseSection;
 use App\Modules\Student\Http\Controllers\StudentSelfController;
+use App\Modules\Student\Models\Student;
 use App\Modules\Student\Models\StudentChangeRequest;
 use App\Modules\Student\Models\StudentContact;
 use App\Modules\Timetable\Http\Controllers\TimetableController;
@@ -25,6 +30,13 @@ class PortalPageController extends Controller
 
     public function timetable(Request $request, TimetableController $timetable): View
     {
+        // Chọn học kỳ khác mà không kèm ngày: mở tuần đầu của học kỳ đó (hôm nay không thuộc học kỳ đó)
+        $chosen = $request->filled('term_id') && ! $request->filled('date') ? Term::query()->find($request->integer('term_id')) : null;
+        $today = now(config('studentmanager.display_timezone'))->toDateString();
+        if ($chosen !== null && ($today < $chosen->start_date->toDateString() || $today > $chosen->end_date->toDateString())) {
+            $request->merge(['date' => $chosen->start_date->toDateString()]);
+        }
+
         $schedule = $timetable->mineStudent($request)->getData(true);
         $from = CarbonImmutable::parse($schedule['from'])->startOfWeek();
         $to = CarbonImmutable::parse($schedule['to']);
@@ -35,7 +47,29 @@ class PortalPageController extends Controller
                 ->map(fn ($week) => $from->addWeeks($week)),
             'previous' => $from->subWeek()->toDateString(),
             'next' => $from->addWeek()->toDateString(),
+            'terms' => $this->timetableTerms($request, $today, (int) $schedule['term']['id']),
         ]);
+    }
+
+    /**
+     * Học kỳ cho ô chọn ở thời khóa biểu: học kỳ sinh viên có lớp đăng ký, học kỳ đang diễn ra và học kỳ chính sắp tới
+     * (để xem lịch dự kiến của lớp vừa đăng ký), cùng học kỳ đang xem.
+     *
+     * @return list<array{id: int, label: string}>
+     */
+    private function timetableTerms(Request $request, string $today, int $shown): array
+    {
+        $student = Student::query()->where('user_id', $request->user()->id)->first();
+        $enrolled = $student === null ? collect() : CourseSection::query()
+            ->whereIn('id', Enrollment::query()->where('student_id', $student->id)->select('course_section_id'))
+            ->distinct()->pluck('term_id');
+        $current = Term::query()->where('start_date', '<=', $today)->where('end_date', '>=', $today)->pluck('id');
+        $next = Term::query()->where('start_date', '>', $today)->where('type', TermType::MAIN->value)->orderBy('start_date')->limit(1)->pluck('id');
+
+        return Term::query()->with('academicYear:id,name')->whereIn('id', $enrolled->merge($current)->merge($next)->push($shown)->unique())
+            ->orderBy('start_date')->get()
+            ->map(fn (Term $term) => ['id' => $term->id, 'label' => trim($term->name.' · '.$term->academicYear?->name, ' ·')])
+            ->all();
     }
 
     public function profile(Request $request, StudentSelfController $self): View

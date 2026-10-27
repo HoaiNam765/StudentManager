@@ -539,6 +539,12 @@ Route::middleware('auth')->group(function (): void {
         Route::delete('offerings/{courseSection}', [$controller, 'destroy'])->middleware(['permission:ENR.update,ALL', 'permission:CLS.update,ALL'])->name('offerings.destroy');
         Route::post('announce', [$controller, 'announce'])->middleware(['permission:ENR.update,ALL', 'permission:NOT.create'])->name('announce');
     });
+    // Mở đăng ký từ trang Chương trình khung: tạo đợt nháp + lớp + giảng viên (lịch xếp sau ở trang Đăng ký học phần)
+    Route::get('training-frameworks/{trainingFramework}/lecturer-options', [RegistrationOfferingController::class, 'frameworkLecturers'])
+        ->whereNumber('trainingFramework')->middleware('permission:ENR.view,ALL')->name('training-frameworks.lecturer-options');
+    Route::post('training-frameworks/{trainingFramework}/registration-periods', [RegistrationOfferingController::class, 'storeFromFramework'])
+        ->whereNumber('trainingFramework')->middleware(['permission:ENR.create,ALL', 'permission:ENR.update,ALL', 'permission:CLS.create,ALL'])
+        ->name('training-frameworks.registration-periods.store');
     Route::delete('registration-periods/{registrationPeriod}', [RegistrationPeriodController::class, 'destroy'])->middleware('permission:ENR.delete,ALL')->name('registration-periods.destroy');
     Route::get('course-sections/{courseSection}/enrollments', [EnrollmentController::class, 'roster'])->whereNumber('courseSection')->middleware('permission:ENR.view')->name('course-sections.enrollments');
     Route::get('students/{student}/registration-result', [EnrollmentResultController::class, 'forStudent'])->whereNumber('student')->middleware('permission:ENR.view')->name('students.registration-result');

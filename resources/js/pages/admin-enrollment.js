@@ -10,7 +10,7 @@ export default function adminEnrollment(root) {
     const region = (name) => root.querySelector(`[data-region="${name}"]`);
     const termSelect = root.querySelector('[data-filter="term"]');
     const form = root.querySelector('[data-form="period"]');
-    const state = { terms: [], cohorts: [], majors: [], classes: [], editId: null, frameworks: [], selectedPeriod: null };
+    const state = { terms: [], cohorts: [], majors: [], classes: [], editId: null, frameworks: [], periods: [], selectedPeriod: null };
     const url = (template, id, status = '') => template.replace('__ID__', encodeURIComponent(id)).replace('__TERM__', encodeURIComponent(id)).replace('__STATUS__', encodeURIComponent(status));
 
     termSelect.addEventListener('change', () => { resetForm(); state.selectedPeriod = null; region('offerings').replaceChildren(); loadAll(); });
@@ -36,8 +36,17 @@ export default function adminEnrollment(root) {
             state.majors = majors?.data ?? [];
             state.classes = classes?.data ?? [];
             fill(termSelect, state.terms, (x) => `${x.name} · ${x.academic_year}`);
+            // Đến từ trang Chương trình khung (?term_id=&period_id=): chọn đúng học kỳ và mở danh sách lớp của đợt
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('term_id') && state.terms.some((t) => String(t.id) === params.get('term_id'))) termSelect.value = params.get('term_id');
             resetForm();
             await loadAll();
+            const fromFramework = state.periods.find((p) => String(p.id) === params.get('period_id'));
+            if (fromFramework?.training_framework_id) {
+                state.selectedPeriod = fromFramework;
+                await showOfferings(region('offerings'), page, fromFramework, loadPeriods);
+                region('offerings').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         } catch (error) { region('periods').replaceChildren(errorBlock(error, bootstrap)); }
     }
 
@@ -55,6 +64,7 @@ export default function adminEnrollment(root) {
         try {
             const data = await api.get(page.api.periods, { term_id: termSelect.value });
             const rows = Array.isArray(data) ? data : (data?.data ?? []);
+            state.periods = rows;
             region('periods').replaceChildren(rows.length ? el('div', { class: 'space-y-3' }, rows.map(periodCard)) : emptyBlock('Chưa có đợt đăng ký', 'Tạo đợt đầu tiên cho học kỳ này.', 'event_available'));
         } catch (error) { region('periods').replaceChildren(errorBlock(error, loadPeriods)); }
     }

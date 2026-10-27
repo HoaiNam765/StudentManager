@@ -156,9 +156,17 @@ class CurriculumVersionTest extends TestCase
         app(PolicyResolver::class)->flush();
         $this->assertSame(2.2, $this->graduation->effectiveFor($cntt, 2026)['min_cgpa']);
 
-        // Ngôn ngữ Trung Quốc không có khối thực tập / khóa luận
+        // CTĐT mẫu nào cũng có thực tập và khóa luận; CTĐT không có khối thực tập thì mặc định không yêu cầu thực tập
         $nntq = Curriculum::query()->where('code', 'CTDT-7220204-2026')->firstOrFail();
-        $this->assertFalse($this->graduation->effectiveFor($nntq, 2026)['requires_internship']);
+        $this->assertTrue($this->graduation->effectiveFor($nntq, 2026)['requires_internship']);
+
+        $draft = $this->curricula->create([
+            'code' => 'CTDT-KHONG-TT', 'name' => 'CTĐT không có thực tập', 'major_id' => $nntq->major_id,
+            'training_type_id' => TrainingType::default()->id, 'cohort_from' => 2030, 'total_credits' => 3,
+        ]);
+        $this->curricula->addBlock($draft, ['name' => 'Cơ sở ngành', 'block_type' => 'foundation', 'required_credits' => 3]);
+        $this->assertFalse($this->graduation->effectiveFor($draft, 2030)['requires_internship']);
+        $this->assertFalse($this->graduation->effectiveFor($draft, 2030)['requires_thesis']);
     }
 
     public function test_dieu_kien_tot_nghiep_chi_sua_o_ban_nhap_va_phai_khop_noi_dung(): void

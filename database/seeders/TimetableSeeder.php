@@ -13,7 +13,8 @@ use Illuminate\Database\Seeder;
 
 /**
  * TTB: khung 15 tiết dùng chung (sáng 1–5, chiều 6–10, tối 11–15) và mẫu lịch tuần 1–15 cho các lớp học phần
- * đã có giảng viên chính, đi qua ScheduleRuleService để dữ liệu mẫu cũng đúng quy tắc (BR-TTB-03, 07).
+ * đã có giảng viên chính, đi qua ScheduleRuleService để dữ liệu mẫu cũng đúng quy tắc (BR-TTB-03, 07); trùng phòng /
+ * giảng viên thì thử phòng khác, buổi khác trong tuần.
  */
 class TimetableSeeder extends Seeder
 {
@@ -52,19 +53,28 @@ class TimetableSeeder extends Seeder
 
             $required = (int) $section->subject->theory_periods + (int) $section->subject->practice_periods;
             $length = max(1, min(5, intdiv($required, 15)));
-            $start = $i % 2 === 0 ? 1 : 6;
 
-            try {
-                $service->create($section, [
-                    'day_of_week' => $i % 5 + 1,
-                    'period_from' => $start,
-                    'period_to' => $start + $length - 1,
-                    'room_id' => $rooms[$i % $rooms->count()]->id,
-                    'week_from' => 1,
-                    'week_to' => 15,
-                ]);
-            } catch (BusinessRuleException) {
-                // Dữ liệu mẫu không hợp quy tắc thì bỏ qua lớp đó
+            // Trùng phòng / giảng viên thì thử phòng khác, rồi lần lượt 10 buổi sáng – chiều trong tuần; không chỗ nào hợp
+            // thì bỏ qua lớp đó
+            for ($j = $i; $j < $i + 10; $j++) {
+                $start = $j % 2 === 0 ? 1 : 6;
+
+                for ($r = 0; $r < $rooms->count(); $r++) {
+                    try {
+                        $service->create($section, [
+                            'day_of_week' => $j % 5 + 1,
+                            'period_from' => $start,
+                            'period_to' => $start + $length - 1,
+                            'room_id' => $rooms[($j + $r) % $rooms->count()]->id,
+                            'week_from' => 1,
+                            'week_to' => 15,
+                        ]);
+
+                        continue 3;
+                    } catch (BusinessRuleException) {
+                        // Thử chỗ tiếp theo
+                    }
+                }
             }
         }
     }

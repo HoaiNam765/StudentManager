@@ -19,7 +19,8 @@ use Illuminate\Support\Str;
 /**
  * Khóa và lớp hành chính mẫu (CLS): khóa K2023–K2026; khóa 2026 mỗi ngành một lớp hệ chính quy, mã dạng 26DH + chữ đầu
  * tên ngành + 01 (ví dụ 26DHCNTT01). Lớp học phần mẫu (#107): học kỳ 2 năm 2026–2027, mỗi học phần học kỳ 2 của các CTĐT
- * đang áp dụng một lớp Dự kiến, giảng viên chính là giảng viên đầu tiên của bộ môn quản lý (nếu có). Tạo thẳng bằng model
+ * đang áp dụng một lớp Dự kiến, giảng viên chính là giảng viên đầu tiên của bộ môn quản lý (bộ môn chưa có giảng viên thì
+ * lần lượt giảng viên toàn trường). Tạo thẳng bằng model
  * (bỏ qua kiểm tra đề cương vì dữ liệu mẫu chưa có đề cương đã duyệt). Chạy lặp lại an toàn.
  */
 class SchoolClassSeeder extends Seeder
@@ -74,6 +75,9 @@ class SchoolClassSeeder extends Seeder
             ->pluck('subject_id');
 
         $yy = sprintf('%02d%d', ((int) $term->start_date->format('Y') - 1) % 100, 2);
+        // Bộ môn chưa có giảng viên (khoa Khoa học cơ bản): lần lượt giảng viên toàn trường theo mã, như DemoDataSeeder
+        $schoolWide = Lecturer::query()->working()->where('code', '!=', DevRoleUsersSeeder::ADVISOR_CODE)->orderBy('code')->get()->values();
+        $turn = 0;
 
         foreach (Subject::query()->whereIn('id', $subjectIds)->orderBy('code')->get() as $subject) {
             $section = CourseSection::firstOrCreate(['subject_id' => $subject->id, 'term_id' => $term->id, 'sequence' => 1], [
@@ -84,7 +88,8 @@ class SchoolClassSeeder extends Seeder
                 'status' => 'planned',
             ]);
 
-            $lecturer = Lecturer::query()->where('department_id', $subject->department_id)->working()->orderBy('code')->first();
+            $lecturer = Lecturer::query()->where('department_id', $subject->department_id)->working()->orderBy('code')->first()
+                ?? ($schoolWide->isEmpty() ? null : $schoolWide[$turn++ % $schoolWide->count()]);
 
             if ($lecturer !== null) {
                 SectionInstructor::firstOrCreate(['course_section_id' => $section->id, 'lecturer_id' => $lecturer->id], ['role' => 'main']);

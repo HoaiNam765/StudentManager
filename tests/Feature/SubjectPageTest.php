@@ -30,7 +30,8 @@ class SubjectPageTest extends TestCase
         $relation = SubjectRelation::query()->where('type', 'prerequisite')->whereNull('effective_to')->firstOrFail();
 
         $this->get('/admin/hoc-phan')->assertOk()->assertSee('data-page="admin-subjects"', false);
-        $row = collect($this->getJson('/admin/subjects?per_page=100')->assertOk()->json('data'))->firstWhere('id', $relation->subject_id);
+        $row = collect($this->getJson('/admin/subjects?per_page=100&department_id='.$relation->subject->department_id)->assertOk()->json('data'))
+            ->firstWhere('id', $relation->subject_id);
 
         $this->assertContains($relation->relatedSubject->code, collect($row['prerequisites'])->pluck('code')->all());
     }

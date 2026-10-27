@@ -36,7 +36,7 @@ use Illuminate\Support\Str;
  * Dữ liệu demo trọn vòng đời học kỳ (#122; BA 11.2, FR-SYS-016, BR-SYS-10, NFR-DAT-02). Chạy bằng `php artisan demo:seed`
  * sau `php artisan migrate --seed`; **từ chối ở môi trường production**. Chạy lại thì bỏ qua (đã có học kỳ demo).
  *
- * Kết quả (cộng với dữ liệu mẫu của các module): 3 khoa, 6 ngành, 60 học phần, 20 giảng viên, 20 phòng; 300 sinh viên
+ * Kết quả (cộng với dữ liệu mẫu của các module): 3 khoa, 6 ngành, 184 học phần (CTĐT 8 học kỳ), 20 giảng viên, 20 phòng; 300 sinh viên
  * (khóa 2025 và 2026, mỗi ngành 25 / khóa, họ tên Faker vi_VN, CCCD / email giả); năm học 2025–2026 hai học kỳ **đã khóa**
  * (lớp học phần theo CTĐT, điểm đã công bố + khóa, GPA đã tính) và học kỳ 1 2026–2027 **đang diễn ra** (đăng ký đã chốt,
  * đang nhập điểm, hai lớp đã nộp); học kỳ 2 2026–2027 đang mở đăng ký (từ EnrollmentSeeder).

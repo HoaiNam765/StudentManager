@@ -105,7 +105,7 @@ class SyllabusTest extends TestCase
         $this->actingAs($this->lecturerUser('GV0002'));   // BM-KTPM
 
         $this->postJson('/admin/subjects/'.$this->subject('INT203')->id.'/syllabi')->assertForbidden();   // BM-HTTT
-        $this->getJson('/admin/subjects')->assertOk()->assertJsonPath('total', 10);
+        $this->getJson('/admin/subjects')->assertOk()->assertJsonPath('total', count(array_filter(SubjectSeeder::SUBJECTS, fn (array $s) => $s[0] === 'BM-KTPM')));
     }
 
     public function test_tra_lai_sua_va_gui_lai_khong_tu_duyet(): void

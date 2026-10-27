@@ -31,6 +31,12 @@ class SubjectApiTest extends TestCase
         return Department::query()->where('code', $code)->firstOrFail();
     }
 
+    /** Số học phần mẫu của SubjectSeeder thỏa điều kiện (tuple [bộ môn, mã, tên, TC, TC thực hành, khối, tự chọn?]). */
+    private function seeded(callable $filter): int
+    {
+        return count(array_filter(SubjectSeeder::SUBJECTS, $filter));
+    }
+
     /** Trưởng bộ môn (vai trò DEAN có hiệu lực theo nhiệm kỳ, phạm vi FACULTY = bộ môn đó). */
     private function headOf(string $departmentCode): User
     {
@@ -44,11 +50,11 @@ class SubjectApiTest extends TestCase
         return $user;
     }
 
-    public function test_seeder_co_60_hoc_phan_dung_quy_tac_va_chay_lap_lai_an_toan(): void
+    public function test_seeder_tao_du_hoc_phan_mau_dung_quy_tac_va_chay_lap_lai_an_toan(): void
     {
         $this->seed(SubjectSeeder::class);
 
-        $this->assertSame(60, Subject::count());
+        $this->assertSame(count(SubjectSeeder::SUBJECTS), Subject::count());
         $this->assertTrue(Subject::all()->every(fn (Subject $s) => $s->theory_credits + $s->practice_credits === $s->credits));
 
         $pe = Subject::query()->where('code', 'GDTC101')->firstOrFail();
@@ -103,8 +109,9 @@ class SubjectApiTest extends TestCase
         $this->getJson('/admin/subjects?q=giao duc the chat')->assertOk()->assertJsonPath('total', 3);
         $this->getJson('/admin/subjects?counts_toward_gpa=0')->assertOk()->assertJsonPath('total', count(SubjectSeeder::CONDITION_SUBJECTS));
         $this->getJson('/admin/subjects?is_graduation_requirement=1')->assertOk()->assertJsonPath('total', count(SubjectSeeder::CONDITION_SUBJECTS));
-        $this->getJson('/admin/subjects?knowledge_block=thesis')->assertOk()->assertJsonPath('total', 2);
-        $this->getJson('/admin/subjects?requirement=elective&faculty_id='.$this->department('BM-KTPM')->faculty_id)->assertOk()->assertJsonPath('total', 3);
+        $this->getJson('/admin/subjects?knowledge_block=thesis')->assertOk()->assertJsonPath('total', $this->seeded(fn (array $s) => $s[5] === 'T'));
+        $this->getJson('/admin/subjects?requirement=elective&faculty_id='.$this->department('BM-KTPM')->faculty_id)->assertOk()
+            ->assertJsonPath('total', $this->seeded(fn (array $s) => $s[6] && in_array($s[0], ['BM-KTPM', 'BM-HTTT', 'BM-MMT'], true)));
 
         $id = Subject::query()->where('code', 'INT201')->value('id');
         $this->getJson("/admin/subjects/{$id}")->assertOk()->assertJsonPath('department.code', 'BM-KTPM')->assertJsonPath('is_pass_fail_only', false);
@@ -117,7 +124,7 @@ class SubjectApiTest extends TestCase
         foreach (['STU', 'EXAM', 'ADMIN'] as $role) {
             $this->actingAs($this->userWithRoles($role));
 
-            $this->getJson('/admin/subjects')->assertOk()->assertJsonPath('total', 60);
+            $this->getJson('/admin/subjects')->assertOk()->assertJsonPath('total', count(SubjectSeeder::SUBJECTS));
             $this->postJson('/admin/subjects', [])->assertForbidden();
             $this->putJson("/admin/subjects/{$id}", ['name' => 'X'])->assertForbidden();
             $this->deleteJson("/admin/subjects/{$id}")->assertForbidden();
@@ -138,7 +145,7 @@ class SubjectApiTest extends TestCase
         $own = Subject::query()->where('code', 'INT301')->firstOrFail();
         $other = Subject::query()->where('code', 'INT203')->firstOrFail(); // BM-HTTT
 
-        $this->getJson('/admin/subjects')->assertOk()->assertJsonPath('total', 10);
+        $this->getJson('/admin/subjects')->assertOk()->assertJsonPath('total', $this->seeded(fn (array $s) => $s[0] === 'BM-KTPM'));
         $this->getJson("/admin/subjects/{$other->id}")->assertForbidden();
 
         $this->putJson("/admin/subjects/{$own->id}", ['description' => 'Cập nhật bởi trưởng bộ môn'])->assertOk();
@@ -180,8 +187,7 @@ class SubjectApiTest extends TestCase
         $reader->close();
 
         $this->assertSame('Mã học phần', $rows[0][0]);
-        $this->assertCount(3, $rows);
-        $this->assertSame(['ENG402', 'INT402'], [$rows[1][0], $rows[2][0]]);
-        $this->assertSame('Đồ án / khóa luận', $rows[2][12]);
+        $this->assertSame(['ACC402', 'BUS402', 'CHN402', 'ENG402', 'INT402'], array_column(array_slice($rows, 1), 0));
+        $this->assertSame('Đồ án / khóa luận', $rows[1][12]);
     }
 }

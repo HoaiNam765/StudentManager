@@ -161,13 +161,13 @@ class GradeStructureTest extends TestCase
         $this->assertStringContainsString('chưa có cơ cấu điểm', $e->getMessage());
     }
 
-    public function test_seeder_tao_co_cau_hop_le_cho_ca_60_hoc_phan(): void
+    public function test_seeder_tao_co_cau_hop_le_cho_moi_hoc_phan_mau(): void
     {
         $this->seed(GradeStructureSeeder::class);
         $this->seed(GradeStructureSeeder::class);
 
-        $this->assertSame(60, GradeComponentTemplate::query()->distinct()->count('subject_id'));
-        $this->assertSame(180, GradeComponentTemplate::count());
+        $this->assertSame(count(SubjectSeeder::SUBJECTS), GradeComponentTemplate::query()->distinct()->count('subject_id'));
+        $this->assertSame(3 * count(SubjectSeeder::SUBJECTS), GradeComponentTemplate::count());
 
         foreach (Subject::all() as $subject) {
             $this->structures->validate(array_map(fn (array $c) => $c, $this->structures->templateFor($subject)));

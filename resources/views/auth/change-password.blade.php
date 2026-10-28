@@ -3,7 +3,7 @@
     Giữ nguyên với BE: PUT route('password.update'), các trường `current_password`, `password`,
     `password_confirmation`, @csrf, @method('PUT'). Chính sách mật khẩu lấy từ config('studentmanager.auth.password').
 --}}
-@extends('layouts.account')
+@extends('layouts.portal')
 
 @section('title', 'Đổi mật khẩu - Hệ thống Quản lý Học vụ - HUIT')
 @section('page-title', 'Đổi mật khẩu')
@@ -19,7 +19,7 @@
     $fieldClass = 'w-full h-10 px-3 pr-10 bg-surface-container-lowest border rounded-lg text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all';
 @endphp
 
-@section('account')
+@section('page')
 <!-- Page Title -->
 <div class="w-full max-w-[540px] text-center mb-6">
     <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-surface-container text-primary mb-3 shadow-sm border border-outline-variant">

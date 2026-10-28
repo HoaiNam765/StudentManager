@@ -1,4 +1,4 @@
-@extends('layouts.account')
+@extends('layouts.portal')
 
 @section('title', 'Phiên đăng nhập - Hệ thống Quản lý Học vụ - HUIT')
 @section('page-title', 'Phiên đăng nhập')
@@ -10,7 +10,7 @@
     $hasOtherSessions = $sessions->contains(fn ($session) => ! $session['is_current']);
 @endphp
 
-@section('account')
+@section('page')
 <div class="w-full max-w-[720px] space-y-5">
     <div>
         <h1 class="text-2xl text-on-surface font-bold tracking-tight">Phiên đăng nhập</h1>

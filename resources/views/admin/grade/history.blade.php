@@ -1,4 +1,4 @@
-@extends('layouts.admin-original')
+@extends('layouts.portal')
 @section('title', 'Lịch sử điều chỉnh điểm')
 @section('page-title', 'Lịch sử điểm')
 @section('page')

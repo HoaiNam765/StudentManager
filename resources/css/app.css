@@ -29,6 +29,10 @@
 
     --color-primary: #1c55c4;
     --color-primary-container: #3f6fde;
+    /* Màu của các trang sinh viên từ mock FE (trước dùng Tailwind CDN) */
+    --color-primary-hover: #1645a5;
+    --color-primary-tint: #eef2fd;
+    --color-primary-50: #f0f5ff;
     --color-primary-fixed: #dae2ff;
     --color-primary-fixed-dim: #b2c5ff;
     --color-on-primary: #ffffff;
@@ -154,6 +158,9 @@
 
     --color-primary: #5b8bf0;
     --color-primary-container: #3f6fde;
+    --color-primary-hover: #7aa0f5;
+    --color-primary-tint: #1e2d52;
+    --color-primary-50: #1a2747;
     --color-primary-fixed: #1e2d52;
     --color-primary-fixed-dim: #2a3f73;
     --color-on-primary-fixed: #dae2ff;

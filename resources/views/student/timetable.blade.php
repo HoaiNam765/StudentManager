@@ -1,6 +1,7 @@
-@extends('layouts.student-original')
-@section('student-title', 'Thời khóa biểu')
-@section('student-content')
+@extends('layouts.portal')
+@section('title', 'Thời khóa biểu - Cổng Sinh viên')
+@section('page-title', 'Thời khóa biểu')
+@section('page')
 
 <!-- ============================================================== -->
 <!-- 3. ACTION CONTROLS & TIMETABLE TOOLBAR BANNER                 -->

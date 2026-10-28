@@ -1,4 +1,4 @@
-@extends('layouts.account')
+@extends('layouts.portal')
 
 @section('title', 'Tùy chọn thông báo - Hệ thống Quản lý Học vụ - HUIT')
 @section('page-title', 'Tùy chọn thông báo')
@@ -7,7 +7,7 @@
     Tùy chọn nhận thông báo (FR-NOT-007; BR-NOT-02): bật / tắt từng loại thông báo không bắt buộc trong ứng dụng.
     Dữ liệu: resources/js/pages/notification-preferences.js gọi GET / PUT /notifications/preferences.
 --}}
-@section('account')
+@section('page')
 <div data-page="notification-preferences" class="w-full max-w-[720px] space-y-5">
     <div>
         <h1 class="text-2xl text-on-surface font-bold tracking-tight">Tùy chọn thông báo</h1>

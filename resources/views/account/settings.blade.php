@@ -1,9 +1,9 @@
-@extends('layouts.account')
+@extends('layouts.portal')
 
 @section('title', 'Thông tin tài khoản - Hệ thống Quản lý Học vụ - HUIT')
 @section('page-title', 'Thông tin tài khoản')
 
-@section('account')
+@section('page')
 <div class="w-full max-w-[720px] space-y-5">
     <div>
         <h1 class="text-2xl text-on-surface font-bold tracking-tight">Thông tin tài khoản</h1>

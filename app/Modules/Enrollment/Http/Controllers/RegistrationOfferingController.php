@@ -25,6 +25,9 @@ use Illuminate\Validation\Rule;
  */
 class RegistrationOfferingController extends Controller
 {
+    /** Thông tin học phần gửi cho trang; số tiết lý thuyết / thực hành để tự tính số buổi và tuần học. */
+    private const SUBJECT_FIELDS = ['id', 'code', 'name', 'credits', 'theory_credits', 'practice_credits', 'theory_periods', 'practice_periods'];
+
     public function __construct(private readonly RegistrationOfferingService $offerings) {}
 
     public function index(RegistrationPeriod $registrationPeriod): JsonResponse
@@ -41,6 +44,7 @@ class RegistrationOfferingController extends Controller
         return response()->json([
             'period_id' => $period->id, 'editable' => $period->status->value === 'draft',
             'term' => $period->term->only('id', 'name', 'weeks'),
+            'practice_min_periods' => (int) config('studentmanager.timetable.practice_min_periods', 5),
             'faculties' => collect($matrix['faculties'])->map(fn ($f) => $f->only('id', 'code', 'name'))->values(),
             'cohorts' => collect($matrix['cohorts'])->map(fn ($c) => $c->only('id', 'code', 'start_year'))->values(),
             'cells' => collect($matrix['cells'])->map(fn (array $c) => [
@@ -52,18 +56,18 @@ class RegistrationOfferingController extends Controller
                 'id' => $f->id, 'faculty' => $f->faculty->only('id', 'code', 'name'), 'cohort' => $f->cohort->only('id', 'code'),
                 'planned_term' => $f->planned_term,
                 'items' => $f->items->sortBy(fn (TrainingFrameworkItem $i) => [! $i->compulsory, $i->subject->code])->values()->map(fn (TrainingFrameworkItem $i) => [
-                    'id' => $i->id, 'subject' => $i->subject->only('id', 'code', 'name', 'credits'), 'compulsory' => $i->compulsory,
+                    'id' => $i->id, 'subject' => $i->subject->only(self::SUBJECT_FIELDS), 'compulsory' => $i->compulsory,
                     'planned_sections' => $i->planned_sections, 'max_size' => $i->max_size,
                 ]),
             ]),
             'sections' => $sections->map(fn ($section) => [
-                'id' => $section->id, 'code' => $section->code, 'subject' => $section->subject->only('id', 'code', 'name', 'credits'),
+                'id' => $section->id, 'code' => $section->code, 'subject' => $section->subject->only(self::SUBJECT_FIELDS),
                 'framework_id' => $section->trainingFrameworkItem?->training_framework_id,
                 'min_size' => $section->min_size, 'max_size' => $section->max_size, 'section_type' => $section->section_type,
                 'lecturer' => $section->instructors->first()?->lecturer?->only('id', 'code', 'full_name'),
                 'schedules' => ($rules->get($section->id) ?? collect())->map(fn ($rule) => $rule->only('day_of_week', 'period_from', 'period_to', 'week_from', 'week_to', 'week_parity', 'room_id') + ['description' => $rule->describe(), 'room' => $rule->room?->code]),
             ]),
-            'subjects' => Subject::query()->where('status', 'active')->orderBy('code')->get(['id', 'code', 'name', 'credits']),
+            'subjects' => Subject::query()->where('status', 'active')->orderBy('code')->get(self::SUBJECT_FIELDS),
             'rooms' => Room::query()->orderBy('code')->get(['id', 'code', 'capacity']),
             'default_max_size' => (int) config('studentmanager.course_section.default_max_size', 60),
         ]);

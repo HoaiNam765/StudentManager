@@ -181,6 +181,8 @@ export async function showOfferings(container, page, period, changed) {
         const schedule = section?.schedules?.[0] ?? {};
         const message = el('div', { hidden: true });
         const lecturerHint = el('p', { class: 'text-xs text-on-surface-variant sm:col-span-2' }, 'Chọn lịch học để kiểm tra giảng viên.');
+        const weekHint = el('p', { class: 'text-xs sm:col-span-2' });
+        let planError = false;
         const save = el('button', { type: 'submit', disabled: true, class: 'rounded-lg bg-primary text-white px-4 py-2 text-sm font-semibold disabled:opacity-50' }, 'Lưu lớp học phần');
         const scheduleBody = () => Object.fromEntries(['day_of_week', 'period_from', 'period_to', 'week_from', 'week_to', 'week_parity', 'room_id'].map((k) => [k, k === 'week_parity' ? fields[k].value : Number(fields[k].value)]));
         const form = el('form', { class: 'space-y-4' },
@@ -196,11 +198,55 @@ export async function showOfferings(container, page, period, changed) {
                 input('period_from', 'Từ tiết', schedule.period_from ?? 1), input('period_to', 'Đến tiết', schedule.period_to ?? 3),
                 input('week_from', 'Từ tuần của học kỳ', schedule.week_from ?? 1), input('week_to', 'Đến tuần của học kỳ', schedule.week_to ?? Math.min(15, data.term.weeks)),
                 select('week_parity', 'Tuần học', [{ value: 'all', label: 'Tất cả' }, { value: 'odd', label: 'Tuần lẻ' }, { value: 'even', label: 'Tuần chẵn' }], schedule.week_parity ?? 'all'),
+                weekHint,
                 select('lecturer_id', 'Giảng viên trong khoa', [], null, true), lecturerHint),
             el('div', { class: 'flex justify-end gap-2' }, button('Đóng', () => dialog.close()), save));
         const dialog = el('dialog', { class: 'm-auto w-[min(94vw,720px)] max-h-[90vh] overflow-y-auto rounded-xl border border-outline-variant bg-white p-5 shadow-xl backdrop:bg-black/40' }, form);
         dialog.addEventListener('close', () => dialog.remove());
         document.body.append(dialog); dialog.showModal();
+        /**
+         * Số buổi theo tín chỉ: tổng tiết của loại lớp (lý thuyết 15 tiết / TC, thực hành 30 tiết / TC — số tiết lưu ở học
+         * phần) chia số tiết mỗi buổi, rồi tính tuần kết thúc từ tuần bắt đầu (tuần lẻ / chẵn thì cách một tuần). Không
+         * đủ tuần của học kỳ hoặc buổi thực hành ít hơn số tiết tối thiểu thì báo và không cho lưu.
+         */
+        function planWeeks(setWeekTo) {
+            const subject = subjectOptions.find((s) => String(s.id) === fields.subject_id.value);
+            const type = fields.section_type.value;
+            const theory = Number(subject?.theory_periods ?? 0);
+            const practice = Number(subject?.practice_periods ?? 0);
+            const byType = { theory: [theory, subject?.theory_credits, 'lý thuyết'], practice: [practice, subject?.practice_credits, 'thực hành'] };
+            let [total, credits, kind] = byType[type] ?? [theory + practice, subject?.credits, 'lý thuyết + thực hành'];
+            if (!total) [total, credits, kind] = [theory + practice, subject?.credits, 'cả học phần'];
+            const perSession = Number(fields.period_to.value) - Number(fields.period_from.value) + 1;
+            const fail = (text) => { planError = true; weekHint.className = 'text-xs sm:col-span-2 font-semibold text-error'; weekHint.textContent = text; save.disabled = true; };
+            planError = false;
+            if (!subject || !total || !(perSession > 0)) {
+                weekHint.className = 'text-xs sm:col-span-2 text-on-surface-variant';
+                weekHint.textContent = 'Chọn học phần và tiết học để tự tính số buổi, tuần học.';
+                return;
+            }
+            if (type === 'practice' && perSession < data.practice_min_periods) {
+                fail(`Lớp thực hành cần tối thiểu ${data.practice_min_periods} tiết mỗi buổi (đang chọn ${perSession} tiết).`);
+                return;
+            }
+            const sessions = Math.ceil(total / perSession);
+            const parity = fields.week_parity.value;
+            const step = parity === 'all' ? 1 : 2;
+            let start = Number(fields.week_from.value) || 1;
+            if ((parity === 'odd' && start % 2 === 0) || (parity === 'even' && start % 2 === 1)) start += 1;
+            const end = start + (sessions - 1) * step;
+            if (setWeekTo) fields.week_to.value = end;
+            const spare = sessions * perSession - total;
+            const plan = `${subject.code}: ${credits} TC ${kind} = ${total} tiết; ${perSession} tiết/buổi → ${sessions} buổi → tuần ${start}–${end}`
+                + (spare ? ` (buổi cuối dư ${spare} tiết)` : '') + '.';
+            if (end > data.term.weeks) {
+                fail(`${plan} Học kỳ chỉ có ${data.term.weeks} tuần: tăng số tiết mỗi buổi, bắt đầu từ tuần sớm hơn hoặc học mọi tuần.`);
+                return;
+            }
+            weekHint.className = 'text-xs sm:col-span-2 text-on-surface-variant';
+            weekHint.textContent = plan;
+            save.disabled = !fields.lecturer_id.value;
+        }
         let requestNumber = 0;
         async function refreshLecturers() {
             const version = ++requestNumber;
@@ -214,14 +260,23 @@ export async function showOfferings(container, page, period, changed) {
                     value: l.id, disabled: !l.available, selected: l.available && Number(current) === l.id,
                 }, `${l.full_name} (${l.code})${l.available ? '' : ' — TRÙNG LỊCH'}`)));
                 lecturerHint.textContent = lecturers.filter((l) => !l.available).map((l) => l.reason).join(' ') || 'Chỉ hiển thị giảng viên đang công tác trong khoa. Máy chủ kiểm tra lại lịch khi lưu.';
-                fields.lecturer_id.disabled = false; save.disabled = !fields.lecturer_id.value;
+                fields.lecturer_id.disabled = false; save.disabled = !fields.lecturer_id.value || planError;
             } catch (error) {
                 if (version !== requestNumber) return;
                 lecturerHint.textContent = error.message ?? 'Chưa kiểm tra được lịch; chọn đủ phòng, thứ, tiết và tuần học.';
             }
         }
+        // Học phần chỉ có tiết lý thuyết / chỉ có tiết thực hành thì chọn sẵn loại lớp tương ứng
+        fields.subject_id.addEventListener('change', () => {
+            const subject = subjectOptions.find((s) => String(s.id) === fields.subject_id.value);
+            if (subject && !Number(subject.theory_periods) && Number(subject.practice_periods)) fields.section_type.value = 'practice';
+            if (subject && Number(subject.theory_periods) && !Number(subject.practice_periods)) fields.section_type.value = 'theory';
+        });
+        // Tính lại tuần kết thúc trước khi kiểm tra lịch giảng viên (tuần kết thúc là một phần của lịch)
+        ['subject_id', 'section_type', 'period_from', 'period_to', 'week_from', 'week_parity'].forEach((key) => fields[key].addEventListener('change', () => planWeeks(true)));
+        ['subject_id', 'section_type'].forEach((key) => fields[key].addEventListener('change', refreshLecturers));
         ['day_of_week', 'period_from', 'period_to', 'week_from', 'week_to', 'week_parity', 'room_id'].forEach((key) => fields[key].addEventListener('change', refreshLecturers));
-        fields.lecturer_id.addEventListener('change', () => { save.disabled = !fields.lecturer_id.value; });
+        fields.lecturer_id.addEventListener('change', () => { save.disabled = !fields.lecturer_id.value || planError; });
         form.addEventListener('submit', async (event) => {
             event.preventDefault(); showAlert(message, null);
             const payload = { framework_id: fw.id, subject_id: Number(fields.subject_id.value), lecturer_id: Number(fields.lecturer_id.value),
@@ -231,6 +286,8 @@ export async function showOfferings(container, page, period, changed) {
                 dialog.close(); toast('Đã lưu lớp, giảng viên và lịch học.', 'success'); await reload(); await changed();
             } catch (error) { showAlert(message, error); }
         });
+        // Lớp mới: điền sẵn tuần kết thúc; lớp đã có lịch giữ tuần đã lưu, chỉ hiện số buổi theo tín chỉ
+        planWeeks(!section?.schedules?.length);
         if (schedule.room_id) refreshLecturers();
     }
 }

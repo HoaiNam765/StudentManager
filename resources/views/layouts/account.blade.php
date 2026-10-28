@@ -88,6 +88,7 @@
                 </nav>
             </div>
             <div class="flex items-center gap-2 shrink-0">
+                @include('partials.theme-toggle')
                 <div class="w-8 h-8 rounded-full bg-primary-container text-white text-xs flex items-center justify-center font-bold shadow-xs" aria-hidden="true">{{ $initials }}</div>
                 <span class="hidden md:inline text-xs text-on-surface font-semibold">{{ $currentUser->name }}</span>
             </div>

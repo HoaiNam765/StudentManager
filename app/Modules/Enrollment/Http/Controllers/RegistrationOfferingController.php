@@ -158,6 +158,17 @@ class RegistrationOfferingController extends Controller
         return response()->json(['deleted' => true]);
     }
 
+    /** Bỏ nhiều lớp khỏi đợt một lần (trang chọn nhiều lớp rồi xóa). */
+    public function destroyMany(Request $request, RegistrationPeriod $registrationPeriod): JsonResponse
+    {
+        $data = $request->validate([
+            'section_ids' => ['required', 'array', 'min:1', 'max:500'],
+            'section_ids.*' => ['integer', 'distinct'],
+        ], [], ['section_ids' => 'lớp đã chọn']);
+
+        return response()->json(['deleted' => $this->offerings->deleteMany($registrationPeriod, $data['section_ids'])]);
+    }
+
     public function announce(Request $request, RegistrationPeriod $registrationPeriod): JsonResponse
     {
         $period = $this->offerings->announce($registrationPeriod, $request->user());

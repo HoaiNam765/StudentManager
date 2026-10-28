@@ -22,15 +22,49 @@ export async function showOfferings(container, page, period, changed) {
     const mutable = data.editable && page.can.offerings;
     const cellOf = (facultyId, cohortId) => data.cells.find((c) => c.faculty_id === facultyId && c.cohort_id === cohortId);
     const missing = data.cells.filter((c) => !c.framework_id);
+    // Chọn nhiều lớp rồi bỏ khỏi đợt một lần (một yêu cầu, tải lại một lần)
+    const selected = new Set();
+    const checkboxes = new Map();
+    const frameworkChecks = [];
+    const selectionCount = el('span', { class: 'text-sm font-semibold' });
+    const deleteSelected = el('button', { type: 'button', class: 'rounded-lg bg-error text-white px-3 py-2 text-xs font-semibold', onclick: removeSelected });
+    const selectionBar = el('div', { hidden: true, class: 'sticky top-16 z-10 mt-4 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-error/40 bg-error-container px-3 py-2 text-on-error-container shadow-sm' },
+        selectionCount,
+        el('div', { class: 'flex gap-2' }, button('Bỏ chọn', () => { selected.clear(); syncSelection(); }), deleteSelected));
 
     container.replaceChildren(
         el('h3', { class: 'font-bold text-base' }, period.name),
         el('p', { class: 'mt-1 text-xs text-on-surface-variant' }, `${data.term.name}. Chọn kỳ CTĐT cho mọi khoa – khóa đang có sinh viên (${data.cells.length - missing.length}/${data.cells.length} đã chọn). Đủ hết, mỗi khung có lớp, mọi lớp có giảng viên và lịch thì mới công bố được.`),
         alert,
         matrix(),
+        selectionBar,
         el('div', { class: 'space-y-4 mt-4' }, data.frameworks.length
             ? data.frameworks.map(frameworkBlock)
             : emptyBlock('Chưa có khung nào', 'Chọn kỳ cho các ô trong bảng trên (hoặc "Điền theo gợi ý").', 'account_tree')));
+
+    function syncSelection() {
+        checkboxes.forEach((box, id) => { box.checked = selected.has(id); });
+        frameworkChecks.forEach(({ box, ids }) => {
+            const count = ids.filter((id) => selected.has(id)).length;
+            box.checked = count > 0 && count === ids.length;
+            box.indeterminate = count > 0 && count < ids.length;
+        });
+        selectionBar.hidden = selected.size === 0;
+        selectionCount.textContent = `Đã chọn ${selected.size} lớp`;
+        deleteSelected.textContent = `Xóa ${selected.size} lớp khỏi đợt`;
+    }
+
+    async function removeSelected(event) {
+        const target = event.currentTarget;
+        const ids = [...selected];
+        const codes = data.sections.filter((s) => selected.has(s.id)).map((s) => s.code);
+        const listed = codes.slice(0, 12).join(', ') + (codes.length > 12 ? ` và ${codes.length - 12} lớp khác` : '');
+        if (!await confirmDialog({ title: `Bỏ ${ids.length} lớp khỏi đợt?`, message: `${listed}. Các lớp dự kiến sẽ được hủy; chương trình khung giữ nguyên.`, danger: true, confirmText: `Xóa ${ids.length} lớp` })) return;
+        try {
+            const result = await withBusy(target, () => api.post(url(page.api.offeringDeleteMany), { section_ids: ids }));
+            toast(`Đã bỏ ${result.deleted} lớp khỏi đợt.`, 'success'); await reload(); await changed();
+        } catch (error) { showAlert(alert, error); }
+    }
 
     function matrix() {
         const th = (text) => el('th', { scope: 'col', class: 'px-3 py-2 text-left text-xs font-semibold text-on-surface-variant' }, text);
@@ -79,6 +113,14 @@ export async function showOfferings(container, page, period, changed) {
 
     function frameworkBlock(fw) {
         const own = data.sections.filter((s) => s.framework_id === fw.id);
+        let selectAll = null;
+        if (mutable && own.length) {
+            const box = el('input', { type: 'checkbox', class: 'rounded border-outline-variant' });
+            const ids = own.map((s) => s.id);
+            box.addEventListener('change', () => { ids.forEach((id) => (box.checked ? selected.add(id) : selected.delete(id))); syncSelection(); });
+            frameworkChecks.push({ box, ids });
+            selectAll = el('label', { class: 'inline-flex items-center gap-2 text-xs font-semibold text-on-surface-variant' }, box, `Chọn cả ${own.length} lớp của khung`);
+        }
         const head = el('div', { class: 'flex flex-wrap items-center justify-between gap-2' },
             el('div', {},
                 el('p', { class: 'font-bold text-sm' }, `${fw.faculty.name} – Khóa ${fw.cohort.code}`),
@@ -92,13 +134,22 @@ export async function showOfferings(container, page, period, changed) {
                     catch (error) { showAlert(alert, error); }
                 })) : null);
 
-        return el('section', { class: 'rounded-xl border border-outline-variant p-3 space-y-3' }, head,
+        return el('section', { class: 'rounded-xl border border-outline-variant p-3 space-y-3' }, head, selectAll,
             own.length ? el('div', { class: 'space-y-2' }, own.map((s) => sectionCard(s, fw))) : el('p', { class: 'text-xs text-amber-700 font-semibold' }, 'Chưa có lớp — bấm "Lớp & giảng viên".'));
     }
 
     function sectionCard(section, fw) {
+        const title = `${section.code} · ${section.subject.name} (${section.subject.credits} TC)`;
+        let heading = el('p', { class: 'font-semibold text-sm' }, title);
+        if (mutable) {
+            const box = el('input', { type: 'checkbox', class: 'rounded border-outline-variant', 'aria-label': `Chọn lớp ${section.code}` });
+            box.addEventListener('change', () => { box.checked ? selected.add(section.id) : selected.delete(section.id); syncSelection(); });
+            checkboxes.set(section.id, box);
+            heading = el('label', { class: 'flex items-start gap-2 font-semibold text-sm cursor-pointer' }, box, el('span', {}, title));
+        }
+
         return el('article', { class: 'rounded-lg border border-outline-variant p-3 space-y-1' },
-            el('p', { class: 'font-semibold text-sm' }, `${section.code} · ${section.subject.name} (${section.subject.credits} TC)`),
+            heading,
             el('p', { class: 'text-xs text-on-surface-variant' }, `${section.lecturer?.full_name ?? 'Chưa phân công'} · Sĩ số ${section.min_size}–${section.max_size}`),
             section.schedules.length
                 ? section.schedules.map((s) => el('p', { class: 'text-xs text-on-surface-variant' }, `${s.description} · ${s.room ?? '—'}`))

@@ -31,6 +31,7 @@ class EnrollmentAdminPageController extends Controller
                 'offeringStore' => route('admin.registration-periods.offerings.store', ['registrationPeriod' => '__ID__']),
                 'offeringUpdate' => route('admin.registration-periods.offerings.update', ['registrationPeriod' => '__ID__', 'courseSection' => '__SECTION__']),
                 'offeringDelete' => route('admin.registration-periods.offerings.destroy', ['registrationPeriod' => '__ID__', 'courseSection' => '__SECTION__']),
+                'offeringDeleteMany' => route('admin.registration-periods.offerings.destroy-many', ['registrationPeriod' => '__ID__']),
                 'lecturerOptions' => route('admin.registration-periods.lecturers', ['registrationPeriod' => '__ID__']),
                 'announce' => route('admin.registration-periods.announce', ['registrationPeriod' => '__ID__']),
                 'frameworkSetTerm' => route('admin.registration-periods.frameworks.set-term', ['registrationPeriod' => '__ID__']),

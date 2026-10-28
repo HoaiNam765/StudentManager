@@ -32,7 +32,7 @@ class AdminClassService extends BaseService
     /** @param  array<string, mixed>  $data */
     public function createCohort(array $data): Cohort
     {
-        $data['code'] ??= 'K'.$data['start_year'];
+        $data['code'] ??= Cohort::codeFor((int) $data['start_year']);
         $data['expected_end_year'] ??= (int) $data['start_year'] + (int) config('studentmanager.school_class.default_cohort_years', 4);
 
         if (Cohort::withTrashed()->where('code', $data['code'])->exists()) {

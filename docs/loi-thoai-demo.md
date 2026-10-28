@@ -40,7 +40,7 @@ Trước khi vào phòng: đã làm bước 0 (dựng dữ liệu, mở hai trì
 
 > Mỗi ngành có **chương trình đào tạo** 8 học kỳ, khoảng 130 tín chỉ, áp dụng theo khóa. Trước mỗi học kỳ, Phòng Đào tạo cần biết **mỗi khoa, mỗi khóa học những môn gì** — đó là **chương trình khung**.
 >
-> Em chọn học kỳ 2 năm 2026–2027 và khoa Công nghệ thông tin: hệ thống hiện các khóa đang học của khoa, mỗi khóa đang ở học kỳ thứ mấy. Em bấm **khóa 2026**: hệ thống tự tính đây là **học kỳ thứ 2 của khóa** và lấy đúng 9 môn từ chương trình đào tạo, kèm số lớp dự kiến theo số sinh viên.
+> Em chọn học kỳ 2 năm 2026–2027, khóa **16DH**, để **tất cả khoa**: hệ thống tự tính đây là **học kỳ thứ 2 của khóa** và hiện ngay các môn của từng khoa lấy từ chương trình đào tạo — Công nghệ thông tin 9 môn, Kinh tế 10, Ngoại ngữ 12. Em bấm **Lập khung cho tất cả khoa** là xong khung cho cả ba khoa.
 >
 > Từ khung, em bấm **Tạo đợt đăng ký**: mỗi môn nhập **số lớp**, sĩ số, và chọn **giảng viên của khoa** cho từng lớp — danh sách chỉ có giảng viên khoa Công nghệ thông tin, kèm số tiết đã nhận để chia đều. Bấm tạo: hệ thống tạo đợt và mở lớp **trong một giao dịch** — một lớp lỗi thì không tạo gì — rồi chuyển sang trang đăng ký học phần.
 
@@ -48,13 +48,12 @@ Trước khi vào phòng: đã làm bước 0 (dựng dữ liệu, mở hai trì
 
 > Lớp vừa mở ghi "chưa xếp lịch". Em xếp lịch: chọn thứ Hai tiết 1 đến 4 thì thầy Nguyễn Văn An bị khóa vì **trùng lịch** với lớp thầy đang dạy; chọn phòng B101 thì hệ thống báo **trùng phòng**. Chuyển sang thứ Bảy, phòng A101 → lưu.
 >
-> Em bấm **Công bố** luôn thì bị chặn: phải **thông báo xem trước** đã — và lớp nào chưa có lịch thì cũng không thông báo được. Em bấm **Thông báo xem trước**: 50 sinh viên khoa Công nghệ thông tin khóa 2026 nhận thông báo.
+> Em bấm **Công bố** luôn thì bị chặn: phải **thông báo xem trước** đã — và lớp nào chưa có lịch thì cũng không thông báo được. Em bấm **Thông báo xem trước**: 50 sinh viên khoa Công nghệ thông tin khóa 16DH nhận thông báo.
 >
 > *(Cửa sổ sinh viên)* Sinh viên bấm thông báo là tới đúng đợt: thấy môn, giảng viên, lịch, phòng, **ngày bắt đầu học**, nhưng **chưa đăng ký được**.
 >
 > *(Quay lại cán bộ)* Em **Công bố**: đợt chờ đến giờ mở, đúng giờ thì máy chủ tự cho đăng ký. Em bấm **Mở ngay** để demo — đợt mở sớm, hạn đóng giữ nguyên.
 >
-> Em cũng **công bố thời khóa biểu học kỳ 1** — có công bố thì giảng viên mới thấy lịch dạy; sau công bố, đổi lịch phải có lý do và báo trước.
 
 ## E. Sinh viên đăng ký học phần (3 phút) — `2601030001`
 
@@ -70,7 +69,7 @@ Trước khi vào phòng: đã làm bước 0 (dựng dữ liệu, mở hai trì
 
 ## F. Giảng viên dạy học (3 phút) — `GV0001`
 
-> Đổi sang **giảng viên**. Lịch giảng dạy hiện các buổi dạy trong tuần. Trang lớp học phần có danh sách 50 sinh viên, in được, xuất được.
+> Đổi sang **giảng viên**. Trang tổng quan hiện buổi dạy hôm nay với phòng, sĩ số, đã điểm danh bao nhiêu; lịch giảng dạy hiện các buổi trong tuần — thời khóa biểu học kỳ đang học đã công bố, nên giảng viên thấy ngay. Trang lớp học phần có danh sách 50 sinh viên, in được, xuất được.
 >
 > **Điểm danh**: chọn buổi vừa dạy, đánh một em vắng, lưu. Quá hạn sửa thì giảng viên không sửa thẳng được mà phải gửi **yêu cầu sửa** cho Phòng Đào tạo duyệt. Hệ thống tự tính tỷ lệ vắng theo quy chế, vượt ngưỡng thì **cảnh báo**, vượt nữa thì **cấm thi**, và gửi thông báo cho sinh viên.
 >
@@ -86,7 +85,7 @@ Trước khi vào phòng: đã làm bước 0 (dựng dữ liệu, mở hai trì
 
 ## G. Sinh viên xem kết quả học tập (2 phút) — `2501010010`
 
-> Đây là một sinh viên khóa 2025 đã học hai học kỳ. **Kết quả học tập**: điểm từng môn, **GPA học kỳ**, **GPA tích lũy 3,82 — Xuất sắc**. GPA tự tính lại mỗi khi điểm được công bố, học lại thì lấy điểm cao nhất theo quy chế.
+> Đây là một sinh viên khóa 15DH đã học hai học kỳ. **Kết quả học tập**: điểm từng môn, **GPA học kỳ**, **GPA tích lũy 3,82 — Xuất sắc**. GPA tự tính lại mỗi khi điểm được công bố, học lại thì lấy điểm cao nhất theo quy chế.
 >
 > Ngoài ra sinh viên xem được **chuyên cần**, **tiến độ chương trình đào tạo**, và **tự cập nhật hồ sơ** — thông tin liên hệ thì sửa ngay; còn họ tên, ngày sinh, CCCD thì phải gửi yêu cầu kèm minh chứng để cán bộ duyệt.
 

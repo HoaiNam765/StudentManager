@@ -5,6 +5,10 @@ namespace Tests\Feature;
 use App\Models\User;
 use App\Modules\SchoolClass\Models\CourseSection;
 use App\Modules\SchoolClass\Models\SectionInstructor;
+use App\Modules\Timetable\Models\ClassSession;
+use App\Modules\Timetable\Models\Period;
+use App\Modules\Timetable\Services\TimetablePublication;
+use Carbon\CarbonImmutable;
 use Database\Seeders\AcademicYearSeeder;
 use Database\Seeders\CurriculumSeeder;
 use Database\Seeders\FacultySeeder;
@@ -63,6 +67,24 @@ class TeacherPortalPagesTest extends TestCase
         $this->assertArrayHasKey('students_count', $row);
         $this->assertNotEmpty($row['schedule']);
         $this->assertSame('draft', $row['grade_status']['value']);
+    }
+
+    public function test_tong_quan_giang_vien_dung_lich_day_that_va_mo_dung_buoi_diem_danh(): void
+    {
+        $section = CourseSection::query()->whereIn('id', DB::table('schedule_rules')->whereNull('deleted_at')->select('course_section_id'))->with('term')->firstOrFail();
+        $user = $this->lecturerOf($section);
+        $session = ClassSession::query()->where('course_section_id', $section->id)->where('status', 'planned')->with('room')->orderBy('date')->firstOrFail();
+        $start = Period::query()->whereNull('campus_id')->where('number', $session->period_from)->value('starts_at');
+        $section->update(['status' => 'in_progress']);
+
+        // Chưa công bố thời khóa biểu: không hiện lịch, báo rõ; không còn số liệu mẫu của bản thiết kế
+        $this->travelTo(CarbonImmutable::parse($session->date->toDateString().' '.$start, config('studentmanager.display_timezone'))->addMinutes(10));
+        $this->actingAs($user)->get('/teacher')->assertOk()->assertSee('chưa công bố')->assertDontSee('IT302')->assertSee($section->code);
+
+        app(TimetablePublication::class)->publish($section->term);
+        $this->get('/teacher')->assertOk()
+            ->assertSee('Lịch giảng dạy hôm nay')->assertSee('Đang diễn ra')->assertSee($session->room->code)
+            ->assertSee(route('teacher.pages.attendance').'?section='.$section->id.'&session='.$session->id, false);
     }
 
     public function test_quan_tri_xem_chi_tiet_lop_hoc_phan(): void

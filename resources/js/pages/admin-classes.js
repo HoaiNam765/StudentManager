@@ -121,7 +121,7 @@ export default function adminClasses(root) {
         const saved = await formDialog({
             title: c ? `Sửa lớp ${c.code}` : 'Thêm lớp hành chính',
             fields: [
-                { name: 'code', label: 'Mã lớp', required: true, value: c?.code, hint: 'Ví dụ 26DHCNTT01; không đổi khi lớp đã có sinh viên' },
+                { name: 'code', label: 'Mã lớp', required: true, value: c?.code, hint: 'Ví dụ 16DHCNTT01; không đổi khi lớp đã có sinh viên' },
                 { name: 'name', label: 'Tên lớp', required: true, value: c?.name },
                 { name: 'cohort_id', label: 'Khóa', type: 'select', required: true, value: c?.cohort?.id, placeholder: 'Chọn khóa', options: state.cohorts.map((x) => ({ value: x.id, label: `${x.code} (${x.start_year})` })) },
                 { name: 'major_id', label: 'Ngành', type: 'select', required: true, value: c?.major?.id, placeholder: 'Chọn ngành', options: state.majors.map((x) => ({ value: x.id, label: x.name })) },

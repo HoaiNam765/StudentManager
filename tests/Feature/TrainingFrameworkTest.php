@@ -172,6 +172,27 @@ class TrainingFrameworkTest extends TestCase
         $this->get(route('admin.pages.training-frameworks'))->assertOk()->assertSee('admin-training-frameworks');
     }
 
+    public function test_chon_hoc_ky_va_khoa_hoc_tat_ca_khoa_xem_mon_va_lap_khung_mot_lan(): void
+    {
+        $this->actingAs($this->acad);
+        $query = ['term_id' => $this->term->id, 'cohort_id' => $this->cohort->id];
+        $overview = collect($this->getJson(route('admin.training-frameworks.faculty-overview', $query))->assertOk()->json());
+
+        // Mọi khoa có ngành, mỗi khoa xem trước môn học kỳ thứ 2 theo CTĐT; khoa không có ngành (KHCB) không hiện
+        $withMajors = Major::query()->distinct()->pluck('faculty_id')->sort()->values()->all();
+        $this->assertSame($withMajors, $overview->pluck('faculty.id')->sort()->values()->all());
+        $this->assertTrue($overview->every(fn ($row) => $row['planned_term'] === 2 && $row['framework'] === null && count($row['subjects']) > 0));
+
+        $this->postJson(route('admin.training-frameworks.all-faculties'), $query)->assertCreated()->assertJsonPath('created', count($withMajors));
+        $after = collect($this->getJson(route('admin.training-frameworks.faculty-overview', $query))->assertOk()->json());
+        foreach ($overview as $row) {
+            $this->assertSame(count($row['subjects']), $after->firstWhere('faculty.id', $row['faculty']['id'])['framework']['items_count']);
+        }
+        // Chạy lại không lập trùng
+        $this->postJson(route('admin.training-frameworks.all-faculties'), $query)->assertCreated()->assertJsonPath('created', 0);
+        $this->actingAs($this->userWithRoles('LEC'))->postJson(route('admin.training-frameworks.all-faculties'), $query)->assertForbidden();
+    }
+
     public function test_chon_hoc_ky_va_khoa_thay_cac_khoa_lap_khung_tu_lay_mon_tu_ctdt(): void
     {
         $facultyId = Major::query()->findOrFail($this->curriculum->major_id)->faculty_id;

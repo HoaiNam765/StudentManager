@@ -21,6 +21,9 @@ export default function teacherAttendance(root) {
     const sectionSelect = root.querySelector('[data-input="section"]');
     const sessionSelect = root.querySelector('[data-input="session"]');
     const state = { sections: [], sessions: [], sheet: null, marks: new Map(), tab: 'sheet' };
+    // Từ trang Tổng quan (?section=&session=): mở đúng lớp và buổi, chỉ dùng cho lần tải đầu
+    const params = new URLSearchParams(window.location.search);
+    const preset = { section: params.get('section'), session: params.get('session') };
 
     root.querySelectorAll('[data-tab]').forEach((tab) => tab.addEventListener('click', () => showTab(tab.dataset.tab)));
     sectionSelect.addEventListener('change', loadSessions);
@@ -58,6 +61,8 @@ export default function teacherAttendance(root) {
             }
 
             sectionSelect.replaceChildren(...state.sections.map((s) => el('option', { value: s.id }, `${s.code} - ${s.subject?.name ?? ''}`)));
+            if (preset.section && state.sections.some((s) => String(s.id) === preset.section)) sectionSelect.value = preset.section;
+            preset.section = null;
             await loadSessions();
         } catch (error) {
             region('rows').replaceChildren(errorBlock(error, loadSections));
@@ -75,7 +80,9 @@ export default function teacherAttendance(root) {
                 `Buổi ${s.week ?? i + 1} • ${s.date === today ? 'Hôm nay ' : ''}${dmy(s.date)} • Tiết ${s.period_from}-${s.period_to}${s.open ? (s.within_edit ? (s.recorded ? ' (đã điểm danh)' : ' - Đang mở') : ' (quá hạn sửa)') : ` (${s.status === 'planned' ? 'chưa diễn ra' : s.status_label})`}`)));
             // Mặc định: buổi gần nhất đã mở
             const latest = [...state.sessions].reverse().find((s) => s.open);
-            sessionSelect.value = String(latest?.id ?? state.sessions[0]?.id ?? '');
+            const wanted = state.sessions.find((s) => String(s.id) === preset.session);
+            sessionSelect.value = String(wanted?.id ?? latest?.id ?? state.sessions[0]?.id ?? '');
+            preset.session = null;
             await loadSheet();
         } catch (error) {
             region('rows').replaceChildren(errorBlock(error, loadSessions));

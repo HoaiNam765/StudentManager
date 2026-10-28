@@ -9,6 +9,7 @@ use App\Modules\Grade\Models\CourseResult;
 use App\Modules\Grade\Models\CumulativeGpa;
 use App\Modules\Grade\Models\GradeEntry;
 use App\Modules\Grade\Models\TermGpa;
+use App\Modules\SchoolClass\Models\Cohort;
 use App\Modules\Student\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -113,7 +114,7 @@ class GradePageController extends Controller
 
     /**
      * Thông tin sinh viên theo các khóa view student/grade/grades đang đọc: `cohort?->code` (khóa lưu dạng năm, hiển thị
-     * "K2025"), `adminClass?->code` (lớp hành chính hiện hành), `major?->name`.
+     * "16DH"), `adminClass?->code` (lớp hành chính hiện hành), `major?->name`.
      */
     private function profile(Student $student): object
     {
@@ -125,7 +126,7 @@ class GradePageController extends Controller
             'student_code' => $student->student_code,
             'major' => $student->major()->first(['id', 'name']),
             'adminClass' => $class,
-            'cohort' => $student->cohort === null ? null : (object) ['code' => 'K'.$student->cohort],
+            'cohort' => $student->cohort === null ? null : (object) ['code' => Cohort::query()->where('start_year', $student->cohort)->value('code') ?? Cohort::codeFor((int) $student->cohort)],
         ];
     }
 }

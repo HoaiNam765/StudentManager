@@ -11,6 +11,8 @@ use App\Modules\SchoolClass\Enums\SectionStatus;
 use App\Modules\SchoolClass\Models\CourseSection;
 use App\Modules\SchoolClass\Models\SectionInstructor;
 use App\Modules\Timetable\Models\ClassSession;
+use App\Modules\Timetable\Models\TermTimetable;
+use App\Modules\Timetable\Services\TimetablePublication;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Seeder;
@@ -20,7 +22,7 @@ use Illuminate\Support\Facades\DB;
  * Dữ liệu demo điểm danh (#142–#144) cho học kỳ đang diễn ra: mỗi lớp học phần đang học chưa có buổi học thì xếp lịch
  * tuần 1–15 có phòng qua `TimetableSeeder::place` (sinh viên của lớp không bị trùng buổi; buổi sinh tự động, trùng ngày
  * nghỉ thì Nghỉ), điểm danh các buổi đã qua (đa số có mặt, một ít vắng / có phép / đi muộn; vài sinh viên vắng nhiều để
- * có cảnh báo và cấm thi), tính lại tổng hợp. Chạy lại thì bỏ qua lớp đã có buổi học.
+ * có cảnh báo và cấm thi), tính lại tổng hợp, rồi công bố thời khóa biểu học kỳ đó. Chạy lại thì bỏ qua lớp đã có buổi học.
  *
  *     php artisan db:seed --class=AttendanceDemoSeeder
  */
@@ -113,6 +115,11 @@ class AttendanceDemoSeeder extends Seeder
             });
 
             $calculator->recalculateSection($section);
+        }
+
+        // Học kỳ đang học thì thời khóa biểu đã công bố: giảng viên thấy lịch dạy, sinh viên thấy lịch chính thức
+        if ($sections->isNotEmpty() && ! TermTimetable::query()->where('term_id', $term->id)->exists()) {
+            app(TimetablePublication::class)->publish($term);
         }
 
         $this->command?->info("Dữ liệu demo điểm danh: {$sections->count()} lớp học phần, {$recorded} lượt điểm danh.");

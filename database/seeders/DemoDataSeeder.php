@@ -30,7 +30,6 @@ use App\Modules\Teacher\Models\Lecturer;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 /**
  * Dữ liệu demo trọn vòng đời học kỳ (#122; BA 11.2, FR-SYS-016, BR-SYS-10, NFR-DAT-02). Chạy bằng `php artisan demo:seed`
@@ -146,10 +145,8 @@ class DemoDataSeeder extends Seeder
         $type = TrainingType::query()->where('code', 'CQ')->firstOrFail();
 
         foreach (Major::query()->orderBy('code')->get() as $major) {
-            $initials = collect(preg_split('/\s+/u', Str::ascii($major->name)) ?: [])->filter()->map(fn (string $w) => Str::upper(Str::substr($w, 0, 1)))->implode('');
-
-            AdminClass::query()->firstOrCreate(['code' => ($year % 100)."DH{$initials}01"], [
-                'name' => "Lớp {$major->name} K{$year} - 01",
+            AdminClass::query()->firstOrCreate(['code' => SchoolClassSeeder::adminClassCode($cohort, $major)], [
+                'name' => "Lớp {$major->name} {$cohort->code}",
                 'cohort_id' => $cohort->id,
                 'major_id' => $major->id,
                 'training_type_id' => $type->id,

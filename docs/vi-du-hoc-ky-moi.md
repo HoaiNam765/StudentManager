@@ -1,10 +1,10 @@
 # Ví dụ tự làm: chuẩn bị một học kỳ mới từ đầu
 
-Làm theo trên giao diện, đúng thứ tự nghiệp vụ của hệ thống. Ví dụ dùng **Học kỳ 2 năm 2026–2027** (bắt đầu 25/01/2027, đang ở trạng thái *Dự kiến*) và **khóa K2025, khoa Công nghệ thông tin**.
+Làm theo trên giao diện, đúng thứ tự nghiệp vụ của hệ thống. Ví dụ dùng **Học kỳ 2 năm 2026–2027** (bắt đầu 25/01/2027, đang ở trạng thái *Dự kiến*) và **khóa 15DH, khoa Công nghệ thông tin**.
 
 Đã chạy thử trên bản sao dữ liệu mẫu ngày 27/10/2026 (CTĐT đầy đủ 8 học kỳ, luồng đăng ký theo chương trình khung); số liệu bên dưới là kết quả thật.
 
-> **Lưu ý:** làm ví dụ này sẽ thêm dữ liệu vào `student_manager`, và đợt đăng ký đã có lớp thì không xóa được. Nếu sau đó demo theo `docs/kich-ban-demo.md`, hãy dựng lại dữ liệu sạch trước buổi demo (`php artisan migrate:fresh --seed; php artisan demo:seed`). Ví dụ dùng khóa K2025 nên không trùng với kịch bản demo (khóa K2026).
+> **Lưu ý:** làm ví dụ này sẽ thêm dữ liệu vào `student_manager`, và đợt đăng ký đã có lớp thì không xóa được. Nếu sau đó demo theo `docs/kich-ban-demo.md`, hãy dựng lại dữ liệu sạch trước buổi demo (`php artisan migrate:fresh --seed; php artisan demo:seed`). Ví dụ dùng khóa 15DH nên không trùng với kịch bản demo (khóa 16DH).
 
 Mật khẩu mọi tài khoản: `password`. Chạy `php artisan serve`, mở http://127.0.0.1:8000/login.
 
@@ -29,7 +29,7 @@ Ví dụ dùng HK2 2026–2027 có sẵn. Muốn một học kỳ hoàn toàn m�
 
 1. **Năm học & Lịch học vụ** (`/admin/nam-hoc`) → **Tạo / sửa năm học**: tên `2027-2028`, bắt đầu 16/08/2027, kết thúc 13/08/2028 → **Lưu năm học** (không chồng lên năm 2026–2027 kết thúc 14/08/2027).
 2. **Tạo học kỳ**: Năm học `2027-2028`, tên `Học kỳ 1`, loại **Học kỳ chính**, 18 tuần, 06/09/2027 → 09/01/2028 → **Tạo học kỳ** → học kỳ ở trạng thái *Dự kiến*.
-3. Rồi làm từ Bước 1 với học kỳ mới: ở trang Chương trình khung chọn **Học kỳ 1 · 2027-2028** + **CNTT** → hiện **K2026 (học kỳ thứ 3)** và **K2025 (học kỳ thứ 5)**; bấm K2026 → khung có 7 môn học kỳ 3 → **Tạo đợt đăng ký** (giờ đóng mặc định 10 ngày trước ngày học).
+3. Rồi làm từ Bước 1 với học kỳ mới: ở trang Chương trình khung chọn **Học kỳ 1 · 2027-2028** + **CNTT** → hiện **16DH (học kỳ thứ 3)** và **15DH (học kỳ thứ 5)**; bấm 16DH → khung có 7 môn học kỳ 3 → **Tạo đợt đăng ký** (giờ đóng mặc định 10 ngày trước ngày học).
 
 ## Bước 1. Lịch học vụ của học kỳ — `acad.test`
 
@@ -39,7 +39,7 @@ Ví dụ dùng HK2 2026–2027 có sẵn. Muốn một học kỳ hoàn toàn m�
 
 ## Bước 2. Chương trình khung — `acad.test`
 
-**Chương trình khung** (`/admin/chuong-trinh-khung`) → chọn **Học kỳ 2 · 2026-2027** và khoa **CNTT** → danh sách hiện các khóa của khoa → bấm **Khóa K2025** ("Học kỳ thứ 4 của khóa · 50 sinh viên · Chưa lập").
+**Chương trình khung** (`/admin/chuong-trinh-khung`) → chọn **Học kỳ 2 · 2026-2027** và khoa **CNTT** → danh sách hiện các khóa của khoa → bấm **Khóa 15DH** ("Học kỳ thứ 4 của khóa · 50 sinh viên · Chưa lập").
 
 Hệ thống lập khung và lấy luôn **11 học phần** có "học kỳ dự kiến = 4" trong CTĐT các ngành của khoa:
 
@@ -58,7 +58,7 @@ Hệ thống lập khung và lấy luôn **11 học phần** có "học kỳ d�
 ## Bước 3. Tạo đợt đăng ký từ chương trình khung — `acad.test`
 
 Cùng trang, bấm **Tạo đợt đăng ký**:
-- Tên (soạn sẵn): `Đăng ký Học kỳ 2 2026-2027 — CNTT K2025`; Vòng: **Vòng 2**
+- Tên (soạn sẵn): `Đăng ký Học kỳ 2 2026-2027 — CNTT 15DH`; Vòng: **Vòng 2**
 - Mở lúc: ngày mai 08:00; Đóng lúc: **15/01/2027 23:00**
 - Bảng học phần — mỗi môn **Số lớp**, **Sĩ số tối đa**, **giảng viên từng lớp** (chỉ giảng viên khoa CNTT, kèm "đã nhận / định mức tiết"). Ví dụ chỉ mở 3 môn, các môn khác để **Số lớp = 0**:
 
@@ -94,12 +94,12 @@ Những gì hệ thống kiểm tra khi lưu:
 ## Bước 5. Thông báo xem trước → Công bố → Mở — `acad.test`
 
 1. Bấm **Công bố** ngay → **bị chặn**: "Cần thông báo danh sách học phần để sinh viên xem trước."
-2. Bấm **Thông báo xem trước** → đợt ghi "Đã thông báo – chỉ xem trước"; 50 sinh viên CNTT khóa 2025 nhận thông báo, mở ra xem được lớp / giảng viên / lịch nhưng **chưa đăng ký được**.
+2. Bấm **Thông báo xem trước** → đợt ghi "Đã thông báo – chỉ xem trước"; 50 sinh viên CNTT khóa 15DH nhận thông báo, mở ra xem được lớp / giảng viên / lịch nhưng **chưa đăng ký được**.
 3. Bấm **Công bố** → đợt chờ đến giờ mở (đúng giờ máy chủ tự cho đăng ký). Muốn thử ngay thì bấm **Mở ngay (sớm hơn lịch)**: đợt mở luôn, giữ nguyên hạn đóng, sinh viên nhận thêm thông báo.
 
 > Sau khi công bố, danh sách lớp của đợt không thêm / sửa được nữa — kiểm tra kỹ ở bước 3–4 trước khi công bố.
 
-## Bước 6. Sinh viên đăng ký — `2501030001` (Nhâm Bích Phong, K2025, Kỹ thuật phần mềm)
+## Bước 6. Sinh viên đăng ký — `2501030001` (Nhâm Bích Phong, 15DH, Kỹ thuật phần mềm)
 
 1. Chuông thông báo: "Xem trước học phần: …" và "Công bố đăng ký: …" → **Xem chi tiết** mở đúng đợt.
 2. **Đăng ký học phần**: khung **11–27 tín chỉ** (học lực khá trở lên được đăng ký thêm).

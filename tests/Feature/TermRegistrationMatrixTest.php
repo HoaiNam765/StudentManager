@@ -140,6 +140,46 @@ class TermRegistrationMatrixTest extends TestCase
         $this->actingAs($this->userWithRoles('LEC'))->putJson(route('admin.registration-periods.frameworks.set-term', $period), ['faculty_id' => $facultyId, 'cohort_id' => $cntt26->cohort_id, 'planned_term' => 2])->assertForbidden();
     }
 
+    public function test_khung_gom_nhieu_nganh_sinh_vien_chi_thay_mon_cua_nganh_minh(): void
+    {
+        $period = $this->createPeriod();
+        $framework = $this->setTerm($period, 'CNTT', 2026, 2);
+        // Khoa CNTT có hai ngành: CNTT (sinh viên cntt26) và Kỹ thuật phần mềm
+        $seMajor = Major::query()->whereHas('faculty', fn ($q) => $q->where('code', 'CNTT'))->where('code', '7480103')->firstOrFail();
+        $seCurriculum = Curriculum::query()->inForce()->forCohort(2026)->where('major_id', $seMajor->id)->firstOrFail();
+        $se26 = Student::factory()->create(['major_id' => $seMajor->id, 'cohort' => 2026, 'status' => 'studying']);
+        StudentCurriculum::create(['student_id' => $se26->id, 'curriculum_id' => $seCurriculum->id, 'effective_from' => now()->toDateString()]);
+        $cnttSubjects = CurriculumSubject::query()->where('curriculum_id', $this->cnttCurriculum->id)->pluck('subject_id');
+        $seSubjects = CurriculumSubject::query()->where('curriculum_id', $seCurriculum->id)->pluck('subject_id');
+        $seOnly = $seSubjects->diff($cnttSubjects)->first();
+        $shared = $seSubjects->intersect($cnttSubjects)->first();
+        // Môn thêm tay ngoài CTĐT của mọi ngành trong khoa (ví dụ môn của khoa Kinh tế)
+        $extra = Subject::query()->whereNotIn('id', $cnttSubjects->merge($seSubjects))->where('status', 'active')->orderBy('code')->value('id');
+        $this->assertNotNull($seOnly);
+        $this->assertNotNull($shared);
+        $this->assertNotNull($extra);
+        foreach ([$seOnly, $shared, $extra] as $subjectId) {
+            if (! $framework->items()->where('subject_id', $subjectId)->exists()) {
+                app(TrainingFrameworkService::class)->addItem($framework, ['subject_id' => $subjectId, 'compulsory' => false]);
+            }
+        }
+        $seClass = $this->openClass($period, $framework, $seOnly);
+        $sharedClass = $this->openClass($period, $framework, $shared);
+        $extraClass = $this->openClass($period, $framework, $extra);
+        $period->refresh();
+
+        $cntt = collect(app(AvailableSections::class)->listFor($this->cntt26, $period))->pluck('id');
+        $this->assertFalse($cntt->contains($seClass), 'Môn chỉ có ở CTĐT ngành khác cùng khoa không hiện');
+        $this->assertTrue($cntt->contains($sharedClass));
+        $this->assertTrue($cntt->contains($extraClass), 'Môn thêm tay ngoài CTĐT các ngành vẫn hiện cho cả khoa – khóa');
+        $reasons = app(EnrollmentRules::class)->check($this->cntt26, CourseSection::findOrFail($seClass), $period);
+        $this->assertTrue(collect($reasons)->contains(fn ($r) => str_contains($r, 'không dành cho khoa – khóa')));
+
+        $se = collect(app(AvailableSections::class)->listFor($se26, $period))->pluck('id');
+        $this->assertTrue($se->contains($seClass));
+        $this->assertTrue($se->contains($sharedClass));
+    }
+
     public function test_sinh_vien_chi_thay_lop_khung_minh_va_hoc_bu_khong_thay_mon_da_dat(): void
     {
         $period = $this->createPeriod();

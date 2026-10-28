@@ -10,6 +10,7 @@ use App\Modules\Curriculum\Models\Curriculum;
 use App\Modules\Curriculum\Models\CurriculumSubject;
 use App\Modules\Enrollment\Enums\PeriodStatus;
 use App\Modules\Enrollment\Models\RegistrationPeriod;
+use App\Modules\Faculty\Models\Faculty;
 use App\Modules\Faculty\Models\Major;
 use App\Modules\Notification\Models\Notification;
 use App\Modules\Notification\Services\AnnouncementService;
@@ -24,6 +25,7 @@ use App\Modules\Subject\Models\Subject;
 use App\Support\Exceptions\BusinessRuleException;
 use App\Support\Services\BaseService;
 use Carbon\CarbonImmutable;
+use Illuminate\Support\Collection;
 
 /**
  * Chương trình khung theo khoa – khóa – học kỳ: khai báo học phần dự kiến mở, gợi ý từ CTĐT, mở lớp học phần hàng loạt
@@ -303,6 +305,82 @@ class TrainingFrameworkService extends BaseService
             ->where('cohort', $cohort->start_year)
             ->whereIn('major_id', Major::query()->select('id')->where('faculty_id', $facultyId))
             ->count();
+    }
+
+    /**
+     * Chọn học kỳ + khóa, mọi khoa: mỗi khoa có ngành (CTĐT đang áp dụng cho khóa) kèm học kỳ thứ mấy của khóa, số sinh
+     * viên, khung đã lập (nếu có) và danh sách môn — của khung đã lập, hoặc xem trước từ CTĐT khi chưa lập.
+     *
+     * @return list<array{faculty: Faculty, planned_term: ?int, students: int, framework: ?TrainingFramework, subjects: list<array{code: string, name: string, credits: int, compulsory: bool}>}>
+     */
+    public function facultyOverview(Term $term, Cohort $cohort): array
+    {
+        $plannedTerm = $this->cohortTermNumber($cohort, $term);
+        $frameworks = TrainingFramework::query()->with('items.subject')
+            ->where(['term_id' => $term->id, 'cohort_id' => $cohort->id])->get()->keyBy('faculty_id');
+        $rows = [];
+
+        foreach (Faculty::query()->whereHas('majors')->orderBy('code')->get() as $faculty) {
+            $framework = $frameworks->get($faculty->id);
+            $subjects = $framework !== null
+                ? $framework->items->map(fn (TrainingFrameworkItem $i) => ['code' => $i->subject->code, 'name' => $i->subject->name, 'credits' => (int) $i->subject->credits, 'compulsory' => (bool) $i->compulsory])
+                : $this->curriculumSubjects($faculty->id, $cohort, $plannedTerm);
+
+            if ($framework === null && $subjects->isEmpty()) {
+                continue; // Khoa không có ngành / CTĐT cho khóa này
+            }
+
+            $rows[] = [
+                'faculty' => $faculty, 'planned_term' => $plannedTerm, 'students' => $this->studentsOf($faculty->id, $cohort),
+                'framework' => $framework,
+                'subjects' => $subjects->sortBy([['compulsory', 'desc'], ['code', 'asc']])->values()->all(),
+            ];
+        }
+
+        return $rows;
+    }
+
+    /**
+     * Lập khung cho mọi khoa còn thiếu ở học kỳ + khóa (mỗi khung lấy môn theo CTĐT). Khoa đã có khung giữ nguyên.
+     *
+     * @return list<TrainingFramework>
+     */
+    public function createForAllFaculties(Term $term, Cohort $cohort): array
+    {
+        $this->assertTermOpen($term);
+
+        return $this->transaction(function () use ($term, $cohort): array {
+            $created = [];
+
+            foreach ($this->facultyOverview($term, $cohort) as $row) {
+                if ($row['framework'] === null) {
+                    $framework = $this->create(['faculty_id' => $row['faculty']->id, 'cohort_id' => $cohort->id, 'term_id' => $term->id]);
+                    $this->suggestFromCurriculum($framework);
+                    $created[] = $framework;
+                }
+            }
+
+            return $created;
+        });
+    }
+
+    /** @return Collection<int, array{code: string, name: string, credits: int, compulsory: bool}> */
+    private function curriculumSubjects(int $facultyId, Cohort $cohort, ?int $plannedTerm): Collection
+    {
+        if ($plannedTerm === null) {
+            return collect();
+        }
+
+        $curricula = Curriculum::query()->inForce()->forCohort($cohort->start_year)
+            ->whereIn('major_id', Major::query()->where('faculty_id', $facultyId)->select('id'))->pluck('id');
+
+        return CurriculumSubject::query()->with('subject')->whereIn('curriculum_id', $curricula)->where('planned_term', $plannedTerm)->get()
+            ->groupBy('subject_id')
+            ->map(fn (Collection $rows) => [
+                'code' => $rows->first()->subject->code, 'name' => $rows->first()->subject->name, 'credits' => (int) $rows->first()->subject->credits,
+                'compulsory' => $rows->contains(fn (CurriculumSubject $c) => $c->curriculum_elective_group_id === null),
+            ])
+            ->values();
     }
 
     /**

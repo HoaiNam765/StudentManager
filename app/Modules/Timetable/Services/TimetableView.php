@@ -75,6 +75,7 @@ class TimetableView extends BaseService
                 'period_from' => $s->period_from,
                 'period_to' => $s->period_to,
                 'time' => ($frame->get($s->period_from)?->startTime() ?? '?').'–'.($frame->get($s->period_to)?->endTime() ?? '?'),
+                'section_id' => $s->course_section_id,
                 'section' => $s->section->code,
                 'subject' => $s->section->subject->name,
                 'lecturer' => $instructors->get($s->course_section_id)?->lecturer?->full_name,

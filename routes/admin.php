@@ -511,10 +511,12 @@ Route::middleware('auth')->group(function (): void {
     Route::middleware('permission:CLS.view')->group(function (): void {
         Route::get('training-frameworks', [TrainingFrameworkController::class, 'index'])->name('training-frameworks.index');
         Route::get('training-frameworks/cohort-options', [TrainingFrameworkController::class, 'cohortOptions'])->name('training-frameworks.cohort-options');
+        Route::get('training-frameworks/faculty-overview', [TrainingFrameworkController::class, 'facultyOverview'])->name('training-frameworks.faculty-overview');
         Route::get('training-frameworks/{trainingFramework}', [TrainingFrameworkController::class, 'show'])->whereNumber('trainingFramework')->name('training-frameworks.show');
     });
     Route::middleware('permission:CLS.create,ALL')->group(function (): void {
         Route::post('training-frameworks', [TrainingFrameworkController::class, 'store'])->name('training-frameworks.store');
+        Route::post('training-frameworks/all-faculties', [TrainingFrameworkController::class, 'storeForAllFaculties'])->name('training-frameworks.all-faculties');
         Route::put('training-frameworks/{trainingFramework}', [TrainingFrameworkController::class, 'update'])->whereNumber('trainingFramework')->name('training-frameworks.update');
         Route::delete('training-frameworks/{trainingFramework}', [TrainingFrameworkController::class, 'destroy'])->whereNumber('trainingFramework')->name('training-frameworks.destroy');
         Route::post('training-frameworks/{trainingFramework}/items', [TrainingFrameworkController::class, 'storeItem'])->whereNumber('trainingFramework')->name('training-frameworks.items.store');

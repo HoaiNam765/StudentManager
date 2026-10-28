@@ -19,7 +19,7 @@ export default function adminTrainingFrameworks(root) {
 
     root.querySelector('[data-action="reload"]').addEventListener('click', loadList);
     root.querySelector('[data-action="create"]')?.addEventListener('click', createFramework);
-    Object.values(filters).forEach((select) => select.addEventListener('change', loadList));
+    Object.values(filters).forEach((select) => select.addEventListener('change', () => { state.selectedId = null; loadList(); }));
 
     bootstrap();
 
@@ -49,6 +49,10 @@ export default function adminTrainingFrameworks(root) {
         if (filters.term.value && filters.faculty.value && !filters.cohort.value) {
             return loadCohorts();
         }
+        // Chọn học kỳ + khóa, "Tất cả khoa": hiện mọi khoa với môn theo học kỳ thứ n của khóa
+        if (filters.term.value && filters.cohort.value && !filters.faculty.value) {
+            return loadFaculties();
+        }
         try {
             const list = rows(await api.get(page.api.list, { term_id: filters.term.value, faculty_id: filters.faculty.value, cohort_id: filters.cohort.value }));
             // Chọn đủ học kỳ – khoa – khóa thì mở luôn khung tương ứng
@@ -61,6 +65,106 @@ export default function adminTrainingFrameworks(root) {
                 : emptyBlock('Chưa có chương trình khung', page.can.create ? 'Bấm "Lập chương trình khung" để bắt đầu.' : 'Thay bộ lọc để xem khung khác.', 'account_tree'));
         } catch (error) {
             region('list').replaceChildren(errorBlock(error, loadList));
+        }
+    }
+
+    async function loadFaculties() {
+        try {
+            const query = { term_id: filters.term.value, cohort_id: filters.cohort.value };
+            const rowsOf = await api.get(page.api.facultyOverview, query);
+            const missing = rowsOf.filter((r) => !r.framework).length;
+            const cohort = state.cohorts.find((c) => String(c.id) === filters.cohort.value);
+            const createAll = page.can.create && missing
+                ? el('button', {
+                    type: 'button',
+                    class: 'w-full inline-flex items-center justify-center gap-1 rounded-lg bg-primary text-white px-3 py-2 text-sm font-semibold hover:bg-primary-container',
+                    onclick: (event) => createAllFaculties(event.currentTarget, query),
+                }, icon('playlist_add', 'text-[18px]'), `Lập khung cho ${missing} khoa còn thiếu`)
+                : null;
+
+            region('list').replaceChildren(rowsOf.length
+                ? el('div', { class: 'space-y-2' },
+                    el('p', { class: 'text-xs text-on-surface-variant' }, `Khóa ${cohort?.code ?? ''}: mỗi khoa học các môn của học kỳ thứ ${rowsOf[0].planned_term ?? '—'} theo CTĐT. Bấm một khoa để mở khung, nhập số lớp và giảng viên.`),
+                    createAll,
+                    rowsOf.map((row) => facultyCard(row)))
+                : emptyBlock('Không có khoa nào', 'Khóa này chưa có CTĐT đang áp dụng.', 'account_tree'));
+
+            if (!state.selectedId) region('detail').replaceChildren(facultyOverview(rowsOf, cohort));
+        } catch (error) {
+            region('list').replaceChildren(errorBlock(error, loadFaculties));
+        }
+    }
+
+    function facultyCard(row) {
+        const fw = row.framework;
+        const active = fw && state.selectedId === fw.id;
+
+        return el('button', {
+            type: 'button',
+            class: `w-full text-left rounded-xl border p-4 transition hover:border-primary/50 hover:bg-surface-container-low ${active ? 'border-primary bg-primary/5' : 'border-outline-variant'}`,
+            onclick: (event) => openFaculty(event.currentTarget, row),
+        },
+        el('div', { class: 'flex items-start justify-between gap-2' },
+            el('p', { class: 'font-bold text-on-surface' }, row.faculty.name),
+            el('span', { class: `rounded-full px-2 py-0.5 text-[11px] font-semibold ${fw ? 'bg-emerald-50 text-emerald-800' : 'bg-slate-100 text-slate-700'}` }, fw ? `${fw.items_count} môn` : 'Chưa lập')),
+        el('p', { class: 'text-sm text-on-surface-variant' }, `Học kỳ thứ ${row.planned_term ?? '—'} · ${row.students} sinh viên · ${row.subjects.length} môn theo CTĐT`));
+    }
+
+    /** Khung chi tiết khi chưa chọn khoa nào: môn của từng khoa theo học kỳ thứ n của khóa. */
+    function facultyOverview(rowsOf, cohort) {
+        if (!rowsOf.length) return emptyBlock('Chọn một khoa', '', 'account_tree');
+        const th = (text, extra = '') => el('th', { scope: 'col', class: `px-3 py-2 text-left font-semibold text-on-surface-variant ${extra}` }, text);
+
+        return el('div', { class: 'space-y-5' },
+            el('h3', { class: 'text-lg font-bold text-on-surface' }, `Môn học theo khoa — Khóa ${cohort?.code ?? ''}`),
+            rowsOf.map((row) => el('section', { class: 'rounded-xl border border-outline-variant' },
+                el('div', { class: 'flex flex-wrap items-center justify-between gap-2 px-4 py-3 bg-surface-container-low rounded-t-xl' },
+                    el('div', {},
+                        el('p', { class: 'font-bold text-on-surface' }, row.faculty.name),
+                        el('p', { class: 'text-xs text-on-surface-variant' }, `Học kỳ thứ ${row.planned_term ?? '—'} của khóa · ${row.students} sinh viên · ${row.subjects.reduce((n, x) => n + x.credits, 0)} TC${row.framework ? '' : ' · xem trước từ CTĐT'}`)),
+                    el('button', {
+                        type: 'button',
+                        class: 'rounded-lg border border-outline-variant bg-white px-3 py-1.5 text-xs font-semibold text-primary hover:bg-surface-container-low',
+                        onclick: (event) => openFaculty(event.currentTarget, row),
+                    }, row.framework ? 'Mở khung · Tạo đợt đăng ký' : (page.can.create ? 'Lập khung khoa này' : 'Chưa lập'))),
+                el('div', { class: 'overflow-x-auto' },
+                    el('table', { class: 'w-full min-w-[520px] text-sm' },
+                        el('thead', {}, el('tr', {}, th('Mã HP'), th('Tên học phần'), th('TC', 'text-center'), th('Loại'))),
+                        el('tbody', {}, row.subjects.map((x) => el('tr', { class: 'border-t border-outline-variant' },
+                            el('td', { class: 'px-3 py-2 font-mono text-secondary' }, x.code),
+                            el('td', { class: 'px-3 py-2' }, x.name),
+                            el('td', { class: 'px-3 py-2 text-center' }, x.credits),
+                            el('td', { class: 'px-3 py-2' }, x.compulsory ? 'Bắt buộc' : 'Tự chọn')))))))));
+    }
+
+    async function openFaculty(button, row) {
+        if (row.framework) {
+            state.selectedId = row.framework.id;
+            await loadDetail(row.framework.id);
+            return loadFaculties();
+        }
+        if (!page.can.create) {
+            return showAlert(region('alert'), 'Khoa này chưa có chương trình khung. Phòng Đào tạo lập khung trước.', 'info');
+        }
+        try {
+            const fw = await withBusy(button, () => api.post(page.api.store, { term_id: Number(filters.term.value), faculty_id: row.faculty.id, cohort_id: Number(filters.cohort.value) }));
+            state.selectedId = fw.id;
+            region('detail').replaceChildren(renderDetail(fw));
+            toast(`Đã lập khung ${row.faculty.name}: ${fw.items.length} môn. Bấm "Tạo đợt đăng ký" để nhập số lớp và giảng viên.`, 'success');
+            await loadFaculties();
+        } catch (error) {
+            showAlert(region('alert'), error);
+        }
+    }
+
+    async function createAllFaculties(button, query) {
+        try {
+            const result = await withBusy(button, () => api.post(page.api.storeAll, { term_id: Number(query.term_id), cohort_id: Number(query.cohort_id) }));
+            toast(`Đã lập khung cho ${result.created} khoa, môn lấy theo CTĐT.`, 'success');
+            state.selectedId = null;
+            await loadFaculties();
+        } catch (error) {
+            showAlert(region('alert'), error);
         }
     }
 

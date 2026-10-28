@@ -7,6 +7,7 @@ use App\Modules\AcademicYear\Models\Term;
 use App\Modules\Auth\Enums\PermissionAction;
 use App\Modules\Auth\Services\AccessControl;
 use App\Modules\SchoolClass\Enums\SectionStatus;
+use App\Modules\SchoolClass\Models\Cohort;
 use App\Modules\SchoolClass\Models\CourseSection;
 use App\Modules\SchoolClass\Models\TrainingFramework;
 use App\Modules\SchoolClass\Models\TrainingFrameworkItem;
@@ -64,6 +65,40 @@ class TrainingFrameworkController extends Controller
         $message = ($data['suggest'] ?? true) ? $this->frameworks->suggestFromCurriculum($framework)['message'] : null;
 
         return response()->json($this->presentDetail($framework->refresh()) + ['message' => $message], 201);
+    }
+
+    /** Chọn học kỳ + khóa (mọi khoa): từng khoa với học kỳ thứ n của khóa, số sinh viên, khung đã lập, danh sách môn. */
+    public function facultyOverview(Request $request): JsonResponse
+    {
+        [$term, $cohort] = $this->termAndCohort($request);
+
+        return response()->json(collect($this->frameworks->facultyOverview($term, $cohort))->map(fn (array $row) => [
+            'faculty' => $row['faculty']->only('id', 'code', 'name'),
+            'planned_term' => $row['planned_term'],
+            'students' => $row['students'],
+            'framework' => $row['framework'] === null ? null : ['id' => $row['framework']->id, 'items_count' => $row['framework']->items->count()],
+            'subjects' => $row['subjects'],
+        ])->values());
+    }
+
+    /** Lập khung cho mọi khoa còn thiếu của học kỳ + khóa, mỗi khung lấy môn theo CTĐT. */
+    public function storeForAllFaculties(Request $request): JsonResponse
+    {
+        [$term, $cohort] = $this->termAndCohort($request);
+        $created = $this->frameworks->createForAllFaculties($term, $cohort);
+
+        return response()->json(['created' => count($created)], 201);
+    }
+
+    /** @return array{0: Term, 1: Cohort} */
+    private function termAndCohort(Request $request): array
+    {
+        $data = $request->validate([
+            'term_id' => ['required', 'integer', 'exists:terms,id'],
+            'cohort_id' => ['required', 'integer', 'exists:cohorts,id'],
+        ], [], ['term_id' => 'học kỳ', 'cohort_id' => 'khóa']);
+
+        return [Term::query()->findOrFail($data['term_id']), Cohort::query()->findOrFail($data['cohort_id'])];
     }
 
     /** Chọn học kỳ + khoa: các khóa của khoa, học kỳ thứ mấy của khóa, khung đã lập chưa. */

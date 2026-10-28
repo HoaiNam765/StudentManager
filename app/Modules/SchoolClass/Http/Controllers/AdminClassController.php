@@ -143,7 +143,7 @@ class AdminClassController extends Controller
             'expected_end_year' => ['sometimes', 'integer', 'between:1990,2110'],
             'policy_set_id' => ['sometimes', 'nullable', 'integer', 'exists:policy_sets,id'],
             'status' => [$creating ? 'prohibited' : 'sometimes', 'in:active,inactive'],
-        ], ['code.regex' => 'Mã khóa chỉ gồm chữ in hoa không dấu, số, dấu chấm, gạch ngang, gạch dưới (ví dụ K2026).'], [
+        ], ['code.regex' => 'Mã khóa chỉ gồm chữ in hoa không dấu, số, dấu chấm, gạch ngang, gạch dưới (ví dụ 16DH).'], [
             'code' => 'mã khóa',
             'name' => 'tên khóa',
             'start_year' => 'năm bắt đầu',
@@ -171,7 +171,7 @@ class AdminClassController extends Controller
             'training_type_id' => ['sometimes', 'integer', 'exists:training_types,id'],
             'max_size' => ['sometimes', 'integer', 'min:1'],
             'status' => [$creating ? 'prohibited' : 'sometimes', 'in:active,inactive'],
-        ], ['code.regex' => 'Mã lớp chỉ gồm chữ in hoa không dấu, số, dấu chấm, gạch ngang, gạch dưới (ví dụ 26DHTH01).'], [
+        ], ['code.regex' => 'Mã lớp chỉ gồm chữ in hoa không dấu, số, dấu chấm, gạch ngang, gạch dưới (ví dụ 16DHCNTT01).'], [
             'code' => 'mã lớp',
             'name' => 'tên lớp',
             'cohort_id' => 'khóa',

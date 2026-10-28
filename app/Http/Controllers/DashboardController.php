@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Modules\Report\Services\PortalOverview;
+use App\Modules\SchoolClass\Models\Cohort;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\View\View;
@@ -74,7 +75,7 @@ class DashboardController extends Controller
             'name' => $o['profile']['name'],
             'student_id' => $o['profile']['code'],
             'major' => $o['profile']['major'] ?? '—',
-            'cohort' => $o['profile']['cohort'] === null ? '—' : 'K'.$o['profile']['cohort'],
+            'cohort' => $o['profile']['cohort'] === null ? '—' : (Cohort::query()->where('start_year', $o['profile']['cohort'])->value('code') ?? Cohort::codeFor((int) $o['profile']['cohort'])),
             'class' => $o['profile']['class'] ?? '—',
             'credits_earned' => $o['credits']['earned'],
             'credits_total' => $o['credits']['total'],

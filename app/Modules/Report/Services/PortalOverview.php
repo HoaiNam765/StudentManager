@@ -18,6 +18,11 @@ use App\Modules\SchoolClass\Models\SectionInstructor;
 use App\Modules\Student\Models\Student;
 use App\Modules\Student\Services\StudentCurriculumService;
 use App\Modules\Teacher\Models\Lecturer;
+use App\Modules\Timetable\Enums\SessionStatus;
+use App\Modules\Timetable\Models\ClassSession;
+use App\Modules\Timetable\Services\TimetablePublication;
+use App\Modules\Timetable\Services\TimetableView;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -98,7 +103,11 @@ class PortalOverview
             ->whereIn('status', EnrollmentStatus::activeValues())->whereNull('deleted_at')
             ->groupBy('course_section_id')->selectRaw('course_section_id, count(*) as n')->pluck('n', 'course_section_id');
 
+        $sessions = $sections->isEmpty() ? collect() : ClassSession::query()->whereIn('course_section_id', $sections->pluck('id'))
+            ->whereNotIn('status', [SessionStatus::Cancelled->value])->get(['course_section_id', 'status'])->groupBy('course_section_id');
+
         return $base + [
+            'teaching_day' => $term === null ? null : $this->teachingDay($lecturer, $term, $sizes),
             'profile' => [
                 'name' => $lecturer->full_name,
                 'code' => $lecturer->code,
@@ -116,6 +125,8 @@ class PortalOverview
                 'status' => $s->status->label(),
                 'grade_status' => ($workflows->get($s->id)?->status ?? GradePublicationStatus::Draft)->label(),
                 'grade_editable' => ($workflows->get($s->id)?->status ?? GradePublicationStatus::Draft)->editable(),
+                'sessions_total' => ($sessions->get($s->id) ?? collect())->where('status', '!=', SessionStatus::Off)->count(),
+                'sessions_taught' => ($sessions->get($s->id) ?? collect())->where('status', SessionStatus::Taught)->count(),
             ])->values()->all(),
             'change_requests' => GradeChangeRequest::query()->where('requested_by', $user->id)->latest('id')->limit(5)
                 ->with('enrollment.student:id,student_code', 'enrollment.section:id,code')->get()
@@ -193,6 +204,49 @@ class PortalOverview
     }
 
     /** Học kỳ đang diễn ra theo ngày; giữa hai học kỳ thì học kỳ gần nhất đã bắt đầu. */
+    /**
+     * Buổi dạy hôm nay của giảng viên; hôm nay không có thì ngày dạy gần nhất trong 7 ngày tới. Chỉ khi thời khóa biểu học
+     * kỳ đã công bố (như trang Lịch giảng dạy). Mỗi buổi kèm sĩ số, số sinh viên đã điểm danh và trạng thái theo giờ.
+     *
+     * @param  Collection<int, int>  $sizes  sĩ số theo lớp
+     * @return array{published: bool, date: ?string, is_today: bool, sessions: list<array<string, mixed>>}
+     */
+    private function teachingDay(Lecturer $lecturer, Term $term, $sizes): array
+    {
+        $tz = config('studentmanager.display_timezone');
+        $now = now($tz);
+
+        if (! app(TimetablePublication::class)->isVisible($term)) {
+            return ['published' => false, 'date' => null, 'is_today' => true, 'sessions' => []];
+        }
+
+        $upcoming = collect(app(TimetableView::class)->sessions('lecturer', $lecturer->id, $term, $now->copy()->startOfDay()->toImmutable(), $now->copy()->addDays(7)->startOfDay()->toImmutable()))
+            ->reject(fn (array $s) => in_array($s['status'], [SessionStatus::Cancelled->value, SessionStatus::Off->value], true));
+        $date = $upcoming->pluck('date')->sort()->first();
+        $day = $upcoming->where('date', $date)->sortBy('period_from')->values();
+        $recorded = DB::table('attendance_records')->whereIn('class_session_id', $day->pluck('id'))->whereNull('deleted_at')
+            ->groupBy('class_session_id')->selectRaw('class_session_id, count(*) as n')->pluck('n', 'class_session_id');
+
+        return [
+            'published' => true,
+            'date' => $date,
+            'is_today' => $date === $now->toDateString(),
+            'sessions' => $day->map(function (array $s) use ($now, $recorded, $sizes): array {
+                [$from, $to] = array_pad(explode('–', $s['time']), 2, null);
+                $start = $now->copy()->setTimeFromTimeString($from ?: '00:00');
+                $end = $now->copy()->setTimeFromTimeString($to ?: '23:59');
+                $state = match (true) {
+                    $s['date'] !== $now->toDateString() => 'upcoming',
+                    $now->between($start, $end) => 'ongoing',
+                    $now->lt($start) => $now->diffInMinutes($start) <= 60 ? 'soon' : 'upcoming',
+                    default => 'done',
+                };
+
+                return $s + ['students' => (int) ($sizes[$s['section_id']] ?? 0), 'recorded' => (int) ($recorded[$s['id']] ?? 0), 'state' => $state];
+            })->all(),
+        ];
+    }
+
     private function currentTerm(): ?Term
     {
         $today = now(config('studentmanager.display_timezone'))->toDateString();

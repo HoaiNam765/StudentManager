@@ -242,8 +242,8 @@ class EnrollmentService extends BaseService
             return RegistrationPeriod::query()->findOrFail($section->registration_period_id);
         }
 
-        $period = $this->access->openPeriodsFor($student)->whereNull('training_framework_id')->firstWhere('term_id', $section->term_id)
-            ?? RegistrationPeriod::query()->whereNull('training_framework_id')->where('term_id', $section->term_id)->where('status', '!=', 'draft')->orderByDesc('opens_at')->first();
+        $period = $this->access->openPeriodsFor($student)->where('uses_frameworks', false)->firstWhere('term_id', $section->term_id)
+            ?? RegistrationPeriod::query()->where('uses_frameworks', false)->where('term_id', $section->term_id)->where('status', '!=', 'draft')->orderByDesc('opens_at')->first();
 
         if ($period === null) {
             $this->fail("Học kỳ của lớp {$section->code} chưa có đợt đăng ký nào.", 'Phòng Đào tạo cần mở đợt đăng ký cho học kỳ này (FR-ENR-001).');

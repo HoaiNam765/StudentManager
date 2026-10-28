@@ -8,7 +8,7 @@
     <section class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm p-5 flex flex-col xl:flex-row xl:items-end justify-between gap-4">
         <div>
             <h1 class="text-headline-lg font-bold">Quản lý đăng ký học phần</h1>
-            <p class="mt-1 text-sm text-on-surface-variant">Chọn chương trình khung, xếp giảng viên và lịch học, thông báo xem trước rồi công bố thời gian đăng ký.</p>
+            <p class="mt-1 text-sm text-on-surface-variant">Tạo đợt cho học kỳ, chọn kỳ CTĐT cho mọi khoa – khóa (bảng khung), mở lớp + giảng viên, xếp lịch, công bố rồi mở đăng ký.</p>
         </div>
         <label class="text-xs font-semibold text-on-surface-variant min-w-[280px]">Học kỳ
             <select data-filter="term" class="mt-1 w-full rounded-lg border border-outline-variant bg-white px-3 py-2 text-sm"></select>
@@ -23,12 +23,15 @@
             @if (($pageData['can']['create'] ?? false) || ($pageData['can']['update'] ?? false))
             <section class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm p-5">
                 <div class="flex items-center justify-between gap-2 mb-4">
-                    <div><h2 class="text-headline-sm font-bold" data-form-title>Tạo đợt đăng ký</h2><p class="text-xs text-on-surface-variant mt-1">Đợt áp dụng cho sinh viên thuộc khoa và khóa của chương trình khung.</p></div>
+                    <div><h2 class="text-headline-sm font-bold" data-form-title>Tạo đợt đăng ký</h2><p class="text-xs text-on-surface-variant mt-1">Đợt theo chương trình khung áp dụng cho mọi khoa – khóa có trong bảng khung của đợt.</p></div>
                     <button type="button" data-action="cancel-edit" hidden class="text-xs text-primary hover:underline">Hủy sửa</button>
                 </div>
                 <form data-form="period" class="space-y-4">
-                    <label class="block text-sm">Chương trình khung của khoa – khóa
-                        <select name="training_framework_id" required class="mt-1 w-full rounded-lg border border-outline-variant px-3 py-2"><option value="">Chọn chương trình khung…</option></select>
+                    <label class="block text-sm">Loại đợt
+                        <select name="mode" class="mt-1 w-full rounded-lg border border-outline-variant px-3 py-2">
+                            <option value="frameworks">Theo chương trình khung — cả học kỳ, mọi khoa – khóa</option>
+                            <option value="targets">Theo đối tượng (khóa / ngành / lớp)</option>
+                        </select>
                     </label>
                     <div class="grid sm:grid-cols-2 gap-3">
                         <label class="text-sm">Tên đợt<input name="name" required maxlength="255" class="mt-1 w-full rounded-lg border border-outline-variant px-3 py-2"></label>
@@ -38,8 +41,8 @@
                         <label class="text-sm">Tín chỉ tối thiểu<input name="min_credits" type="number" min="0" max="60" class="mt-1 w-full rounded-lg border border-outline-variant px-3 py-2"></label>
                         <label class="text-sm">Tín chỉ tối đa<input name="max_credits" type="number" min="1" max="60" class="mt-1 w-full rounded-lg border border-outline-variant px-3 py-2"></label>
                     </div>
-                    <div class="rounded-xl bg-surface-container-low p-3 space-y-3">
-                        <div class="flex items-center justify-between"><div><p class="text-sm font-semibold">Đối tượng áp dụng</p><p class="text-xs text-on-surface-variant">Khóa và khoa đã giới hạn theo khung. Các dòng dưới đây chỉ thu hẹp thêm đối tượng.</p></div><button type="button" data-action="add-target" class="rounded-lg border border-outline-variant px-3 py-1.5 text-xs font-semibold">+ Dòng đối tượng</button></div>
+                    <div data-region="targets-box" class="rounded-xl bg-surface-container-low p-3 space-y-3">
+                        <div class="flex items-center justify-between"><div><p class="text-sm font-semibold">Đối tượng áp dụng</p><p class="text-xs text-on-surface-variant">Chỉ dùng cho đợt theo đối tượng. Để trống = mọi sinh viên.</p></div><button type="button" data-action="add-target" class="rounded-lg border border-outline-variant px-3 py-1.5 text-xs font-semibold">+ Dòng đối tượng</button></div>
                         <div data-region="targets" class="space-y-2"></div>
                     </div>
                     <div class="flex justify-end"><button type="submit" class="rounded-lg bg-primary text-white px-4 py-2 text-sm font-semibold">Lưu đợt đăng ký</button></div>
@@ -60,8 +63,8 @@
             </section>
 
             <section class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm">
-                <div class="px-5 py-4 border-b border-outline-variant"><h2 class="text-headline-sm font-bold">Học phần của đợt đăng ký</h2></div>
-                <div data-region="offerings" class="p-4"><p class="text-sm text-on-surface-variant">Chọn “Học phần / giảng viên / lịch” trên một đợt để quản lý.</p></div>
+                <div class="px-5 py-4 border-b border-outline-variant"><h2 class="text-headline-sm font-bold">Khung & lớp của đợt</h2></div>
+                <div data-region="offerings" class="p-4"><p class="text-sm text-on-surface-variant">Bấm “Khung & lớp” trên một đợt theo chương trình khung để chọn kỳ cho từng khoa – khóa, mở lớp, phân công giảng viên và xếp lịch.</p></div>
             </section>
 
             <section class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm">

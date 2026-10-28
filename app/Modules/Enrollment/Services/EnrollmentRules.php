@@ -45,6 +45,15 @@ class EnrollmentRules
         private readonly SectionStartDates $startDates,
     ) {}
 
+    /** @var array<string, array<int, array{backlog: bool, planned_term: ?int}>> lớp trong phạm vi theo sinh viên – đợt */
+    private array $scopes = [];
+
+    /** @return array<int, array{backlog: bool, planned_term: ?int}> */
+    public function scopeFor(Student $student, RegistrationPeriod $period): array
+    {
+        return $this->scopes["{$student->id}-{$period->id}"] ??= app(FrameworkPeriodScope::class)->sectionsFor($student, $period);
+    }
+
     /**
      * @param  list<string>  $skip  mã quy tắc được bỏ qua khi cán bộ đăng ký thay có phê duyệt (FR-ENR-009, #113):
      *                              period, capacity, prerequisite, schedule, credits, debt
@@ -63,8 +72,13 @@ class EnrollmentRules
 
         // Không cho dùng đợt khác cùng học kỳ để vượt giới hạn khóa hoặc thời gian của lớp.
         if (($section->registration_period_id !== null && $section->registration_period_id !== $period->id)
-            || ($period->training_framework_id !== null && $section->registration_period_id !== $period->id)) {
+            || ($period->usesFrameworks() && $section->registration_period_id !== $period->id)) {
             $reasons[] = 'Lớp học phần không thuộc danh sách được mở trong đợt đăng ký này.';
+        } elseif ($period->usesFrameworks() && ! in_array('period', $skip, true)
+            && ! in_array($section->subject_id, $this->record->passedSubjectIds($student), true)
+            && ! array_key_exists($section->id, $this->scopeFor($student, $period))) {
+            // Đợt theo khung: chỉ lớp của khung khoa – khóa mình và lớp học bù môn CTĐT kỳ trước chưa đạt
+            $reasons[] = 'Lớp không dành cho khoa – khóa của bạn. Chỉ đăng ký lớp của khung khoa – khóa mình hoặc môn kỳ trước chưa học / chưa đạt.';
         }
 
         if (! in_array('period', $skip, true)) {

@@ -252,7 +252,7 @@ class TrainingFrameworkController extends Controller
             ->groupBy('training_framework_item_id');
 
         return $this->presentSummary($framework) + [
-            'planned_term' => $this->frameworks->cohortTermNumber($framework->cohort, $framework->term),
+            'planned_term' => $this->frameworks->plannedTermOf($framework),
             'students' => $this->frameworks->studentCount($framework),
             'items' => $framework->items->sortBy(fn (TrainingFrameworkItem $i) => [! $i->compulsory, $i->subject->code])->values()
                 ->map(function (TrainingFrameworkItem $item) use ($sections): array {

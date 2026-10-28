@@ -3,8 +3,8 @@ import { confirmDialog, el, emptyBlock, errorBlock, icon, loadingBlock, pageData
 import { dmy, fillSelect, formDialog, formJson, listAll, rows, tpl } from '../lookups.js';
 
 /**
- * Chương trình khung theo khoa – khóa – học kỳ: danh sách khung, chi tiết học phần, gợi ý từ CTĐT và tạo đợt đăng ký
- * kèm số lớp + giảng viên của khoa. Lịch học, thông báo xem trước và công bố làm tiếp ở trang Đăng ký học phần.
+ * Chương trình khung theo khoa – khóa – học kỳ: danh sách khung, chi tiết học phần, gợi ý từ CTĐT. Mở lớp, giảng viên,
+ * lịch và công bố làm ở đợt đăng ký cả học kỳ (bảng Khoa × Khóa, trang Đăng ký học phần).
  */
 export default function adminTrainingFrameworks(root) {
     const page = pageData();
@@ -84,7 +84,7 @@ export default function adminTrainingFrameworks(root) {
 
             region('list').replaceChildren(rowsOf.length
                 ? el('div', { class: 'space-y-2' },
-                    el('p', { class: 'text-xs text-on-surface-variant' }, `Khóa ${cohort?.code ?? ''}: mỗi khoa học các môn của học kỳ thứ ${rowsOf[0].planned_term ?? '—'} theo CTĐT. Bấm một khoa để mở khung, nhập số lớp và giảng viên.`),
+                    el('p', { class: 'text-xs text-on-surface-variant' }, `Khóa ${cohort?.code ?? ''}: mỗi khoa học các môn của học kỳ thứ ${rowsOf[0].planned_term ?? '—'} theo CTĐT. Bấm một khoa để mở khung; lớp và giảng viên nhập ở đợt đăng ký của học kỳ.`),
                     createAll,
                     rowsOf.map((row) => facultyCard(row)))
                 : emptyBlock('Không có khoa nào', 'Khóa này chưa có CTĐT đang áp dụng.', 'account_tree'));
@@ -126,7 +126,7 @@ export default function adminTrainingFrameworks(root) {
                         type: 'button',
                         class: 'rounded-lg border border-outline-variant bg-white px-3 py-1.5 text-xs font-semibold text-primary hover:bg-surface-container-low',
                         onclick: (event) => openFaculty(event.currentTarget, row),
-                    }, row.framework ? 'Mở khung · Tạo đợt đăng ký' : (page.can.create ? 'Lập khung khoa này' : 'Chưa lập'))),
+                    }, row.framework ? 'Mở khung' : (page.can.create ? 'Lập khung khoa này' : 'Chưa lập'))),
                 el('div', { class: 'overflow-x-auto' },
                     el('table', { class: 'w-full min-w-[520px] text-sm' },
                         el('thead', {}, el('tr', {}, th('Mã HP'), th('Tên học phần'), th('TC', 'text-center'), th('Loại'))),
@@ -150,7 +150,7 @@ export default function adminTrainingFrameworks(root) {
             const fw = await withBusy(button, () => api.post(page.api.store, { term_id: Number(filters.term.value), faculty_id: row.faculty.id, cohort_id: Number(filters.cohort.value) }));
             state.selectedId = fw.id;
             region('detail').replaceChildren(renderDetail(fw));
-            toast(`Đã lập khung ${row.faculty.name}: ${fw.items.length} môn. Bấm "Tạo đợt đăng ký" để nhập số lớp và giảng viên.`, 'success');
+            toast(`Đã lập khung ${row.faculty.name}: ${fw.items.length} môn. Mở lớp ở đợt đăng ký của học kỳ.`, 'success');
             await loadFaculties();
         } catch (error) {
             showAlert(region('alert'), error);
@@ -210,7 +210,7 @@ export default function adminTrainingFrameworks(root) {
             const fw = await withBusy(button, () => api.post(page.api.store, { term_id: Number(filters.term.value), faculty_id: Number(filters.faculty.value), cohort_id: option.cohort.id }));
             state.selectedId = fw.id;
             region('detail').replaceChildren(renderDetail(fw));
-            toast(fw.items.length ? `Đã lập khung khóa ${option.cohort.code}: ${fw.items.length} môn của học kỳ ${fw.planned_term} theo CTĐT. Bấm "Tạo đợt đăng ký" để nhập số lớp và giảng viên.` : (fw.message ?? 'Đã lập khung; thêm học phần thủ công.'), fw.items.length ? 'success' : 'info');
+            toast(fw.items.length ? `Đã lập khung khóa ${option.cohort.code}: ${fw.items.length} môn của học kỳ ${fw.planned_term} theo CTĐT. Mở lớp ở đợt đăng ký của học kỳ.` : (fw.message ?? 'Đã lập khung; thêm học phần thủ công.'), fw.items.length ? 'success' : 'info');
             await loadCohorts();
         } catch (error) {
             showAlert(region('alert'), error);
@@ -258,7 +258,8 @@ export default function adminTrainingFrameworks(root) {
             );
         }
         if (page.can.create) { actions.append(button('Sửa ghi chú', 'edit', editFramework)); actions.append(button('Xóa khung', 'delete', removeFramework)); }
-        if (page.can.openRegistration && fw.items.length) actions.prepend(button('Tạo đợt đăng ký', 'event_available', openRegistration, true));
+        // Lớp, giảng viên, lịch và công bố làm ở đợt đăng ký cả học kỳ (bảng Khoa × Khóa)
+        if (page.can.enrollment) actions.prepend(el('a', { href: `${page.links.enrollment}?term_id=${fw.term?.id ?? ''}`, class: 'inline-flex items-center gap-1 rounded-lg bg-primary text-white px-3 py-2 text-sm font-semibold hover:bg-primary-container' }, icon('event_available', 'text-[18px]'), 'Mở lớp ở đợt đăng ký của học kỳ'));
 
         return el('div', { class: 'space-y-5' },
             el('div', {},
@@ -266,7 +267,7 @@ export default function adminTrainingFrameworks(root) {
                 el('p', { class: 'text-sm text-on-surface-variant' },
                     `${fw.term?.name ?? '—'} · ${fw.term?.academic_year ?? ''} · bắt đầu học ${dmy(fw.term?.start_date)}`),
                 el('div', { class: 'mt-3 grid sm:grid-cols-3 gap-2 text-sm' },
-                    stat('Học kỳ thứ của khóa', fw.planned_term ?? '—'),
+                    stat('Kỳ CTĐT của khung', fw.planned_term ?? '—'),
                     stat('Sinh viên khoa – khóa', fw.students),
                     stat('Học phần', fw.items.length)),
                 fw.note ? el('p', { class: 'mt-2 text-sm text-on-surface' }, fw.note) : null),
@@ -386,105 +387,6 @@ export default function adminTrainingFrameworks(root) {
         } catch (error) {
             showAlert(alert, error);
         }
-    }
-
-    /**
-     * Tạo đợt đăng ký từ khung: thông tin đợt + mỗi học phần số lớp, sĩ số, giảng viên từng lớp (giảng viên của khoa,
-     * kèm số tiết đã nhận trong học kỳ). Lịch học xếp tiếp ở trang Đăng ký học phần.
-     */
-    async function openRegistration(event, fw, alert) {
-        const button = event.currentTarget;
-        let lecturers;
-        try { lecturers = await withBusy(button, () => api.get(tpl(page.api.lecturers, fw.id))); }
-        catch (error) { showAlert(alert, error); return; }
-        if (!lecturers.length) { showAlert(alert, 'Khoa chưa có giảng viên đang công tác để phân công.', 'warning'); return; }
-
-        const inputClass = 'mt-1 w-full rounded-lg border border-outline-variant bg-white px-3 py-2 text-sm';
-        const smallInput = 'w-20 rounded-lg border border-outline-variant bg-white px-2 py-1.5 text-sm';
-        const lecturerLabel = (l) => `${l.full_name} (${l.code}) — ${l.load}/${l.limit} tiết`;
-        // Ngày theo giờ máy người dùng (toISOString đổi sang UTC sẽ lệch một ngày)
-        const ymd = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-        const tomorrow = ymd(new Date(Date.now() + 86_400_000));
-        const start = fw.term?.start_date ? new Date(`${fw.term.start_date}T00:00:00`) : null;
-        const closeDay = start ? ymd(new Date(start.getTime() - 10 * 86_400_000)) : '';
-        const field = (label, control) => el('label', { class: 'text-sm' }, label, control);
-        const name = el('input', { name: 'name', required: true, class: inputClass, value: `Đăng ký ${fw.term?.name ?? ''} ${fw.term?.academic_year ?? ''} — ${fw.faculty?.code ?? ''} ${fw.cohort?.code ?? ''}`.replace(/\s+/g, ' ').trim() });
-        const round = el('select', { name: 'round', class: inputClass },
-            [['round_1', 'Vòng 1'], ['round_2', 'Vòng 2'], ['supplementary', 'Bổ sung']].map(([v, l]) => el('option', { value: v }, l)));
-        const opens = el('input', { type: 'datetime-local', required: true, class: inputClass, value: `${tomorrow}T08:00` });
-        const closes = el('input', { type: 'datetime-local', required: true, class: inputClass, value: closeDay ? `${closeDay}T23:00` : '' });
-        const minCredits = el('input', { type: 'number', min: 0, class: inputClass });
-        const maxCredits = el('input', { type: 'number', min: 1, class: inputClass });
-        const overload = el('input', { type: 'checkbox', class: 'mr-2' });
-
-        // Mỗi học phần: số lớp → bấy nhiêu ô chọn giảng viên (chia vòng tròn theo số tiết đang nhận, ít trước)
-        const byLoad = [...lecturers].sort((a, b) => a.load - b.load);
-        let turn = 0;
-        const rowsOf = fw.items.map((item) => {
-            const count = el('input', { type: 'number', min: 0, max: 20, value: item.planned_sections, class: smallInput, 'aria-label': `Số lớp ${item.subject.code}` });
-            const size = el('input', { type: 'number', min: 1, value: item.max_size ?? item.default_max_size, class: smallInput, 'aria-label': `Sĩ số ${item.subject.code}` });
-            const picks = el('div', { class: 'space-y-1' });
-            const render = () => {
-                const keep = [...picks.querySelectorAll('select')].map((s) => s.value);
-                picks.replaceChildren(...Array.from({ length: Math.max(0, Number(count.value) || 0) }, (_, i) => {
-                    const chosen = keep[i] ?? String(byLoad[turn++ % byLoad.length].id);
-                    return el('select', { class: 'w-full rounded-lg border border-outline-variant bg-white px-2 py-1.5 text-sm', 'aria-label': `Giảng viên lớp ${i + 1} ${item.subject.code}` },
-                        lecturers.map((l) => el('option', { value: l.id, selected: String(l.id) === chosen }, `Lớp ${i + 1}: ${lecturerLabel(l)}`)));
-                }));
-                if (!picks.children.length) picks.append(el('span', { class: 'text-xs text-on-surface-variant' }, 'Không mở lớp'));
-            };
-            count.addEventListener('input', render);
-            render();
-
-            return { item, count, size, picks, row: el('tr', { class: 'border-t border-outline-variant align-top' },
-                el('td', { class: 'px-2 py-2' }, el('p', { class: 'font-semibold' }, item.subject.code), el('p', { class: 'text-xs text-on-surface-variant' }, `${item.subject.name} · ${item.subject.credits} TC`)),
-                el('td', { class: 'px-2 py-2' }, count), el('td', { class: 'px-2 py-2' }, size), el('td', { class: 'px-2 py-2 min-w-[260px]' }, picks)) };
-        });
-
-        const message = el('div', { hidden: true });
-        const save = el('button', { type: 'submit', class: 'rounded-lg bg-primary text-white px-4 py-2 text-sm font-semibold' }, 'Tạo đợt và mở lớp');
-        const th = (text) => el('th', { scope: 'col', class: 'px-2 py-2 text-left text-xs font-semibold text-on-surface-variant' }, text);
-        const form = el('form', { class: 'space-y-4' },
-            el('h3', { class: 'font-bold text-base' }, `Tạo đợt đăng ký — ${fw.faculty?.name ?? ''} · Khóa ${fw.cohort?.code ?? ''}`),
-            el('p', { class: 'text-xs text-on-surface-variant' }, `${fw.term?.name ?? ''} · ${fw.term?.academic_year ?? ''}, bắt đầu học ${dmy(fw.term?.start_date)}. Đợt chỉ dành cho sinh viên của khoa – khóa này. Sau khi tạo, xếp lịch từng lớp, thông báo xem trước và công bố ở trang Đăng ký học phần.`),
-            message,
-            el('div', { class: 'grid sm:grid-cols-2 gap-3' },
-                el('div', { class: 'sm:col-span-2' }, field('Tên đợt', name)), field('Vòng', round), el('span'),
-                field('Mở lúc (giờ Việt Nam)', opens), field('Đóng lúc — trước ngày bắt đầu học', closes),
-                field('Tín chỉ tối thiểu (trống = theo quy chế)', minCredits), field('Tín chỉ tối đa (trống = theo quy chế)', maxCredits)),
-            el('div', { class: 'overflow-x-auto rounded-lg border border-outline-variant' },
-                el('table', { class: 'w-full min-w-[640px] text-sm' },
-                    el('thead', { class: 'bg-surface-container-low' }, el('tr', {}, th('Học phần'), th('Số lớp'), th('Sĩ số tối đa'), th('Giảng viên của khoa (đã nhận / định mức tiết)'))),
-                    el('tbody', {}, rowsOf.map((r) => r.row)))),
-            el('label', { class: 'flex items-center text-sm' }, overload, 'Đồng ý phân công dù giảng viên vượt định mức tiết'),
-            el('div', { class: 'flex justify-end gap-2' },
-                el('button', { type: 'button', class: 'rounded-lg border border-outline-variant px-4 py-2 text-sm font-semibold', onclick: () => dialog.close() }, 'Hủy'), save));
-        const dialog = el('dialog', { class: 'm-auto w-[min(96vw,900px)] max-h-[92vh] overflow-y-auto rounded-xl border border-outline-variant bg-white p-5 shadow-xl backdrop:bg-black/40' }, form);
-        dialog.addEventListener('close', () => dialog.remove());
-        document.body.append(dialog);
-        dialog.showModal();
-
-        form.addEventListener('submit', async (submitEvent) => {
-            submitEvent.preventDefault();
-            showAlert(message, null);
-            const classes = rowsOf.flatMap((r) => [...r.picks.querySelectorAll('select')].map((s) => ({ item_id: r.item.id, lecturer_id: Number(s.value), max_size: Number(r.size.value) || null })));
-            const body = {
-                name: name.value, round: round.value,
-                opens_at: opens.value.replace('T', ' '), closes_at: closes.value.replace('T', ' '),
-                min_credits: minCredits.value === '' ? null : Number(minCredits.value),
-                max_credits: maxCredits.value === '' ? null : Number(maxCredits.value),
-                classes, confirm_overload: overload.checked,
-            };
-            try {
-                const period = await withBusy(save, () => api.post(tpl(page.api.openRegistration, fw.id), body));
-                dialog.close();
-                toast(`Đã tạo đợt "${period.name}" với ${period.sections} lớp. Xếp lịch từng lớp rồi thông báo xem trước.`, 'success');
-                window.location.assign(`${page.links.enrollment}?term_id=${period.term_id}&period_id=${period.id}`);
-            } catch (error) {
-                showAlert(message, error);
-                message.scrollIntoView({ block: 'nearest' });
-            }
-        });
     }
 
     async function editFramework(event, fw) {

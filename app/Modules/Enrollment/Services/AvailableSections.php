@@ -14,7 +14,8 @@ use App\Modules\Timetable\Services\SectionStartDates;
 
 /**
  * Danh sách lớp học phần sinh viên được chọn trong đợt (FR-ENR-002): lớp của học kỳ thuộc học phần trong CTĐT hiện hành
- * của sinh viên, kèm sĩ số còn lại, lịch, giảng viên, phòng. Lớp không đăng ký được vẫn hiện, đánh dấu kèm lý do.
+ * của sinh viên (đợt theo khung: lớp khung khoa – khóa mình + học bù, xem FrameworkPeriodScope), kèm sĩ số còn lại, lịch,
+ * giảng viên, phòng. Lớp không đăng ký được vẫn hiện, đánh dấu kèm lý do.
  *
  * Lý do lấy từ EnrollmentRules (FR-ENR-004): lớp chưa mở / hết chỗ, đã đạt, trùng lịch, tiên quyết, tín chỉ tối đa…
  */
@@ -31,18 +32,20 @@ class AvailableSections
     {
         $curriculum = $this->curricula->current($student);
 
-        if ($curriculum === null && $period->training_framework_id === null) {
+        if ($curriculum === null && ! $period->usesFrameworks()) {
             return [];
         }
 
         $items = CurriculumSubject::query()->where('curriculum_id', $curriculum?->id)->get()->keyBy('subject_id');
-        $frameworkItems = $period->framework?->items->keyBy('subject_id');
+        // Đợt theo khung: lớp của khung khoa – khóa mình + lớp học bù (môn kỳ trước chưa đạt); môn đã đạt không hiện
+        $scope = $period->usesFrameworks() ? $this->rules->scopeFor($student, $period) : [];
+        $frameworkItems = $period->usesFrameworks() ? $period->frameworkFor($student)?->items->keyBy('subject_id') : null;
 
         $sections = CourseSection::query()
             ->with(['subject:id,code,name,credits', 'room:id,code', 'instructors.lecturer:id,code,full_name'])
             ->where('term_id', $period->term_id)
-            ->when($period->training_framework_id !== null,
-                fn ($q) => $q->where('registration_period_id', $period->id),
+            ->when($period->usesFrameworks(),
+                fn ($q) => $q->whereIn('id', array_keys($scope)),
                 fn ($q) => $q->whereNull('registration_period_id')->whereIn('subject_id', $items->keys()))
             ->where('status', '!=', SectionStatus::Cancelled)
             ->orderBy('code')
@@ -51,7 +54,7 @@ class AvailableSections
         $rules = ScheduleRule::query()->with('room:id,code')->whereIn('course_section_id', $sections->pluck('id'))->get()->groupBy('course_section_id');
         $starts = $this->startDates->for($sections->pluck('id'));
 
-        return $sections->map(function (CourseSection $section) use ($items, $frameworkItems, $rules, $starts, $student, $period): array {
+        return $sections->map(function (CourseSection $section) use ($items, $frameworkItems, $scope, $rules, $starts, $student, $period): array {
             $item = $items->get($section->subject_id);
             $remaining = $this->rules->remaining($section);
             $reasons = $this->rules->check($student, $section, $period);
@@ -61,6 +64,7 @@ class AvailableSections
                 'code' => $section->code,
                 'subject' => $section->subject->only('id', 'code', 'name', 'credits'),
                 'planned_term' => $item?->planned_term,
+                'backlog' => $scope[$section->id]['backlog'] ?? false,
                 'compulsory' => $frameworkItems?->get($section->subject_id)?->compulsory
                     ?? ($item !== null && $item->curriculum_elective_group_id === null),
                 'status' => $section->status->value,

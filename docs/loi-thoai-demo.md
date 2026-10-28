@@ -36,24 +36,21 @@ Trước khi vào phòng: đã làm bước 0 (dựng dữ liệu, mở hai trì
 >
 > *(Thêm sinh viên → Nhập học)* Em thêm một thí sinh mới… lưu, hồ sơ ở trạng thái **Chờ nhập học**. Giờ em bấm **Xác nhận nhập học**: chỉ một thao tác, hệ thống **cấp mã số sinh viên** theo quy tắc khóa + mã ngành + số thứ tự, cấp email trường, tạo tài khoản, gán chương trình đào tạo và xếp vào lớp hành chính. Tất cả nằm trong một giao dịch — bước nào lỗi thì hoàn tác hết.
 
-## C. Chương trình khung → tạo đợt đăng ký (3 phút) — `acad.test`
+## C. Đợt đăng ký cả học kỳ và bảng khung (3 phút) — `acad.test`
 
-> Mỗi ngành có **chương trình đào tạo** 8 học kỳ, khoảng 130 tín chỉ, áp dụng theo khóa. Trước mỗi học kỳ, Phòng Đào tạo cần biết **mỗi khoa, mỗi khóa học những môn gì** — đó là **chương trình khung**.
+> Mỗi ngành có **chương trình đào tạo** 8 học kỳ, khoảng 130 tín chỉ, áp dụng theo khóa. Mỗi học kỳ, Phòng Đào tạo mở **một đợt đăng ký cho cả trường**.
 >
-> Em chọn học kỳ 2 năm 2026–2027, khóa **16DH**, để **tất cả khoa**: hệ thống tự tính đây là **học kỳ thứ 2 của khóa** và hiện ngay các môn của từng khoa lấy từ chương trình đào tạo — Công nghệ thông tin 9 môn, Kinh tế 10, Ngoại ngữ 12. Em bấm **Lập khung cho tất cả khoa** là xong khung cho cả ba khoa.
->
-> Từ khung, em bấm **Tạo đợt đăng ký**: mỗi môn nhập **số lớp**, sĩ số, và chọn **giảng viên của khoa** cho từng lớp — danh sách chỉ có giảng viên khoa Công nghệ thông tin, kèm số tiết đã nhận để chia đều. Bấm tạo: hệ thống tạo đợt và mở lớp **trong một giao dịch** — một lớp lỗi thì không tạo gì — rồi chuyển sang trang đăng ký học phần.
+> Em tạo đợt cho học kỳ 2 năm 2026–2027, loại **theo chương trình khung**. Trong đợt có **bảng Khoa × Khóa**: mỗi khoa, mỗi khóa đang học chọn **kỳ thứ mấy của chương trình đào tạo** — hệ thống gợi ý sẵn, khóa 16DH là kỳ 2, khóa 15DH là kỳ 4. Em bấm **Công bố** thử: bị chặn, vì phải chọn **đủ mọi khoa – khóa**. Em bấm **Điền theo gợi ý**: mỗi ô có ngay các môn của kỳ đó lấy từ chương trình đào tạo.
 
-## D. Xếp lịch, xem trước, công bố (3 phút) — `acad.test`
+## D. Lớp, giảng viên, lịch, công bố (4 phút) — `acad.test`
 
-> Lớp vừa mở ghi "chưa xếp lịch". Em xếp lịch: chọn thứ Hai tiết 1 đến 4 thì thầy Nguyễn Văn An bị khóa vì **trùng lịch** với lớp thầy đang dạy; chọn phòng B101 thì hệ thống báo **trùng phòng**. Chuyển sang thứ Bảy, phòng A101 → lưu.
+> Ở mỗi khung, em bấm **Lớp & giảng viên**: mỗi môn nhập **số lớp** và chọn **giảng viên của khoa** cho từng lớp — danh sách chỉ có giảng viên thuộc khoa, kèm số tiết đã nhận để chia đều. Lớp và giảng viên được tạo **trong một giao dịch** — một lớp lỗi thì không tạo gì.
 >
-> Em bấm **Công bố** luôn thì bị chặn: phải **thông báo xem trước** đã — và lớp nào chưa có lịch thì cũng không thông báo được. Em bấm **Thông báo xem trước**: 50 sinh viên khoa Công nghệ thông tin khóa 16DH nhận thông báo.
+> Rồi xếp lịch từng lớp: chọn thứ Hai tiết 1 đến 4 thì thầy Nguyễn Văn An bị khóa vì **trùng lịch**; chọn phòng B101 thì báo **trùng phòng**. Chuyển sang thứ Bảy, phòng A101 → lưu.
 >
-> *(Cửa sổ sinh viên)* Sinh viên bấm thông báo là tới đúng đợt: thấy môn, giảng viên, lịch, phòng, **ngày bắt đầu học**, nhưng **chưa đăng ký được**.
+> Em bấm **Công bố**: hệ thống kiểm tra mọi khoa – khóa đã có khung, khung nào cũng có lớp, lớp nào cũng có giảng viên và lịch — thiếu chỗ nào báo đúng chỗ đó. Đủ rồi thì công bố: sinh viên **thấy lớp ngay nhưng chưa có nút đăng ký**; đúng giờ hẹn nút mới hiện, hoặc em bấm **Mở đăng ký ngay**.
 >
-> *(Quay lại cán bộ)* Em **Công bố**: đợt chờ đến giờ mở, đúng giờ thì máy chủ tự cho đăng ký. Em bấm **Mở ngay** để demo — đợt mở sớm, hạn đóng giữ nguyên.
->
+> *(Cửa sổ sinh viên)* Sinh viên chỉ thấy lớp của **khoa – khóa mình**, cộng các lớp **học bù** — môn kỳ trước chưa học hoặc chưa đạt; môn đã đạt thì không hiện.
 
 ## E. Sinh viên đăng ký học phần (3 phút) — `2601030001`
 

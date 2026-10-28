@@ -11,7 +11,6 @@ use App\Modules\Enrollment\Enums\PeriodStatus;
 use App\Modules\Enrollment\Models\RegistrationPeriod;
 use App\Modules\SchoolClass\Models\AdminClass;
 use App\Modules\SchoolClass\Models\Cohort;
-use App\Modules\SchoolClass\Models\TrainingFramework;
 use App\Support\Services\BaseService;
 use Carbon\CarbonImmutable;
 
@@ -36,12 +35,10 @@ class RegistrationPeriodService extends BaseService
     {
         $term = Term::query()->findOrFail($data['term_id']);
         $attributes = $this->attributes($term, $data);
-        if (isset($data['training_framework_id'])) {
-            $framework = TrainingFramework::query()->findOrFail($data['training_framework_id']);
-            if ($framework->term_id !== $term->id) {
-                $this->fail('Chương trình khung không thuộc học kỳ đã chọn.', 'Chọn khung đúng học kỳ của đợt.');
-            }
-            $attributes['training_framework_id'] = $framework->id;
+        // Đợt theo chương trình khung cho cả học kỳ: khung từng khoa – khóa chọn trong bảng của đợt, không dùng đối tượng
+        $attributes['uses_frameworks'] = (bool) ($data['uses_frameworks'] ?? false);
+        if ($attributes['uses_frameworks']) {
+            $data['targets'] = [];
         }
 
         return $this->transaction(function () use ($attributes, $data): RegistrationPeriod {
@@ -70,7 +67,7 @@ class RegistrationPeriodService extends BaseService
         return $this->transaction(function () use ($period, $attributes, $data): RegistrationPeriod {
             $period->update($attributes);
 
-            if (array_key_exists('targets', $data)) {
+            if (array_key_exists('targets', $data) && ! $period->usesFrameworks()) {
                 $this->syncTargets($period, $data['targets'] ?? []);
             }
 
@@ -90,11 +87,9 @@ class RegistrationPeriodService extends BaseService
                 'name' => $period->name, 'round' => $period->round->value,
                 'opens_at' => $this->local($period->opens_at), 'closes_at' => $this->local($period->closes_at),
             ]);
-            if ($period->training_framework_id !== null && $period->preview_at === null) {
-                $this->fail('Cần thông báo danh sách học phần để sinh viên xem trước.', 'Bấm Thông báo xem trước rồi công bố thời gian đăng ký.');
-            }
+            // Đợt theo khung: Công bố = sinh viên thấy lớp ngay (chưa có nút đăng ký tới giờ mở); kiểm tra đủ khung, lớp, lịch
             app(RegistrationOfferingService::class)->activateSections($period);
-            $period->update(['status' => PeriodStatus::Published]);
+            $period->update(['status' => PeriodStatus::Published, 'preview_at' => $period->preview_at ?? now()]);
             if ($actor !== null) {
                 app(RegistrationOfferingService::class)->notify($period, $actor);
             }

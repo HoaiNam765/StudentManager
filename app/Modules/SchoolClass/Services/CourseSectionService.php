@@ -115,10 +115,12 @@ class CourseSectionService extends BaseService
      */
     public function assign(CourseSection $section, Lecturer $lecturer, string $role, bool $confirmOverload = false): array
     {
-        if ($section->registrationPeriod?->framework !== null) {
+        // Lớp mở trong đợt theo khung: giảng viên phải thuộc khoa của khung (khoa – khóa) của lớp
+        $framework = $section->registrationPeriod?->usesFrameworks() ? $section->loadMissing('trainingFrameworkItem.framework')->trainingFrameworkItem?->framework : null;
+        if ($framework !== null) {
             $availability = app(OfferingLecturers::class);
-            if (! $availability->inFaculty($section->registrationPeriod->framework->faculty_id)->whereKey($lecturer->id)->exists()) {
-                $this->fail('Giảng viên không thuộc khoa của đợt đăng ký.', 'Chọn giảng viên đang công tác trong khoa của chương trình khung.');
+            if (! $availability->inFaculty($framework->faculty_id)->whereKey($lecturer->id)->exists()) {
+                $this->fail('Giảng viên không thuộc khoa của chương trình khung của lớp.', 'Chọn giảng viên đang công tác trong khoa của chương trình khung.');
             }
             foreach (ScheduleRule::query()->where('course_section_id', $section->id)->get() as $rule) {
                 if ($reason = $availability->conflict($lecturer, $section->term, $rule->getAttributes(), $section->id)) {

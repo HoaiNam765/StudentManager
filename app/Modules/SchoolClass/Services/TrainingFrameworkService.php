@@ -26,6 +26,7 @@ use App\Support\Exceptions\BusinessRuleException;
 use App\Support\Services\BaseService;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Chương trình khung theo khoa – khóa – học kỳ: khai báo học phần dự kiến mở, gợi ý từ CTĐT, mở lớp học phần hàng loạt
@@ -79,7 +80,7 @@ class TrainingFrameworkService extends BaseService
 
     public function delete(TrainingFramework $framework): void
     {
-        if (RegistrationPeriod::query()->where('training_framework_id', $framework->id)->exists()) {
+        if (DB::table('registration_period_frameworks')->where('training_framework_id', $framework->id)->exists()) {
             $this->fail('Chương trình khung đang được tham chiếu bởi đợt đăng ký.', 'Sửa học phần trong khung hoặc xóa đợt nháp chưa có lớp trước khi xóa khung.');
         }
         $opened = CourseSection::query()->whereIn('training_framework_item_id', $framework->items()->select('id'))->count();
@@ -160,7 +161,7 @@ class TrainingFrameworkService extends BaseService
     {
         $framework->loadMissing(['cohort', 'term.academicYear']);
         $this->assertTermOpen($framework->term);
-        $plannedTerm = $this->cohortTermNumber($framework->cohort, $framework->term);
+        $plannedTerm = $this->plannedTermOf($framework);
         $students = $this->studentCount($framework);
 
         if ($plannedTerm === null) {
@@ -404,6 +405,14 @@ class TrainingFrameworkService extends BaseService
         }
 
         return $rows;
+    }
+
+    /** Kỳ CTĐT của khung: kỳ Phòng Đào tạo đã chọn, trống thì học kỳ thứ n của khóa. */
+    public function plannedTermOf(TrainingFramework $framework): ?int
+    {
+        $framework->loadMissing(['cohort', 'term.academicYear']);
+
+        return $framework->planned_term ?? $this->cohortTermNumber($framework->cohort, $framework->term);
     }
 
     /**

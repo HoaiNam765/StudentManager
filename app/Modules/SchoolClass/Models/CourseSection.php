@@ -32,6 +32,12 @@ class CourseSection extends StandardModel implements HasDataScope
         return $this->belongsTo(RegistrationPeriod::class);
     }
 
+    /** Mục chương trình khung lớp được mở từ đó (khoa – khóa của lớp trong đợt theo khung). */
+    public function trainingFrameworkItem(): BelongsTo
+    {
+        return $this->belongsTo(TrainingFrameworkItem::class);
+    }
+
     use HasVietnameseSearch;
 
     protected $guarded = [];

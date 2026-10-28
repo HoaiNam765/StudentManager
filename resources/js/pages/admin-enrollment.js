@@ -1,5 +1,4 @@
 import { showOfferings } from './registration-offerings.js';
-import { listAll } from '../lookups.js';
 import { api } from '../api.js';
 import { confirmDialog, el, emptyBlock, errorBlock, loadingBlock, pageData, showAlert, toast, withBusy } from '../ui.js';
 
@@ -10,7 +9,7 @@ export default function adminEnrollment(root) {
     const region = (name) => root.querySelector(`[data-region="${name}"]`);
     const termSelect = root.querySelector('[data-filter="term"]');
     const form = root.querySelector('[data-form="period"]');
-    const state = { terms: [], cohorts: [], majors: [], classes: [], editId: null, frameworks: [], periods: [], selectedPeriod: null };
+    const state = { terms: [], cohorts: [], majors: [], classes: [], editId: null, periods: [], selectedPeriod: null };
     const url = (template, id, status = '') => template.replace('__ID__', encodeURIComponent(id)).replace('__TERM__', encodeURIComponent(id)).replace('__STATUS__', encodeURIComponent(status));
 
     termSelect.addEventListener('change', () => { resetForm(); state.selectedPeriod = null; region('offerings').replaceChildren(); loadAll(); });
@@ -18,6 +17,7 @@ export default function adminEnrollment(root) {
     root.querySelector('[data-action="add-target"]')?.addEventListener('click', () => addTargetRow());
     root.querySelector('[data-action="cancel-edit"]')?.addEventListener('click', resetForm);
     form?.addEventListener('submit', savePeriod);
+    form?.elements.mode.addEventListener('change', syncMode);
 
     bootstrap();
 
@@ -42,7 +42,7 @@ export default function adminEnrollment(root) {
             resetForm();
             await loadAll();
             const fromFramework = state.periods.find((p) => String(p.id) === params.get('period_id'));
-            if (fromFramework?.training_framework_id) {
+            if (fromFramework?.uses_frameworks) {
                 state.selectedPeriod = fromFramework;
                 await showOfferings(region('offerings'), page, fromFramework, loadPeriods);
                 region('offerings').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -56,7 +56,7 @@ export default function adminEnrollment(root) {
             region('stats').replaceChildren(); region('finalize').replaceChildren(); region('under-min').replaceChildren();
             return;
         }
-        await Promise.all([loadFrameworks(), loadPeriods(), loadStats(), loadFinalizePreview(), loadUnderMin()]);
+        await Promise.all([loadPeriods(), loadStats(), loadFinalizePreview(), loadUnderMin()]);
     }
 
     async function loadPeriods() {
@@ -71,19 +71,18 @@ export default function adminEnrollment(root) {
 
     function periodCard(item) {
         const actions = [];
+        if (item.uses_frameworks) {
+            actions.push(el('button', { type: 'button', class: 'text-xs text-primary font-semibold hover:underline', onclick: () => {
+                state.selectedPeriod = item; showOfferings(region('offerings'), page, item, loadPeriods);
+                region('offerings').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } }, 'Khung & lớp'));
+        }
         if (page.can.update && item.status === 'draft') {
             actions.push(el('button', { type: 'button', class: 'text-xs text-primary font-semibold hover:underline', onclick: () => editPeriod(item) }, 'Sửa'));
             actions.push(el('button', { type: 'button', class: 'text-xs text-blue-700 font-semibold hover:underline', onclick: (e) => publishPeriod(e.currentTarget, item) }, 'Công bố'));
         }
-        if (item.training_framework_id) {
-            actions.push(el('button', { type: 'button', class: 'text-xs text-primary font-semibold hover:underline', onclick: () => {
-                state.selectedPeriod = item; showOfferings(region('offerings'), page, item, loadPeriods);
-                region('offerings').scrollIntoView({ behavior: 'smooth', block: 'start' });
-            } }, 'Học phần / giảng viên / lịch'));
-            if (page.can.update && page.can.notify && item.status === 'draft') actions.push(el('button', { type: 'button', class: 'text-xs text-primary font-semibold hover:underline', onclick: (e) => announce(e.currentTarget, item) }, item.preview_at ? 'Gửi lại thông báo xem trước' : 'Thông báo xem trước'));
-        }
         if (page.can.update && item.status === 'published' && !item.is_open && new Date(item.opens_at.replace(' ', 'T') + '+07:00') > new Date()) {
-            actions.push(el('button', { type: 'button', class: 'text-xs text-primary font-semibold hover:underline', onclick: (e) => openEarly(e.currentTarget, item) }, 'Mở ngay (sớm hơn lịch)'));
+            actions.push(el('button', { type: 'button', class: 'text-xs text-primary font-semibold hover:underline', onclick: (e) => openEarly(e.currentTarget, item) }, 'Mở đăng ký ngay'));
         }
         if (page.can.delete && item.status === 'draft') actions.push(el('button', { type: 'button', class: 'text-xs text-red-700 font-semibold hover:underline', onclick: (e) => deletePeriod(e.currentTarget, item) }, 'Xóa'));
         return el('article', { class: 'rounded-xl border border-outline-variant p-4 space-y-2' },
@@ -91,7 +90,7 @@ export default function adminEnrollment(root) {
                 el('div', {}, el('p', { class: 'font-bold' }, item.name), el('p', { class: 'text-xs text-on-surface-variant' }, `${item.round_label} · ${item.opens_at ?? '—'} → ${item.closes_at ?? '—'}`)),
                 el('span', { class: `rounded-full px-2 py-1 text-[11px] font-semibold ${BADGE[item.status] ?? ''}` }, item.status_label)),
             item.framework_label ? el('p', { class: 'text-xs text-on-surface-variant' }, item.framework_label) : null,
-            el('p', { class: 'text-xs text-on-surface-variant' }, `Khung tín chỉ: ${item.min_credits ?? '—'} – ${item.max_credits ?? '—'} · ${item.targets?.length ?? 0} nhóm đối tượng`),
+            el('p', { class: 'text-xs text-on-surface-variant' }, `Khung tín chỉ: ${item.min_credits ?? '—'} – ${item.max_credits ?? '—'}${item.uses_frameworks ? '' : ` · ${item.targets?.length ?? 0} nhóm đối tượng`}`),
             item.targets?.length ? el('div', { class: 'text-xs text-on-surface-variant space-y-0.5' }, item.targets.map((x) => el('p', {}, `• ${x.description}`))) : null,
             el('div', { class: 'flex flex-wrap gap-3 pt-1' }, actions));
     }
@@ -189,13 +188,13 @@ export default function adminEnrollment(root) {
 
     function resetForm() {
         if (!form) return;
-        state.editId = null; form.reset(); form.elements.training_framework_id.disabled = false; form.elements.training_framework_id.required = true; region('targets').replaceChildren(); addTargetRow();
+        state.editId = null; form.reset(); form.elements.mode.disabled = false; region('targets').replaceChildren(); addTargetRow(); syncMode();
         root.querySelector('[data-form-title]').textContent = 'Tạo đợt đăng ký'; root.querySelector('[data-action="cancel-edit"]').hidden = true;
         form.querySelector('button[type="submit"]').textContent = 'Lưu đợt đăng ký';
     }
 
     function editPeriod(item) {
-        state.editId = item.id; form.elements.training_framework_id.value = item.training_framework_id ?? ''; form.elements.training_framework_id.disabled = true; form.elements.training_framework_id.required = false;
+        state.editId = item.id; form.elements.mode.value = item.uses_frameworks ? 'frameworks' : 'targets'; form.elements.mode.disabled = true; syncMode();
         form.elements.name.value = item.name ?? ''; form.elements.round.value = item.round ?? 'round_1';
         form.elements.opens_at.value = toLocalInput(item.opens_at); form.elements.closes_at.value = toLocalInput(item.closes_at);
         form.elements.min_credits.value = item.min_credits ?? ''; form.elements.max_credits.value = item.max_credits ?? '';
@@ -221,14 +220,18 @@ export default function adminEnrollment(root) {
     async function savePeriod(event) {
         event.preventDefault(); const button = form.querySelector('button[type="submit"]');
         const body = { name: form.elements.name.value.trim(), round: form.elements.round.value, opens_at: fromLocalInput(form.elements.opens_at.value), closes_at: fromLocalInput(form.elements.closes_at.value), min_credits: numberOrNull(form.elements.min_credits.value), max_credits: numberOrNull(form.elements.max_credits.value), targets: collectTargets() };
-        if (!state.editId) { body.term_id = Number(termSelect.value); body.training_framework_id = Number(form.elements.training_framework_id.value); }
+        const frameworks = form.elements.mode.value === 'frameworks';
+        if (frameworks) delete body.targets;
+        if (!state.editId) { body.term_id = Number(termSelect.value); body.uses_frameworks = frameworks; }
         Object.keys(body).forEach((k) => { if (body[k] === null || body[k] === '') delete body[k]; });
         try { await withBusy(button, () => state.editId ? api.put(url(page.api.periodUpdate, state.editId), body) : api.post(page.api.periodStore, body)); toast(state.editId ? 'Đã cập nhật đợt đăng ký.' : 'Đã tạo đợt đăng ký.', 'success'); resetForm(); await loadAll(); }
         catch (error) { showAlert(region('alert'), error); }
     }
 
     async function publishPeriod(button, item) {
-        const ok = await confirmDialog({ title: `Công bố ${item.name}?`, message: 'Sinh viên thuộc đối tượng áp dụng có thể đăng ký trong khung thời gian đã cấu hình.', confirmText: 'Công bố' }); if (!ok) return;
+        const ok = await confirmDialog({ title: `Công bố ${item.name}?`, message: item.uses_frameworks
+            ? `Sinh viên mọi khoa – khóa của đợt thấy ngay lớp, giảng viên, lịch (môn đã đạt không hiện). Nút đăng ký hiện từ ${item.opens_at} hoặc khi bấm "Mở đăng ký ngay". Hệ thống kiểm tra đủ khung, lớp, giảng viên, lịch trước khi công bố.`
+            : 'Sinh viên thuộc đối tượng áp dụng có thể đăng ký trong khung thời gian đã cấu hình.', confirmText: 'Công bố' }); if (!ok) return;
         try { await withBusy(button, () => api.post(url(page.api.periodPublish, item.id), {})); toast('Đã công bố đợt đăng ký.', 'success'); if (state.selectedPeriod?.id === item.id) { state.selectedPeriod = { ...item, status: 'published' }; await showOfferings(region('offerings'), page, state.selectedPeriod, loadPeriods); } await loadAll(); } catch (error) { showAlert(region('alert'), error); }
     }
 
@@ -237,14 +240,10 @@ export default function adminEnrollment(root) {
         try { await withBusy(button, () => api.del(url(page.api.periodDelete, item.id))); toast('Đã xóa đợt đăng ký.', 'success'); await loadAll(); } catch (error) { showAlert(region('alert'), error); }
     }
 
-    async function loadFrameworks() {
-        if (!form || state.editId) return;
-        const select = form.elements.training_framework_id;
-        const current = select.value;
-        try {
-            state.frameworks = await listAll(page.api.frameworks, { term_id: termSelect.value });
-            select.replaceChildren(el('option', { value: '' }, 'Chọn chương trình khung…'), ...state.frameworks.map((f) => el('option', { value: f.id, selected: String(f.id) === current }, `${f.faculty?.name} · ${f.cohort?.code} (${f.items_count} môn)`)));
-        } catch (error) { showAlert(region('alert'), error); }
+    /** Đợt theo khung không dùng dòng đối tượng (khoa – khóa lấy từ bảng khung của đợt). */
+    function syncMode() {
+        if (!form) return;
+        region('targets-box').hidden = form.elements.mode.value === 'frameworks';
     }
 
     async function announce(button, item) {

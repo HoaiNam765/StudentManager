@@ -50,12 +50,11 @@ class RegistrationAccess extends BaseService
     /** Sinh viên thuộc đối tượng của đợt. */
     public function targets(RegistrationPeriod $period, Student $student): bool
     {
-        if ($period->training_framework_id !== null) {
-            $period->loadMissing('framework.cohort');
-            if ($period->framework === null || $period->framework->cohort->start_year !== $student->cohort
-                || $student->major?->faculty_id !== $period->framework->faculty_id) {
-                return false;
-            }
+        // Đợt theo khung: thuộc đợt khi đợt có khung đúng khoa – khóa của sinh viên (không dùng dòng đối tượng)
+        if ($period->usesFrameworks()) {
+            $period->loadMissing('frameworks.cohort');
+
+            return $period->frameworkFor($student) !== null;
         }
         $period->loadMissing('targets.cohort');
 
@@ -73,7 +72,7 @@ class RegistrationAccess extends BaseService
     /** Đợt đã thông báo để xem trước, hoặc đã công bố; tuyệt đối không lộ bản nháp. */
     public function visiblePeriodsFor(Student $student): Collection
     {
-        return RegistrationPeriod::query()->with('targets', 'term', 'framework.cohort')
+        return RegistrationPeriod::query()->with('targets', 'term', 'frameworks.cohort')
             ->where(fn ($q) => $q->where('status', 'published')->orWhere(fn ($q) => $q->where('status', 'draft')->whereNotNull('preview_at')))
             ->where('closes_at', '>', $this->now())->orderBy('opens_at')->get()
             ->filter(fn (RegistrationPeriod $p) => $this->targets($p, $student))->values();

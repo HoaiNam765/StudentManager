@@ -7,6 +7,7 @@ use App\Modules\AcademicYear\Models\Term;
 use App\Modules\Curriculum\Models\Curriculum;
 use App\Modules\Enrollment\Contracts\AcademicRecord;
 use App\Modules\Enrollment\Models\RegistrationPeriod;
+use App\Modules\Enrollment\Services\OfferingLecturers;
 use App\Modules\Enrollment\Services\RegistrationPeriodService;
 use App\Modules\Faculty\Models\Major;
 use App\Modules\Room\Models\Room;
@@ -221,6 +222,46 @@ class RegistrationOfferingWorkflowTest extends TestCase
         $this->postJson($this->endpoint('offerings.destroy-many'), ['section_ids' => $ids])->assertOk()->assertJsonPath('deleted', 2);
         $this->getJson($this->endpoint('offerings.index'))->assertOk()->assertJsonCount(0, 'sections');
         $this->assertSame(1, $this->framework->items()->count());
+    }
+
+    public function test_auto_schedule_picks_free_slot_room_and_lecturer_without_clashing_the_same_cohort(): void
+    {
+        $item = $this->framework->items()->with('subject')->firstOrFail();
+        $lecturer = Lecturer::whereHas('department', fn ($q) => $q->where('faculty_id', $this->framework->faculty_id))->orderBy('code')->firstOrFail();
+        $classes = route('admin.registration-periods.frameworks.classes', ['registrationPeriod' => $this->period, 'trainingFramework' => $this->framework]);
+        // Ba lớp cùng một giảng viên: tự xếp phải tránh trùng lịch giảng viên và trùng buổi của cùng khoa – khóa
+        $this->postJson($classes, ['classes' => array_fill(0, 3, ['item_id' => $item->id, 'lecturer_id' => $lecturer->id, 'max_size' => 40])])->assertCreated();
+        $sections = $this->period->sections()->orderBy('code')->get();
+        // Lớp thứ ba chưa có giảng viên: hệ thống tự chọn giảng viên của khoa
+        $sections[2]->instructors()->delete();
+
+        $suggest = $this->postJson($this->endpoint('offerings.suggest-slot'), [
+            'framework_id' => $this->framework->id, 'section_type' => 'theory', 'max_size' => 40, 'length' => 3, 'week_from' => 1, 'week_to' => 15,
+        ])->assertOk()->json();
+        $this->assertSame(['day_of_week', 'period_from', 'period_to', 'room_id', 'week_from', 'week_to', 'week_parity', 'lecturer_id'], array_keys($suggest));
+
+        $result = $this->postJson($this->endpoint('offerings.auto-schedule'), ['framework_id' => $this->framework->id])->assertOk()->json();
+        $this->assertCount(3, $result['scheduled'], json_encode($result['skipped'], JSON_UNESCAPED_UNICODE));
+        $rules = ScheduleRule::query()->whereIn('course_section_id', $sections->pluck('id'))->get();
+        $this->assertCount(3, $rules);
+        foreach ($rules as $a) {
+            $this->assertNotNull($a->room_id);
+            $this->assertLessThanOrEqual(5, $a->period_to - $a->period_from + 1);
+            foreach ($rules as $b) {
+                if ($a->id !== $b->id) {
+                    $this->assertFalse($a->day_of_week === $b->day_of_week && $a->period_from <= $b->period_to && $b->period_from <= $a->period_to, 'Hai lớp cùng khoa – khóa trùng buổi.');
+                }
+            }
+        }
+        $total = $item->subject->theory_periods;
+        $length = $rules[0]->period_to - $rules[0]->period_from + 1;
+        $this->assertSame((int) ceil($total / $length), $rules[0]->week_to);
+        $assigned = $sections[2]->instructors()->where('role', 'main')->firstOrFail()->lecturer;
+        $this->assertTrue(app(OfferingLecturers::class)->inFaculty($this->framework->faculty_id)->whereKey($assigned->id)->exists());
+
+        // Lớp đã có lịch thì không xếp lại
+        $this->postJson($this->endpoint('offerings.auto-schedule'))->assertOk()->assertJsonCount(0, 'scheduled');
+        $this->actingAs($this->studentUser)->postJson($this->endpoint('offerings.auto-schedule'))->assertForbidden();
     }
 
     public function test_scheduled_open_uses_server_time_and_passed_subject_cannot_bypass_with_improve(): void

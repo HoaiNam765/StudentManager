@@ -36,6 +36,7 @@ class RegistrationOfferingService extends BaseService
         private readonly OfferingLecturers $lecturers,
         private readonly AnnouncementService $announcements,
         private readonly TrainingFrameworkService $frameworks,
+        private readonly OfferingSlotFinder $slots,
     ) {}
 
     /**
@@ -278,6 +279,79 @@ class RegistrationOfferingService extends BaseService
 
             return $sections->count();
         });
+    }
+
+    /**
+     * Tự xếp các lớp chưa có lịch của đợt (hoặc của một khung): số tiết / tuần theo tín chỉ, thứ – tiết không trùng lớp khác
+     * cùng khoa – khóa, phòng trống, giảng viên của khoa trống lịch và ít tiết nhất (lớp đã có giảng viên thì giữ). Mỗi lớp
+     * một giao dịch: lớp không xếp được thì bỏ qua kèm lý do, các lớp khác vẫn lưu.
+     *
+     * @return array{scheduled: list<array{code: string, schedule: string, lecturer: string}>, skipped: list<array{code: string, reason: string}>}
+     */
+    public function autoSchedule(RegistrationPeriod $period, ?TrainingFramework $only = null): array
+    {
+        $this->assertDraft($period);
+        if ($only !== null) {
+            $this->assertAttached($period, $only);
+        }
+        $term = $period->term;
+        $sections = $period->sections()->with('subject', 'instructors', 'trainingFrameworkItem.framework')
+            ->where('status', '!=', SectionStatus::Cancelled)
+            ->whereNotIn('id', ScheduleRule::query()->select('course_section_id'))
+            ->when($only, fn ($q) => $q->whereHas('trainingFrameworkItem', fn ($q) => $q->where('training_framework_id', $only->id)))
+            ->orderBy('code')->get();
+        $result = ['scheduled' => [], 'skipped' => []];
+
+        foreach ($sections as $section) {
+            $framework = $section->trainingFrameworkItem?->framework;
+            $main = $section->instructors->firstWhere('role', SectionInstructor::MAIN);
+            $slot = $framework === null ? null : $this->slots->find($term, $framework,
+                $this->slots->plan($section->subject, $section->section_type, $term->weeks)
+                + ['section_type' => $section->section_type, 'max_size' => $section->max_size, 'lecturer_id' => $main?->lecturer_id],
+                $section->id);
+
+            if ($slot === null) {
+                $result['skipped'][] = ['code' => $section->code, 'reason' => $framework === null
+                    ? 'Lớp không thuộc khung nào của đợt.'
+                    : 'Không còn buổi nào có phòng đủ chỗ và giảng viên của khoa cùng trống.'];
+
+                continue;
+            }
+
+            try {
+                $this->transaction(function () use ($period, $section, $slot, $main, &$result): void {
+                    $period = RegistrationPeriod::query()->lockForUpdate()->findOrFail($period->id);
+                    $this->assertDraft($period);
+                    $lecturer = Lecturer::query()->lockForUpdate()->findOrFail($slot['lecturer_id']);
+                    if ($main === null) {
+                        $this->sections->assign($section, $lecturer, SectionInstructor::MAIN);
+                    }
+                    $section = $this->sections->update($section, ['room_id' => $slot['room_id']]);
+                    $rule = $this->schedules->create($section, $slot + ['reason' => 'Tự xếp lịch mở học phần'])['rule'];
+                    $result['scheduled'][] = ['code' => $section->code, 'schedule' => $rule->describe().' · '.$rule->room?->code, 'lecturer' => $lecturer->full_name];
+                });
+            } catch (BusinessRuleException $e) {
+                $result['skipped'][] = ['code' => $section->code, 'reason' => $e->getMessage()];
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Gợi ý một buổi trống cho hộp thoại Sửa lớp (chưa lưu): giữ số tiết mỗi buổi và tuần đang nhập, giảng viên đã chọn nếu có.
+     *
+     * @return array<string, int|string>
+     */
+    public function suggestSlot(RegistrationPeriod $period, TrainingFramework $framework, array $need, ?int $ignoreSection = null): array
+    {
+        $this->assertAttached($period, $framework);
+
+        return $this->slots->find($period->term, $framework, $need, $ignoreSection)
+            ?? $this->fail(
+                'Không còn buổi nào (thứ 2–7) có phòng đủ chỗ và giảng viên '.(! empty($need['lecturer_id']) ? 'đã chọn' : 'của khoa').' cùng trống.',
+                'Giảm số tiết mỗi buổi / sĩ số, bỏ chọn giảng viên để hệ thống chọn người khác, hoặc chọn tay thứ, tiết, phòng.'
+            );
     }
 
     /** Thông báo xem trước (đợt nháp): sinh viên các khoa – khóa của đợt xem được lớp, chưa đăng ký. */

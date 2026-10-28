@@ -1,5 +1,6 @@
 import { showOfferings } from './registration-offerings.js';
 import { api } from '../api.js';
+import { dmy } from '../lookups.js';
 import { confirmDialog, el, emptyBlock, errorBlock, loadingBlock, pageData, showAlert, toast, withBusy } from '../ui.js';
 
 const BADGE = { draft: 'bg-slate-100 text-slate-800', published: 'bg-blue-50 text-blue-800', finalized: 'bg-emerald-50 text-emerald-800' };
@@ -87,7 +88,7 @@ export default function adminEnrollment(root) {
         if (page.can.delete && item.status === 'draft') actions.push(el('button', { type: 'button', class: 'text-xs text-red-700 font-semibold hover:underline', onclick: (e) => deletePeriod(e.currentTarget, item) }, 'Xóa'));
         return el('article', { class: 'rounded-xl border border-outline-variant p-4 space-y-2' },
             el('div', { class: 'flex items-start justify-between gap-3' },
-                el('div', {}, el('p', { class: 'font-bold' }, item.name), el('p', { class: 'text-xs text-on-surface-variant' }, `${item.round_label} · ${item.opens_at ?? '—'} → ${item.closes_at ?? '—'}`)),
+                el('div', {}, el('p', { class: 'font-bold' }, item.name), el('p', { class: 'text-xs text-on-surface-variant' }, `${item.round_label} · ${dmyHm(item.opens_at)} → ${dmyHm(item.closes_at)}`)),
                 el('span', { class: `rounded-full px-2 py-1 text-[11px] font-semibold ${BADGE[item.status] ?? ''}` }, item.status_label)),
             item.framework_label ? el('p', { class: 'text-xs text-on-surface-variant' }, item.framework_label) : null,
             el('p', { class: 'text-xs text-on-surface-variant' }, `Khung tín chỉ: ${item.min_credits ?? '—'} – ${item.max_credits ?? '—'}${item.uses_frameworks ? '' : ` · ${item.targets?.length ?? 0} nhóm đối tượng`}`),
@@ -230,7 +231,7 @@ export default function adminEnrollment(root) {
 
     async function publishPeriod(button, item) {
         const ok = await confirmDialog({ title: `Công bố ${item.name}?`, message: item.uses_frameworks
-            ? `Sinh viên mọi khoa – khóa của đợt thấy ngay lớp, giảng viên, lịch (môn đã đạt không hiện). Nút đăng ký hiện từ ${item.opens_at} hoặc khi bấm "Mở đăng ký ngay". Hệ thống kiểm tra đủ khung, lớp, giảng viên, lịch trước khi công bố.`
+            ? `Sinh viên mọi khoa – khóa của đợt thấy ngay lớp, giảng viên, lịch (môn đã đạt không hiện). Nút đăng ký hiện từ ${dmyHm(item.opens_at)} hoặc khi bấm "Mở đăng ký ngay". Hệ thống kiểm tra đủ khung, lớp, giảng viên, lịch trước khi công bố.`
             : 'Sinh viên thuộc đối tượng áp dụng có thể đăng ký trong khung thời gian đã cấu hình.', confirmText: 'Công bố' }); if (!ok) return;
         try { await withBusy(button, () => api.post(url(page.api.periodPublish, item.id), {})); toast('Đã công bố đợt đăng ký.', 'success'); if (state.selectedPeriod?.id === item.id) { state.selectedPeriod = { ...item, status: 'published' }; await showOfferings(region('offerings'), page, state.selectedPeriod, loadPeriods); } await loadAll(); } catch (error) { showAlert(region('alert'), error); }
     }
@@ -267,6 +268,8 @@ export default function adminEnrollment(root) {
     function metric(label, value) { return el('div', { class: 'rounded-xl border border-outline-variant bg-surface-container-lowest p-4 shadow-sm' }, el('p', { class: 'text-xs text-on-surface-variant' }, label), el('p', { class: 'mt-1 text-2xl font-bold' }, value)); }
     function fill(select, items, label) { select.replaceChildren(); items.forEach((x) => select.append(el('option', { value: x.id }, label(x)))); }
     function numberOrNull(v) { return v === '' ? null : Number(v); }
+    /** 'Y-m-d H:i' → 'd/m/Y H:i'. */
+    function dmyHm(value) { return value ? `${dmy(value)} ${String(value).slice(11, 16)}`.trim() : '—'; }
     function toLocalInput(value) { return value ? value.replace(' ', 'T') : ''; }
     function fromLocalInput(value) { return value ? value.replace('T', ' ') : null; }
 }

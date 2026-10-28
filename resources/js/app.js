@@ -1,3 +1,4 @@
+import { initDateInputs } from './date-inputs.js';
 import { initNotificationBell } from './notification-bell.js';
 
 // Mỗi trang gọi API khai báo <div data-page="ten-trang"> và có tệp resources/js/pages/ten-trang.js (xuất mặc định
@@ -17,3 +18,5 @@ document.querySelectorAll('[data-page]').forEach((root) => {
 });
 
 initNotificationBell();
+// Ô ngày / ngày giờ hiển thị dd/mm/yyyy (hh:mm) bất kể ngôn ngữ trình duyệt
+initDateInputs();

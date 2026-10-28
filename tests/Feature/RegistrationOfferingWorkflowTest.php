@@ -69,15 +69,17 @@ class RegistrationOfferingWorkflowTest extends TestCase
         ]);
         $subject = $curriculum->items()->firstOrFail()->subject;
         app(TrainingFrameworkService::class)->addItem($this->framework, ['subject_id' => $subject->id]);
+        // Đợt theo khung cả học kỳ; chỉ có một khoa – khóa có sinh viên (sinh viên tạo bên dưới) nên bảng khung đủ một ô
         $this->period = app(RegistrationPeriodService::class)->create([
-            'term_id' => $term->id, 'training_framework_id' => $this->framework->id, 'name' => 'Đợt kiểm thử theo khung',
+            'term_id' => $term->id, 'uses_frameworks' => true, 'name' => 'Đợt kiểm thử theo khung',
             'round' => 'round_1', 'opens_at' => '2026-11-01 08:00', 'closes_at' => '2026-12-20 17:00',
         ]);
+        $this->period->frameworks()->attach($this->framework->id);
         $this->studentUser = $this->userWithRoles('STU');
         $this->student = Student::factory()->create(['major_id' => $curriculum->major_id, 'cohort' => 2026, 'status' => 'studying', 'user_id' => $this->studentUser->id]);
         $lecturer = Lecturer::whereHas('department', fn ($q) => $q->where('faculty_id', $this->framework->faculty_id))->firstOrFail();
         $this->payload = [
-            'subject_id' => $subject->id, 'lecturer_id' => $lecturer->id, 'min_size' => 1, 'max_size' => 30,
+            'framework_id' => $this->framework->id, 'subject_id' => $subject->id, 'lecturer_id' => $lecturer->id, 'min_size' => 1, 'max_size' => 30,
             'schedule' => ['day_of_week' => 6, 'period_from' => 1, 'period_to' => 3, 'week_from' => 2, 'week_to' => 3, 'week_parity' => 'all',
                 'room_id' => Room::where('status', 'available')->where('capacity', '>=', 30)->firstOrFail()->id],
         ];
@@ -100,8 +102,7 @@ class RegistrationOfferingWorkflowTest extends TestCase
         $this->getJson($this->endpoint('offerings.index'))->assertOk()->assertJsonPath('sections.0.id', $id);
         $this->actingAs($this->studentUser)->getJson(route('student.registration.options'))->assertOk()->assertJsonPath('period', null);
         $this->getJson(route('student.registration.options', ['period_id' => $this->period->id]))->assertNotFound();
-        $this->actingAs($this->acad)->postJson($this->endpoint('publish'))->assertUnprocessable();
-        $this->postJson($this->endpoint('announce'))->assertOk();
+        $this->actingAs($this->acad)->postJson($this->endpoint('announce'))->assertOk();
         $this->assertDatabaseHas('notification_recipients', ['user_id' => $this->studentUser->id]);
         $this->actingAs($this->studentUser)->getJson(route('student.registration.options'))->assertOk()
             ->assertJsonPath('period.preview_only', true)->assertJsonPath('sections.0.id', $id)
@@ -132,7 +133,7 @@ class RegistrationOfferingWorkflowTest extends TestCase
         $id = $this->openSection();
         $candidate = $this->payload;
         $candidate['schedule']['room_id'] = Room::where('id', '!=', $candidate['schedule']['room_id'])->where('status', 'available')->where('capacity', '>=', 30)->firstOrFail()->id;
-        $options = $this->postJson($this->endpoint('lecturers'), ['schedule' => $candidate['schedule']])->assertOk()->json();
+        $options = $this->postJson($this->endpoint('lecturers'), ['schedule' => $candidate['schedule'], 'framework_id' => $this->framework->id])->assertOk()->json();
         $this->assertFalse(collect($options)->firstWhere('id', $this->payload['lecturer_id'])['available']);
         $this->assertFalse(collect($options)->contains('id', $other->id));
         $this->postJson($this->endpoint('offerings.store'), $candidate)->assertUnprocessable();
@@ -146,7 +147,7 @@ class RegistrationOfferingWorkflowTest extends TestCase
         $this->assertDatabaseHas('schedule_rules', ['course_section_id' => $id, 'day_of_week' => 6, 'deleted_at' => null]);
     }
 
-    public function test_open_registration_from_framework_page_with_class_count_and_faculty_lecturers(): void
+    public function test_add_classes_to_framework_with_class_count_and_faculty_lecturers(): void
     {
         $item = $this->framework->items()->firstOrFail();
         $inFaculty = Lecturer::whereHas('department', fn ($q) => $q->where('faculty_id', $this->framework->faculty_id))->orderBy('code')->take(2)->get();
@@ -156,28 +157,26 @@ class RegistrationOfferingWorkflowTest extends TestCase
         $this->assertFalse(collect($options)->contains('id', $outside->id));
         $this->assertArrayHasKey('load', $options[0]);
 
-        $url = route('admin.training-frameworks.registration-periods.store', $this->framework);
-        $body = ['name' => 'Đợt mở từ khung', 'round' => 'round_2', 'opens_at' => '2026-11-02 08:00', 'closes_at' => '2026-12-20 17:00',
-            'classes' => [['item_id' => $item->id, 'lecturer_id' => $inFaculty[0]->id, 'max_size' => 40], ['item_id' => $item->id, 'lecturer_id' => $outside->id]]];
-        $periods = RegistrationPeriod::count();
-        // Giảng viên ngoài khoa: hoàn tác cả đợt lẫn lớp đã mở trước đó
+        $url = route('admin.registration-periods.frameworks.classes', ['registrationPeriod' => $this->period, 'trainingFramework' => $this->framework]);
+        $body = ['classes' => [['item_id' => $item->id, 'lecturer_id' => $inFaculty[0]->id, 'max_size' => 40], ['item_id' => $item->id, 'lecturer_id' => $outside->id]]];
+        // Giảng viên ngoài khoa: hoàn tác cả lớp đã mở trước đó
         $this->postJson($url, $body)->assertUnprocessable()->assertJsonPath('message', fn ($m) => str_contains($m, 'lớp thứ 2'));
-        $this->assertSame($periods, RegistrationPeriod::count());
+        $this->assertSame(0, $this->period->sections()->count());
 
         $body['classes'][1]['lecturer_id'] = $inFaculty[1]->id;
-        $created = $this->postJson($url, $body)->assertCreated()->assertJsonPath('sections', 2)->json();
-        $period = RegistrationPeriod::findOrFail($created['id']);
-        $this->assertSame($this->framework->id, $period->training_framework_id);
-        $this->assertSame('draft', $period->status->value);
-        $sections = $period->sections()->with('instructors')->orderBy('code')->get();
+        $this->postJson($url, $body)->assertCreated()->assertJsonCount(2, 'opened');
+        $sections = $this->period->sections()->with('instructors')->orderBy('code')->get();
         $this->assertSame([$inFaculty[0]->id, $inFaculty[1]->id], $sections->map(fn ($s) => $s->instructors->first()->lecturer_id)->all());
         $this->assertSame(40, $sections[0]->max_size);
         $this->assertSame(2, $item->refresh()->planned_sections);
 
-        // Lịch xếp tiếp ở trang Đăng ký học phần; còn lớp chưa có lịch thì chưa thông báo được
-        $this->period = $period;
+        // Bảng khung: một ô, đã có 2 lớp, 2 lớp chưa xếp lịch
+        $this->getJson($this->endpoint('offerings.index'))->assertOk()
+            ->assertJsonPath('cells.0.framework_id', $this->framework->id)->assertJsonPath('cells.0.sections', 2)->assertJsonPath('cells.0.unscheduled', 2);
+
+        // Lịch xếp ở từng lớp; còn lớp chưa có lịch thì chưa công bố được
         $this->putJson($this->endpoint('offerings.update', $sections[0]->id), array_replace($this->payload, ['lecturer_id' => $inFaculty[0]->id]))->assertOk();
-        $this->postJson($this->endpoint('announce'))->assertUnprocessable()->assertJsonPath('message', fn ($m) => str_contains($m, $sections[1]->code));
+        $this->postJson($this->endpoint('publish'))->assertUnprocessable()->assertJsonPath('message', fn ($m) => str_contains($m, $sections[1]->code));
 
         $this->actingAs($this->studentUser)->postJson($url, $body)->assertForbidden();
     }
@@ -197,7 +196,7 @@ class RegistrationOfferingWorkflowTest extends TestCase
         $this->deleteJson($this->endpoint('offerings.destroy', $id))->assertOk();
         $this->getJson($this->endpoint('offerings.index'))->assertOk()->assertJsonCount(0, 'sections');
         $this->assertSame(1, $this->framework->items()->count());
-        $this->postJson($this->endpoint('announce'))->assertUnprocessable();
+        $this->postJson($this->endpoint('announce'))->assertUnprocessable()->assertJsonPath('message', fn ($m) => str_contains($m, 'chưa có lớp'));
         // Lớp đã bỏ vẫn giữ lịch sử nên đợt không xóa được; thông báo chỉ cách dùng lại đợt
         $this->deleteJson(route('admin.registration-periods.destroy', $this->period))
             ->assertUnprocessable()->assertJsonFragment(['message' => 'Đợt đã có lớp học phần (kể cả lớp đã bỏ khỏi đợt) nên không xóa được, để giữ lịch sử lớp. Dùng lại đợt nháp này: bấm Sửa để đổi tên / thời gian rồi thêm lớp mới.']);
@@ -212,7 +211,7 @@ class RegistrationOfferingWorkflowTest extends TestCase
         $record->shouldReceive('onProbation')->andReturn(false);
         $record->shouldReceive('goodStanding')->andReturn(false);
         $id = $this->openSection();
-        $this->postJson($this->endpoint('announce'))->assertOk();
+        // Đợt theo khung: Công bố một bước (không cần thông báo xem trước riêng)
         $this->postJson($this->endpoint('publish'))->assertOk();
         $this->travelTo($this->period->opens_at->subSecond());
         $this->actingAs($this->studentUser)->postJson(route('student.registration.enroll'), ['course_section_id' => $id])->assertUnprocessable();

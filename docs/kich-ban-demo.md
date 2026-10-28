@@ -59,36 +59,38 @@ Số liệu trong kịch bản lấy từ bộ dữ liệu mẫu (`demo:seed`), 
    - Mở hồ sơ vừa tạo → **Xác nhận nhập học**: hệ thống cấp **MSSV** (2 số khóa + mã ngành + số thứ tự), email trường, tài khoản, gán CTĐT, xếp lớp hành chính trong một lần.
 5. **Khóa & Lớp hành chính** (`/admin/lop-hanh-chinh`): khóa 14DH–16DH, lớp (ví dụ 16DHCNTT01), sĩ số; thêm / gỡ sinh viên có xem trước.
 
-## C. Chương trình khung → tạo đợt đăng ký (4 phút) — `acad.test`
+## C. Đợt đăng ký cả học kỳ → bảng khung Khoa × Khóa (4 phút) — `acad.test`
 
-Chương trình khung = **danh sách môn** mỗi khoa – khóa học trong một học kỳ. Từ khung, Phòng Đào tạo tạo luôn đợt đăng ký: số lớp mỗi môn và giảng viên của khoa.
+Một **đợt đăng ký cho cả học kỳ**, gồm chương trình khung của **mọi khoa – khóa**. Mỗi khoa – khóa chọn **kỳ thứ mấy của CTĐT**; môn của kỳ đó tự vào khung.
 
-1. **Chương trình khung** (`/admin/chuong-trinh-khung`) → ở đầu trang chọn **Học kỳ 2 · 2026-2027**, Khoa để **Tất cả khoa**, Khóa **16DH** → bên phải hiện **từng khoa** với các môn của **học kỳ thứ 2** của khóa theo CTĐT (xem trước): CNTT 9 môn, Kinh tế 10 môn, Ngoại ngữ 12 môn.
-2. Bấm **Lập khung cho 3 khoa còn thiếu** → mỗi khoa có khung, môn lấy theo CTĐT (thẻ khoa ghi "9 môn", "10 môn", "12 môn"). Có thể thêm / sửa / xóa môn từng khung.
-   - Cách khác: chọn Học kỳ + **Khoa CNTT** (để trống Khóa) → hiện các khóa của khoa (16DH học kỳ thứ 2, 15DH học kỳ thứ 4) → bấm khóa là lập / mở khung.
-3. Bấm **Khoa Công nghệ thông tin** → mở khung 9 môn → **Tạo đợt đăng ký**. Hộp thoại có tên đợt (soạn sẵn), vòng, giờ mở / đóng (mặc định ngày mai 08:00 → 10 ngày trước ngày học), và bảng học phần: **Số lớp**, **Sĩ số tối đa**, **giảng viên từng lớp** (chỉ giảng viên khoa CNTT, kèm số tiết đã nhận / định mức):
-   - Vòng: **Vòng 2**.
-   - Để demo gọn: **Số lớp = 0** cho mọi môn trừ **TOAN103** (1 lớp, giảng viên `GV0001` Nguyễn Văn An) và **TOAN104** (1 lớp, `GV0008` Bùi Văn Khánh). Gõ số lớp 2 thì hiện thêm ô giảng viên lớp 2.
-   - **Tạo đợt và mở lớp** → hệ thống tạo đợt nháp gắn khung, mở `TOAN103.262.02`, `TOAN104.262.02` (lớp + giảng viên trong một giao dịch), rồi **tự chuyển sang trang Đăng ký học phần** đã mở sẵn đợt đó.
-4. Ý để nói: CTĐT theo **ngành – khóa** (8 học kỳ) là chương trình gốc; khung là phần của một học kỳ, Phòng Đào tạo điều chỉnh theo khoa – khóa mà không sửa CTĐT. Giảng viên ngoài khoa bị từ chối, lỗi ở một lớp thì không tạo gì cả.
+1. **Đăng ký học phần** (`/admin/dang-ky-hoc-phan`) → chọn **Học kỳ 2 · 2026-2027** → **Tạo đợt đăng ký**:
+   - Loại đợt: **Theo chương trình khung — cả học kỳ, mọi khoa – khóa**
+   - Tên: `Đăng ký HK2 2026–2027 theo chương trình khung`; Vòng: **Vòng 2**
+   - Mở lúc: **ngày mai 08:00**; Đóng lúc: **15/01/2027 23:00** → **Lưu đợt đăng ký**.
+   - (Thử) đóng 26/01/2027 → bị chặn: ngày đóng phải **trước ngày bắt đầu học** 25/01/2027.
+2. Trên thẻ đợt bấm **Khung & lớp** → **bảng Khoa × Khóa**: 3 khoa (CNTT, Kinh tế, Ngoại ngữ) × 2 khóa (16DH, 15DH), mỗi ô có ô chọn **Kỳ 1–8** và gợi ý (16DH: kỳ 2, 15DH: kỳ 4).
+3. Bấm **Công bố** ngay → bị chặn: "Chưa chọn kỳ cho: Khoa Công nghệ thông tin – 16DH, …" (phải chọn đủ mọi khoa – khóa).
+4. Bấm **Điền theo gợi ý (6 ô)** (hoặc chọn kỳ từng ô) → mỗi ô ghi số môn lấy theo CTĐT (CNTT – 16DH: 9 môn, Kinh tế – 16DH: 10, Ngoại ngữ – 16DH: 12). Bên dưới hiện mỗi khung một khối.
+5. Ý để nói: CTĐT theo **ngành – khóa** (8 học kỳ) là gốc; Phòng Đào tạo chọn kỳ cho từng khoa – khóa, đổi kỳ được khi khung chưa có lớp. Môn của khung xem / sửa ở trang **Chương trình khung**.
 
-## D. Xếp lịch → xem trước → công bố (5 phút) — `acad.test`
+## D. Lớp, giảng viên, lịch → công bố → mở đăng ký (6 phút) — `acad.test`
 
-1. Trang **Đăng ký học phần** (đến từ bước C4): hai lớp ghi **"Chưa xếp lịch"**. Lớp `TOAN103.262.02` → **Sửa giảng viên / lịch**, tuần 1–15:
-   - Chọn **Thứ Hai tiết 1–4**, phòng **A101** → ô giảng viên: `GV0001` hiện "— TRÙNG LỊCH", không chọn được (đang dạy `INT102.262.01` Thứ Hai tiết 1–4).
-   - Chọn **Thứ Hai tiết 1–3**, phòng **B101**, giảng viên `GV0001` → **Lưu** → bị chặn "Phòng B101 đã có lớp ACC201.262.01 (Thứ Hai tiết 1–3…)".
-   - Chọn **Thứ Bảy tiết 1–4**, phòng **A101** → giảng viên giữ nguyên `GV0001` → **Lưu lớp học phần**.
-   - Lớp `TOAN104.262.02`: **Thứ Bảy tiết 6–9**, phòng **A101**, `GV0008` → lưu.
-2. Bấm **Công bố** ngay → bị chặn "Cần thông báo danh sách học phần để sinh viên xem trước". (Còn lớp chưa xếp lịch thì **Thông báo xem trước** cũng bị chặn và nêu mã lớp.)
-3. Bấm **Thông báo xem trước** → đợt ghi "Đã thông báo – chỉ xem trước"; 50 sinh viên CNTT khóa 16DH nhận thông báo.
-4. (Cửa sổ thứ hai) `2601030001` → chuông thông báo **"Xem trước học phần: …"** → **Xem chi tiết** mở đúng đợt: thấy lớp, giảng viên, lịch, phòng, **"Bắt đầu học: 30/01/2027"**, nhưng chưa đăng ký được.
-5. Quay lại `acad.test` → **Công bố** → sinh viên bấm **Làm mới**: "Chờ đến giờ mở đăng ký", khung đếm ngược **"Mở đăng ký sau"**. Bấm **Mở ngay (sớm hơn lịch)** → đợt mở luôn, giữ nguyên hạn đóng.
+1. Khối **Khoa Công nghệ thông tin – Khóa 16DH** → **Lớp & giảng viên**: mỗi môn có **Số lớp**, **Sĩ số**, **giảng viên từng lớp** (chỉ giảng viên khoa CNTT, kèm số tiết đã nhận / định mức). Để demo gọn: **Số lớp = 0** cho mọi môn trừ **TOAN103** (1 lớp, `GV0001` Nguyễn Văn An) và **TOAN104** (1 lớp, `GV0008` Bùi Văn Khánh) → **Mở lớp** → `TOAN103.262.02`, `TOAN104.262.02` ghi "Chưa xếp lịch".
+2. Lớp `TOAN103.262.02` → **Sửa giảng viên / lịch**, tuần 1–15:
+   - **Thứ Hai tiết 1–4**, phòng **A101** → `GV0001` hiện "— TRÙNG LỊCH" (đang dạy `INT102.262.01` Thứ Hai tiết 1–4).
+   - **Thứ Hai tiết 1–3**, phòng **B101**, `GV0001` → **Lưu** → bị chặn "Phòng B101 đã có lớp ACC201.262.01 (Thứ Hai tiết 1–3…)".
+   - **Thứ Bảy tiết 1–4**, phòng **A101** → giữ `GV0001` → **Lưu lớp học phần**. Lớp `TOAN104.262.02`: **Thứ Bảy tiết 6–9**, phòng **A101**.
+3. Bấm **Công bố** → bị chặn: "Khung chưa có lớp nào: Khoa Công nghệ thông tin – 15DH, Khoa Kinh tế – 16DH, …".
+4. 5 khung còn lại: mỗi khung **Lớp & giảng viên** 1 lớp (giảng viên gợi ý của khoa), rồi xếp lịch **Thứ Bảy tiết 1–4**, mỗi lớp một phòng **A103 → A107** (để kịp giờ, có thể làm sẵn phần này trước buổi demo).
+5. **Công bố** → thẻ đợt "Đã công bố – chờ giờ mở"; sinh viên mọi khoa – khóa nhận thông báo, thấy lớp nhưng **chưa có nút đăng ký**.
+6. (Cửa sổ thứ hai) `2601030001` → **Đăng ký học phần** → chọn đợt "… theo chương trình khung": "Chờ đến giờ mở đăng ký", khung đếm ngược **"Mở đăng ký sau"**; chỉ thấy lớp của khung CNTT – 16DH (`TOAN103.262.02`, `TOAN104.262.02`), không thấy lớp khoa khác / 15DH.
+7. `acad.test` → **Mở đăng ký ngay** → sinh viên bấm **Làm mới**: hiện nút **Đăng ký lớp này**.
 
-Ý để nói: lớp mở trong đợt **không sửa chương trình khung**; lớp bỏ khỏi đợt chuyển sang "Đã hủy" để giữ lịch sử. Sinh viên khác khoa hoặc khác khóa không thấy đợt này.
+Ý để nói: lớp mở trong đợt **không sửa chương trình khung**; lớp bỏ khỏi đợt chuyển "Đã hủy" để giữ lịch sử. Sinh viên thấy lớp khung khoa – khóa mình và lớp **học bù** (môn kỳ trước chưa học / chưa đạt, nhãn "Học bù"); môn đã đạt không hiện.
 
 ## E. Sinh viên đăng ký học phần (4 phút) — `2601030001`
 
-1. **Đăng ký học phần**: trang mặc định mở đợt vòng 1 (luồng cũ, mở sớm hơn) → ở ô chọn đợt dưới tên đợt chọn "Đăng ký Học kỳ 2 2026-2027 — CNTT 16DH" (hoặc bấm từ thông báo): **Đang mở đăng ký**, khung **11–24 tín chỉ**, "Hạn đóng đợt" đếm ngược.
+1. **Đăng ký học phần**: trang mặc định mở đợt vòng 1 (luồng cũ, mở sớm hơn) → ở ô chọn đợt dưới tên đợt chọn "Đăng ký HK2 2026–2027 theo chương trình khung" (hoặc bấm từ thông báo): **Đang mở đăng ký**, khung **11–24 tín chỉ**, "Hạn đóng đợt" đếm ngược.
 2. Lớp `TOAN103.262.02` → **Đăng ký lớp này** → "Đã đăng ký lớp TOAN103.262.02 – Xác suất thống kê."
 3. Chọn đợt **vòng 1** → lớp `INT102.262.01` **không đăng ký được**: "Thiếu học phần tiên quyết: Nhập môn lập trình (INT101)" — sinh viên đang học INT101 ở HK1, chưa có điểm.
 4. **Kết quả đăng ký** (`/student/ket-qua-dang-ky`): danh sách, ngày bắt đầu học, **Tải phiếu PDF**, **In phiếu**.

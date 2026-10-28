@@ -14,7 +14,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * Chương trình khung của một khoa cho một khóa trong một học kỳ: các học phần dự kiến mở và số lớp.
+ * Chương trình khung của một khoa cho một khóa trong một học kỳ: các học phần dự kiến mở và số lớp. `planned_term`: kỳ
+ * CTĐT Phòng Đào tạo chọn (trống = học kỳ thứ n của khóa).
  * Phạm vi dữ liệu theo quyền CLS: DEAN xem khung của khoa mình (FACULTY).
  */
 class TrainingFramework extends StandardModel implements HasDataScope
@@ -23,7 +24,7 @@ class TrainingFramework extends StandardModel implements HasDataScope
 
     protected function casts(): array
     {
-        return ['notified_at' => 'immutable_datetime'];
+        return ['notified_at' => 'immutable_datetime', 'planned_term' => 'integer'];
     }
 
     public function faculty(): BelongsTo

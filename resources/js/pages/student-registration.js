@@ -259,6 +259,8 @@ export default function studentRegistration(root) {
                         el('span', { class: 'px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-label-sm font-semibold' }, `${section.subject.credits} tín chỉ`),
                         el('span', { class: 'px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant text-label-sm' }, section.compulsory ? 'Bắt buộc' : 'Tự chọn'),
                         section.planned_term ? el('span', { class: 'px-2 py-0.5 rounded-full bg-blue-50 text-blue-800 text-label-sm' }, `HK ${section.planned_term} theo CTĐT`) : null,
+                        // Đợt theo khung: môn kỳ trước chưa học / chưa đạt
+                        section.backlog ? el('span', { class: 'px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-label-sm font-semibold' }, 'Học bù') : null,
                         mine ? el('span', { class: 'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-blue-50 text-primary border border-primary/30 text-label-sm font-semibold' }, icon('check_circle', 'text-[14px]'), mine.status_label) : null,
                         section.status !== 'registration_open' ? el('span', { class: 'px-2 py-0.5 rounded-full bg-slate-100 text-secondary text-label-sm' }, section.status_label) : null,
                     ),

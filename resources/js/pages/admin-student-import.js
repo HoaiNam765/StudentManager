@@ -157,7 +157,7 @@ export default function adminStudentImport(root) {
 
         try {
             const result = await withBusy(button, async () => wait(await api.post(tpl(page.api.save, b.id), { mode: 'all_valid' })));
-            toast(`Đã lưu ${result.saved_rows ?? 0} hồ sơ sinh viên.`, 'success');
+            toast(`Đã lưu ${result.saved_rows ?? 0} ${page.noun ?? 'hồ sơ sinh viên'}.`, 'success');
             await Promise.all([showBatch(result), loadHistory()]);
         } catch (error) {
             showAlert(region('alert'), error);

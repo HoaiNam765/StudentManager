@@ -8,6 +8,7 @@ use App\Modules\Auth\Enums\DataScope;
 use App\Modules\Auth\Enums\PermissionAction;
 use App\Modules\Auth\Services\AccessControl;
 use App\Modules\Faculty\Services\FacultyAccess;
+use App\Modules\Teacher\Contracts\TeachingAssignments;
 use App\Modules\Teacher\Enums\LecturerStatus;
 use App\Modules\Teacher\Http\Requests\LecturerProfileRequest;
 use App\Modules\Teacher\Http\Requests\LecturerRequest;
@@ -39,13 +40,19 @@ class LecturerController extends Controller
         private readonly LecturerService $lecturers,
         private readonly LecturerProfileService $profiles,
         private readonly AccessControl $access,
+        private readonly TeachingAssignments $assignments,
     ) {}
 
     public function index(Request $request): JsonResponse
     {
-        $list = $this->access->constrain($this->listQuery($request), $request->user(), 'TCH', PermissionAction::View)->paginate(50);
+        $perPage = min(max($request->integer('per_page', 50), 1), 100);
+        $list = $this->access->constrain($this->listQuery($request), $request->user(), 'TCH', PermissionAction::View)->paginate($perPage);
+        // ?term_id=: số lớp và số tiết được phân công trong học kỳ (cột "Lớp HP", "Giờ chuẩn / thực" của trang giảng viên)
+        $loads = $request->filled('term_id') ? $this->assignments->termLoads($list->pluck('id')->all(), $request->integer('term_id')) : null;
+        $limit = (int) config('studentmanager.course_section.max_periods_per_term', 400);
 
-        return response()->json($list->through(fn (Lecturer $lecturer) => $this->present($lecturer, $request->user())));
+        return response()->json($list->through(fn (Lecturer $lecturer) => $this->present($lecturer, $request->user())
+            + ($loads === null ? [] : ['load' => ($loads[$lecturer->id] ?? ['sections' => 0, 'periods' => 0]) + ['limit' => $limit]])));
     }
 
     public function show(Request $request, Lecturer $lecturer): JsonResponse

@@ -12,4 +12,9 @@ class NoTeachingAssignments implements TeachingAssignments
     {
         return [];
     }
+
+    public function termLoads(array $lecturerIds, int $termId): array
+    {
+        return [];
+    }
 }

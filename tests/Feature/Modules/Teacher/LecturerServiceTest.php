@@ -184,6 +184,11 @@ class LecturerServiceTest extends TestCase
             {
                 return ['INT201.01 – Cấu trúc dữ liệu', 'INT201.02 – Cấu trúc dữ liệu', 'INT303.01 – Phát triển ứng dụng web'];
             }
+
+            public function termLoads(array $lecturerIds, int $termId): array
+            {
+                return [];
+            }
         });
         $service = app(LecturerService::class);
 

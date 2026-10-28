@@ -48,6 +48,7 @@ class PortalMenu
                 ['Xếp thời khóa biểu', 'calendar_month', 'admin.pages.timetable', 'TTB.view'],
                 ['Năm học & Lịch học vụ', 'calendar_month', 'admin.pages.academic-years', 'ACY.view,ALL'],
                 ['Học phần', 'menu_book', 'admin.pages.subjects', 'SUB.view'],
+                ['Giảng viên', 'co_present', 'admin.pages.lecturers', 'TCH.view'],
                 ['Sinh viên', 'school', 'admin.pages.students', 'STU.view'],
                 ['Khóa & Lớp hành chính', 'diversity_3', 'admin.pages.admin-classes', 'CLS.view'],
                 ['Chương trình khung', 'account_tree', 'admin.pages.training-frameworks', 'CLS.view'],

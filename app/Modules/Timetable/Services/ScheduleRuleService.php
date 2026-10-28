@@ -22,7 +22,8 @@ use Closure;
  *
  * - Chỉ xếp khi lớp còn Dự kiến / Mở đăng ký / Đóng đăng ký; lớp đã học thì điều chỉnh từng buổi (FR-TTB-007, P2).
  * - Tiết phải có trong khung tiết của cơ sở, cùng một ca (không vắt qua giờ nghỉ trưa) và kết thúc không muộn hơn
- *   `studentmanager.timetable.latest_end` (BR-TTB-03).
+ *   `studentmanager.timetable.latest_end` (BR-TTB-03). Lớp thực hành học tối thiểu
+ *   `studentmanager.timetable.practice_min_periods` tiết mỗi buổi.
  * - Các buổi nằm trong học kỳ (tuần ≤ số tuần, ngày trong khoảng bắt đầu – kết thúc; BR-TTB-07).
  * - Lớp học trực tiếp phải có phòng; phòng xếp được trong cả khoảng (BR-ROM-02) và đủ sức chứa sĩ số tối đa (BR-TTB-02).
  * - Hai dòng lịch của cùng lớp không chồng nhau; trùng phòng / giảng viên / lịch sinh viên, sai loại phòng giữa các lớp
@@ -186,6 +187,15 @@ class ScheduleRuleService extends BaseService
 
         if ($from > $to) {
             $this->fail("Tiết bắt đầu ({$from}) sau tiết kết thúc ({$to}).", 'Nhập tiết bắt đầu nhỏ hơn hoặc bằng tiết kết thúc.');
+        }
+
+        $minPractice = (int) config('studentmanager.timetable.practice_min_periods', 5);
+
+        if ($section->section_type === 'practice' && $to - $from + 1 < $minPractice) {
+            $this->fail(
+                'Lớp thực hành học '.($to - $from + 1)." tiết mỗi buổi, cần tối thiểu {$minPractice} tiết.",
+                "Chọn buổi từ {$minPractice} tiết trở lên (ví dụ tiết 1–5) hoặc đổi tham số TIMETABLE_PRACTICE_MIN_PERIODS."
+            );
         }
 
         // BR-TTB-03: tiết có trong khung, cùng ca, không kết thúc muộn hơn giờ quy định

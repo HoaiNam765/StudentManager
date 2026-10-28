@@ -2,18 +2,24 @@
 
 namespace App\Modules\Enrollment\Services;
 
+use App\Modules\Curriculum\Models\Curriculum;
 use App\Modules\Curriculum\Models\CurriculumSubject;
 use App\Modules\Enrollment\Contracts\AcademicRecord;
 use App\Modules\Enrollment\Models\RegistrationPeriod;
+use App\Modules\Faculty\Models\Major;
 use App\Modules\SchoolClass\Enums\SectionStatus;
 use App\Modules\SchoolClass\Models\CourseSection;
+use App\Modules\SchoolClass\Models\TrainingFramework;
 use App\Modules\SchoolClass\Services\TrainingFrameworkService;
 use App\Modules\Student\Models\Student;
 use App\Modules\Student\Services\StudentCurriculumService;
+use Illuminate\Support\Collection;
 
 /**
  * Lớp sinh viên thấy trong đợt theo chương trình khung (cả học kỳ):
- *  (a) lớp của khung đúng khoa – khóa của sinh viên;
+ *  (a) lớp của khung đúng khoa – khóa của sinh viên, môn thuộc CTĐT ngành của sinh viên (khung gom môn của mọi ngành
+ *      trong khoa; môn chỉ có ở CTĐT ngành khác thì không hiện). Môn thêm tay ngoài CTĐT của mọi ngành trong khoa vẫn hiện
+ *      cho cả khoa – khóa;
  *  (b) lớp "học bù": môn trong CTĐT của sinh viên ở kỳ trước kỳ của khung mình, chưa học hoặc học chưa đạt — lớp của bất
  *      kỳ khung nào trong đợt.
  * Môn đã đạt không hiện. Dùng chung cho danh sách lớp (AvailableSections) và quy tắc đăng ký (EnrollmentRules).
@@ -42,6 +48,7 @@ class FrameworkPeriodScope
         $passed = $this->record->passedSubjectIds($student);
         $curriculum = $this->curricula->current($student);
         $plan = $curriculum === null ? collect() : CurriculumSubject::query()->where('curriculum_id', $curriculum->id)->pluck('planned_term', 'subject_id');
+        $otherMajors = $plan->isEmpty() ? collect() : $this->otherMajorSubjects($framework, $curriculum->id)->diff($plan->keys());
         $result = [];
 
         $sections = CourseSection::query()->with('trainingFrameworkItem:id,training_framework_id')
@@ -52,7 +59,8 @@ class FrameworkPeriodScope
                 continue;
             }
 
-            $own = $section->trainingFrameworkItem?->training_framework_id === $framework->id;
+            $own = $section->trainingFrameworkItem?->training_framework_id === $framework->id
+                && ! $otherMajors->contains($section->subject_id);
             $plannedTerm = $plan->get($section->subject_id);
             $backlog = ! $own && $plannedTerm !== null && $myTerm !== null && (int) $plannedTerm < $myTerm;
 
@@ -62,5 +70,15 @@ class FrameworkPeriodScope
         }
 
         return $result;
+    }
+
+    /** Môn trong CTĐT (đang áp dụng cho khóa) của các ngành khác cùng khoa với khung. */
+    private function otherMajorSubjects(TrainingFramework $framework, int $ownCurriculumId): Collection
+    {
+        $curricula = Curriculum::query()->inForce()->forCohort($framework->cohort->start_year)
+            ->whereIn('major_id', Major::query()->where('faculty_id', $framework->faculty_id)->select('id'))
+            ->whereKeyNot($ownCurriculumId)->pluck('id');
+
+        return CurriculumSubject::query()->whereIn('curriculum_id', $curricula)->distinct()->pluck('subject_id');
     }
 }

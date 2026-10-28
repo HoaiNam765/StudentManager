@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Pages\Teacher;
 use App\Http\Controllers\Controller;
 use App\Modules\Auth\Enums\PermissionAction;
 use App\Modules\Auth\Services\AccessControl;
+use App\Modules\Enrollment\Models\Enrollment;
 use App\Modules\Grade\Enums\GradePublicationStatus;
 use App\Modules\Grade\Models\CourseResult;
+use App\Modules\Grade\Services\CourseGradeService;
 use App\Modules\Grade\Services\GradebookService;
 use App\Modules\Grade\Services\GradeWorkflowService;
 use App\Modules\SchoolClass\Enums\SectionStatus;
@@ -26,7 +28,8 @@ class GradebookPageController extends Controller
     public function __construct(
         private readonly GradebookService $gradebook,
         private readonly GradeWorkflowService $workflowService,
-        private readonly AccessControl $access
+        private readonly AccessControl $access,
+        private readonly CourseGradeService $grades,
     ) {}
 
     public function index(Request $request): View
@@ -60,9 +63,10 @@ class GradebookPageController extends Controller
                 abort_unless($this->access->allowsOn($user, 'GRD', PermissionAction::View, $selectedSection), 403, 'Bạn không có quyền xem sổ điểm lớp này.');
 
                 $workflow = $this->workflowService->current($selectedSection);
-                $gradebookData = $this->withResults($this->gradebook->gradebook($selectedSection, $user));
-
                 $statusVal = $workflow->status instanceof GradePublicationStatus ? $workflow->status->value : (string) $workflow->status;
+                // Còn nháp / bị trả lại: tính thử kết quả từ điểm đang lưu (chưa có course_results tới khi nộp)
+                $gradebookData = $this->withResults($this->gradebook->gradebook($selectedSection, $user), in_array($statusVal, ['draft', 'returned'], true));
+
                 $canEdit = in_array($statusVal, ['draft', 'returned'], true)
                     && in_array($selectedSection->status, [SectionStatus::InProgress, SectionStatus::Finished], true)
                     && $this->access->allowsOn($user, 'GRD', PermissionAction::Update, $selectedSection);
@@ -109,9 +113,25 @@ class GradebookPageController extends Controller
      * Thêm cho từng sinh viên: `student.name` (họ tên) và `final_result` (điểm hệ 10, chữ, hệ 4, đạt) — các khóa view
      * teacher/grade/gradebook đang dùng.
      */
-    private function withResults(array $book): array
+    /**
+     * Cột Tổng kết / Điểm chữ / Hệ 4 / Kết quả. Đã nộp trở đi: kết quả đã lưu (`course_results`). Còn nháp / bị trả lại
+     * (`$preview`): tính thử bằng CourseGradeService::calculate (không lưu) để giảng viên thấy ngay sau khi lưu nháp hoặc
+     * nhập Excel; thiếu thành phần bắt buộc thì để trống.
+     */
+    private function withResults(array $book, bool $preview = false): array
     {
-        $results = CourseResult::query()->whereIn('enrollment_id', collect($book['students'])->pluck('enrollment_id'))->get()->keyBy('enrollment_id');
+        $ids = collect($book['students'])->pluck('enrollment_id');
+        $results = $preview
+            ? Enrollment::query()->with('student', 'section.subject')->whereIn('id', $ids)->get()->mapWithKeys(function (Enrollment $enrollment): array {
+                try {
+                    $r = $this->grades->calculate($enrollment);
+                } catch (BusinessRuleException) {
+                    return [$enrollment->id => null]; // cơ cấu điểm / thang quy đổi chưa hợp lệ: chưa tính được
+                }
+
+                return [$enrollment->id => $r['status'] === 'incomplete' ? null : (object) ['score10' => $r['score10'], 'letter' => $r['letter'], 'point4' => $r['point4'], 'is_passed' => $r['is_passed']]];
+            })
+            : CourseResult::query()->whereIn('enrollment_id', $ids)->get()->keyBy('enrollment_id');
 
         $book['students'] = collect($book['students'])->map(function (array $row) use ($results): array {
             $result = $results->get($row['enrollment_id']);

@@ -157,6 +157,26 @@ class GradebookSpreadsheetTest extends TestCase
         $this->assertNull($this->score(2, 0));
     }
 
+    public function test_trang_nhap_diem_tinh_thu_ket_qua_khi_con_nhap(): void
+    {
+        $n = count($this->components);
+        $this->import($this->workbook([
+            ['269901', array_fill(0, $n, 8)],
+            ['269902', [null, ...array_fill(0, $n - 1, 8)]],
+        ]))->assertOk();
+
+        $students = collect($this->get(route('teacher.pages.gradebook', ['course_section_id' => $this->section->id]))
+            ->assertOk()->viewData('gradebookData')['students'])->keyBy('enrollment_id');
+
+        // Đủ điểm: tính ngay dù chưa nộp (8 mọi thành phần → 8.0); thiếu thành phần thì để trống
+        $full = $students[$this->enrollments[0]->id]['final_result'];
+        $this->assertEquals(8.0, $full['score_10']);
+        $this->assertNotNull($full['letter']);
+        $this->assertTrue($full['passed']);
+        $partial = $students[$this->enrollments[1]->id]['final_result'];
+        $this->assertTrue($partial === null || $partial['score_10'] === null);
+    }
+
     public function test_file_loi_bao_theo_dong_va_khong_luu_gi(): void
     {
         $n = count($this->components);

@@ -7,6 +7,7 @@ use App\Modules\AcademicYear\Models\Term;
 use App\Modules\Curriculum\Models\Curriculum;
 use App\Modules\Curriculum\Models\CurriculumSubject;
 use App\Modules\Enrollment\Contracts\AcademicRecord;
+use App\Modules\Enrollment\Models\Enrollment;
 use App\Modules\Enrollment\Models\RegistrationPeriod;
 use App\Modules\Enrollment\Services\AvailableSections;
 use App\Modules\Enrollment\Services\EnrollmentRules;
@@ -227,6 +228,16 @@ class TermRegistrationMatrixTest extends TestCase
         // Gọi thẳng đăng ký lớp ngoài phạm vi bị từ chối kèm lý do
         $reasons = app(EnrollmentRules::class)->check($this->cntt26, CourseSection::findOrFail($other), $period);
         $this->assertTrue(collect($reasons)->contains(fn ($r) => str_contains($r, 'không dành cho khoa – khóa')));
+
+        // Đang học môn đó ở học kỳ khác (đăng ký còn hiệu lực, chưa có kết quả) thì không phải học bù; rút học phần thì lại là nợ
+        $otherTerm = Term::query()->whereKeyNot($this->term->id)->orderBy('start_date')->firstOrFail();
+        $studying = Enrollment::create([
+            'student_id' => $this->cntt26->id, 'course_section_id' => $own, 'term_id' => $otherTerm->id,
+            'subject_id' => $backlogSubject, 'status' => 'confirmed', 'registered_at' => now(),
+        ]);
+        $this->assertFalse(collect(app(AvailableSections::class)->listFor($this->cntt26, $period))->pluck('id')->contains($backlog), 'Môn đang học không hiện là học bù');
+        $studying->update(['status' => 'withdrawn']);
+        $this->assertTrue(collect(app(AvailableSections::class)->listFor($this->cntt26, $period))->pluck('id')->contains($backlog));
 
         $ktRows = collect(app(AvailableSections::class)->listFor($this->kt26, $period))->pluck('id');
         $this->assertTrue($ktRows->contains($other));

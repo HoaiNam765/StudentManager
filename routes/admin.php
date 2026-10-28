@@ -9,6 +9,7 @@ use App\Http\Controllers\Pages\Admin\GradeAdminActionController;
 use App\Http\Controllers\Pages\Admin\GradeAdminDetailController;
 use App\Http\Controllers\Pages\Admin\GradeAdminPageController;
 use App\Http\Controllers\Pages\Admin\GradeChangePageController;
+use App\Http\Controllers\Pages\Admin\LecturerPageController;
 use App\Http\Controllers\Pages\Admin\MakeupPageController;
 use App\Http\Controllers\Pages\Admin\StudentPageController;
 use App\Http\Controllers\Pages\Admin\SubjectPageController;
@@ -94,6 +95,8 @@ Route::middleware('auth')->group(function (): void {
     Route::get('lop-hoc-phan', [CourseSectionPageController::class, 'index'])->middleware('permission:CLS.view')->name('pages.course-sections');
     Route::get('lop-hoc-phan/{courseSection}', [CourseSectionDetailPageController::class, 'show'])->whereNumber('courseSection')->middleware('permission:CLS.view')->name('pages.course-sections.show');
     // Quản lý sinh viên (FE #16) và khóa – lớp hành chính (FE #15): trang HTML, dữ liệu do JavaScript gọi API STU / CLS / SYS
+    Route::get('giang-vien', [LecturerPageController::class, 'index'])->middleware('permission:TCH.view')->name('pages.lecturers');
+    Route::get('giang-vien/nhap-file', [LecturerPageController::class, 'import'])->middleware('permission:SYS.view')->name('pages.lecturers.import');
     Route::get('sinh-vien', [StudentPageController::class, 'index'])->middleware('permission:STU.view')->name('pages.students');
     Route::get('sinh-vien/them', [StudentPageController::class, 'create'])->middleware('permission:STU.create')->name('pages.students.create');
     Route::get('sinh-vien/nhap-file', [StudentPageController::class, 'import'])->middleware('permission:SYS.view')->name('pages.students.import');

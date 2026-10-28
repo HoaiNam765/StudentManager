@@ -1,4 +1,4 @@
-@extends('layouts.admin-original')
+@extends('layouts.portal')
 
 @section('title', 'Quản lý Điểm & Duyệt công bố - Quản lý Đào tạo')
 @section('page-title', 'Quản lý Điểm học phần')

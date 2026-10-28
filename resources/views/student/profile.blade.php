@@ -1,6 +1,7 @@
-@extends('layouts.student-original')
-@section('student-title', 'Hồ sơ cá nhân và Yêu cầu chỉnh sửa')
-@section('student-content')
+@extends('layouts.portal')
+@section('title', 'Hồ sơ cá nhân và Yêu cầu chỉnh sửa - Cổng Sinh viên')
+@section('page-title', 'Hồ sơ cá nhân và Yêu cầu chỉnh sửa')
+@section('page')
 
 <!-- 1. PROFILE HEADER CARD (Banner thông tin đầu trang) -->
 <section class="bg-surface-container-lowest rounded-xl border border-slate-200 p-6 shadow-sm">

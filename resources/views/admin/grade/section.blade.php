@@ -1,4 +1,4 @@
-@extends('layouts.admin-original')
+@extends('layouts.portal')
 @section('title', 'Chi tiết sổ điểm lớp học phần')
 @section('page-title', 'Chi tiết sổ điểm')
 @section('page')

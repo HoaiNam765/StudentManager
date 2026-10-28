@@ -22,10 +22,11 @@
         ->map(fn ($word) => mb_strtoupper(mb_substr($word, 0, 1)))->implode('');
 
     $accountLinks = [
-        ['route' => 'notifications.page', 'icon' => 'notifications', 'label' => 'Thông báo'],
-        ['route' => 'account.settings', 'icon' => 'manage_accounts', 'label' => 'Thông tin tài khoản'],
-        ['route' => 'password.change', 'icon' => 'lock_reset', 'label' => 'Đổi mật khẩu'],
-        ['route' => 'account.sessions', 'icon' => 'devices', 'label' => 'Phiên đăng nhập'],
+        ['route' => 'notifications.page', 'icon' => 'notifications', 'label' => 'Thông báo', 'active' => 'notifications.page'],
+        ['route' => 'account.settings', 'icon' => 'manage_accounts', 'label' => 'Thông tin tài khoản', 'active' => 'account.settings'],
+        ['route' => 'account.notifications', 'icon' => 'notifications_active', 'label' => 'Tùy chọn thông báo', 'active' => 'account.notifications'],
+        ['route' => 'password.change', 'icon' => 'lock_reset', 'label' => 'Đổi mật khẩu', 'active' => 'password.*'],
+        ['route' => 'account.sessions', 'icon' => 'devices', 'label' => 'Phiên đăng nhập', 'active' => 'account.sessions'],
     ];
 @endphp
 <div class="flex min-h-screen">
@@ -58,8 +59,11 @@
                 <div class="space-y-0.5">
                     <div class="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-on-surface-variant">Tài khoản</div>
                     @foreach ($accountLinks as $link)
-                        <a href="{{ route($link['route']) }}" class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg px-3 py-2 flex items-center gap-3 text-sm transition-colors">
-                            <span class="material-symbols-outlined text-[20px]" aria-hidden="true">{{ $link['icon'] }}</span>
+                        @continue (! Route::has($link['route']))
+                        @php($linkActive = request()->routeIs($link['active']))
+                        <a href="{{ route($link['route']) }}" @if ($linkActive) aria-current="page" @endif
+                           class="{{ $linkActive ? 'bg-secondary-container text-primary font-semibold border-l-4 border-primary' : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low' }} rounded-lg px-3 py-2 flex items-center gap-3 text-sm transition-colors">
+                            <span class="material-symbols-outlined text-[20px] {{ $linkActive ? 'fill' : '' }}" aria-hidden="true">{{ $link['icon'] }}</span>
                             <span class="truncate">{{ $link['label'] }}</span>
                         </a>
                     @endforeach

@@ -1,4 +1,4 @@
-@extends('layouts.admin-original')
+@extends('layouts.portal')
 @section('title', 'Tra cứu GPA sinh viên')
 @section('page-title', 'Tra cứu GPA')
 @section('page')

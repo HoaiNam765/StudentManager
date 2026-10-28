@@ -1,6 +1,7 @@
-@extends('layouts.student-original')
-@section('student-title', 'Chương trình đào tạo')
-@section('student-content')
+@extends('layouts.portal')
+@section('title', 'Chương trình đào tạo - Cổng Sinh viên')
+@section('page-title', 'Chương trình đào tạo')
+@section('page')
 
 <div class="flex flex-col gap-6">
 <!-- SECTION 1: BANNER TỔNG QUAN CHƯƠNG TRÌNH & THẺ TIẾN ĐỘ TÍCH LŨY -->

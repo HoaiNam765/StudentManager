@@ -540,6 +540,8 @@ Route::middleware('auth')->group(function (): void {
         Route::post('offerings', [$controller, 'store'])->middleware(['permission:ENR.update,ALL', 'permission:CLS.create,ALL', 'permission:TTB.create,ALL'])->name('offerings.store');
         Route::put('offerings/{courseSection}', [$controller, 'update'])->middleware(['permission:ENR.update,ALL', 'permission:CLS.update,ALL', 'permission:TTB.update,ALL'])->name('offerings.update');
         Route::delete('offerings/{courseSection}', [$controller, 'destroy'])->middleware(['permission:ENR.update,ALL', 'permission:CLS.update,ALL'])->name('offerings.destroy');
+        Route::post('offerings/auto-schedule', [$controller, 'autoSchedule'])->middleware(['permission:ENR.update,ALL', 'permission:CLS.update,ALL', 'permission:TTB.create,ALL'])->name('offerings.auto-schedule');
+        Route::post('offerings/suggest-slot', [$controller, 'suggestSlot'])->middleware('permission:ENR.view,ALL')->name('offerings.suggest-slot');
         Route::post('offerings/delete-many', [$controller, 'destroyMany'])->middleware(['permission:ENR.update,ALL', 'permission:CLS.update,ALL'])->name('offerings.destroy-many');
         Route::post('announce', [$controller, 'announce'])->middleware(['permission:ENR.update,ALL', 'permission:NOT.create'])->name('announce');
         // Bảng Khoa × Khóa của đợt theo khung: chọn kỳ CTĐT từng ô, bỏ khung, mở lớp + giảng viên cho môn của khung

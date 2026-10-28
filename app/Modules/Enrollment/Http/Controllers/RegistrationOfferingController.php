@@ -158,6 +158,33 @@ class RegistrationOfferingController extends Controller
         return response()->json(['deleted' => true]);
     }
 
+    /** Tự xếp lịch + giảng viên cho các lớp chưa có lịch của đợt, hoặc của một khung (`framework_id`). */
+    public function autoSchedule(Request $request, RegistrationPeriod $registrationPeriod): JsonResponse
+    {
+        $data = $request->validate(['framework_id' => ['nullable', 'integer', 'exists:training_frameworks,id']], [], ['framework_id' => 'khoa – khóa']);
+        $framework = isset($data['framework_id']) ? TrainingFramework::query()->findOrFail($data['framework_id']) : null;
+
+        return response()->json($this->offerings->autoSchedule($registrationPeriod, $framework));
+    }
+
+    /** Gợi ý thứ, tiết, phòng, giảng viên còn trống cho hộp thoại Sửa lớp. */
+    public function suggestSlot(Request $request, RegistrationPeriod $registrationPeriod): JsonResponse
+    {
+        $data = $request->validate([
+            'framework_id' => ['required', 'integer', 'exists:training_frameworks,id'],
+            'section_type' => ['required', Rule::in(['theory', 'practice', 'mixed'])],
+            'max_size' => ['required', 'integer', 'min:1'],
+            'length' => ['required', 'integer', 'min:1', 'max:6'],
+            'week_from' => ['required', 'integer', 'min:1'],
+            'week_to' => ['required', 'integer', 'gte:week_from'],
+            'lecturer_id' => ['nullable', 'integer', 'exists:lecturers,id'],
+            'ignore_section_id' => ['nullable', 'integer'],
+        ]);
+        $framework = TrainingFramework::query()->findOrFail($data['framework_id']);
+
+        return response()->json($this->offerings->suggestSlot($registrationPeriod, $framework, $data, $data['ignore_section_id'] ?? null));
+    }
+
     /** Bỏ nhiều lớp khỏi đợt một lần (trang chọn nhiều lớp rồi xóa). */
     public function destroyMany(Request $request, RegistrationPeriod $registrationPeriod): JsonResponse
     {

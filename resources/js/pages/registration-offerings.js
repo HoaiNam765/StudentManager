@@ -22,6 +22,7 @@ export async function showOfferings(container, page, period, changed) {
     const mutable = data.editable && page.can.offerings;
     const cellOf = (facultyId, cohortId) => data.cells.find((c) => c.faculty_id === facultyId && c.cohort_id === cohortId);
     const missing = data.cells.filter((c) => !c.framework_id);
+    const unscheduled = data.sections.filter((s) => !s.schedules.length).length;
     // Chọn nhiều lớp rồi bỏ khỏi đợt một lần (một yêu cầu, tải lại một lần)
     const selected = new Set();
     const checkboxes = new Map();
@@ -37,6 +38,9 @@ export async function showOfferings(container, page, period, changed) {
         el('p', { class: 'mt-1 text-xs text-on-surface-variant' }, `${data.term.name}. Chọn kỳ CTĐT cho mọi khoa – khóa đang có sinh viên (${data.cells.length - missing.length}/${data.cells.length} đã chọn). Đủ hết, mỗi khung có lớp, mọi lớp có giảng viên và lịch thì mới công bố được.`),
         alert,
         matrix(),
+        mutable && unscheduled ? el('div', { class: 'mt-4 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-outline-variant bg-surface-container-low px-3 py-2' },
+            el('p', { class: 'text-xs text-on-surface-variant' }, `${unscheduled} lớp chưa có lịch. Hệ thống chọn thứ 2–7 (ban ngày trước), phòng trống đủ chỗ, không trùng lớp khác cùng khoa – khóa, và giảng viên của khoa trống lịch, ít tiết nhất (lớp đã có giảng viên thì giữ).`),
+            button(`Tự xếp lịch & giảng viên (${unscheduled} lớp)`, (e) => autoSchedule(e), true)) : null,
         selectionBar,
         el('div', { class: 'space-y-4 mt-4' }, data.frameworks.length
             ? data.frameworks.map(frameworkBlock)
@@ -52,6 +56,20 @@ export async function showOfferings(container, page, period, changed) {
         selectionBar.hidden = selected.size === 0;
         selectionCount.textContent = `Đã chọn ${selected.size} lớp`;
         deleteSelected.textContent = `Xóa ${selected.size} lớp khỏi đợt`;
+    }
+
+    /** Tự xếp thứ, tiết, phòng trống (và giảng viên nếu lớp chưa có) cho các lớp chưa có lịch; báo lớp không xếp được. */
+    async function autoSchedule(event, fw = null) {
+        const target = event.currentTarget;
+        try {
+            const result = await withBusy(target, () => api.post(url(page.api.offeringAutoSchedule), { framework_id: fw?.id ?? null }));
+            await reload(); await changed();
+            if (result.skipped.length) {
+                showAlert(alert, `Đã xếp ${result.scheduled.length} lớp. Chưa xếp được ${result.skipped.length} lớp: ${result.skipped.map((s) => `${s.code} — ${s.reason}`).join(' ')} Xếp tay các lớp này bằng "Sửa giảng viên / lịch".`, 'warning');
+            } else {
+                toast(`Đã xếp lịch và giảng viên cho ${result.scheduled.length} lớp.`, 'success');
+            }
+        } catch (error) { showAlert(alert, error); }
     }
 
     async function removeSelected(event) {
@@ -128,6 +146,7 @@ export async function showOfferings(container, page, period, changed) {
             mutable ? el('div', { class: 'flex flex-wrap gap-2' },
                 button('Lớp & giảng viên', (e) => addClasses(e.currentTarget, fw), true),
                 button('Thêm học phần khác', () => edit(null, fw, true)),
+                own.some((s) => !s.schedules.length) ? button(`Tự xếp lịch (${own.filter((s) => !s.schedules.length).length} lớp)`, (e) => autoSchedule(e, fw)) : null,
                 own.length ? null : button('Bỏ khỏi đợt', async () => {
                     if (!await confirmDialog({ title: `Bỏ khung ${fw.faculty.name} – ${fw.cohort.code} khỏi đợt?`, message: 'Khung vẫn giữ ở trang Chương trình khung.', confirmText: 'Bỏ khỏi đợt' })) return;
                     try { await api.del(url(page.api.frameworkDetach, { __FW__: fw.id })); await reload(); await changed(); }
@@ -167,8 +186,13 @@ export async function showOfferings(container, page, period, changed) {
         try { lecturers = await withBusy(trigger, () => api.get(url(page.api.frameworkLecturers, { __FW__: fw.id }))); }
         catch (error) { showAlert(alert, error); return; }
         if (!lecturers.length) { showAlert(alert, 'Khoa chưa có giảng viên đang công tác để phân công.', 'warning'); return; }
-        const byLoad = [...lecturers].sort((a, b) => a.load - b.load);
-        let turn = 0;
+        // Gợi ý: mỗi lớp giao cho người đang ít tiết nhất, cộng cả số tiết của lớp vừa chia trong hộp thoại này
+        const planned = new Map(lecturers.map((l) => [l.id, l.load]));
+        const suggest = (subject) => {
+            const pick = [...lecturers].sort((a, b) => planned.get(a.id) - planned.get(b.id) || a.code.localeCompare(b.code))[0];
+            planned.set(pick.id, planned.get(pick.id) + (Number(subject.theory_periods ?? 0) + Number(subject.practice_periods ?? 0) || 45));
+            return String(pick.id);
+        };
         const small = 'w-20 rounded-lg border border-outline-variant bg-white px-2 py-1.5 text-sm';
         const rowsOf = fw.items.map((item) => {
             const opened = data.sections.filter((s) => s.framework_id === fw.id && s.subject.id === item.subject.id).length;
@@ -177,8 +201,11 @@ export async function showOfferings(container, page, period, changed) {
             const picks = el('div', { class: 'space-y-1' });
             const render = () => {
                 const keep = [...picks.querySelectorAll('select')].map((s) => s.value);
-                picks.replaceChildren(...Array.from({ length: Math.max(0, Number(count.value) || 0) }, (_, i) => el('select', { class: 'w-full rounded-lg border border-outline-variant bg-white px-2 py-1.5 text-sm', 'aria-label': `Giảng viên lớp ${i + 1} ${item.subject.code}` },
-                    lecturers.map((l) => el('option', { value: l.id, selected: String(l.id) === (keep[i] ?? String(byLoad[turn++ % byLoad.length].id)) }, `Lớp ${i + 1}: ${l.full_name} (${l.code}) — ${l.load}/${l.limit} tiết`)))));
+                picks.replaceChildren(...Array.from({ length: Math.max(0, Number(count.value) || 0) }, (_, i) => {
+                    const chosen = keep[i] ?? suggest(item.subject);
+                    return el('select', { class: 'w-full rounded-lg border border-outline-variant bg-white px-2 py-1.5 text-sm', 'aria-label': `Giảng viên lớp ${i + 1} ${item.subject.code}` },
+                        lecturers.map((l) => el('option', { value: l.id, selected: String(l.id) === chosen }, `Lớp ${i + 1}: ${l.full_name} (${l.code}) — ${l.load}/${l.limit} tiết`)));
+                }));
                 if (!picks.children.length) picks.append(el('span', { class: 'text-xs text-on-surface-variant' }, opened ? `Đã mở ${opened} lớp` : 'Không mở lớp'));
             };
             count.addEventListener('input', render);
@@ -194,7 +221,7 @@ export async function showOfferings(container, page, period, changed) {
         const th = (text) => el('th', { scope: 'col', class: 'px-2 py-2 text-left text-xs font-semibold text-on-surface-variant' }, text);
         const form = el('form', { class: 'space-y-4' },
             el('h3', { class: 'font-bold text-base' }, `Lớp & giảng viên — ${fw.faculty.name} · Khóa ${fw.cohort.code}`),
-            el('p', { class: 'text-xs text-on-surface-variant' }, 'Mỗi môn nhập số lớp, sĩ số và giảng viên của khoa cho từng lớp (gợi ý chia theo số tiết đang nhận, ít trước). Lịch học xếp sau ở từng lớp.'),
+            el('p', { class: 'text-xs text-on-surface-variant' }, 'Mỗi môn nhập số lớp, sĩ số và giảng viên của khoa cho từng lớp (gợi ý chia đều theo số tiết đang nhận, ít trước). Mở lớp xong bấm "Tự xếp lịch" để chọn thứ, phòng trống, hoặc xếp tay từng lớp.'),
             message,
             el('div', { class: 'overflow-x-auto rounded-lg border border-outline-variant' },
                 el('table', { class: 'w-full min-w-[640px] text-sm' },
@@ -233,6 +260,9 @@ export async function showOfferings(container, page, period, changed) {
         const message = el('div', { hidden: true });
         const lecturerHint = el('p', { class: 'text-xs text-on-surface-variant sm:col-span-2' }, 'Chọn lịch học để kiểm tra giảng viên.');
         const weekHint = el('p', { class: 'text-xs sm:col-span-2' });
+        let preferLecturer = null;
+        const suggestButton = el('button', { type: 'button', class: 'rounded-lg border border-primary px-3 py-2 text-xs font-semibold text-primary sm:col-span-2 justify-self-start', onclick: suggestSlot },
+            'Tự chọn thứ, phòng & giảng viên còn trống');
         let planError = false;
         const save = el('button', { type: 'submit', disabled: true, class: 'rounded-lg bg-primary text-white px-4 py-2 text-sm font-semibold disabled:opacity-50' }, 'Lưu lớp học phần');
         const scheduleBody = () => Object.fromEntries(['day_of_week', 'period_from', 'period_to', 'week_from', 'week_to', 'week_parity', 'room_id'].map((k) => [k, k === 'week_parity' ? fields[k].value : Number(fields[k].value)]));
@@ -250,6 +280,7 @@ export async function showOfferings(container, page, period, changed) {
                 input('week_from', 'Từ tuần của học kỳ', schedule.week_from ?? 1), input('week_to', 'Đến tuần của học kỳ', schedule.week_to ?? Math.min(15, data.term.weeks)),
                 select('week_parity', 'Tuần học', [{ value: 'all', label: 'Tất cả' }, { value: 'odd', label: 'Tuần lẻ' }, { value: 'even', label: 'Tuần chẵn' }], schedule.week_parity ?? 'all'),
                 weekHint,
+                suggestButton,
                 select('lecturer_id', 'Giảng viên trong khoa', [], null, true), lecturerHint),
             el('div', { class: 'flex justify-end gap-2' }, button('Đóng', () => dialog.close()), save));
         const dialog = el('dialog', { class: 'm-auto w-[min(94vw,720px)] max-h-[90vh] overflow-y-auto rounded-xl border border-outline-variant bg-white p-5 shadow-xl backdrop:bg-black/40' }, form);
@@ -298,10 +329,29 @@ export async function showOfferings(container, page, period, changed) {
             weekHint.textContent = plan;
             save.disabled = !fields.lecturer_id.value;
         }
+        /** Giữ số tiết mỗi buổi, tuần và giảng viên đang chọn; hệ thống chọn thứ, tiết bắt đầu, phòng (và giảng viên nếu chưa chọn). */
+        async function suggestSlot() {
+            showAlert(message, null);
+            const length = Number(fields.period_to.value) - Number(fields.period_from.value) + 1;
+            const body = {
+                framework_id: fw.id, section_type: fields.section_type.value, max_size: Number(fields.max_size.value),
+                length: length > 0 ? length : 3, week_from: Number(fields.week_from.value), week_to: Number(fields.week_to.value),
+                lecturer_id: fields.lecturer_id.value ? Number(fields.lecturer_id.value) : null, ignore_section_id: section?.id ?? null,
+            };
+            try {
+                const slot = await withBusy(suggestButton, () => api.post(url(page.api.offeringSuggestSlot), body));
+                ['day_of_week', 'period_from', 'period_to', 'room_id', 'week_from', 'week_to'].forEach((k) => { fields[k].value = slot[k]; });
+                fields.week_parity.value = slot.week_parity;
+                preferLecturer = slot.lecturer_id;
+                planWeeks(false);
+                await refreshLecturers();
+            } catch (error) { showAlert(message, error); }
+        }
         let requestNumber = 0;
         async function refreshLecturers() {
             const version = ++requestNumber;
-            const current = fields.lecturer_id.value || section?.lecturer?.id;
+            const current = preferLecturer ?? (fields.lecturer_id.value || section?.lecturer?.id);
+            preferLecturer = null;
             save.disabled = true; fields.lecturer_id.disabled = true;
             lecturerHint.textContent = 'Đang kiểm tra lịch giảng viên…';
             try {

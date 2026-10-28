@@ -163,6 +163,7 @@
                 </div>
                 <div class="hidden lg:block h-5 w-px bg-outline-variant/60"></div>
                 <div class="flex items-center gap-1">
+                    @include('partials.theme-toggle')
                     <button title="Thông báo học vụ" aria-label="Thông báo học vụ" class="relative p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg transition-colors">
                         <span class="material-symbols-outlined text-[20px]">notifications</span>
                         <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-error ring-2 ring-surface-container-lowest"></span>

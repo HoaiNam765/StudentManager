@@ -99,6 +99,7 @@
                 </nav>
             </div>
             <div class="flex items-center gap-2 shrink-0">
+                @include('partials.theme-toggle')
                 @if (Route::has('notifications.page') && app(\App\Modules\Auth\Services\AccessControl::class)->allows($currentUser, 'NOT', \App\Modules\Auth\Enums\PermissionAction::View))
                     {{-- Chuông thông báo (FR-NOT-001): số chưa đọc do resources/js/notification-bell.js hỏi định kỳ --}}
                     <a href="{{ route('notifications.page') }}" class="relative p-2 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-low"

@@ -253,6 +253,33 @@ class RegistrationOfferingService extends BaseService
         });
     }
 
+    /**
+     * Bỏ nhiều lớp khỏi đợt nháp trong một giao dịch: lớp nào không thuộc đợt hoặc hủy không được thì không bỏ lớp nào.
+     *
+     * @param  list<int>  $sectionIds
+     * @return int số lớp đã bỏ
+     */
+    public function deleteMany(RegistrationPeriod $period, array $sectionIds): int
+    {
+        return $this->transaction(function () use ($period, $sectionIds): int {
+            $period = RegistrationPeriod::query()->lockForUpdate()->findOrFail($period->id);
+            $this->assertDraft($period);
+            $sections = CourseSection::query()->whereIn('id', $sectionIds)->lockForUpdate()->orderBy('code')->get();
+            $foreign = $sections->filter(fn (CourseSection $s) => $s->registration_period_id !== $period->id);
+
+            if ($sections->count() !== count(array_unique($sectionIds)) || $foreign->isNotEmpty()) {
+                $this->fail(
+                    'Có lớp không thuộc đợt '.$period->name.($foreign->isNotEmpty() ? ' ('.$foreign->pluck('code')->implode(', ').')' : '').'.',
+                    'Tải lại trang rồi chọn lại các lớp của đợt này.'
+                );
+            }
+
+            $sections->each(fn (CourseSection $section) => $this->sections->cancel($section, 'Bỏ học phần khỏi kế hoạch đăng ký trước công bố'));
+
+            return $sections->count();
+        });
+    }
+
     /** Thông báo xem trước (đợt nháp): sinh viên các khoa – khóa của đợt xem được lớp, chưa đăng ký. */
     public function announce(RegistrationPeriod $period, User $actor): RegistrationPeriod
     {

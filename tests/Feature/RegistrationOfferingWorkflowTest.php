@@ -203,6 +203,26 @@ class RegistrationOfferingWorkflowTest extends TestCase
         $this->actingAs($this->acad)->get(route('admin.pages.enrollment'))->assertOk();
     }
 
+    public function test_delete_many_offerings_in_one_request_all_or_nothing(): void
+    {
+        $item = $this->framework->items()->firstOrFail();
+        $lecturers = Lecturer::whereHas('department', fn ($q) => $q->where('faculty_id', $this->framework->faculty_id))->orderBy('code')->take(2)->get();
+        $classes = route('admin.registration-periods.frameworks.classes', ['registrationPeriod' => $this->period, 'trainingFramework' => $this->framework]);
+        $this->postJson($classes, ['classes' => $lecturers->map(fn ($l) => ['item_id' => $item->id, 'lecturer_id' => $l->id])->all()])->assertCreated();
+        $ids = $this->period->sections()->pluck('id')->all();
+        $this->assertCount(2, $ids);
+
+        $this->actingAs($this->studentUser)->postJson($this->endpoint('offerings.destroy-many'), ['section_ids' => $ids])->assertForbidden();
+        $this->actingAs($this->acad);
+        // Có lớp không thuộc đợt: không bỏ lớp nào
+        $this->postJson($this->endpoint('offerings.destroy-many'), ['section_ids' => [...$ids, 999999]])->assertUnprocessable();
+        $this->getJson($this->endpoint('offerings.index'))->assertOk()->assertJsonCount(2, 'sections');
+
+        $this->postJson($this->endpoint('offerings.destroy-many'), ['section_ids' => $ids])->assertOk()->assertJsonPath('deleted', 2);
+        $this->getJson($this->endpoint('offerings.index'))->assertOk()->assertJsonCount(0, 'sections');
+        $this->assertSame(1, $this->framework->items()->count());
+    }
+
     public function test_scheduled_open_uses_server_time_and_passed_subject_cannot_bypass_with_improve(): void
     {
         $record = $this->mock(AcademicRecord::class);

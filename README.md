@@ -312,5 +312,5 @@ StudentManager/
 ## Tác giả
 
 - GitHub: [@HoaiNam765](https://github.com/HoaiNam765)
-- Nhóm thực hiện: *[Họ tên — MSSV — Lớp]*
-- Giảng viên hướng dẫn: *[Họ tên]*
+- Nhóm thực hiện: *Nhóm 12*
+- Giảng viên hướng dẫn: *Nguyễn Minh Hiến*
